@@ -1,6 +1,7 @@
 .container {
     min-height: 100vh;
     height: auto;
+    background-color: #48d4cd;
 }
 
 .justified {
@@ -8,17 +9,34 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 60px;
 }
 
 .button {
-    margin-top: 10px;
+    margin-top: 50px;
     text-align: center;
+    border-radius: 20px;
+    padding: 15px;
+    font-family: cursive;
+}
+
+.button:hover{
+    transform: translateY(-5px);
+    background-color: rgb(245, 142, 105);
+    color: white;    
 }
 
 .team-name {
     margin-top: 0.25em;
     margin-bottom: 0.25em;
-    color: green;
+    color: rgb(255, 255, 255);
+    font-family: cursive;
+    font-size: medium;
+}
+
+span{
+    color: rgb(255, 255, 255);
+    font-family: cursive;
 }
 
 .header-item {
@@ -28,17 +46,19 @@
 
 .footer-item {
     text-align: center;
+    color: white;
 }
 
-.footer-item p :nth-child(even) {
-    color: orange;
-}
-.footer-item p :nth-child(odd) {
-    color: blue;
-}
+// .footer-item p :nth-child(even) {
+//     color: orange;
+// }
+// .footer-item p :nth-child(odd) {
+//     color: blue;
+// }
 
 .server-message {
     justify-content: center;
     width: 20%;
     min-width: min-content;
 }
+
