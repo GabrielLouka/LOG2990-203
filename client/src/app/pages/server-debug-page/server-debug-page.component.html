@@ -1,0 +1,5 @@
+<p>Server sent : {{ debugDisplayMessage.getValue() }}</p>
+
+<input type="file" id="browseButton" name="imageToSend" accept=".bmp" />
+<button class="button" (click)="sendImageToServer()">Send Image</button>
+<button class="button" routerLink="/">Home</button>

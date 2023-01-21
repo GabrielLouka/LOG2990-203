@@ -111,6 +111,12 @@ export class ExampleController {
             res.sendStatus(HTTP_STATUS_CREATED);
         });
 
+        this.router.post('/send-image', (req: Request, res: Response) => {
+            const message: Message = req.body;
+            this.exampleService.storeMessage(message);
+            res.sendStatus(HTTP_STATUS_CREATED);
+        });
+
         /**
          * @swagger
          *
