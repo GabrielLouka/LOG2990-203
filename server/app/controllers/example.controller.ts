@@ -1,6 +1,7 @@
 import { ExampleService } from '@app/services/example.service';
 import { Message } from '@common/message';
 import { Request, Response, Router } from 'express';
+import { writeFile } from 'fs';
 import { Service } from 'typedi';
 
 const HTTP_STATUS_CREATED = 201;
@@ -112,9 +113,21 @@ export class ExampleController {
         });
 
         this.router.post('/send-image', (req: Request, res: Response) => {
-            const message: Message = req.body;
-            this.exampleService.storeMessage(message);
-            res.sendStatus(HTTP_STATUS_CREATED);
+            const buffer = Buffer.from(req.body);
+            // eslint-disable-next-line no-console
+            console.log(buffer);
+
+            writeFile('./assets/file.bmp', buffer, (err) => {
+                if (err) {
+                    // eslint-disable-next-line no-console
+                    console.error(err);
+                } else {
+                    // eslint-disable-next-line no-console
+                    console.log('File successfully written.');
+                }
+            });
+
+            res.status(HTTP_STATUS_CREATED).send(buffer.length.toString());
         });
 
         /**

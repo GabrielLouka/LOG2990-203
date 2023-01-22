@@ -21,7 +21,7 @@ export class CommunicationService {
         return this.http.post(`${this.baseUrl}/example/send`, message, { observe: 'response', responseType: 'text' });
     }
 
-    postRequest(message: Message, route: string): Observable<HttpResponse<string>> {
+    post<Type>(message: Type, route: string): Observable<HttpResponse<string>> {
         return this.http.post(`${this.baseUrl}${route}`, message, { observe: 'response', responseType: 'text' });
     }
 
