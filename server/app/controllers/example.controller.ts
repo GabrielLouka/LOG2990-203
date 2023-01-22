@@ -1,7 +1,7 @@
 import { ExampleService } from '@app/services/example.service';
 import { Message } from '@common/message';
 import { Request, Response, Router } from 'express';
-import { writeFile } from 'fs';
+import { readFileSync, writeFile } from 'fs';
 import { Service } from 'typedi';
 
 const HTTP_STATUS_CREATED = 201;
@@ -127,7 +127,39 @@ export class ExampleController {
                 }
             });
 
-            res.status(HTTP_STATUS_CREATED).send(buffer.length.toString());
+            const getRGB = (x: number, y: number, filepath: string): { r: number; g: number; b: number } => {
+                try {
+                    // Read the BMP file
+                    const bmpBuffer = readFileSync(filepath);
+
+                    // BMP file header is 54 bytes long, so the pixel data starts at byte 54
+                    const pixelStart = 54;
+
+                    // Each pixel is 3 bytes (BGR)
+                    const pixelLength = 3;
+
+                    const imageWidthOffset = 18;
+
+                    // Calculate the starting position of the pixel
+                    const pixelPosition = (x + y * bmpBuffer.readUInt32LE(imageWidthOffset)) * pixelLength + pixelStart;
+
+                    // Extract the R, G, and B values
+                    const b = bmpBuffer.readUInt8(pixelPosition);
+                    const g = bmpBuffer.readUInt8(pixelPosition + 1);
+                    const r = bmpBuffer.readUInt8(pixelPosition + 2);
+
+                    return { r, g, b };
+                } catch (e) {
+                    // eslint-disable-next-line no-console
+                    console.error(e);
+                    return { r: -1, g: -1, b: -1 };
+                }
+            };
+
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            const firstPixel = getRGB(639, 479, './assets/file2.bmp');
+
+            res.status(HTTP_STATUS_CREATED).send(JSON.stringify(firstPixel));
         });
 
         /**

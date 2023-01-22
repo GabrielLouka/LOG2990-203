@@ -14,7 +14,7 @@ export class ServerDebugPageComponent {
     constructor(private readonly communicationService: CommunicationService) {}
 
     async sendImageToServer(): Promise<void> {
-        const routeToSend = '/example/send-image';
+        const routeToSend = '/image_processing/send-image';
         const inputValue = (document.getElementById('browseButton') as HTMLInputElement).files?.[0];
 
         if (inputValue !== undefined) {
@@ -29,7 +29,8 @@ export class ServerDebugPageComponent {
             this.communicationService.post<number[]>(byteArray, routeToSend).subscribe({
                 next: (response) => {
                     const responseString = `Success : ${response.status} - 
-                    ${response.statusText} | ${response.body}`;
+                    ${response.statusText} \n`;
+                    this.updateImageDisplay(this.convertToBuffer(JSON.parse(response.body as string)));
                     this.debugDisplayMessage.next(responseString);
                 },
                 error: (err: HttpErrorResponse) => {
@@ -38,5 +39,20 @@ export class ServerDebugPageComponent {
                 },
             });
         }
+    }
+
+    // Convert number[] to ArrayBuffer
+    convertToBuffer(byteArray: number[]): ArrayBuffer {
+        const buffer = new ArrayBuffer(byteArray.length);
+        const view = new Uint8Array(buffer);
+        for (let i = 0; i < byteArray.length; i++) {
+            view[i] = byteArray[i];
+        }
+        return buffer;
+    }
+
+    updateImageDisplay(imgData: ArrayBuffer) {
+        const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
+        if (imagePreview !== null) imagePreview.src = URL.createObjectURL(new Blob([imgData]));
     }
 }
