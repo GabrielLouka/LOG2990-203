@@ -1,4 +1,7 @@
 export class Pixel {
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    static readonly white = new Pixel(255, 255, 255);
+    static readonly black = new Pixel(0, 0, 0);
     r: number;
     g: number;
     b: number;
@@ -8,4 +11,8 @@ export class Pixel {
         this.g = g;
         this.b = b;
     }
+
+    equals = (pixel: Pixel): boolean => {
+        return this.r === pixel.r && this.g === pixel.g && this.b === pixel.b;
+    };
 }

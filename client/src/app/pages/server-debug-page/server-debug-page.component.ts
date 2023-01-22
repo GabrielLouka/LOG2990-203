@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
+import { DifferenceImage } from '@common/difference.image';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -15,18 +16,21 @@ export class ServerDebugPageComponent {
 
     async sendImageToServer(): Promise<void> {
         const routeToSend = '/image_processing/send-image';
-        const inputValue = (document.getElementById('browseButton') as HTMLInputElement).files?.[0];
+        const inputValue1 = (document.getElementById('browseButton1') as HTMLInputElement).files?.[0];
+        const inputValue2 = (document.getElementById('browseButton2') as HTMLInputElement).files?.[0];
 
-        if (inputValue !== undefined) {
-            const buffer = await inputValue.arrayBuffer();
+        if (inputValue1 !== undefined && inputValue2 !== undefined) {
+            const buffer1 = await inputValue1.arrayBuffer();
+            const buffer2 = await inputValue2.arrayBuffer();
 
             // convert buffer to int array
-            const byteArray: number[] = Array.from(new Uint8Array(buffer));
+            const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
+            const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
 
-            // eslint-disable-next-line no-console
-            console.log('Sending image to server' + byteArray);
+            const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
+            const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
 
-            this.communicationService.post<number[]>(byteArray, routeToSend).subscribe({
+            this.communicationService.post<DifferenceImage[]>([firstImage, secondImage], routeToSend).subscribe({
                 next: (response) => {
                     const responseString = `Success : ${response.status} - 
                     ${response.statusText} \n`;
