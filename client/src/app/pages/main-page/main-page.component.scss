@@ -78,23 +78,23 @@ body {
     display: flex;
     flex-direction: column;
     text-align: center;
-
+    padding-bottom: 2.5%;
     height: 10vh;
 }
 
 .team-number {
-    margin-top: 1.5vh;
-    font-size: 1.5vh;
+    position: absolute;
+    margin: 2vh;
+    top: 5vh;
+    left: 0vh;
+    height: 10vh;
 }
 
 .dev-team {
     display: flex;
     flex-direction: row;
-
     margin-left: 15vw;
     margin-right: 15vw;
-
     justify-content: space-evenly;
-
-    font-size: 1.5vh;
+    font-size: 2vh;
 }
