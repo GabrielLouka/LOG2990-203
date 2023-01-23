@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
@@ -11,9 +11,8 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
-import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
-import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
-import { LimitedTimePageComponent } from './pages/limited-time-page/limited-time-page.component';
+import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
+import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -29,11 +28,10 @@ import { LimitedTimePageComponent } from './pages/limited-time-page/limited-time
         MaterialPageComponent,
         PlayAreaComponent,
         SidebarComponent,
-        ClassicPageComponent,
-        LimitedTimePageComponent,
-        ConfigurationPageComponent,
+        SelectionsPageComponent,
+        RegistrationPageComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],
     bootstrap: [AppComponent],
 })

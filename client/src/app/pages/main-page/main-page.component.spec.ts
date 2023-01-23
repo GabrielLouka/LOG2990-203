@@ -33,7 +33,7 @@ describe('MainPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it("should have as title 'LOG2990'", () => {
+    it("should have as title 'Mismatch Mania'", () => {
         expect(component.title).toEqual('Mismatch Mania');
     });
 
