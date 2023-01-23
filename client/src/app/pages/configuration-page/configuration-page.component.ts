@@ -11,5 +11,12 @@ export class ConfigurationPageComponent implements OnInit {
 
   ngOnInit(): void {
   }
+  
+  over(){
+    let subBox = document.getElementById("sub-box");
+    if (subBox){
+      subBox.className = "game-buttons";
+    }
+  }
 
 }
