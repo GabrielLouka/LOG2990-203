@@ -1,0 +1,18 @@
+<div *ngIf="game" id="sub-box" class="box">
+    <div class="game-buttons">
+        <p class="description">{{game.description}}</p>
+        <div class="image-stats-container">
+            <div class="image-show">
+                <img src={{ game.imagePath }} alt="Logo" width="200" height="200" />
+            </div>
+            <div class="stats-box">
+                <div class="ranking-box">
+                    <p class="difficulty">{{ game.difficulty }}</p>
+                    <p class="difficulty" *ngFor="let classement of game.classements">
+                        <p class="myClassement"> classement
+                        </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -28,19 +28,23 @@ body {
 .header {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: right;
     height: 15vh;
 }
 
-#add-game-btn {
+.game-btn {
     font-weight: 600;
     font-size: 1.7vh;
     letter-spacing: 0.1vw;
-
+    position: relative;
     border-radius: 2vw;
     border: solid 0.3vh;
-
+    float: right;
     padding: 2vh 4vh;
+    top: 0;
+    left: 0;
+    margin: 2vw;
+    float: right;
 
     background-color: white;
 
@@ -50,6 +54,7 @@ body {
         transform: scale(0.9);
         background-color: lightsalmon;
     }
+    margin-left: 5px;
 }
 
 .return-button {
@@ -257,6 +262,7 @@ body {
     width: 300px;
     background-color: white;
     border: 1px solid black;
+    text-align: center;
 }
 
 .stats-box {
@@ -275,4 +281,8 @@ body {
 .difficulty {
     text-align: center;
     margin-top: 5px;
+}
+#projectLogo {
+    margin-top: -35px;
+    margin-right: 1px;
 }
