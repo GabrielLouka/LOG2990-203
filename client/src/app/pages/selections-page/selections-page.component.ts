@@ -7,4 +7,6 @@ import { Component } from '@angular/core';
 })
 export class SelectionsPageComponent {
     title = 'Selection Page';
+
+    games = ['Game 1', 'Game 2', 'Game 3', 'Game 4'];
 }

@@ -29,3 +29,17 @@
 
     width: 45vw;
 }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-gap: 20px;
+
+    align-items: center;
+    justify-items: center;
+
+    margin: 0 auto;
+
+    border: solid;
+}
