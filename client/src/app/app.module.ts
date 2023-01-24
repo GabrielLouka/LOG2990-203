@@ -3,14 +3,17 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { BackButtonComponent } from './components/back-button/back-button/back-button.component';
+import { GameCardComponent } from './components/game-card/game-card/game-card.component';
+import { NextPageButtonComponent } from './components/next-page-button/next-page-button/next-page-button.component';
+import { OverlayComponent } from './components/overlay/overlay/overlay.component';
+import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
+import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
+import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -19,7 +22,17 @@ import { MaterialPageComponent } from '@app/pages/material-page/material-page.co
  * Otherwise Angular Cli will not know in which module to put new component
  */
 @NgModule({
-    declarations: [AppComponent, GamePageComponent, MainPageComponent, MaterialPageComponent, PlayAreaComponent, SidebarComponent],
+    declarations: [
+        AppComponent,
+        MainPageComponent,
+        SelectionsPageComponent,
+        RegistrationPageComponent,
+        BackButtonComponent,
+        PreviousPageButtonComponent,
+        NextPageButtonComponent,
+        GameCardComponent,
+        OverlayComponent,
+    ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
     bootstrap: [AppComponent],

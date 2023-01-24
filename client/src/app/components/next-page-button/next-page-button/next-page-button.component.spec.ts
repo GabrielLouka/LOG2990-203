@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SelectionsPageComponent } from './selections-page.component';
+import { NextPageButtonComponent } from './next-page-button.component';
 
-describe('SelectionsPageComponent', () => {
-    let component: SelectionsPageComponent;
-    let fixture: ComponentFixture<SelectionsPageComponent>;
+describe('NextPageButtonComponent', () => {
+    let component: NextPageButtonComponent;
+    let fixture: ComponentFixture<NextPageButtonComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [SelectionsPageComponent],
+            declarations: [NextPageButtonComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(SelectionsPageComponent);
+        fixture = TestBed.createComponent(NextPageButtonComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
