@@ -4,55 +4,10 @@ import { Service } from 'typedi';
 
 @Service()
 export class ImageProcessingService {
-    getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {
-        try {
-            const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
-
-            // Extract the R, G, and B values
-            const b = imageBuffer.readUInt8(pixelPosition);
-            const g = imageBuffer.readUInt8(pixelPosition + 1);
-            const r = imageBuffer.readUInt8(pixelPosition + 2);
-
-            return new Pixel(r, g, b);
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
-            return null;
-        }
-    };
-
-    setRGB = (position: Vector2, imageBuffer: Buffer, pixel: Pixel): void => {
-        try {
-            const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
-
-            // Set the R, G, and B values
-            imageBuffer.writeUInt8(pixel.b, pixelPosition);
-            imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
-            imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
-        }
-    };
-
-    setHalfOfImageToBlack = (imageBuffer: Buffer): void => {
-        try {
-            const imageWidthOffset = 18;
-            const imageHeightOffset = 22;
-
-            const imageWidth = imageBuffer.readUInt32LE(imageWidthOffset);
-            const imageHeight = imageBuffer.readUInt32LE(imageHeightOffset);
-
-            for (let y = 0; y < imageHeight; y++) {
-                for (let x = 0; x < imageWidth / 2; x++) {
-                    this.setRGB({ x, y }, imageBuffer, new Pixel(0, 0, 0));
-                }
-            }
-        } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
-        }
-    };
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    static readonly imageWidthOffset = 18;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    static readonly imageHeightOffset = 22;
 
     turnImageToWhite = (imageBuffer: Buffer): void => {
         try {
@@ -73,13 +28,10 @@ export class ImageProcessingService {
         }
     };
 
-    getDifferencesBetweenImages = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[] => {
+    getDifferentPixelPositionsBetweenImages = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[] => {
         try {
-            const imageWidthOffset = 18;
-            const imageHeightOffset = 22;
-
-            const imageWidth = imageBuffer1.readUInt32LE(imageWidthOffset);
-            const imageHeight = imageBuffer1.readUInt32LE(imageHeightOffset);
+            const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
+            const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
 
             const differences: Vector2[] = [];
 
@@ -113,20 +65,122 @@ export class ImageProcessingService {
         }
     };
 
+    // eslint-disable-next-line complexity
+    getDifferencesPositionsList = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[][] => {
+        const visitRadius = 6;
+        const differencesList: Vector2[][] = [[]];
+        let currentDifferenceGroupIndex = 0;
+        const pixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
+
+        const alreadyVisited: Vector2[] = [];
+        const nextPixelsToVisit: { pos: Vector2; radius: number }[] = [];
+
+        const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
+        const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
+
+        while (pixelsToVisit.length > 0) {
+            if (pixelsToVisit.length > 0) {
+                const nextPixel = pixelsToVisit.pop();
+                if (nextPixel !== undefined) nextPixelsToVisit.push({ pos: nextPixel as Vector2, radius: visitRadius });
+            }
+
+            while (nextPixelsToVisit.length > 0) {
+                const currentPixel = nextPixelsToVisit.pop() as { pos: Vector2; radius: number };
+
+                if (!alreadyVisited.some((pos) => pos.x === currentPixel.pos.x && pos.y === currentPixel.pos.y)) {
+                    differencesList[currentDifferenceGroupIndex].push(currentPixel.pos);
+                    alreadyVisited.push(currentPixel.pos);
+                }
+
+                if (currentPixel.radius > 0) {
+                    for (let y = currentPixel.pos.y - 1; y <= currentPixel.pos.y + 1; y++) {
+                        if (y < 0 || y >= imageHeight) continue;
+                        for (let x = currentPixel.pos.x - 1; x <= currentPixel.pos.x + 1; x++) {
+                            if (x < 0 || x >= imageWidth) continue;
+                            const nextPixel = { x, y };
+                            if (!alreadyVisited.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)) {
+                                //  if next pixels to visit already contains the pixel, with a higher radius, don't do anything
+                                // if (
+                                //     nextPixelsToVisit.some(
+                                //         (pixel) =>
+                                //             pixel.pos.x === nextPixel.x && pixel.pos.y === nextPixel.y && pixel.radius > currentPixel.radius - 1,
+                                //     )
+                                // )
+                                //     continue;
+
+                                // if this pixel is already in the list of pixels to visit, add it but with the maximum radius
+                                nextPixelsToVisit.push({
+                                    pos: nextPixel,
+                                    radius: pixelsToVisit.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)
+                                        ? visitRadius
+                                        : currentPixel.radius - 1,
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            if (differencesList[currentDifferenceGroupIndex].length > 0 && pixelsToVisit.length > 0) {
+                differencesList.push([]);
+                currentDifferenceGroupIndex++;
+            }
+        }
+        if (differencesList[differencesList.length - 1].length === 0) differencesList.pop();
+        return differencesList;
+    };
+
     getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer): Buffer => {
         try {
             const output: Buffer = Buffer.from(imageBuffer1);
-            // eslint-disable-next-line no-unused-vars
-            const differences: Vector2[] = this.getDifferencesBetweenImages(imageBuffer1, imageBuffer2);
+            // const differences: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
+            const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2);
+            const currentDifferences: Vector2[] = allDifferences[1];
+
+            // display the length of each difference group
+            allDifferences.forEach((diffGroup, index) => {
+                // eslint-disable-next-line no-console
+                console.log('diff group length ' + index + ' : ' + diffGroup.length);
+            });
 
             this.turnImageToWhite(output);
-            this.paintBlackPixelsAtPositions(differences, output);
+            this.paintBlackPixelsAtPositions(currentDifferences, output);
 
             return output;
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error(e);
             return Buffer.from(imageBuffer1);
+        }
+    };
+
+    private getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {
+        try {
+            const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
+
+            // Extract the R, G, and B values
+            const b = imageBuffer.readUInt8(pixelPosition);
+            const g = imageBuffer.readUInt8(pixelPosition + 1);
+            const r = imageBuffer.readUInt8(pixelPosition + 2);
+
+            return new Pixel(r, g, b);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(e);
+            return null;
+        }
+    };
+
+    private setRGB = (position: Vector2, imageBuffer: Buffer, pixel: Pixel): void => {
+        try {
+            const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
+
+            // Set the R, G, and B values
+            imageBuffer.writeUInt8(pixel.b, pixelPosition);
+            imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
+            imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.error(e);
         }
     };
 
