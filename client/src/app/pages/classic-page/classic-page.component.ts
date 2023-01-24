@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
     styleUrls: ['./classic-page.component.scss'],
 })
 export class ClassicPageComponent {
-    title = 'Jeu classique';
+    title = 'JEUX CLASSIQUE';
 }

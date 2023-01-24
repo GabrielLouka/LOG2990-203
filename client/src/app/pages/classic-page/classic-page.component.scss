@@ -1,17 +1,27 @@
-.container #hints-icon {
+body {
+    display: flex;
+    flex-direction: column;
+
+    max-height: 100vh;
+    background-color: lightblue;
+}
+
+.header #hints-icon {
     position: absolute;
     margin: 5vh;
     top: 1vh;
     right: 2vh;
     width: 100px;
     height: auto;
+    background-color: white;
+    border-radius: 50%;
 
     &:active {
         transform: scale(0.9);
     }
 }
 
-.container #exit-icon {
+.header #exit-icon {
     position: absolute;
     margin: 5vh;
     top: 1vh;
@@ -21,10 +31,21 @@
 
     &:active {
         transform: scale(0.9);
+        border-radius: 30%;
+        background-color: red;
     }
 }
 
-.container #info-icon {
+.header #mode {
+    position: relative;
+    margin: 5vh;
+    top: 1vh;
+    left: 40%;
+    font-size: large;
+    font-weight: bold;
+}
+
+.footer #info-icon {
     position: absolute;
     margin: 5vh;
     bottom: 0vh;
