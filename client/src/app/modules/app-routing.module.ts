@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ClassicPageComponent } from '@app/pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from '@app/pages/configuration-page/configuration-page.component';
+import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { LimitedTimePageComponent } from '@app/pages/limited-time-page/limited-time-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
@@ -21,6 +22,7 @@ const routes: Routes = [
     { path: 'classic', component: ClassicPageComponent },
     { path: 'limited-time', component: LimitedTimePageComponent },
     { path: 'config', component: ConfigurationPageComponent },
+    { path: 'game-creation', component: GameCreationPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

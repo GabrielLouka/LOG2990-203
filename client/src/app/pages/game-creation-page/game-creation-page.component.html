@@ -1,0 +1,42 @@
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+</head>
+<body>
+    <Section class="header">
+        <button class="button-style return-button" (click)="previousPage()">Retour</button>
+        <a id="projectLogo"><img src=".\assets\img\ProjectLogo.png" alt="Logo Projet" width="180" height="180" /></a>
+        <div class="original-canvas">   
+            <button class="button-style">Ajouter une image individuelle (originale) format BMP 24-bit de taille 640x480.
+              <input type="file" id="image" accept="image/bmp" (change)="processImage($event, false)"/>
+            </button>
+            <button class="button-style" (click) = "resetCanvas(false)">Réinitialiser image originale</button>
+            <canvas id="original-image" width="640" height="480">
+            </canvas>
+
+        </div>
+        <div class = "modified-canvas">
+            <button class="button-style">Ajouter une image individuelle (modifiee)
+                <input type="file" id="image" accept="image/bmp" (change)="processImage($event, true)"/>
+              </button>
+            <button class="button-style" (click) = "resetCanvas(true)">Réinitialiser image modifiee</button>
+            <canvas id = "modified-image" width="640" height="480"></canvas>
+        </div>
+    </Section>
+
+    <section class="selection-container">
+      <button class="button-style">Ajouter la meme image 
+        <input type="file" id="image" accept="image/bmp" (change)="processImage($event, true);processImage($event, false) "/>
+      </button>
+      <button class="button-style">Rayon d'elargissement: <select id="enlargement-radius">
+        <option value="0">0</option>
+        <option value="3">3</option>
+        <option value="9">9</option>
+        <option value="15">15</option>
+    </select></button>
+    <label htmlFor="name">Entrez un nom: </label>
+              <input type="text" id="name" placeholder="Mon jeu"  (change) = "updateName($event)"/>
+    <button class="button-style">Lancer validation des differences</button>
+       
+    </section>
+</body>
