@@ -11,6 +11,7 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { GameSheetComponent } from './components/game-sheet/game-sheet.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 
@@ -30,6 +31,7 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         SidebarComponent,
         SelectionsPageComponent,
         RegistrationPageComponent,
+        GameSheetComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
     providers: [],

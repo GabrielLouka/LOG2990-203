@@ -1,4 +1,8 @@
-/* Règles Générales */
+.container {
+    min-height: 100vh;
+    height: auto;
+    background-color: #48d4cd;
+}
 
 body {
     display: flex;
@@ -12,65 +16,39 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-
-    font-weight: 600;
-    font-size: 1.7vh;
-    letter-spacing: 0.1vw;
-
-    border-radius: 2vw;
-    border: 0.3vh;
-
-    padding: 2vh 4vh;
-}
-
-/* Icon style */
-.logoContainer {
-    display: flex;
-    justify-content: center;
-}
-
-.logoContainer #gameIcon {
-    width: 40vh;
-    height: 40vh;
-}
-
-.logoContainer #configIcon {
-    position: absolute;
-    margin: 2vh;
-    top: 0vh;
-    right: 0vh;
-    height: 10vh;
-
-    &:active {
-        transform: scale(0.9);
-    }
-}
-
-/* Button style */
-
-.navBarContainer {
-    display: flex;
-    flex-direction: row;
-
-    justify-content: center;
-    align-items: center;
-
-    height: 50vh;
+    margin-bottom: 60px;
 }
 
 .button {
-    margin: 3vw;
-    padding: 2vh 8vh;
-    background-color: white;
+    margin-top: 50px;
+    text-align: center;
+    border-radius: 20px;
+    padding: 15px;
+    font-family: cursive;
+}
 
-    border: solid;
+.button:hover{
+    transform: translateY(-5px);
+    background-color: rgb(245, 142, 105);
+    color: white;    
+}
 
-    cursor: pointer;
+.team-name {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    color: rgb(255, 255, 255);
+    font-family: cursive;
+    font-size: medium;
+}
 
-    &:hover {
-        transform: scale(0.9);
-        background-color: lightsalmon;
-    }
+span{
+    color: rgb(255, 255, 255);
+    font-family: cursive;
+}
+
+.header-item {
+    justify-content: center;
+    text-align: center;
 }
 
 /* Credit style */
@@ -78,14 +56,15 @@ body {
     display: flex;
     flex-direction: column;
     text-align: center;
-
-    height: 10vh;
+    color: white;
 }
 
-.team-number {
-    margin-top: 1.5vh;
-    font-size: 1.5vh;
-}
+// .footer-item p :nth-child(even) {
+//     color: orange;
+// }
+// .footer-item p :nth-child(odd) {
+//     color: blue;
+// }
 
 .dev-team {
     display: flex;
