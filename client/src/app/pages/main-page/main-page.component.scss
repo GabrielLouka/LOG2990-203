@@ -3,24 +3,35 @@
 body {
     display: flex;
     flex-direction: column;
+
+    max-height: 100vh;
+    background-color: lightblue;
 }
 
-.justified {
+.button-style {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+
+    font-weight: 600;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
+
+    border-radius: 2vw;
+    border: 0.3vh;
+
+    padding: 2vh 4vh;
 }
 
-.button {
-    margin-top: 10px;
-    text-align: center;
+/* Icon style */
+.logoContainer {
+    display: flex;
+    justify-content: center;
 }
 
-.team-name {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-    color: green;
+.logoContainer #gameIcon {
+    width: 40vh;
+    height: 40vh;
 }
 
 .logoContainer #configIcon {
@@ -42,22 +53,48 @@ body {
     flex-direction: row;
 
     justify-content: center;
-    text-align: center;
+    align-items: center;
+
+    height: 50vh;
 }
 
+.button {
+    margin: 3vw;
+    padding: 2vh 8vh;
+    background-color: white;
+
+    border: solid;
+
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(0.9);
+        background-color: lightsalmon;
+    }
+}
+
+/* Credit style */
 .footer-item {
+    display: flex;
+    flex-direction: column;
     text-align: center;
+
+    height: 10vh;
 }
 
-.footer-item p :nth-child(even) {
-    color: orange;
-}
-.footer-item p :nth-child(odd) {
-    color: blue;
+.team-number {
+    margin-top: 1.5vh;
+    font-size: 1.5vh;
 }
 
-.server-message {
-    justify-content: center;
-    width: 20%;
-    min-width: min-content;
+.dev-team {
+    display: flex;
+    flex-direction: row;
+
+    margin-left: 15vw;
+    margin-right: 15vw;
+
+    justify-content: space-evenly;
+
+    font-size: 1.5vh;
 }

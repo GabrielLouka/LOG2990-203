@@ -12,7 +12,6 @@ import { GameCardComponent } from './components/game-card/game-card/game-card.co
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
-import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 
 /**
@@ -26,7 +25,6 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         AppComponent,
         MainPageComponent,
         SelectionsPageComponent,
-        RegistrationPageComponent,
         BackButtonComponent,
         PreviousPageButtonComponent,
         NextPageButtonComponent,
