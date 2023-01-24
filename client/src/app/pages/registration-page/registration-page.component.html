@@ -1,0 +1,24 @@
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ title }}</title>
+</head>
+<body>
+    <Section class="header">
+        <button class="button-style return-button" routerLink="/selections">
+            <img src=".\assets\img\previous-icon.png" class="previous-icon" alt="gameLogo" />Retour
+        </button>
+    </Section>
+    <h1 class="button-style titre">Classic Game</h1>
+    <Section class="registerContainer">
+        <form [formGroup]="registrationForm" class="register-input">
+            <label class="button-style" for="input">NAME :</label>
+            <input class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="pseudo" required />
+
+            <br />
+
+            <button class="button-style play-button" [disabled]="registrationForm.invalid" [ngClass]="{ 'not-allowed': registrationForm.invalid }">
+                <img src=".\assets\img\play-icon.png" id="play-icon" alt="gameLogo" />
+            </button>
+        </form>
+    </Section>
+</body>
