@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+// import { GameCardComponent } from '@app/components/game-card/game-card.component';
 
 @Component({
     selector: 'app-selections-page',
@@ -6,7 +7,14 @@ import { Component } from '@angular/core';
     styleUrls: ['./selections-page.component.scss'],
 })
 export class SelectionsPageComponent {
-    title = 'Selection Page';
+    // @ViewChild(GameCardComponent) view!: GameCardComponent;
 
-    games = ['Game 1', 'Game 2', 'Game 3', 'Game 4'];
+    originTitle = 'Bonjour';
+
+    games = [
+        { title: 'Glouton', difficulty: 'FACILE' },
+        { title: 'Hommes de Cro-Magnon', difficulty: 'MOYEN' },
+        { title: 'Bagnoles #Cars', difficulty: 'DIFFICILE' },
+        { title: 'Playa', difficulty: 'FACILE' },
+    ];
 }

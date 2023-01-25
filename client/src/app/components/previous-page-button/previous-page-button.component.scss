@@ -1,13 +1,18 @@
-.previous-arrow {
+.container {
+    display: flex;
     position: absolute;
+
+    justify-content: center;
+    align-items: center;
+
     border-radius: 20vh;
     border: solid;
+    background-color: white;
 
     height: 15vh;
     width: 2.2vw;
     top: 57%;
     left: 2.5vw;
-    background-color: white;
 
     cursor: pointer;
 
@@ -16,28 +21,13 @@
     $transition-time: 0.15s;
 
     &:hover {
-        transform: translateX(-55%) translateY(-50%) scale(0.9);
+        transform: translateX(-45%) translateY(-50%) scale(0.9);
         background-color: lightsalmon;
     }
 }
-.previous-arrow-bottom {
-    background-color: black;
-    height: 4px;
-    right: -5px;
-    position: absolute;
-    top: 47%;
-    width: 100%;
-    transform: rotate(-45deg);
-    transform-origin: top left;
-}
 
-.previous-arrow-top {
-    background-color: black;
-    height: 4px;
-    right: -5px;
-    position: absolute;
-    top: 45%;
-    width: 100%;
-    transform: rotate(45deg);
-    transform-origin: bottom left;
+.icon {
+    margin-left: 30px;
+    height: 7vh;
+    width: 5vw;
 }

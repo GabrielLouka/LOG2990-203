@@ -1,16 +1,17 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { BackButtonComponent } from './components/back-button/back-button/back-button.component';
-import { GameCardComponent } from './components/game-card/game-card/game-card.component';
-import { NextPageButtonComponent } from './components/next-page-button/next-page-button/next-page-button.component';
-import { OverlayComponent } from './components/overlay/overlay/overlay.component';
+import { BackButtonComponent } from './components/back-button/back-button.component';
+import { GameCardComponent } from './components/game-card/game-card.component';
+import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
+import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 
@@ -31,7 +32,7 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         GameCardComponent,
         OverlayComponent,
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
+    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatGridListModule],
     providers: [],
     bootstrap: [AppComponent],
 })

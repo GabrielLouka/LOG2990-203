@@ -2,7 +2,10 @@
     <div class="description-container">
         <div class="title-container">
             <div class="title">{{ title }}</div>
-            <div>Difficulté : {{ difficulty }}</div>
+            <div class="difficulty">
+                <div>Difficulté :</div>
+                <div [ngStyle]="{ color: getDifficultyColor(difficulty) }">{{ '&nbsp;' + difficulty }}</div>
+            </div>
         </div>
         <div class="content-container">
             <img src="./assets/img/original-picture.png" class="original-picture" alt="original-picture" />

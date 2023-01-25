@@ -1,5 +1,10 @@
-.next-arrow {
+.container {
+    display: flex;
     position: absolute;
+
+    justify-content: center;
+    align-items: center;
+
     border-radius: 20vh;
     border: solid;
     background-color: white;
@@ -20,24 +25,8 @@
         background-color: lightsalmon;
     }
 }
-.next-arrow-bottom {
-    background-color: black;
-    height: 4px;
-    left: -5px;
-    position: absolute;
-    top: 45%;
-    width: 100%;
-    transform: rotate(-45deg);
-    transform-origin: top right;
-}
 
-.next-arrow-top {
-    background-color: black;
-    height: 4px;
-    left: -5px;
-    position: absolute;
-    top: 47%;
-    width: 100%;
-    transform: rotate(45deg);
-    transform-origin: bottom right;
+.icon {
+    height: 7vh;
+    width: 5vw;
 }

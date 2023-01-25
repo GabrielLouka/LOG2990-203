@@ -1,3 +1,8 @@
+body {
+    justify-content: center;
+    align-items: center;
+}
+
 .header {
     display: flex;
     flex-direction: row;
@@ -11,35 +16,7 @@
     height: 15vh;
 }
 
-.selection-container {
-    display: flex;
-    flex-direction: row;
-
-    justify-content: center;
-
+.container {
+    width: 85vw;
     height: 85vh;
-}
-
-.sub-container {
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
-    justify-content: space-around;
-
-    width: 45vw;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    grid-gap: 20px;
-
-    align-items: center;
-    justify-items: center;
-
-    margin: 0 auto;
-
-    border: solid;
 }
