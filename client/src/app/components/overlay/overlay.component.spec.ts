@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SelectionsPageComponent } from './selections-page.component';
+import { OverlayComponent } from './overlay.component';
 
-describe('SelectionsPageComponent', () => {
-    let component: SelectionsPageComponent;
-    let fixture: ComponentFixture<SelectionsPageComponent>;
+describe('OverlayComponent', () => {
+    let component: OverlayComponent;
+    let fixture: ComponentFixture<OverlayComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [SelectionsPageComponent],
+            declarations: [OverlayComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(SelectionsPageComponent);
+        fixture = TestBed.createComponent(OverlayComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

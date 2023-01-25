@@ -41,7 +41,11 @@ body {
     right: 0vh;
     height: 10vh;
 
+<<<<<<< HEAD
     &:active {
+=======
+    &:hover {
+>>>>>>> feature/selection-view
         transform: scale(0.9);
     }
 }
@@ -78,23 +82,42 @@ body {
     display: flex;
     flex-direction: column;
     text-align: center;
+<<<<<<< HEAD
     padding-bottom: 1%;
+=======
+
+>>>>>>> feature/selection-view
     height: 10vh;
 }
 
 .team-number {
+<<<<<<< HEAD
     position: absolute;
     margin: 2vh;
     top: 5vh;
     left: 0vh;
     height: 10vh;
+=======
+    margin-top: 1.5vh;
+    font-size: 1.5vh;
+>>>>>>> feature/selection-view
 }
 
 .dev-team {
     display: flex;
     flex-direction: row;
+<<<<<<< HEAD
     margin-left: 15vw;
     margin-right: 15vw;
     justify-content: space-evenly;
     font-size: 2vh;
+=======
+
+    margin-left: 15vw;
+    margin-right: 15vw;
+
+    justify-content: space-evenly;
+
+    font-size: 1.5vh;
+>>>>>>> feature/selection-view
 }
