@@ -1,0 +1,36 @@
+.box {
+    // border: 2px solid red;
+    width: 760px;
+    height: 100%;
+    overflow: auto;
+}
+
+.description {
+    text-align: center;
+}
+
+.game-buttons {
+    // border: 1px solid yellow;
+    height: 90%;
+}
+
+.image-stats-container {
+    justify-content: space-around;
+    // border: 1px solid orange;
+    height: 90%;
+    display: flex;
+    flex-direction: row;
+}
+
+.image-show {
+    background-color: white;
+    width: 50%;
+
+}
+
+.stats-box {
+    border: 2px solid black;
+    border-radius: 10px;
+    width: 40%;
+    text-align: center;
+}

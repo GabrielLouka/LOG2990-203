@@ -1,12 +1,13 @@
 /* eslint-disable no-restricted-imports */
-import { Component, OnInit } from '@angular/core';
-import { Games } from '../../interfaces/games';
+import { Component, Input, OnInit } from '@angular/core';
+import { Game } from '@app/interfaces/games';
 @Component({
     selector: 'app-game-sheet',
     templateUrl: './game-sheet.component.html',
     styleUrls: ['./game-sheet.component.scss'],
 })
 export class GameSheetComponent implements OnInit {
-    game: Games;
+    @Input() singleGame: Game;
+
     ngOnInit(): void {}
 }

@@ -1,16 +1,15 @@
-<div *ngIf="game" id="sub-box" class="box">
+<div class="box">
     <div class="game-buttons">
-        <p class="description">{{game.description}}</p>
+        <p class="description">{{singleGame.description}}</p>
         <div class="image-stats-container">
             <div class="image-show">
-                <img src={{ game.imagePath }} alt="Logo" width="200" height="200" />
+                <!-- <img src={{ singleGame.imagePath }} alt="Logo" width="200" height="200" /> -->
             </div>
             <div class="stats-box">
-                <div class="ranking-box">
-                    <p class="difficulty">{{ game.difficulty }}</p>
-                    <p class="difficulty" *ngFor="let classement of game.classements">
-                        <p class="myClassement"> classement
-                        </p>
+                <p class="difficulty">Difficulty : {{ singleGame.difficulty }}</p>
+                Rang :
+                <div class="ranking-box" *ngFor="let player of singleGame.ranking">
+                    <p *ngIf="player.name && player.score">{{player.name}} : {{player.score}}</p>
                 </div>
             </div>
         </div>
