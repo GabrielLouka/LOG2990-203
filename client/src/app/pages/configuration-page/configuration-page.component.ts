@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-imports */
@@ -102,5 +103,9 @@ export class ConfigurationPageComponent implements OnInit {
             }
         }
     }
+    deleteButton(){
+        if(confirm('Are you sure you want to delete all the games')){
+        }
     
+    }
 }
