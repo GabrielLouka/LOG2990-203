@@ -25,7 +25,7 @@ export class ConfigurationPageComponent implements OnInit {
     games: Game[] = [
         {
             description: 'Jeux 1',
-            image: '.\\assets\\img\\ProjectLogo.png',
+            image: '.\\assets\\img\\game-icon.png',
             difficulty: 'Hard',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
@@ -39,7 +39,7 @@ export class ConfigurationPageComponent implements OnInit {
         },
         {
             description: 'Jeux 2',
-            image: '.\\assets\\img\\ProjectLogo.png',
+            image: '.\\assets\\img\\game-icon.png',
             difficulty: 'Hard',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
@@ -53,7 +53,7 @@ export class ConfigurationPageComponent implements OnInit {
         },
         {
             description: 'Jeux 3',
-            image: '.\\assets\\img\\ProjectLogo.png',
+            image: '.\\assets\\img\\game-icon.png',
             difficulty: 'Hard',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
@@ -67,7 +67,7 @@ export class ConfigurationPageComponent implements OnInit {
         },
         {
             description: 'Jeux 4',
-            image: '.\\assets\\img\\ProjectLogo.png',
+            image: '.\\assets\\img\\game-icon.png',
             difficulty: 'Hard',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
@@ -105,7 +105,12 @@ export class ConfigurationPageComponent implements OnInit {
     }
     deleteButton(){
         if(confirm('Are you sure you want to delete all the games')){
+            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('sub-container') as HTMLCollectionOf<Element>;
+            for(let i=0; i<divContainer.length;i++){
+                divContainer[i].innerHTML='';
+            }      
         }
+
     
     }
 }
