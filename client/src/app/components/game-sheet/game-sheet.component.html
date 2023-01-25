@@ -1,14 +1,23 @@
 <div class="box">
     <div class="game-buttons">
         <p class="description">{{singleGame.description}}</p>
+        <div class="btn-container">
+            <button (click)="messageAlert()" class="btn" >Supprimer</button>
+            <button (click)="messageAlert()" class="btn" >Réinitialiser</button>
+        </div>
         <div class="image-stats-container">
             <div class="image-show">
                 <!-- <img src={{ singleGame.imagePath }} alt="Logo" width="200" height="200" /> -->
             </div>
             <div class="stats-box">
                 <p class="difficulty">Difficulty : {{ singleGame.difficulty }}</p>
-                Rang :
-                <div class="ranking-box" *ngFor="let player of singleGame.ranking">
+                <p> Mode solo :</p>
+                <div class="ranking-box" *ngFor="let player of singleGame.ranking[0]">
+                    <p *ngIf="player.name && player.score">{{player.name}} : {{player.score}}</p>
+                </div>
+                <p> 1 vs 1 :</p>
+                
+                <div class="ranking-box" *ngFor="let player of singleGame.ranking[0]">
                     <p *ngIf="player.name && player.score">{{player.name}} : {{player.score}}</p>
                 </div>
             </div>

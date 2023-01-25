@@ -19,41 +19,57 @@ export class ConfigurationPageComponent implements OnInit {
             description: 'Jeux 1',
             image: '.\assets\img\ProjectLogo.png',
             difficulty: 'Hard',
-            ranking: [
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
-            ]
+            ],[
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+            ]]
         },
         {
             description: 'Jeux 2',
             image: '.\assets\img\ProjectLogo.png',
             difficulty: 'Hard',
-            ranking: [
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
-            ]
+            ],[
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+            ]]
         },
         {
             description: 'Jeux 3',
             image: '.\assets\img\ProjectLogo.png',
             difficulty: 'Hard',
-            ranking: [
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
-            ],
+            ],[
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+            ]]
         },
         {
             description: 'Jeux 4',
             image: '.\assets\img\ProjectLogo.png',
             difficulty: 'Hard',
-            ranking: [
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
-            ],
+            ],[
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+            ]]
         },
     ];
     constructor(private location: Location) {}

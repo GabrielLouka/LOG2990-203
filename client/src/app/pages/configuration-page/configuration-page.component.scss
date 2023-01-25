@@ -218,13 +218,13 @@ body {
     transition: opacity 0.5s ease-in-out;
 }
 
-// .game-buttons {
-//     display: flex;
-//     flex-direction: row;
+.game-buttons {
+    display: flex;
+    flex-direction: row;
 
-//     justify-content: space-around;
-//     height: 40vh;
-// }
+    justify-content: space-around;
+    height: 40vh;
+}
 
 .button-1 {
     margin-top: 25vh;
@@ -277,10 +277,10 @@ body {
 //     margin-top: 5px;
 // }
 
-// #projectLogo {
-//     margin-top: -35px;
-//     margin-right: 18px;
-// }
+#projectLogo {
+    margin-top: -35px;
+    margin-right: 18px;
+}
 
 .sub-container {
     // display: grid;

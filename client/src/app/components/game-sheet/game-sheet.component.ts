@@ -10,4 +10,7 @@ export class GameSheetComponent implements OnInit {
     @Input() singleGame: Game;
 
     ngOnInit(): void {}
+    messageAlert() {
+        window.alert("cette fonctionnalité n'est pas disponible pour le moment");
+    }
 }
