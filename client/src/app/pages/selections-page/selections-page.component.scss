@@ -1,0 +1,22 @@
+body {
+    justify-content: center;
+    align-items: center;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    height: 15vh;
+}
+
+.header #gameIcon {
+    width: 15vh;
+    height: 15vh;
+}
+
+.container {
+    width: 85vw;
+    height: 85vh;
+}
