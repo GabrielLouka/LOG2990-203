@@ -22,6 +22,7 @@ export class ConfigurationPageComponent implements OnInit {
         { name: 'PlayerB', score: 200 },
         { name: 'PlayerC', score: 200 }
     ];
+    
     games: Game[] = [
         {
             description: 'Jeux 1',
