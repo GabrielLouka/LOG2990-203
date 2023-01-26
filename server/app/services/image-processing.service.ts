@@ -1,5 +1,5 @@
 import { Pixel } from '@app/classes/pixel';
-import Queue from '@app/classes/queue';
+import { Queue } from '@app/classes/queue';
 import { Vector2 } from '@app/classes/vector2';
 import { Service } from 'typedi';
 
@@ -111,9 +111,6 @@ export class ImageProcessingService {
                     }
                 }
 
-                // || eventualClone.radius < currentPixel.radius
-
-                // if (currentPixel.radius > 0) {
                 for (let y = currentPixel.pos.y - 1; y <= currentPixel.pos.y + 1; y++) {
                     if (y < 0 || y >= imageHeight) continue;
                     for (let x = currentPixel.pos.x - 1; x <= currentPixel.pos.x + 1; x++) {
@@ -132,7 +129,6 @@ export class ImageProcessingService {
                         }
                     }
                 }
-                // }
             }
             if (differencesList[currentDifferenceGroupIndex].length > 0 && pixelsToVisit.length > 0) {
                 differencesList.push([]);
