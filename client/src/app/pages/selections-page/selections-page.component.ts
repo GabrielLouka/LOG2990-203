@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-// import { GameCardComponent } from '@app/components/game-card/game-card.component';
 
 @Component({
     selector: 'app-selections-page',
@@ -7,8 +6,6 @@ import { Component } from '@angular/core';
     styleUrls: ['./selections-page.component.scss'],
 })
 export class SelectionsPageComponent {
-    // @ViewChild(GameCardComponent) view!: GameCardComponent;
-
     originTitle = 'Bonjour';
 
     games = [
