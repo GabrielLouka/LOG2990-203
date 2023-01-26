@@ -5,7 +5,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Classements } from '@app/interfaces/classements';
 import { Game } from '../../interfaces/games';
 
@@ -15,7 +15,7 @@ import { Game } from '../../interfaces/games';
     styleUrls: ['./configuration-page.component.scss'],
 })
 
-export class ConfigurationPageComponent implements OnInit {
+export class ConfigurationPageComponent {
     title = 'Page de configuration';
     resetClassement:Classements[] = [ 
         { name: 'PlayerA', score: 200 },
