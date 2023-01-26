@@ -27,7 +27,7 @@ export class ConfigurationPageComponent implements OnInit {
         {
             description: 'Jeux 1',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'Hard',
+            difficulty: 'DIFFICILE',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
@@ -41,7 +41,7 @@ export class ConfigurationPageComponent implements OnInit {
         {
             description: 'Jeux 2',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'Hard',
+            difficulty: 'FACILE',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
@@ -55,7 +55,7 @@ export class ConfigurationPageComponent implements OnInit {
         {
             description: 'Jeux 3',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'Hard',
+            difficulty: 'MOYEN',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
@@ -69,7 +69,7 @@ export class ConfigurationPageComponent implements OnInit {
         {
             description: 'Jeux 4',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'Hard',
+            difficulty: 'MOYEN',
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
