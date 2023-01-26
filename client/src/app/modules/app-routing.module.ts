@@ -22,7 +22,7 @@ const routes: Routes = [
     { path: 'classic', component: ClassicPageComponent },
     { path: 'limited-time', component: LimitedTimePageComponent },
     { path: 'config', component: ConfigurationPageComponent },
-    { path: 'game-creation', component: GameCreationPageComponent },
+    { path: 'creation', component: GameCreationPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

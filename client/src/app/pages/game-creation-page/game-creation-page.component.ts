@@ -11,12 +11,7 @@ export class GameCreationPageComponent {
     originalImage = new Image();
     modifiedImage = new Image();
     gameName: string = '';
-    constructor(private location: Location) {
-        const enlargementRadiusMenu = document.getElementById('enlargement-radius') as HTMLSelectElement;
-        enlargementRadiusMenu.onchange = () => {
-            this.enlargementRadius = parseInt(enlargementRadiusMenu.value, 10);
-        };
-    }
+    constructor(private location: Location) {}
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     processImage(event: any, isModified: boolean) {
@@ -33,7 +28,9 @@ export class GameCreationPageComponent {
                 const canvasId = isModified ? 'modified-image' : 'original-image';
                 // eslint-disable-next-line prefer-const
                 canvas = document.getElementById(canvasId) as HTMLCanvasElement;
-                canvas.getContext('2d')?.drawImage(image, 0, 0);
+                // canvas.getContext('2d')?.drawImage(image, 0, 0);
+                // eslint-disable-next-line max-len
+                canvas.getContext('2d')?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height); // destination rectangle
             }
             if (isModified) {
                 this.modifiedImage = image;
@@ -48,8 +45,8 @@ export class GameCreationPageComponent {
         // eslint-disable-next-line prefer-const
         canvas = document.getElementById(canvasId) as HTMLCanvasElement;
         canvas.getContext('2d')?.clearRect(0, 0, canvas.width, canvas.height);
-        this.originalImage = new Image();
-        this.modifiedImage = new Image();
+        // this.originalImage = new Image();
+        // this.modifiedImage = new Image();
         return;
     }
     previousPage() {
@@ -58,5 +55,13 @@ export class GameCreationPageComponent {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateName(event: any) {
         this.gameName = event.target.value;
+    }
+
+    createGame() {
+        // const enlargement = document.getElementById('enlargement-radius').value;
+        const selObj = document.getElementById('enlargement-radius') as HTMLSelectElement;
+        this.enlargementRadius = parseInt(selObj.value, 10);
+
+        // Setting Value
     }
 }
