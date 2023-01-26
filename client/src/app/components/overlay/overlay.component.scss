@@ -1,0 +1,42 @@
+.button-style {
+    font-weight: 600;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
+
+    border-radius: 2vw;
+    border: solid 0.3vh;
+
+    padding: 2vh 4vh;
+    margin-top: 10vh;
+    margin-left: 5%;
+
+    background-color: white;
+
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(0.9);
+        background-color: lightsalmon;
+    }
+}
+
+.overlay {
+    display: flex;
+    flex-direction: row;
+
+    position: absolute;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 40vw;
+    height: 40vh;
+    border-radius: 1.5vh;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+
+    &:hover {
+        opacity: 1;
+    }
+}
