@@ -6,6 +6,7 @@ import { LimitedTimePageComponent } from '@app/pages/limited-time-page/limited-t
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { RegistrationPageComponent } from '@app/pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from '@app/pages/selections-page/selections-page.component';
+import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -15,6 +16,7 @@ const routes: Routes = [
     { path: 'classic', component: ClassicPageComponent },
     { path: 'limited-time', component: LimitedTimePageComponent },
     { path: 'config', component: ConfigurationPageComponent },
+    { path: 'server-debug', component: ServerDebugPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

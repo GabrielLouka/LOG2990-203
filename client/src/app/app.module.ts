@@ -19,6 +19,7 @@ import { PreviousPageButtonComponent } from './components/previous-page-button/p
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
+import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -29,7 +30,6 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
 @NgModule({
     declarations: [
         AppComponent,
-
         MainPageComponent,
         GameSheetComponent,
         ConfigurationPageComponent,
@@ -42,6 +42,7 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         SelectionsPageComponent,
         HintComponent,
         InfoIconComponent,
+        ServerDebugPageComponent
     ],
     imports: [
         AppMaterialModule,
