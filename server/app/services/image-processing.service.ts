@@ -1,4 +1,5 @@
 import { Pixel } from '@app/classes/pixel';
+import Queue from '@app/classes/queue';
 import { Vector2 } from '@app/classes/vector2';
 import { Service } from 'typedi';
 
@@ -72,8 +73,9 @@ export class ImageProcessingService {
         let currentDifferenceGroupIndex = 0;
         const pixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
 
-        const alreadyVisited: Vector2[] = [];
-        const nextPixelsToVisit: { pos: Vector2; radius: number }[] = [];
+        const alreadyVisited: { pos: Vector2; radius: number }[] = [];
+        // const nextPixelsToVisit: { pos: Vector2; radius: number }[] = [];
+        const nextPixelsToVisit: Queue<{ pos: Vector2; radius: number }> = new Queue();
 
         const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
         const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
@@ -81,35 +83,46 @@ export class ImageProcessingService {
         while (pixelsToVisit.length > 0) {
             if (pixelsToVisit.length > 0) {
                 const nextPixel = pixelsToVisit.pop();
-                if (nextPixel !== undefined) nextPixelsToVisit.push({ pos: nextPixel as Vector2, radius: visitRadius });
+                if (nextPixel !== undefined) nextPixelsToVisit.enqueue({ pos: nextPixel as Vector2, radius: visitRadius });
             }
 
             while (nextPixelsToVisit.length > 0) {
-                const currentPixel = nextPixelsToVisit.pop() as { pos: Vector2; radius: number };
+                const currentPixel = nextPixelsToVisit.dequeue() as { pos: Vector2; radius: number };
 
-                if (!alreadyVisited.some((pos) => pos.x === currentPixel.pos.x && pos.y === currentPixel.pos.y)) {
+                // eslint-disable-next-line no-console
+                // console.log(
+                //     'Visiting ' + currentPixel.pos.x + ', ' + (imageHeight - (currentPixel.pos.y + 1)) + ' with radius ' + currentPixel.radius,
+                // );
+
+                // see if the pixel was already visited
+                const eventualClone = alreadyVisited.find((pixelData) => {
+                    return pixelData.pos.x === currentPixel.pos.x && pixelData.pos.y === currentPixel.pos.y;
+                });
+                // if this pixel hasn't been visited, add it to the list of differences
+                if (eventualClone === undefined) {
                     differencesList[currentDifferenceGroupIndex].push(currentPixel.pos);
-                    alreadyVisited.push(currentPixel.pos);
+                    alreadyVisited.push({ pos: currentPixel.pos, radius: currentPixel.radius });
+                } else {
+                    // if the pixel was already visited, check if the radius is bigger
+                    if (currentPixel.radius > eventualClone.radius) {
+                        eventualClone.radius = currentPixel.radius;
+                    } else {
+                        continue;
+                    }
                 }
 
-                if (currentPixel.radius > 0) {
-                    for (let y = currentPixel.pos.y - 1; y <= currentPixel.pos.y + 1; y++) {
-                        if (y < 0 || y >= imageHeight) continue;
-                        for (let x = currentPixel.pos.x - 1; x <= currentPixel.pos.x + 1; x++) {
-                            if (x < 0 || x >= imageWidth) continue;
-                            const nextPixel = { x, y };
-                            if (!alreadyVisited.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)) {
-                                //  if next pixels to visit already contains the pixel, with a higher radius, don't do anything
-                                // if (
-                                //     nextPixelsToVisit.some(
-                                //         (pixel) =>
-                                //             pixel.pos.x === nextPixel.x && pixel.pos.y === nextPixel.y && pixel.radius > currentPixel.radius - 1,
-                                //     )
-                                // )
-                                //     continue;
+                // || eventualClone.radius < currentPixel.radius
 
+                // if (currentPixel.radius > 0) {
+                for (let y = currentPixel.pos.y - 1; y <= currentPixel.pos.y + 1; y++) {
+                    if (y < 0 || y >= imageHeight) continue;
+                    for (let x = currentPixel.pos.x - 1; x <= currentPixel.pos.x + 1; x++) {
+                        if (x < 0 || x >= imageWidth) continue;
+                        const nextPixel = { x, y };
+                        if (!alreadyVisited.some((pixelData) => pixelData.pos.x === nextPixel.x && pixelData.pos.y === nextPixel.y)) {
+                            if (currentPixel.radius > 0 || pixelsToVisit.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)) {
                                 // if this pixel is already in the list of pixels to visit, add it but with the maximum radius
-                                nextPixelsToVisit.push({
+                                nextPixelsToVisit.enqueue({
                                     pos: nextPixel,
                                     radius: pixelsToVisit.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)
                                         ? visitRadius
@@ -119,6 +132,7 @@ export class ImageProcessingService {
                         }
                     }
                 }
+                // }
             }
             if (differencesList[currentDifferenceGroupIndex].length > 0 && pixelsToVisit.length > 0) {
                 differencesList.push([]);
@@ -134,7 +148,7 @@ export class ImageProcessingService {
             const output: Buffer = Buffer.from(imageBuffer1);
             // const differences: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
             const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2, radius);
-            const currentDifferences: Vector2[] = allDifferences[0];
+            // const currentDifferences: Vector2[] = allDifferences[0];
 
             // display the length of each difference group
             allDifferences.forEach((diffGroup, index) => {
@@ -143,7 +157,12 @@ export class ImageProcessingService {
             });
 
             this.turnImageToWhite(output);
-            this.paintBlackPixelsAtPositions(currentDifferences, output);
+            let sumOfAllDifferences: Vector2[] = [];
+            // eslint-disable-next-line @typescript-eslint/prefer-for-of
+            for (let i = 0; i < allDifferences.length; i++) {
+                sumOfAllDifferences = sumOfAllDifferences.concat(allDifferences[i]);
+            }
+            this.paintBlackPixelsAtPositions(sumOfAllDifferences, output);
 
             return output;
         } catch (e) {
