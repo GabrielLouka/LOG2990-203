@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ClassicPageComponent } from './classic-page.component';
+import { InfoIconComponent } from './info-icon.component';
 
-describe('ClassicPageComponent', () => {
-    let component: ClassicPageComponent;
-    let fixture: ComponentFixture<ClassicPageComponent>;
+describe('InfoIconComponent', () => {
+    let component: InfoIconComponent;
+    let fixture: ComponentFixture<InfoIconComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ClassicPageComponent],
+            declarations: [InfoIconComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(ClassicPageComponent);
+        fixture = TestBed.createComponent(InfoIconComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

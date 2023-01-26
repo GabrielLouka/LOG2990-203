@@ -10,10 +10,13 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
+import { HintComponent } from './components/hint/hint.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
+import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
+import { InfoIconComponent } from './components/info-icon/info-icon.component';
 
 /**
  * Main module that is used in main.ts.
@@ -23,14 +26,17 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
  */
 @NgModule({
     declarations: [
+        BackButtonComponent,
         AppComponent,
         MainPageComponent,
+        ClassicPageComponent,
         SelectionsPageComponent,
-        BackButtonComponent,
         PreviousPageButtonComponent,
         NextPageButtonComponent,
         GameCardComponent,
         OverlayComponent,
+        HintComponent,
+        InfoIconComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, MatGridListModule],
     providers: [],

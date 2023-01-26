@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ClassicPageComponent } from './classic-page.component';
+import { HintComponent } from './hint.component';
 
-describe('ClassicPageComponent', () => {
-    let component: ClassicPageComponent;
-    let fixture: ComponentFixture<ClassicPageComponent>;
+describe('HintComponent', () => {
+    let component: HintComponent;
+    let fixture: ComponentFixture<HintComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ClassicPageComponent],
+            declarations: [HintComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(ClassicPageComponent);
+        fixture = TestBed.createComponent(HintComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
