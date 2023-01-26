@@ -1,0 +1,93 @@
+body {
+    display: flex;
+    flex-direction: column;
+
+    max-height: 100vh;
+    background-color: lightblue;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    height: 15vh;
+}
+
+.button-style {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-weight: 600;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
+
+    border-radius: 2vw;
+    border: 0.3vh;
+
+    padding: 2vh 4vh;
+}
+
+.return-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 2vw;
+
+    background-color: white;
+
+    border: solid;
+
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(0.9);
+        background-color: lightsalmon;
+    }
+}
+
+.previous-icon {
+    height: 2vh;
+    margin-right: 10px;
+}
+
+.titre {
+    font-size: 5vh;
+}
+
+.registerContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    height: 85vh;
+}
+
+.register-input {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-around;
+
+    width: 65vh;
+}
+
+#input {
+    border: solid;
+}
+
+.play-button {
+    border-radius: 5vh;
+    cursor: pointer;
+}
+
+.not-allowed {
+    cursor: not-allowed;
+}
+
+.button-style #play-icon {
+    width: 3vh;
+    height: 3vh;
+}

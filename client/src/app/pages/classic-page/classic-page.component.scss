@@ -1,0 +1,25 @@
+body {
+    display: flex;
+    flex-direction: column;
+
+    max-height: 100vh;
+    background-color: lightblue;
+}
+
+.header #mode {
+    position: relative;
+    margin: 5vh;
+    top: 1vh;
+    left: 40%;
+    font-size: large;
+    font-weight: bold;
+}
+
+.footer #info-icon {
+    position: absolute;
+    margin: 5vh;
+    bottom: 0vh;
+    left: 2vh;
+    width: 50px;
+    height: auto;
+}
