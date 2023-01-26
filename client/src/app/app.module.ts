@@ -13,6 +13,11 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
 import { GameSheetComponent } from './components/game-sheet/game-sheet.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
+import { OverlayComponent } from './components/overlay/overlay.component';
+import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
+import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
+import { GameCardComponent } from './components/game-card/game-card.component';
+import { BackButtonComponent } from './components/back-button/back-button.component';
 
 /**
  * Main module that is used in main.ts.
@@ -30,6 +35,11 @@ import { ConfigurationPageComponent } from './pages/configuration-page/configura
         SidebarComponent,
         GameSheetComponent,
         ConfigurationPageComponent,
+        OverlayComponent,
+        PreviousPageButtonComponent,
+        NextPageButtonComponent,
+        GameCardComponent,
+        BackButtonComponent,
     ],
     imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule],
     providers: [],
