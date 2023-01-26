@@ -66,8 +66,8 @@ export class ImageProcessingService {
     };
 
     // eslint-disable-next-line complexity
-    getDifferencesPositionsList = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[][] => {
-        const visitRadius = 6;
+    getDifferencesPositionsList = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): Vector2[][] => {
+        const visitRadius = radius;
         const differencesList: Vector2[][] = [[]];
         let currentDifferenceGroupIndex = 0;
         const pixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
@@ -129,12 +129,12 @@ export class ImageProcessingService {
         return differencesList;
     };
 
-    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer): Buffer => {
+    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): Buffer => {
         try {
             const output: Buffer = Buffer.from(imageBuffer1);
             // const differences: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
-            const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2);
-            const currentDifferences: Vector2[] = allDifferences[1];
+            const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2, radius);
+            const currentDifferences: Vector2[] = allDifferences[0];
 
             // display the length of each difference group
             allDifferences.forEach((diffGroup, index) => {

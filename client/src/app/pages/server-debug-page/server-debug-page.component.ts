@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
+import { ImageUploadForm } from '@common/image.upload.form';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -18,6 +19,7 @@ export class ServerDebugPageComponent {
         const routeToSend = '/image_processing/send-image';
         const inputValue1 = (document.getElementById('browseButton1') as HTMLInputElement).files?.[0];
         const inputValue2 = (document.getElementById('browseButton2') as HTMLInputElement).files?.[0];
+        const radiusValue = (document.getElementById('radiusInput') as HTMLInputElement).value;
 
         if (inputValue1 !== undefined && inputValue2 !== undefined) {
             const buffer1 = await inputValue1.arrayBuffer();
@@ -29,8 +31,10 @@ export class ServerDebugPageComponent {
 
             const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
             const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
+            const radius = radiusValue === '' ? 0 : parseInt(radiusValue, 10);
 
-            this.communicationService.post<DifferenceImage[]>([firstImage, secondImage], routeToSend).subscribe({
+            const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
+            this.communicationService.post<ImageUploadForm>(imageUploadForm, routeToSend).subscribe({
                 next: (response) => {
                     const responseString = `Success : ${response.status} - 
                     ${response.statusText} \n`;
