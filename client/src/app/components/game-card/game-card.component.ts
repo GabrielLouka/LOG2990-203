@@ -14,8 +14,6 @@ export class GameCardComponent {
         switch (difficulty) {
             case 'FACILE':
                 return 'green';
-            case 'MOYEN':
-                return 'darkorange';
             case 'DIFFICILE':
                 return 'red';
             default:

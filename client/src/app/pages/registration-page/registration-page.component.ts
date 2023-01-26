@@ -10,6 +10,6 @@ export class RegistrationPageComponent {
     title = 'Register Page';
 
     registrationForm = new FormGroup({
-        pseudo: new FormControl('', Validators.required),
+        pseudo: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9_]{3,}$')])),
     });
 }

@@ -17,7 +17,7 @@
                 </div>
                 <p> 1 vs 1 :</p>
                 
-                <div class="ranking-box" *ngFor="let player of singleGame.ranking[0]">
+                <div class="ranking-box" *ngFor="let player of singleGame.ranking[1]">
                     <p *ngIf="player.name && player.score">{{player.name}} : {{player.score}}</p>
                 </div>
             </div>
