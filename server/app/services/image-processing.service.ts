@@ -73,8 +73,8 @@ export class ImageProcessingService {
         let currentDifferenceGroupIndex = 0;
         const pixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
 
-        const alreadyVisited: { pos: Vector2; radius: number }[] = [];
-        // const nextPixelsToVisit: { pos: Vector2; radius: number }[] = [];
+        const visitedRadius: { pos: Vector2; radius: number }[] = [];
+        const alreadyVisited: Set<string> = new Set();
         const nextPixelsToVisit: Queue<{ pos: Vector2; radius: number }> = new Queue();
 
         const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
@@ -95,16 +95,19 @@ export class ImageProcessingService {
                 // );
 
                 // see if the pixel was already visited
-                const eventualClone = alreadyVisited.find((pixelData) => {
-                    return pixelData.pos.x === currentPixel.pos.x && pixelData.pos.y === currentPixel.pos.y;
-                });
+
                 // if this pixel hasn't been visited, add it to the list of differences
-                if (eventualClone === undefined) {
+                if (!alreadyVisited.has(currentPixel.pos.x + ' ' + currentPixel.pos.y)) {
                     differencesList[currentDifferenceGroupIndex].push(currentPixel.pos);
-                    alreadyVisited.push({ pos: currentPixel.pos, radius: currentPixel.radius });
+                    visitedRadius.push({ pos: currentPixel.pos, radius: currentPixel.radius });
+                    alreadyVisited.add(currentPixel.pos.x + ' ' + currentPixel.pos.y);
                 } else {
                     // if the pixel was already visited, check if the radius is bigger
-                    if (currentPixel.radius > eventualClone.radius) {
+                    const eventualClone = visitedRadius.find((pixelData) => {
+                        return pixelData.pos.x === currentPixel.pos.x && pixelData.pos.y === currentPixel.pos.y;
+                    });
+
+                    if (eventualClone !== undefined && currentPixel.radius > eventualClone.radius) {
                         eventualClone.radius = currentPixel.radius;
                     } else {
                         continue;
@@ -116,7 +119,7 @@ export class ImageProcessingService {
                     for (let x = currentPixel.pos.x - 1; x <= currentPixel.pos.x + 1; x++) {
                         if (x < 0 || x >= imageWidth) continue;
                         const nextPixel = { x, y };
-                        if (!alreadyVisited.some((pixelData) => pixelData.pos.x === nextPixel.x && pixelData.pos.y === nextPixel.y)) {
+                        if (!alreadyVisited.has(nextPixel.x + ' ' + nextPixel.y)) {
                             if (currentPixel.radius > 0 || pixelsToVisit.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)) {
                                 // if this pixel is already in the list of pixels to visit, add it but with the maximum radius
                                 nextPixelsToVisit.enqueue({
