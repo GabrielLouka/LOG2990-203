@@ -9,6 +9,9 @@ import { Game } from '@app/interfaces/games';
 export class GameCardComponent {
     @Input() game: Game;
     @Input() pageTitle: string;
+    @Input() playable: boolean;
+
+    // selection: 'Bonjour';
 
     getDifficultyColor(game: { difficulty: unknown }) {
         switch (game.difficulty) {

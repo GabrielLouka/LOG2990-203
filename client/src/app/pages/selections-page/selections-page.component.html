@@ -11,7 +11,7 @@
     <div class="container">
         <mat-grid-list cols="2" rowHeight="42vh">
             <mat-grid-tile *ngFor="let game of games">
-                <app-game-card [game]="game"></app-game-card>
+                <app-game-card [game]="game" [playable]="playable"></app-game-card>
             </mat-grid-tile>
         </mat-grid-list>
     </div>

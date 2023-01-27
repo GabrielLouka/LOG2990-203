@@ -8,6 +8,8 @@ import { Game } from '../../interfaces/games';
     styleUrls: ['./selections-page.component.scss'],
 })
 export class SelectionsPageComponent {
+    playable = true;
+
     games: Game[] = [
         {
             description: 'Glouton',

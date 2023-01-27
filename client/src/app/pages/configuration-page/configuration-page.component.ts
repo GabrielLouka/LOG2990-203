@@ -17,6 +17,8 @@ import { Game } from '../../interfaces/games';
 
 export class ConfigurationPageComponent {
     title = 'Page de configuration';
+    playable = false;
+    
     resetClassement:Classements[] = [ 
         { name: 'PlayerA', score: "10:00" },
         { name: 'PlayerB', score: "10:00" },
