@@ -9,11 +9,11 @@
     </Section>
 
     <div class="container">
-        <!-- <mat-grid-list cols="2" rowHeight="42vh">
-            <mat-grid-tile *ngFor="let game of games"
-                ><app-game-card [title]="game.title" [difficulty]="game.difficulty"></app-game-card
-            ></mat-grid-tile>
-        </mat-grid-list> -->
+        <mat-grid-list cols="2" rowHeight="42vh">
+            <mat-grid-tile *ngFor="let game of games">
+                <app-game-card [game]="game"></app-game-card>
+            </mat-grid-tile>
+        </mat-grid-list>
     </div>
 
     <app-next-page-button></app-next-page-button>

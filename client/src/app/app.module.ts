@@ -10,7 +10,6 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
-import { GameSheetComponent } from './components/game-sheet/game-sheet.component';
 import { HintComponent } from './components/hint/hint.component';
 import { InfoIconComponent } from './components/info-icon/info-icon.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
@@ -31,7 +30,6 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
     declarations: [
         AppComponent,
         MainPageComponent,
-        GameSheetComponent,
         ConfigurationPageComponent,
         OverlayComponent,
         PreviousPageButtonComponent,

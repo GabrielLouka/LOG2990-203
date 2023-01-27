@@ -18,67 +18,79 @@ import { Game } from '../../interfaces/games';
 export class ConfigurationPageComponent {
     title = 'Page de configuration';
     resetClassement:Classements[] = [ 
-        { name: 'PlayerA', score: 200 },
-        { name: 'PlayerB', score: 200 },
-        { name: 'PlayerC', score: 200 }
+        { name: 'PlayerA', score: "10:00" },
+        { name: 'PlayerB', score: "10:00" },
+        { name: 'PlayerC', score: "10:00" }
     ];
     
     games: Game[] = [
         {
-            description: 'Jeux 1',
+            description: 'Glouton',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'DIFFICILE',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            ranking: [
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+            ],
         },
         {
-            description: 'Jeux 2',
+            description: 'Hommes de Cro-Magnon',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'FACILE',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            ranking: [
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+            ],
         },
         {
-            description: 'Jeux 3',
+            description: 'Bagnoles',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'MOYEN',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            difficulty: 'FACILE',
+            ranking: [
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+            ],
         },
         {
-            description: 'Jeux 4',
+            description: 'Playa',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'MOYEN',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            difficulty: 'DIFFICILE',
+            ranking: [
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+                [
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+            ],
         },
     ];
     constructor(private location: Location) {}
