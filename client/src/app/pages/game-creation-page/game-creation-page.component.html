@@ -7,37 +7,56 @@
         <button class="button-style return-button" (click)="previousPage()">Retour</button>
         <a id="projectLogo"><img src=".\assets\img\ProjectLogo.png" alt="Logo Projet" width="180" height="180" /></a>    
     </Section>
-<section class = "creation-options"><p>Rayon d'elargissement: <select id="enlargement-radius">
-  <option value="0">0</option>
-  <option value="3">3</option>
-  <option value="9">9</option>
-  <option value="15">15</option>
-</select></p></section>
+
 
     <section class="canvas-container">
-      <button class="button-style">Ajouter une image individuelle (originale) format BMP 24-bit de taille 640x480.
-        <input type="file" id="image" accept="image/bmp" (change)="processImage($event, false)"/>
-      </button>
-      <button class="button-style" (click) = "resetCanvas(false)">Réinitialiser image originale</button>
-
       <div class="original-canvas">   
         <canvas id="original-image" width="320" height="240">
         </canvas>
-    </div>
-    <div class = "modified-canvas">
-        <button class="button-style">Ajouter une image individuelle (modifiee)
-            <input type="file" id="image" accept="image/bmp" (change)="processImage($event, true)"/>
-        </button>
-        <button class="button-style" (click) = "resetCanvas(true)">Réinitialiser image modifiee</button>
+        </div>
+
+      <div class = "creation-options">   
+      <p>Rayon d'elargissement: <select id="enlargement-radius">
+          <option value="0">0</option>
+          <option value="3">3</option>
+          <option value="9">9</option>
+          <option value="15">15</option>
+        </select></p>
+        <button class ="crayon"> Crayon</button>
+        <button class ="gomme"> Gomme</button>
+        <button class ="rectangle"> Rectangle</button>
+      </div>
+      
+      <div class = "modified-canvas">       
+       
         <canvas id = "modified-image" width="320" height="240"></canvas>
     </div>
-      <button class="button-style">Ajouter la meme image 
-        <input type="file" id="image" accept="image/bmp" (change)="processImage($event, true);processImage($event, false) "/>
-      </button>
+
+  </section> 
       
-    <label htmlFor="name">Entrez un nom: </label>
-              <input type="text" id="name" placeholder="Mon jeu"  (change) = "updateName($event)"/>
-    <button class="button-style">Lancer validation des differences</button>
+<section class = "options-container">
+  <button class="button-style"><label for="original-image">Ajouter une image </label><input type="file" id="original-image" accept="image/bmp" (change)="processImage($event, false)"/></button>
+    
+  
+  <button class="button-style" (click) = "resetCanvas(false)">Réinitialiser image originale</button>
+
+  <button class="button-style"><label for="both-images">Ajouter la meme image </label> <input type="file" id="both-images" accept="image/bmp" (change)="processImage($event, true);processImage($event, false) "/>
+  </button>
+
+  <button class="button-style"><label for="modified-image">Ajouter une image </label><input type="file" id="modified-image" accept="image/bmp" (change)="processImage($event, true)"/></button>
+    
+<button class="button-style" (click) = "resetCanvas(true)">Réinitialiser image modifiee</button>
+
+</section>
+ 
+      
+<section class = "submission-container"> 
+<p>format BMP 24-bit de taille 640x480</p>
+        <button class="button-style">Lancer validation des differences</button>
+</section>
+    <!-- <label htmlFor="name">Entrez un nom: </label>
+              <input type="text" id="name" placeholder="Mon jeu"  (change) = "updateName($event)"/> -->
+    
        
-    </section>
+   
 </body>

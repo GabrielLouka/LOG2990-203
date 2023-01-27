@@ -1,3 +1,28 @@
+.canvas-container {
+  display : flex;
+
+  flex-direction: row;
+  justify-content: center;
+  
+}
+
+.options-container {
+  display : flex;
+
+  flex-direction: row;
+  justify-content: center;
+}
+
+section {
+  display : flex;
+
+  flex-direction: row;
+  justify-content: center;
+}
+
+input {
+  opacity: 0;
+}
 canvas {
     border: 1px solid black;
   }
@@ -14,74 +39,65 @@ body {
   background-color: lightblue;
 }
 
-// .button-style {
-//   font-weight: 600;
-//   font-size: 1.7vh;
-//   letter-spacing: 0.1vw;
+.button-style {
+  font-weight: 600;
+  font-size: 1.7vh;
+  letter-spacing: 0.1vw;
 
-//   border-radius: 2vw;
-//   border: solid 0.3vh;
+  border-radius: 2vw;
+  border: solid 0.3vh;
 
-//   padding: 2vh 4vh;
+  padding: 2vh 4vh;
 
-//   background-color: white;
+  background-color: white;
 
-//   cursor: pointer;
+  cursor: pointer;
 
-//   &:hover {
-//       transform: scale(0.9);
-//       background-color: lightsalmon;
-//   }
-// }
+  &:hover {
+      transform: scale(0.9);
+      background-color: lightsalmon;
+  }
+}
 
-// .header {
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 
-//   height: 15vh;
-// }
+  height: 15vh;
+}
 
-// .return-button {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
+.return-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-//   position: absolute;
-//   top: 0;
-//   left: 0;
-//   margin: 2vw;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 2vw;
 
-//   background-color: white;
+  background-color: white;
 
-//   border: solid;
+  border: solid;
 
-//   cursor: pointer;
+  cursor: pointer;
 
-//   &:hover {
-//       transform: scale(0.9);
-//       background-color: lightsalmon;
-//   }
-// }
+  &:hover {
+      transform: scale(0.9);
+      background-color: lightsalmon;
+  }
+}
 
-// .return-button #previousIcon {
-//   height: 2vh;
-//   margin-right: 10px;
-// }
+.return-button #previousIcon {
+  height: 2vh;
+  margin-right: 10px;
+}
 
-// .header #gameIcon {
-//   width: 15vh;
-//   height: 15vh;
-// }
-
-// .selection-container {
-//   display: flex;
-//   flex-direction: row;
-
-//   justify-content: center;
-
-//   height: 85vh;
-// }
+.header #gameIcon {
+  width: 15vh;
+  height: 15vh;
+}
 
 // .next-arrow {
 //   position: absolute;
