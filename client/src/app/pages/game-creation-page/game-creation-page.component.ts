@@ -53,15 +53,11 @@ export class GameCreationPageComponent {
         this.location.back();
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    updateName(event: any) {
-        this.gameName = event.target.value;
+    updateName(name: string) {
+        this.gameName = name;
     }
 
-    createGame() {
-        // const enlargement = document.getElementById('enlargement-radius').value;
-        const selObj = document.getElementById('enlargement-radius') as HTMLSelectElement;
-        this.enlargementRadius = parseInt(selObj.value, 10);
-
-        // Setting Value
+    submitImages() {
+        return true;
     }
 }

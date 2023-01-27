@@ -1,62 +1,63 @@
 <head>
-    <meta charset="UTF-8" />
-    <title>{{ title }}</title>
+  <meta charset="UTF-8" />
+  <title>{{ title }}</title>
 </head>
 <body>
-    <Section class="header">
-        <button class="button-style return-button" (click)="previousPage()">Retour</button>
-        <a id="projectLogo"><img src=".\assets\img\ProjectLogo.png" alt="Logo Projet" width="180" height="180" /></a>    
-    </Section>
-
-
-    <section class="canvas-container">
+  <section class="header">
+    <h1 class="button-style titre">Création de jeu</h1>
+      <button class="button-style return-button" (click)="previousPage()">Retour</button>
+      <a class="projectLogo"><img src=".\assets\img\ProjectLogo.png" alt="Logo Projet" width="180" height="180"/></a>    
+  </section>
+  <div class="row">
+    <div class="col-2">
       <div class="original-canvas">   
-        <canvas id="original-image" width="320" height="240">
-        </canvas>
-        </div>
-
-      <div class = "creation-options">   
-      <p>Rayon d'elargissement: <select id="enlargement-radius">
-          <option value="0">0</option>
-          <option value="3">3</option>
-          <option value="9">9</option>
-          <option value="15">15</option>
-        </select></p>
-        <button class ="crayon"> Crayon</button>
-        <button class ="gomme"> Gomme</button>
-        <button class ="rectangle"> Rectangle</button>
+        <canvas id="original-image"></canvas>
       </div>
-      
-      <div class = "modified-canvas">       
-       
-        <canvas id = "modified-image" width="320" height="240"></canvas>
     </div>
-
-  </section> 
-      
-<section class = "options-container">
-  <button class="button-style"><label for="original-image">Ajouter une image </label><input type="file" id="original-image" accept="image/bmp" (change)="processImage($event, false)"/></button>
-    
-  
-  <button class="button-style" (click) = "resetCanvas(false)">Réinitialiser image originale</button>
-
-  <button class="button-style"><label for="both-images">Ajouter la meme image </label> <input type="file" id="both-images" accept="image/bmp" (change)="processImage($event, true);processImage($event, false) "/>
-  </button>
-
-  <button class="button-style"><label for="modified-image">Ajouter une image </label><input type="file" id="modified-image" accept="image/bmp" (change)="processImage($event, true)"/></button>
-    
-<button class="button-style" (click) = "resetCanvas(true)">Réinitialiser image modifiee</button>
-
-</section>
- 
-      
-<section class = "submission-container"> 
-<p>format BMP 24-bit de taille 640x480</p>
-        <button class="button-style">Lancer validation des differences</button>
-</section>
-    <!-- <label htmlFor="name">Entrez un nom: </label>
-              <input type="text" id="name" placeholder="Mon jeu"  (change) = "updateName($event)"/> -->
-    
-       
-   
-</body>
+      <div class="col-1">
+          <div class="creation-options">   
+              <button class ="button-style crayon">Crayon:<span class="material-icons">mode</span></button>
+              <button class ="button-style gomme">Gomme: <span class="material-icons" style="font-size: 30px; color: rgb(254, 0, 161); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
+              <button class ="button-style rectangle">Rectangle:<span class="material-icons" style="font-size: 30px; color: rgb(0, 0, 0); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
+              <button class = "button-style" (click)="bothImagesButton.click()">Ajouter la meme image</button>
+              <input type="file" id="both-images" accept="image/bmp" #bothImagesButton (change)="processImage($event, false);processImage($event, true)" style="display:none;">
+              <button class ="button-style">Rayon d'elargissement: 
+                <select id="enlargement-radius" [(ngModel)]="enlargementRadius">
+                    <option value="0">0</option>
+                    <option value="3">3</option>
+                    <option value="9">9</option>
+                    <option value="15">15</option>
+              </select>
+              </button>
+          </div>
+      </div>
+      <div class="col-2">
+        <div class = "modified-canvas">       
+          <canvas id = "modified-image"></canvas>
+        </div>
+      </div>
+  </div>
+  <div class="row">
+      <div class="col-1">
+        <button class = "button-style" (click)="originalButton.click()">Ajouter une image</button>
+        <input type="file" id="original-image" accept="image/bmp" #originalButton (change)="processImage($event, false)" style="display:none;">
+      </div>
+     <div class="col-1">
+            <button class="button-style" (click) = "resetCanvas(false)">Réinitialiser image originale</button>
+      </div>
+      <div class="col-2">
+        <button class = "button-style" (click)="modifiedButton.click()">Ajouter une image</button>
+        <input type="file" id="modified-image" accept="image/bmp" #modifiedButton (change)="processImage($event, true)" style="display:none;">
+      </div>        
+      <div class="col-2">
+          <button class="button-style" (click) = "resetCanvas(true)">Réinitialiser image modifiée</button>
+      </div>
+    </div>
+    <div class="row">
+    <button class = "button-style" (click)="submitImages()">Valider les differences</button>
+    <button class = "button-style" >Nombre de differences: </button>
+    <button class = "button-style" >Entrer un nom de jeu:<label for="name"></label> </button>
+    <input id="game-name" [(ngModel)]="gameName"/>
+    <button (click)="updateName(gameName)">Envoyer nom</button>
+    <button class = "button-style" >Creer un jeu: </button>
+    </div>
