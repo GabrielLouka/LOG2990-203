@@ -1,12 +1,21 @@
-.hints-icon {
-    display: flex;
-    position: absolute;
-    background-color: white;
+.hint-container {
 
-    border: solid;
-    border-radius: 50%;
-    height: 15vh;
-    width: auto;
-    top: 0;
-    right: 0;
+    display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+
+    position: absolute;
+    top:0;
+    right:0;
+    background-color: white;
+	margin: .5em;
+	width: 100%;
+	max-width: 400px;
+	text-align: center;
+	border-radius: 40%;
+}
+
+.hint-container .nbHints p {
+    bottom: 4;
+    left:3;
 }
