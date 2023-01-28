@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 // eslint-disable-next-line no-restricted-imports
-import { Game } from '../../interfaces/games';
+import { Game } from '@app/interfaces/games';
 
 @Component({
     selector: 'app-selections-page',

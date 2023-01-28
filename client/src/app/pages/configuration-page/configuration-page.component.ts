@@ -4,7 +4,6 @@
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
-import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { Classements } from '@app/interfaces/classements';
 import { Game } from '../../interfaces/games';
@@ -95,18 +94,7 @@ export class ConfigurationPageComponent {
             ],
         },
     ];
-    constructor(private location: Location) {}
 
-
-    over() {
-        const subBox = document.getElementById('sub-box');
-        if (subBox) {
-            subBox.className = 'game-buttons';
-        }
-    }
-    previousPage() {
-        this.location.back();
-    }
     
     resetButton(){
         if(confirm('Are you sure you want to reset all the games')){
@@ -119,12 +107,10 @@ export class ConfigurationPageComponent {
     }
     deleteButton(){
         if(confirm('Are you sure you want to delete all the games')){
-            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('sub-container') as HTMLCollectionOf<Element>;
+            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('container') as HTMLCollectionOf<Element>;
             for(let i=0; i<divContainer.length;i++){
                 divContainer[i].innerHTML='';
             }      
         }
-
-    
     }
 }
