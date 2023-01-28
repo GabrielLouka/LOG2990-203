@@ -6,20 +6,19 @@ import { Service } from 'typedi';
 @Service()
 export class ImageProcessingService {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    static readonly imageWidthOffset = 18;
+    private static readonly requiredImageWidth = 640;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    static readonly imageHeightOffset = 22;
+    private static readonly requiredImageHeight = 480;
 
     turnImageToWhite = (imageBuffer: Buffer): void => {
         try {
-            const imageWidthOffset = 18;
-            const imageHeightOffset = 22;
+            const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer);
 
-            const imageWidth = imageBuffer.readUInt32LE(imageWidthOffset);
-            const imageHeight = imageBuffer.readUInt32LE(imageHeightOffset);
+            // eslint-disable-next-line no-console
+            console.log('Image dimensions to turn white ' + imageDimensions.x + 'x' + imageDimensions.y);
 
-            for (let y = 0; y < imageHeight; y++) {
-                for (let x = 0; x < imageWidth; x++) {
+            for (let y = 0; y < imageDimensions.y; y++) {
+                for (let x = 0; x < imageDimensions.x; x++) {
                     this.setRGB({ x, y }, imageBuffer, Pixel.white);
                 }
             }
@@ -31,16 +30,23 @@ export class ImageProcessingService {
 
     getDifferentPixelPositionsBetweenImages = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[] => {
         try {
-            const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
-            const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
+            // const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
+            // const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
+
+            const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
+            const imageDimensions2: Vector2 = this.getImageDimensions(imageBuffer2);
+
+            // eslint-disable-next-line no-console
+            console.log('Image dimensions 1: ' + imageDimensions.x + 'x' + imageDimensions.y);
+            // eslint-disable-next-line no-console
+            console.log('Image dimensions 2: ' + imageDimensions2.x + 'x' + imageDimensions2.y);
 
             const differences: Vector2[] = [];
 
-            for (let y = 0; y < imageHeight; y++) {
-                for (let x = 0; x < imageWidth; x++) {
+            for (let y = 0; y < imageDimensions.y; y++) {
+                for (let x = 0; x < imageDimensions.x; x++) {
                     const pixel1 = this.getRGB({ x, y }, imageBuffer1);
                     const pixel2 = this.getRGB({ x, y }, imageBuffer2);
-
                     if (pixel1 !== null && pixel2 !== null && !pixel1.equals(pixel2)) {
                         differences.push({ x, y });
                     }
@@ -77,8 +83,9 @@ export class ImageProcessingService {
         const alreadyVisited: Set<string> = new Set();
         const nextPixelsToVisit: Queue<{ pos: Vector2; radius: number }> = new Queue();
 
-        const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
-        const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
+        const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
+        const imageWidth = imageDimensions.x;
+        const imageHeight = imageDimensions.y;
 
         while (pixelsToVisit.length > 0) {
             if (pixelsToVisit.length > 0) {
@@ -145,9 +152,29 @@ export class ImageProcessingService {
     getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): Buffer => {
         try {
             const output: Buffer = Buffer.from(imageBuffer1);
-            // const differences: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
+
+            const image1Dimensions: Vector2 = this.getImageDimensions(imageBuffer1);
+            const image2Dimensions: Vector2 = this.getImageDimensions(imageBuffer2);
+
+            if (
+                image1Dimensions.x !== ImageProcessingService.requiredImageWidth ||
+                image1Dimensions.y !== ImageProcessingService.requiredImageHeight ||
+                image2Dimensions.x !== ImageProcessingService.requiredImageWidth ||
+                image2Dimensions.y !== ImageProcessingService.requiredImageHeight
+            )
+                throw new Error(
+                    'Images must be 640x480! (img 1 ' +
+                        image1Dimensions.x +
+                        'x' +
+                        image1Dimensions.y +
+                        ') (img 2 ' +
+                        image2Dimensions.x +
+                        'x' +
+                        image2Dimensions.y +
+                        ')',
+                );
+
             const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2, radius);
-            // const currentDifferences: Vector2[] = allDifferences[0];
 
             // display the length of each difference group
             allDifferences.forEach((diffGroup, index) => {
@@ -184,6 +211,8 @@ export class ImageProcessingService {
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error(e);
+            // eslint-disable-next-line no-console
+            console.error("OOPS! Couldn't get the RGB values for the pixel at position " + position.x + ', ' + position.y + '!');
             return null;
         }
     };
@@ -199,6 +228,8 @@ export class ImageProcessingService {
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error(e);
+            // eslint-disable-next-line no-console
+            console.error("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
         }
     };
 
@@ -209,9 +240,53 @@ export class ImageProcessingService {
         // Each pixel is 3 bytes (BGR)
         const pixelLength = 3;
 
-        const imageWidthOffset = 18;
+        const imageWidth = this.getImageDimensions(imageBuffer).x;
 
         // Calculate the starting position of the pixel
-        return (position.x + position.y * imageBuffer.readUInt32LE(imageWidthOffset)) * pixelLength + pixelStart;
+        // return (position.x + position.y * imageBuffer.readUInt32LE(imageWidthOffset)) * pixelLength + pixelStart;
+        return (position.x + position.y * imageWidth) * pixelLength + pixelStart;
     };
+
+    private getImageDimensions = (imageBuffer: Buffer): Vector2 => {
+        const imageWidthOffset = 18;
+        const imageHeightOffset = 22;
+
+        const imageWidth = imageBuffer.readInt32LE(imageWidthOffset);
+        let imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
+
+        if (imageHeight < 0) {
+            imageHeight = -imageHeight;
+        }
+
+        return new Vector2(imageWidth, imageHeight);
+    };
+
+    // private getImageDimensions = (imageBuffer: Buffer): Vector2 => {
+    //     let width = 0;
+    //     let height = 0;
+    //     // let pixelStart = 0;
+
+    //     const imageWidthOffset = 18;
+    //     const imageHeightOffset = 22;
+
+    //     // Check if the file has a BITMAPCOREHEADER or a BITMAPINFOHEADER
+    //     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    //     if (imageBuffer.readUInt16LE(14) === 12) {
+    //         // BITMAPCOREHEADER
+    //         width = imageBuffer.readUInt16LE(imageWidthOffset);
+    //         height = imageBuffer.readUInt16LE(imageHeightOffset);
+    //     } else {
+    //         // BITMAPINFOHEADER
+    //         width = imageBuffer.readInt32LE(imageWidthOffset);
+    //         height = imageBuffer.readInt32LE(imageHeightOffset);
+    //         // pixelStart = imageBuffer.readUInt32LE(10);
+    //     }
+
+    //     // Check if the height is negative (indicates a top-down DIB)
+    //     if (height < 0) {
+    //         height = -height;
+    //     }
+
+    //     return { x: width, y: height };
+    // };
 }
