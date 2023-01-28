@@ -1,21 +1,33 @@
+
 .hint-container {
-
     display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-
     position: absolute;
-    top:0;
-    right:0;
-    background-color: white;
-	margin: .5em;
-	width: 100%;
-	max-width: 400px;
-	text-align: center;
-	border-radius: 40%;
+
+    width: 20vh;
+    height: 20vh;
+    top: 0;
+    right: 0;
+
 }
 
-.hint-container .nbHints p {
-    bottom: 4;
-    left:3;
+.hint-icon {
+    display: flex;
+    position: absolute;
+    background-color: white;
+
+    border: solid;
+    border-radius: 50%;
+    height: 15vh;
+    width: auto;
+    top: 0;
+    right: 0;
+    margin: 2vh 4vh;
+}
+
+.nbHints {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin:3vh 7vh;
 }
