@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { Info } from '@app/interfaces/info';
 
 @Component({
-    selector: 'app-info-icon',
-    templateUrl: './info-icon.component.html',
-    styleUrls: ['./info-icon.component.scss'],
+    selector: 'app-info-card',
+    templateUrl: './info-card.component.html',
+    styleUrls: ['./info-card.component.scss'],
 })
-export class InfoIconComponent {
+export class InfoCardComponent {
     info: Info = {
         description: 'Jeu 1',
         difficulty: 'Facile',

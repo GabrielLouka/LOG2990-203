@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
     selector: 'app-back-button',
@@ -6,6 +6,8 @@ import { Component } from '@angular/core';
     styleUrls: ['./back-button.component.scss'],
 })
 export class BackButtonComponent {
+    @Input() btnType: string = '';
+
     goBack() {
         window.history.back();
     }

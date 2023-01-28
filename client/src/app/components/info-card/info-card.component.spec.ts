@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InfoIconComponent } from './info-icon.component';
+import { InfoIconComponent } from './info-card.component';
 
 describe('InfoIconComponent', () => {
     let component: InfoIconComponent;

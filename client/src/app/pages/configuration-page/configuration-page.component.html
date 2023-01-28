@@ -5,7 +5,7 @@
 
 <body>
     <Section class="header">
-        <button class="button-style return-button" (click)="previousPage()">Retour</button>
+        <app-back-button [btnType] = "btnType"></app-back-button>
         <a id="projectLogo"><img src=".\assets\img\game-icon.png" alt="Logo Projet" width="180" height="180" /></a>
         <div class="btn">
             <button class="game-btn">Créer un jeu</button>

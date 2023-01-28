@@ -7,4 +7,5 @@ import { Component } from '@angular/core';
 })
 export class ClassicPageComponent {
     title = 'JEUX CLASSIQUE';
+    btnType = 'Quitter';
 }

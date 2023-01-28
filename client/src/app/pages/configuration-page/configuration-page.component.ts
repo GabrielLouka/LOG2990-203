@@ -16,6 +16,7 @@ import { Game } from '../../interfaces/games';
 })
 
 export class ConfigurationPageComponent {
+    btnType = 'Retour';
     title = 'Page de configuration';
     resetClassement:Classements[] = [ 
         { name: 'PlayerA', score: 200 },
