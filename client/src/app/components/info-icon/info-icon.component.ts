@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
-import { Game } from '@app/interfaces/games';
+import { Component } from '@angular/core';
+import { Info } from '@app/interfaces/info';
 
 @Component({
     selector: 'app-info-icon',
@@ -7,5 +7,11 @@ import { Game } from '@app/interfaces/games';
     styleUrls: ['./info-icon.component.scss'],
 })
 export class InfoIconComponent {
-    @Input() soloClassicGame: Game;
+    info: Info = {
+        description: 'Jeu 1',
+        difficulty: 'Facile',
+        mode: 'Solo Classique',
+        nbHints: 3,
+        hintsPenalty: 10,
+    };
 }

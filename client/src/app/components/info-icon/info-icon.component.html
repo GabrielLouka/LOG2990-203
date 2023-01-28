@@ -1,15 +1,14 @@
-<div class="box">
+<div class="info-container">
     <div class="game-info">
-        <p class="description">{{soloClassicGame.description}}</p>
-        <p class="description">{{soloClassicGame.difficulty}</p>
-        <p class="description">{{soloClassicGame.mode}}</p>
-        <p class="description">{{soloClassicGame.nbHints}}</p>
-        <p class="description">{{soloClassicGame.hintsPenalty}}</p>
-        <div class="image-stats-container">
-            <div class="info-icon">
-                <img src=".\assets\img\info-icon.png" class="info-icon" alt="gameInfoIcon"/>
-            </div>
+        <p> {{info.description}}</p>
+        <p> {{info.difficulty}}</p>
+        <p> {{info.mode}}</p>
+        <p> Nombre d'indices : {{info.nbHints}}</p>
+        <p> Temps pénalité : {{info.hintsPenalty}}</p>
+        <div class="info-icon">
+            <img src=".\assets\img\info-icon.png" class="info-icon" alt="gameInfoIcon"/>
         </div>
+    </div>
 </div>
 
 
