@@ -10,7 +10,7 @@
                 <img src={{singleGame.image}} alt="Logo" width="291.46" height="300.47" /> 
             </div>
             <div class="stats-box">
-                <p class="difficulty">Difficulty : {{ singleGame.difficulty }}</p>
+                <p class="difficulty">Difficulté : {{ singleGame.difficulty }}</p>
                 <p> Mode solo :</p>
                 <div class="ranking-box" *ngFor="let player of singleGame.ranking[0]">
                     <p *ngIf="player.name && player.score">{{player.name}} : {{player.score}}</p>

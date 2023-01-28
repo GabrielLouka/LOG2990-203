@@ -28,6 +28,9 @@ export class ConfigurationPageComponent {
             description: 'Jeux 1',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'DIFFICILE',
+            mode: "Classique",
+            nbHints: 3,
+            hintsPenalty: 10,
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
@@ -42,6 +45,9 @@ export class ConfigurationPageComponent {
             description: 'Jeux 2',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'FACILE',
+            mode: "Classique",
+            nbHints: 3,
+            hintsPenalty: 10,
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
@@ -56,6 +62,9 @@ export class ConfigurationPageComponent {
             description: 'Jeux 3',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'MOYEN',
+            mode: "Classique",
+            nbHints: 3,
+            hintsPenalty: 10,
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
@@ -70,6 +79,9 @@ export class ConfigurationPageComponent {
             description: 'Jeux 4',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'MOYEN',
+            mode: "Classique",
+            nbHints: 3,
+            hintsPenalty: 10,
             ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
