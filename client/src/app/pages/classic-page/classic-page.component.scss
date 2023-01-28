@@ -11,7 +11,13 @@ body {
     flex-direction: row;
     justify-content: center;
 
-    height: 15vh;
+    height: 20vh;
+}
+
+.difference-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 
 .titre {

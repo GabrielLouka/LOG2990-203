@@ -21,6 +21,7 @@ import { ClassicPageComponent } from './pages/classic-page/classic-page.componen
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
+import { FoundHintsCounterComponent } from './components/found-hints-counter/found-hints-counter.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -44,6 +45,7 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         InfoCardComponent,
         ServerDebugPageComponent,
         RegistrationPageComponent,
+        FoundHintsCounterComponent,
     ],
     imports: [
         AppMaterialModule,

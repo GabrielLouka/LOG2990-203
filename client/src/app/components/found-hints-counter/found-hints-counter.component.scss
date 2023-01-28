@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    justify-content: center;
+    border: solid;
+    border-color: black;
+    border-radius: 5%;
+
+    width: max-content;
+    height: auto;
+    padding: 10px;
+}

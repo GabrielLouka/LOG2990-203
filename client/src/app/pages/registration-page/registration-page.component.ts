@@ -13,4 +13,8 @@ export class RegistrationPageComponent {
     registrationForm = new FormGroup({
         pseudo: new FormControl('', Validators.required),
     });
+
+    get enteredPseudo() {
+        return this.registrationForm.value;
+    }
 }
