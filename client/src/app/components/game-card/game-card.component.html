@@ -1,16 +1,44 @@
 <div class="game-card">
     <div class="description-container">
         <div class="title-container">
-            <div class="title">{{ title }}</div>
+            <div class="title">{{ game.description }}</div>
             <div class="difficulty">
                 <div>Difficulté :</div>
-                <div [ngStyle]="{ color: getDifficultyColor(difficulty) }">{{ '&nbsp;' + difficulty }}</div>
+                <div [ngStyle]="{ color: getDifficultyColor(game) }">{{ '&nbsp;' + game.difficulty }}</div>
             </div>
         </div>
         <div class="content-container">
-            <img src="./assets/img/original-picture.png" class="original-picture" alt="original-picture" />
-            <div class="classement">Classement</div>
+            <img img src={{game.image}} class="original-picture" alt="original-picture" />
+            <div class="classement-container">
+                <div class="description"> Classement</div>
+                <div class="test">
+                    <div class="badge-container">
+                        <img src=".\assets\img\gold-badge.png" class="badge-icon" alt="gameLogo" />
+                        <img src=".\assets\img\silver-badge.png" class="badge-icon" alt="gameLogo" />
+                        <img src=".\assets\img\bronze-badge.png" class="badge-icon" alt="gameLogo" />
+                    </div>
+                    <div class="mode">
+                        <p>Solo</p>
+                        <br>
+                        <div class="data-container" *ngFor="let player of game.ranking[0]">
+                            <p class ="pseudo" *ngIf="player.name && player.score">{{player.name}} </p> 
+                            <p> : {{player.score}} </p>
+                        </div>
+                    </div>
+                    <div class="divider">
+                    </div>
+                    <div class="mode">
+                        <p class="title-mode">1 VS 1</p>
+                        <br>
+                        <div class="data-container" *ngFor="let player of game.ranking[1]">
+                              
+                            <p class ="pseudo" *ngIf="player.name && player.score">{{player.name}} </p> 
+                            <p> : {{player.score}} </p>
+                        </div>
+                    </div>
+                </div> 
+            </div>
         </div>
     </div>
-    <app-overlay> </app-overlay>
+    <app-overlay [playable]="playable"></app-overlay>
 </div>

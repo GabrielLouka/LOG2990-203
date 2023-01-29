@@ -12,19 +12,18 @@ import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-de
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { FoundHintsCounterComponent } from './components/found-hints-counter/found-hints-counter.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
-import { GameSheetComponent } from './components/game-sheet/game-sheet.component';
 import { HintComponent } from './components/hint/hint.component';
 import { ImagesAreaComponent } from './components/images-area/images-area.component';
 import { InfoCardComponent } from './components/info-card/info-card.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
+import { TimerComponent } from './components/timer/timer.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
-import { TimerComponent } from './components/timer/timer.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -35,7 +34,6 @@ import { TimerComponent } from './components/timer/timer.component';
     declarations: [
         AppComponent,
         MainPageComponent,
-        GameSheetComponent,
         ConfigurationPageComponent,
         OverlayComponent,
         PreviousPageButtonComponent,

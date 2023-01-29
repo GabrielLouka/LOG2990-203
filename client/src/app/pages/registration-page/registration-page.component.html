@@ -3,23 +3,27 @@
     <title>{{ title }}</title>
 </head>
 <body>
+    
     <Section class="header">
-        <app-back-button [btnType]= "btnType"></app-back-button>
+        <app-back-button></app-back-button>
+        <h1 class="button-style titre">Jeu classique</h1>
     </Section>
-    <h1 class="button-style titre">Jeu classique</h1>
     <Section class="registerContainer">
         <form class="register-input">
             <label class="button-style" for="input">Pseudo :</label>
             <div [formGroup]="registrationForm">
             <input name="userName" class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="pseudo" required />
             </div>
+        <form [formGroup]="registrationForm" class="register-input">
+            <label class="button-style" for="input">Username :</label>
+            <input class="button-style" id="input" type="text" placeholder="Write here" formControlName="pseudo" required />
             <br />
 
-            <button (click)="registerUser()" type="button" class="button-style play-button" routerLink="/classic">
+            <button class="button-style play-button" routerLink="/classic">
                 <img src=".\assets\img\play-icon.png" id="play-icon" alt="gameLogo" />
-            </button> 
-        
+            </button>
         </form>
+
 
     </Section>
 </body>

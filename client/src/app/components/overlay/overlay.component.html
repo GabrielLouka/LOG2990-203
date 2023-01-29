@@ -1,4 +1,7 @@
 <div class="overlay">
-    <button class="button-style" routerLink="/registration">Jouer</button>
-    <button class="button-style">Rejoindre</button>
+    <button *ngIf="playable" class="button-style" routerLink="/registration">Jouer</button>
+    <button *ngIf="playable" class="button-style">Rejoindre</button>
+    
+    <button *ngIf="!playable" class="button-style">Supprimer</button>
+    <button *ngIf="!playable" class="button-style">Réinitialiser</button>
 </div>

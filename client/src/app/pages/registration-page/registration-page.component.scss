@@ -1,9 +1,6 @@
 body {
     display: flex;
     flex-direction: column;
-
-    max-height: 100vh;
-    background-color: lightblue;
 }
 
 .header {
@@ -29,29 +26,6 @@ body {
     padding: 2vh 4vh;
 }
 
-.return-button {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 2vw;
-
-    background-color: white;
-
-    border: solid;
-
-    cursor: pointer;
-
-    &:hover {
-        transform: scale(0.9);
-        background-color: lightsalmon;
-    }
-}
-
-.previous-icon {
-    height: 2vh;
-    margin-right: 10px;
-}
-
 .titre {
     font-size: 5vh;
 }
@@ -62,7 +36,7 @@ body {
     justify-content: center;
     align-items: center;
 
-    height: 85vh;
+    height: 80vh;
 }
 
 .register-input {
@@ -79,15 +53,26 @@ body {
 }
 
 .play-button {
-    border-radius: 5vh;
-    cursor: pointer;
-}
-
-.not-allowed {
-    cursor: not-allowed;
+    border:solid; 
 }
 
 .button-style #play-icon {
     width: 3vh;
     height: 3vh;
+}
+
+
+
+input.ng-invalid {
+    background-color:rgb(249, 99, 99);
+}
+input.ng-valid {
+    background-color:lightgreen;
+}
+
+.not-allowed {
+    cursor: not-allowed;
+}
+.allowed {
+    cursor: pointer;
 }

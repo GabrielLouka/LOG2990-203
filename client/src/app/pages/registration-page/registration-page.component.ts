@@ -12,7 +12,7 @@ export class RegistrationPageComponent {
     btnType = 'Retour';
 
     registrationForm = new FormGroup({
-        pseudo: new FormControl('', Validators.required),
+        pseudo: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
     });
 
     constructor(private auth: AuthService) {}
