@@ -12,11 +12,11 @@ export class TimerComponent implements AfterViewInit {
     @ViewChild('minutes', { static: true }) minutes: ElementRef;
     @ViewChild('seconds', { static: true }) seconds: ElementRef;
 
-    timeInSecond: number = 120;
+    timeInSecond: number = 5;
 
     ngAfterViewInit() {
         setInterval(() => {
-            this.tickTock();
+            if (this.timeInSecond > 0) this.tickTock();
         }, 1000);
     }
 
