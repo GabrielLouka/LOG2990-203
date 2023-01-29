@@ -1,5 +1,25 @@
-.mat-grid-list {
+.img-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: row;
+
+    width: 60vw;
+    height: 70vh;
+    margin-top: 10%;
+    align-content: center;
 }
+
+.original {
+    position: relative;
+    top:10%;
+    left:0;
+    padding-right: 10vh;
+    padding-left: 1vh
+}
+
+.difference {
+    position: relative;
+    top:10%;
+    right:0;
+    padding-left: 9vh;
+}
+
