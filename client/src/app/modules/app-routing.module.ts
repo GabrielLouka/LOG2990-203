@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { SlidingPageComponent } from '@app/components/sliding-page/sliding-page.component';
 import { ClassicPageComponent } from '@app/pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from '@app/pages/configuration-page/configuration-page.component';
 import { LimitedTimePageComponent } from '@app/pages/limited-time-page/limited-time-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { RegistrationPageComponent } from '@app/pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from '@app/pages/selections-page/selections-page.component';
-
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
@@ -15,6 +15,7 @@ const routes: Routes = [
     { path: 'classic', component: ClassicPageComponent },
     { path: 'limited-time', component: LimitedTimePageComponent },
     { path: 'config', component: ConfigurationPageComponent },
+    { path: 'sliding', component: SlidingPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
