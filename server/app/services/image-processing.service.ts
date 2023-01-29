@@ -1,6 +1,7 @@
 import { Pixel } from '@app/classes/pixel';
 import { Queue } from '@app/classes/queue';
 import { Vector2 } from '@app/classes/vector2';
+import { ImageUploadResult } from '@common/image.upload.result';
 import { Service } from 'typedi';
 
 @Service()
@@ -150,8 +151,8 @@ export class ImageProcessingService {
         return differencesList;
     };
 
-    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): Buffer => {
-        const output: Buffer = Buffer.from(imageBuffer1);
+    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): ImageUploadResult => {
+        const imageOutput: Buffer = Buffer.from(imageBuffer1);
 
         const image1Dimensions: Vector2 = this.getImageDimensions(imageBuffer1);
         const image2Dimensions: Vector2 = this.getImageDimensions(imageBuffer2);
@@ -184,15 +185,16 @@ export class ImageProcessingService {
             console.log('diff group length ' + index + ' : ' + diffGroup.length);
         });
 
-        this.turnImageToWhite(output);
+        this.turnImageToWhite(imageOutput);
         let sumOfAllDifferences: Vector2[] = [];
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < allDifferences.length; i++) {
             sumOfAllDifferences = sumOfAllDifferences.concat(allDifferences[i]);
         }
-        this.paintBlackPixelsAtPositions(sumOfAllDifferences, output);
+        this.paintBlackPixelsAtPositions(sumOfAllDifferences, imageOutput);
 
-        return output;
+        return { resultImageByteArray: Array.from(new Uint8Array(imageOutput)), numberOfDifferences: allDifferences.length, message: 'Success!' };
+        // return imageOutput;
     };
 
     private getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {

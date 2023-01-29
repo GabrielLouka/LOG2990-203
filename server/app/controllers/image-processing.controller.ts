@@ -1,5 +1,6 @@
 import { ImageProcessingService } from '@app/services/image-processing.service';
 import { ImageUploadForm } from '@common/image.upload.form';
+import { ImageUploadResult } from '@common/image.upload.result';
 import { Request, Response, Router } from 'express';
 import { writeFile } from 'fs';
 import { Service } from 'typedi';
@@ -34,18 +35,21 @@ export class ImageProcessingController {
             });
 
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            let outputBuffer: Buffer = Buffer.from(buffer1);
+            // let outputBuffer: Buffer = Buffer.from(buffer1);
             let status = HTTP_STATUS_CREATED;
+            let outputResult: ImageUploadResult = { resultImageByteArray: Array.from(new Uint8Array(buffer1)), numberOfDifferences: 0, message: '' };
             try {
-                outputBuffer = this.imageProcessingService.getDifferencesBlackAndWhiteImage(buffer1, buffer2, receivedDifferenceImages.radius);
+                outputResult = this.imageProcessingService.getDifferencesBlackAndWhiteImage(buffer1, buffer2, receivedDifferenceImages.radius);
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.error(e);
                 status = HTTP_BAD_REQUEST;
+                outputResult.message = '' + e;
             }
 
-            const byteArray: number[] = Array.from(new Uint8Array(outputBuffer));
-            res.status(status).send(JSON.stringify(byteArray));
+            // const byteArray: number[] = Array.from(new Uint8Array(outputBuffer));
+            // res.status(status).send(JSON.stringify(byteArray));
+            res.status(status).send(JSON.stringify(outputResult));
         });
     }
 }
