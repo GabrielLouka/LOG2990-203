@@ -8,10 +8,8 @@ import { StatusCodes } from 'http-status-codes';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
-import { GameController } from './controllers/game.controller';
+import { GamesController } from './controllers/games.controller';
 import { ImageProcessingController } from './controllers/image-processing.controller';
-import { dbService } from './services/database.service';
-import { DB_URL } from './utils/env';
 
 @Service()
 export class Application {
@@ -24,7 +22,7 @@ export class Application {
         private readonly exampleController: ExampleController,
         private readonly dateController: DateController,
         private readonly imageProcessingController: ImageProcessingController,
-        private readonly gameController: GameController,
+        readonly gamesController: GamesController,
     ) {
         this.app = express();
 
@@ -49,20 +47,11 @@ export class Application {
         this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/image_processing', this.imageProcessingController.router);
         this.app.use('/api/date', this.dateController.router);
-        this.app.use('/api/game', this.gameController.router);
+        this.app.use('/api/games', this.gamesController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });
         this.errorHandling();
-
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-magic-numbers
-        const server = this.app.listen(3000, () => {
-            dbService.connectToServer(DB_URL).then(() => {
-                this.gameController.gameService.populateDb();
-                // eslint-disable-next-line no-console, @typescript-eslint/no-magic-numbers
-                console.log(`Listening on port ${3000}.`);
-            });
-        });
     }
 
     private config(): void {
