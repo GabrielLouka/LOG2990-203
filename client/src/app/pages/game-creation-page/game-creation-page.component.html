@@ -4,60 +4,57 @@
 </head>
 <body>
   <section class="header">
-    <h1 class="button-style titre">Création de jeu</h1>
+    <h1 class="titre">Création de jeu</h1>
       <button class="button-style return-button" (click)="previousPage()">Retour</button>
       <a class="projectLogo"><img src=".\assets\img\ProjectLogo.png" alt="Logo Projet" width="180" height="180"/></a>    
   </section>
   <div class="row">
-    <div class="col-2">
       <div class="original-canvas">   
         <canvas id="original-image"></canvas>
       </div>
-    </div>
-      <div class="col-1">
-          <div class="creation-options">   
-              <button class ="button-style crayon">Crayon:<span class="material-icons">mode</span></button>
-              <button class ="button-style gomme">Gomme: <span class="material-icons" style="font-size: 30px; color: rgb(254, 0, 161); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
-              <button class ="button-style rectangle">Rectangle:<span class="material-icons" style="font-size: 30px; color: rgb(0, 0, 0); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
-              <button class = "button-style" (click)="bothImagesButton.click()">Ajouter la meme image</button>
-              <input type="file" id="both-images" accept="image/bmp" #bothImagesButton (change)="processImage($event, false);processImage($event, true)" style="display:none;">
-              <button class ="button-style">Rayon d'elargissement: 
-                <select id="enlargement-radius" [(ngModel)]="enlargementRadius">
-                    <option value="0">0</option>
-                    <option value="3">3</option>
-                    <option value="9">9</option>
-                    <option value="15">15</option>
-              </select>
-              </button>
-          </div>
-      </div>
-      <div class="col-2">
-        <div class = "modified-canvas">       
+      <div class = "modified-canvas">       
           <canvas id = "modified-image"></canvas>
-        </div>
       </div>
   </div>
-  <div class="row">
-      <div class="col-1">
-        <button class = "button-style" (click)="originalButton.click()">Ajouter une image</button>
-        <input type="file" id="original-image" accept="image/bmp" #originalButton (change)="processImage($event, false)" style="display:none;">
-      </div>
-     <div class="col-1">
-            <button class="button-style" (click) = "resetCanvas(false)">Réinitialiser image originale</button>
-      </div>
-      <div class="col-2">
-        <button class = "button-style" (click)="modifiedButton.click()">Ajouter une image</button>
-        <input type="file" id="modified-image" accept="image/bmp" #modifiedButton (change)="processImage($event, true)" style="display:none;">
-      </div>        
-      <div class="col-2">
-          <button class="button-style" (click) = "resetCanvas(true)">Réinitialiser image modifiée</button>
-      </div>
-    </div>
-    <div class="row">
-    <button class = "button-style" (click)="submitImages()">Valider les differences</button>
-    <button class = "button-style" >Nombre de differences: </button>
-    <button class = "button-style" >Entrer un nom de jeu:<label for="name"></label> </button>
-    <input id="game-name" [(ngModel)]="gameName"/>
-    <button (click)="updateName(gameName)">Envoyer nom</button>
-    <button class = "button-style" >Creer un jeu: </button>
-    </div>
+  <div class="row">   
+      <button class ="button-style crayon">Crayon:<span class="material-icons">mode</span></button>
+      <button class ="button-style gomme">Gomme: <span class="material-icons" style="font-size: 30px; color: rgb(254, 0, 161); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
+      <button class ="button-style rectangle">Rectangle:<span class="material-icons" style="font-size: 30px; color: rgb(0, 0, 0); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
+  </div>
+  <div class = "row">
+    <section class = "steps-container">
+      <ol> Pour créer un jeu, veuillez suivre ces étapes dans l'ordre:
+        <li *ngFor = "let step of steps; index as stepId" [ngClass]="{'in-progress': this.currentStep === stepId, 'completed': this.currentStep > stepId, 'upcoming': this.currentStep < stepId}">
+        {{step}}
+        <div *ngIf = "stepId === 0">
+          <button class = "button-style" (click)="originalButton.click()">Ajouter une image originale</button>
+          <input type="file" id="original-image" accept="image/bmp" #originalButton (change)="processImage($event, false)" style="display:none;">
+          <button class="button-style" (click) = "resetCanvas(false)" >Réinitialiser l'image originale</button>
+
+          <button class = "button-style" (click)="modifiedButton.click()">Ajouter une image modifiée</button>
+          <input type="file" id="modified-image" accept="image/bmp" #modifiedButton (change)="processImage($event, true)" style="display:none;">
+          <button class="button-style"(click) = "resetCanvas(true)">Réinitialiser image modifiée</button>
+          <button class = "button-style" (click)="bothImagesButton.click()">Ajouter la meme image</button>
+          <input type="file" id="both-images" accept="image/bmp" #bothImagesButton (change)="processImage($event, false); processImage($event, true)" style="display:none;"> 
+        </div>
+        <select *ngIf = "stepId === 1" class="button-style" id="enlargement-radius" [(ngModel)]="enlargementRadius">
+            <option value="0">0</option>
+            <option value="3">3</option>
+            <option value="9">9</option>
+            <option value="15">15</option>
+        </select>
+        <button *ngIf = "stepId === 1" class = "button-style" (click)="submitRadius(enlargementRadius)">Confirmer</button>
+        <button *ngIf = "stepId === 2" class = "button-style" (click)="submitImages()">Calculer differences</button>
+        <button *ngIf = "stepId === 2" class = "button-style">Nombre de differences : {{totalDifferences}}</button>
+        <input *ngIf = "stepId === 3" id="game-name" [(ngModel)]="gameName"/>
+        <button *ngIf = "stepId === 3" (click)="updateName(gameName)">Envoyer nom</button>
+        <button *ngIf = "stepId === 4" class = "button-style">Creer un jeu: </button>
+        </li>
+    </ol>
+    </section>
+    
+    <section>       
+      <div class = "difference-canvas">       
+      <canvas id = "difference-canvas"></canvas>
+  </div></section>
+  </div>
