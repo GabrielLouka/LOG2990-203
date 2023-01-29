@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
     selector: 'app-registration-page',
@@ -14,7 +15,9 @@ export class RegistrationPageComponent {
         pseudo: new FormControl('', Validators.required),
     });
 
-    get enteredPseudo() {
-        return this.registrationForm.value;
+    constructor(private auth: AuthService) {}
+
+    registerUser() {
+        this.auth.registerUser(this.registrationForm.value.pseudo);
     }
 }

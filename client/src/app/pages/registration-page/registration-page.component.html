@@ -10,11 +10,12 @@
     <Section class="registerContainer">
         <form class="register-input">
             <label class="button-style" for="input">Pseudo :</label>
-            <input class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="pseudo" required />
-
+            <div [formGroup]="registrationForm">
+            <input name="userName" class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="pseudo" required />
+            </div>
             <br />
 
-            <button class="button-style play-button" routerLink="/classic">
+            <button (click)="registerUser()" type="button" class="button-style play-button" routerLink="/classic">
                 <img src=".\assets\img\play-icon.png" id="play-icon" alt="gameLogo" />
             </button> 
         

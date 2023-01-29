@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
     selector: 'app-found-hints-counter',
@@ -6,5 +7,6 @@ import { Component } from '@angular/core';
     styleUrls: ['./found-hints-counter.component.scss'],
 })
 export class FoundHintsCounterComponent {
-    pseudo: string = 'Marie-Jade';
+    pseudo = this.auth.registerUserName();
+    constructor(private auth: AuthService) {}
 }
