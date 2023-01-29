@@ -14,9 +14,6 @@ export class ImageProcessingService {
         try {
             const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer);
 
-            // eslint-disable-next-line no-console
-            console.log('Image dimensions to turn white ' + imageDimensions.x + 'x' + imageDimensions.y);
-
             for (let y = 0; y < imageDimensions.y; y++) {
                 for (let x = 0; x < imageDimensions.x; x++) {
                     this.setRGB({ x, y }, imageBuffer, Pixel.white);
@@ -77,19 +74,27 @@ export class ImageProcessingService {
         const visitRadius = radius;
         const differencesList: Vector2[][] = [[]];
         let currentDifferenceGroupIndex = 0;
-        const pixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
+        const allPixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
 
-        const visitedRadius: { pos: Vector2; radius: number }[] = [];
-        const alreadyVisited: Set<string> = new Set();
+        // This is a set of all pixels to visit, used to check if a pixel is supposed to be visited, regardless of the radius
+        // It has a much better performance than checking if the pixel is in the allPixelsToVisit array since it's a set
+        const allPixelsToVisitSet: Set<string> = new Set();
+        allPixelsToVisit.forEach((pixel) => {
+            allPixelsToVisitSet.add(pixel.x + ' ' + pixel.y);
+        });
+
+        // This is a map of all pixels that have been visited, and the radius of the visit
+        const alreadyVisited: Map<string, number> = new Map();
+        // This is a working queue of the next pixels to visit, and the radius of the visit (BFS algorithm)
         const nextPixelsToVisit: Queue<{ pos: Vector2; radius: number }> = new Queue();
 
         const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
         const imageWidth = imageDimensions.x;
         const imageHeight = imageDimensions.y;
 
-        while (pixelsToVisit.length > 0) {
-            if (pixelsToVisit.length > 0) {
-                const nextPixel = pixelsToVisit.pop();
+        while (allPixelsToVisit.length > 0) {
+            if (allPixelsToVisit.length > 0) {
+                const nextPixel = allPixelsToVisit.pop();
                 if (nextPixel !== undefined) nextPixelsToVisit.enqueue({ pos: nextPixel as Vector2, radius: visitRadius });
             }
 
@@ -101,22 +106,18 @@ export class ImageProcessingService {
                 //     'Visiting ' + currentPixel.pos.x + ', ' + (imageHeight - (currentPixel.pos.y + 1)) + ' with radius ' + currentPixel.radius,
                 // );
 
-                // see if the pixel was already visited
-
                 // if this pixel hasn't been visited, add it to the list of differences
                 if (!alreadyVisited.has(currentPixel.pos.x + ' ' + currentPixel.pos.y)) {
                     differencesList[currentDifferenceGroupIndex].push(currentPixel.pos);
-                    visitedRadius.push({ pos: currentPixel.pos, radius: currentPixel.radius });
-                    alreadyVisited.add(currentPixel.pos.x + ' ' + currentPixel.pos.y);
+                    alreadyVisited.set(currentPixel.pos.x + ' ' + currentPixel.pos.y, currentPixel.radius);
                 } else {
-                    // if the pixel was already visited, check if the radius is bigger
-                    const eventualClone = visitedRadius.find((pixelData) => {
-                        return pixelData.pos.x === currentPixel.pos.x && pixelData.pos.y === currentPixel.pos.y;
-                    });
+                    // if the pixel was already visited, check if the radius was bigger at the time of the visit
+                    const radiusOfTheVisitedPixelAtThatTime = alreadyVisited.get(currentPixel.pos.x + ' ' + currentPixel.pos.y);
 
-                    if (eventualClone !== undefined && currentPixel.radius > eventualClone.radius) {
-                        eventualClone.radius = currentPixel.radius;
+                    if (radiusOfTheVisitedPixelAtThatTime !== undefined && currentPixel.radius > radiusOfTheVisitedPixelAtThatTime) {
+                        alreadyVisited.set(currentPixel.pos.x + ' ' + currentPixel.pos.y, currentPixel.radius);
                     } else {
+                        // if the radius was bigger, skip this pixel because visiting it again with a smaller radius would not change anything
                         continue;
                     }
                 }
@@ -127,20 +128,20 @@ export class ImageProcessingService {
                         if (x < 0 || x >= imageWidth) continue;
                         const nextPixel = { x, y };
                         if (!alreadyVisited.has(nextPixel.x + ' ' + nextPixel.y)) {
-                            if (currentPixel.radius > 0 || pixelsToVisit.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)) {
+                            // if our pixel has a radius bigger than 0, we visit the neighbor
+                            // we also visit the neighbor if they are in the list of pixels to visit (allPixelsToVisitSet)
+                            if (currentPixel.radius > 0 || allPixelsToVisitSet.has(nextPixel.x + ' ' + nextPixel.y)) {
                                 // if this pixel is already in the list of pixels to visit, add it but with the maximum radius
                                 nextPixelsToVisit.enqueue({
                                     pos: nextPixel,
-                                    radius: pixelsToVisit.some((pos) => pos.x === nextPixel.x && pos.y === nextPixel.y)
-                                        ? visitRadius
-                                        : currentPixel.radius - 1,
+                                    radius: allPixelsToVisitSet.has(nextPixel.x + ' ' + nextPixel.y) ? visitRadius : currentPixel.radius - 1,
                                 });
                             }
                         }
                     }
                 }
             }
-            if (differencesList[currentDifferenceGroupIndex].length > 0 && pixelsToVisit.length > 0) {
+            if (differencesList[currentDifferenceGroupIndex].length > 0 && allPixelsToVisit.length > 0) {
                 differencesList.push([]);
                 currentDifferenceGroupIndex++;
             }
