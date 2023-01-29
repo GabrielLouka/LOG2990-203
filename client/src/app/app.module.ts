@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -15,11 +16,11 @@ import { InfoIconComponent } from './components/info-icon/info-icon.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
-import { SlidingPageComponent } from './components/sliding-page/sliding-page.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -51,7 +52,7 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         HttpClientModule,
         MatGridListModule,
         ReactiveFormsModule,
-        SlidingPageComponent,
+        CommonModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

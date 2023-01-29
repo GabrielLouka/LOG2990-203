@@ -17,14 +17,84 @@ import { Game } from '../../interfaces/games';
 export class ConfigurationPageComponent {
     title = 'Page de configuration';
     playable = false;
-    
-    resetClassement:Classements[] = [ 
+
+    resetClassement: Classements[] = [
         { name: 'PlayerA', score: "10:00" },
         { name: 'PlayerB', score: "10:00" },
         { name: 'PlayerC', score: "10:00" }
     ];
-    
-    games: Game[] = [
+    currentIndex = 0;
+    games: Game[][] = [[
+        {
+            description: 'Glouton',
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'DIFFICILE',
+            ranking: [
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+            ],
+        },
+        {
+            description: 'Hommes de Cro-Magnon',
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'FACILE',
+            ranking: [
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+            ],
+        },
+        {
+            description: 'Bagnoles',
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'FACILE',
+            ranking: [
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+            ],
+        },
+        {
+            description: 'Playa',
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'DIFFICILE',
+            ranking: [
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+                [
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                    { name: 'gabriel', score: '05:30' },
+                ],
+            ],
+        },
+    ],
+    [
         {
             description: 'Glouton',
             image: '.\\assets\\img\\game-icon.png',
@@ -93,24 +163,34 @@ export class ConfigurationPageComponent {
                 ],
             ],
         },
+    ]
     ];
 
-    
-    resetButton(){
-        if(confirm('Are you sure you want to reset all the games')){
-            for(let i=0; i<this.games.length;i++ ){
-                for(let j=0; j<this.games[i].ranking.length;j++){
-                    this.games[i].ranking[j]=this.resetClassement;
-                }
-            }
-        }
+    goToNextSlide() {
+        const isLastPage = this.currentIndex === this.games.length - 1;
+        const newIndex = isLastPage ? this.currentIndex : this.currentIndex + 1;
+        this.currentIndex = newIndex;
     }
-    deleteButton(){
-        if(confirm('Are you sure you want to delete all the games')){
-            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('container') as HTMLCollectionOf<Element>;
-            for(let i=0; i<divContainer.length;i++){
-                divContainer[i].innerHTML='';
-            }      
-        }
+    goToPreviousSlide() {
+        const isFirstPage = this.currentIndex === 0;
+        const newIndex = isFirstPage ? this.currentIndex : this.currentIndex - 1;
+        this.currentIndex = newIndex;
+    }
+    resetButton() {
+        // if (confirm('Are you sure you want to reset all the games')) {
+        //     for (let i = 0; i < this.games.length; i++) {
+        //         for (let j = 0; j < this.games[i].ranking.length; j++) {
+        //             this.games[i].ranking[j] = this.resetClassement;
+        //         }
+        //     }
+        // }
+    }
+    deleteButton() {
+        // if (confirm('Are you sure you want to delete all the games')) {
+        //     const divContainer: HTMLCollectionOf<Element> = document.getElementsByClassName('container') as HTMLCollectionOf<Element>;
+        //     for (let i = 0; i < divContainer.length; i++) {
+        //         divContainer[i].innerHTML = '';
+        //     }
+        // }
     }
 }
