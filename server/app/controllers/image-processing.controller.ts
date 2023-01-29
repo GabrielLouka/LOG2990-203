@@ -5,6 +5,7 @@ import { writeFile } from 'fs';
 import { Service } from 'typedi';
 
 const HTTP_STATUS_CREATED = 201;
+const HTTP_BAD_REQUEST = 400;
 
 @Service()
 export class ImageProcessingController {
@@ -33,14 +34,18 @@ export class ImageProcessingController {
             });
 
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            // const firstPixel = this.imageProcessingService.getRGB(639, 479, buffer);
-            const outputBuffer: Buffer = this.imageProcessingService.getDifferencesBlackAndWhiteImage(
-                buffer1,
-                buffer2,
-                receivedDifferenceImages.radius,
-            );
+            let outputBuffer: Buffer = Buffer.from(buffer1);
+            let status = HTTP_STATUS_CREATED;
+            try {
+                outputBuffer = this.imageProcessingService.getDifferencesBlackAndWhiteImage(buffer1, buffer2, receivedDifferenceImages.radius);
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error(e);
+                status = HTTP_BAD_REQUEST;
+            }
+
             const byteArray: number[] = Array.from(new Uint8Array(outputBuffer));
-            res.status(HTTP_STATUS_CREATED).send(JSON.stringify(byteArray));
+            res.status(status).send(JSON.stringify(byteArray));
         });
     }
 }

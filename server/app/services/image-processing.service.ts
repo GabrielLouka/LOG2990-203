@@ -150,52 +150,48 @@ export class ImageProcessingService {
     };
 
     getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): Buffer => {
-        try {
-            const output: Buffer = Buffer.from(imageBuffer1);
+        const output: Buffer = Buffer.from(imageBuffer1);
 
-            const image1Dimensions: Vector2 = this.getImageDimensions(imageBuffer1);
-            const image2Dimensions: Vector2 = this.getImageDimensions(imageBuffer2);
+        const image1Dimensions: Vector2 = this.getImageDimensions(imageBuffer1);
+        const image2Dimensions: Vector2 = this.getImageDimensions(imageBuffer2);
 
-            if (
-                image1Dimensions.x !== ImageProcessingService.requiredImageWidth ||
-                image1Dimensions.y !== ImageProcessingService.requiredImageHeight ||
-                image2Dimensions.x !== ImageProcessingService.requiredImageWidth ||
-                image2Dimensions.y !== ImageProcessingService.requiredImageHeight
-            )
-                throw new Error(
-                    'Images must be 640x480! (img 1 ' +
-                        image1Dimensions.x +
-                        'x' +
-                        image1Dimensions.y +
-                        ') (img 2 ' +
-                        image2Dimensions.x +
-                        'x' +
-                        image2Dimensions.y +
-                        ')',
-                );
+        if (
+            image1Dimensions.x !== ImageProcessingService.requiredImageWidth ||
+            image1Dimensions.y !== ImageProcessingService.requiredImageHeight ||
+            image2Dimensions.x !== ImageProcessingService.requiredImageWidth ||
+            image2Dimensions.y !== ImageProcessingService.requiredImageHeight
+        )
+            throw new Error(
+                'Images must be 640x480! (img 1 ' +
+                    image1Dimensions.x +
+                    'x' +
+                    image1Dimensions.y +
+                    ') (img 2 ' +
+                    image2Dimensions.x +
+                    'x' +
+                    image2Dimensions.y +
+                    ')',
+            );
 
-            const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2, radius);
+        if (!this.is24BitDepthBMP(imageBuffer1) || !this.is24BitDepthBMP(imageBuffer2)) throw new Error('Images must be 24 bit depth BMPs!');
 
-            // display the length of each difference group
-            allDifferences.forEach((diffGroup, index) => {
-                // eslint-disable-next-line no-console
-                console.log('diff group length ' + index + ' : ' + diffGroup.length);
-            });
+        const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2, radius);
 
-            this.turnImageToWhite(output);
-            let sumOfAllDifferences: Vector2[] = [];
-            // eslint-disable-next-line @typescript-eslint/prefer-for-of
-            for (let i = 0; i < allDifferences.length; i++) {
-                sumOfAllDifferences = sumOfAllDifferences.concat(allDifferences[i]);
-            }
-            this.paintBlackPixelsAtPositions(sumOfAllDifferences, output);
-
-            return output;
-        } catch (e) {
+        // display the length of each difference group
+        allDifferences.forEach((diffGroup, index) => {
             // eslint-disable-next-line no-console
-            console.error(e);
-            return Buffer.from(imageBuffer1);
+            console.log('diff group length ' + index + ' : ' + diffGroup.length);
+        });
+
+        this.turnImageToWhite(output);
+        let sumOfAllDifferences: Vector2[] = [];
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < allDifferences.length; i++) {
+            sumOfAllDifferences = sumOfAllDifferences.concat(allDifferences[i]);
         }
+        this.paintBlackPixelsAtPositions(sumOfAllDifferences, output);
+
+        return output;
     };
 
     private getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {
@@ -259,6 +255,12 @@ export class ImageProcessingService {
         }
 
         return new Vector2(imageWidth, imageHeight);
+    };
+
+    private is24BitDepthBMP = (imageBuffer: Buffer): boolean => {
+        const BITMAP_TYPE_OFFSET = 28;
+        const BIT_COUNT_24 = 24;
+        return imageBuffer.readUInt16LE(BITMAP_TYPE_OFFSET) === BIT_COUNT_24;
     };
 
     // private getImageDimensions = (imageBuffer: Buffer): Vector2 => {
