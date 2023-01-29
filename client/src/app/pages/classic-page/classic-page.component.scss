@@ -1,17 +1,17 @@
 body {
-    display: flex;
-    flex-direction: column;
-
-    max-height: 100vh;
-    background-color: lightblue;
+    justify-content: center;
+    align-items: center;
+    border: solid yellow; 
 }
-
 .header {
     display: flex;
     flex-direction: row;
     justify-content: center;
 
+    border:solid red; 
+
     height: 20vh;
+    width: 100%;
 }
 
 .difference-container {
