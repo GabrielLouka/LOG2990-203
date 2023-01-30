@@ -48,7 +48,12 @@ export class ServerDebugPageComponent {
                         const serverResult: ImageUploadResult = JSON.parse(response.body);
                         this.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
                         this.debugDisplayMessage.next(
-                            responseString + serverResult.message + '\n Number of differences = ' + serverResult.numberOfDifferences,
+                            responseString +
+                                serverResult.message +
+                                '\n Number of differences = ' +
+                                serverResult.numberOfDifferences +
+                                '\n Generated game id = ' +
+                                serverResult.generatedGameId,
                         );
                     }
                 },
