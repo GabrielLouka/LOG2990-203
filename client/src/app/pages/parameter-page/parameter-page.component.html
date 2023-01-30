@@ -4,10 +4,10 @@
 </head>
 
 <body>
-    <Section class="header">
+    <div class="header">
         <app-back-button></app-back-button>
 
-    </Section>
+    </div>
 
     <div class="body">
         <div class="buttons-section">
@@ -21,24 +21,32 @@
 
         <div class="middle-section">
             <div class="parameters">
-                <p class="title"> Paramètres</p>
+                <p class="title"><b> Paramètres de temps globaux</b></p>
                 <div class="constants-option">
-
+                    <div class="label-input" *ngFor="let constant of constants; let index=index;">
+                        <label for="{{constant.fetchData}}">{{constant.label}}</label>
+                        <input type="number" id="{{constant.fetchData}}" name="{{constant.fetchData}}" step="1"
+                            value="{{constant.time}}">
+                    </div>
+                </div>
+                <div class="two-btn">
+                    <button class="button-style reset-btn" (click)="resetConstants()">Mettre à défault les
+                        constantes</button>
+                    <button class="button-style" (click)="saveConstants()">Sauvegarder les constantes</button>
                 </div>
             </div>
             <div class="sub-section-history">
-                <p class="title"> Historique des parties jouées</p>
+                <p class="title"> <b> Historique des parties jouées</b></p>
                 <div class="history-section">
                     <div class="history-container" *ngFor="let history of gamesHistory">
-                        <p class="history-line" *ngIf="history && history.gameMode === 'Solo'">{{history.startingTime}}
-                            |
-                            {{history.endingTime}},
-                            {{history.gameMode}}, Jouée par {{history.player1}}
+                        <p class="history-line" *ngIf="history">Début du jeu : {{history.startingTime}}</p>
+                        <p class="history-line" *ngIf="history">Fin du jeu : {{history.endingTime}}</p>
+                        <p class="history-line" *ngIf="history">Mode : {{history.gameMode}}</p>
+                        <p class="history-line" *ngIf="history && history.gameMode === 'Solo'"> Partie jouée par :
+                            {{history.player1}}
                         </p>
-                        <p class="history-line" *ngIf="history && history.gameMode === '1v1'">{{history.startingTime}})
-                            |
-                            {{history.endingTime}},
-                            {{history.gameMode}}, Jouée par {{history.player1}} et {{history.player2}}
+                        <p class="history-line" *ngIf="history && history.gameMode === '1v1'">Partie jouée par :
+                            {{history.player1}} et {{history.player2}}
                         </p>
                     </div>
                 </div>

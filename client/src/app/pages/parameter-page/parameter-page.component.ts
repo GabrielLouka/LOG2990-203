@@ -7,7 +7,24 @@ import { History } from '@app/interfaces/history';
   styleUrls: ['./parameter-page.component.scss'],
 })
 export class ParameterPageComponent {
-  title = "Page de paramètres"
+  title = "Page de paramètres";
+  constants = [
+    {
+      fetchData: "temps-init",
+      label: "Temps intial du compte à rebours",
+      time: 35
+    },
+    {
+      fetchData: "temps-penal",
+      label: "Temps de pénalité par indice utilisé",
+      time: 15
+    },
+    {
+      fetchData: "temps-bonus",
+      label: "Temps bonus par différence trouvée",
+      time: 10
+    }];
+  defaultConstants = [30, 5, 5];
   gamesHistory: History[] = [
     {
       startingTime: new Date(Date.parse('23 Janvier, 2023 11:13:10')),
@@ -41,5 +58,16 @@ export class ParameterPageComponent {
     else {
       window.alert("L'historique est déjà vide");
     }
+  }
+
+  resetConstants() {
+    if (confirm("Êtes-vous certain de vouloir réinitiliser les constantes de temps à défault?"))
+      for (let i = 0; i < this.constants.length; i++) {
+        this.constants[i].time = this.defaultConstants[i];
+      }
+  }
+
+  saveConstants() {
+
   }
 }
