@@ -1,10 +1,45 @@
+import { DatabaseService } from '@app/services/database.service';
+import { FileSystemManager } from '@app/services/file_system_manager';
+import { GameData } from '@common/game-data';
+import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
+import { WithId } from 'mongodb';
 import { Service } from 'typedi';
-
 @Service()
-export class GameStoreService {
+export class GameStorageService {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    JSON_PATH: string;
+    fileSystemManager: FileSystemManager;
     private readonly persistentDataFolderPath = './stored data/';
     private readonly lastGameIdFileName = 'lastGameId.txt';
+
+    constructor(private databaseService: DatabaseService) {
+        this.JSON_PATH = './app/data/default-games.json';
+        this.fileSystemManager = new FileSystemManager();
+    }
+    get collection() {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return this.databaseService.database.collection(process.env.DB_COLLECTION_GAMES!);
+    }
+
+    async addGame(body: ReadableStream<Uint8Array> | null): Promise<GameData> {
+        throw new Error('Method not implemented.');
+    }
+
+    async getAllGames() {
+        return await this.collection.find({}).toArray();
+    }
+    async getGameById(id: string): Promise<GameData> {
+        const query = { id: parseInt(id, 10) };
+        // return await this.collection.findOne(query);
+        return this.collection.findOne(query).then((game: WithId<GameData>) => {
+            return game;
+        });
+    }
+    async populateDb() {
+        const games = JSON.parse(await this.fileSystemManager.readFile(this.JSON_PATH)).games;
+        await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
+    }
 
     getNextAvailableGameId(): number {
         let output = -1;

@@ -1,5 +1,5 @@
-import { Game } from '@app/classes/game';
-import { GamesService } from '@app/services/games.service';
+import { GameStorageService } from '@app/services/game-storage.service';
+import { GameData } from '@common/game-data';
 import { NextFunction, Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -7,9 +7,7 @@ import { Service } from 'typedi';
 @Service()
 export class GamesController {
     router: Router;
-    // dbService
-    constructor(public gamesService: GamesService) {
-        // this.dbService = dbService;
+    constructor(public gamesService: GameStorageService) {
         this.configureRouter();
     }
 
@@ -29,7 +27,7 @@ export class GamesController {
         this.router.get('/:id', async (req: Request, res: Response, next: NextFunction) => {
             this.gamesService
                 .getGameById(req.params.id)
-                .then((game: Game) => {
+                .then((game: GameData) => {
                     res.json(game);
                 })
                 .catch((error: Error) => {

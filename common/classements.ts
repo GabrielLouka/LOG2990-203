@@ -1,4 +1,4 @@
-export interface Classements {
+export interface Ranking {
     name: string;
     score: number;
 }
