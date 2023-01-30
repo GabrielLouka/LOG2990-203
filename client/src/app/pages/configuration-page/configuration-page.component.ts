@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-imports */
@@ -20,9 +19,9 @@ export class ConfigurationPageComponent {
     playable = false;
     
     resetClassement:Classements[] = [ 
-        { name: 'PlayerA', score: "10:00" },
-        { name: 'PlayerB', score: "10:00" },
-        { name: 'PlayerC', score: "10:00" }
+        { name: 'PlayerA', score: '10:00' },
+        { name: 'PlayerB', score: '10:00' },
+        { name: 'PlayerC', score: '10:00' }
     ];
     
     games: Game[] = [
@@ -30,19 +29,19 @@ export class ConfigurationPageComponent {
             description: 'Glouton',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'DIFFICILE',
-            mode: "Classique",
+            mode: 'Classique',
             nbHints: 3,
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'SnakeDiabet', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
                     { name: 'ibrahim', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'MonsieurPoséMonsieurPosé', score: '05:30' },
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
                 ],
             ],
         },
@@ -50,19 +49,19 @@ export class ConfigurationPageComponent {
             description: 'Hommes de Cro-Magnon',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'FACILE',
-            mode: "Classique",
+            mode: 'Classique',
             nbHints: 3,
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
                 ],
             ],
         },
@@ -70,19 +69,19 @@ export class ConfigurationPageComponent {
             description: 'Bagnoles',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'FACILE',
-            mode: "Classique",
+            mode: 'Classique',
             nbHints: 3,
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
+                    { name: 'CanardMilo', score: '05:30' },
                 ],
             ],
         },
@@ -90,19 +89,19 @@ export class ConfigurationPageComponent {
             description: 'Playa',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'DIFFICILE',
-            mode: "Classique",
+            mode: 'Classique',
             nbHints: 3,
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CheatRush', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
+                    { name: 'SnakeDiabet', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CheatRush', score: '05:30' },
+                    { name: 'CanardMilo', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
                 ],
             ],
         },

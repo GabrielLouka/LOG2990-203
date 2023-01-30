@@ -20,14 +20,14 @@ export class SelectionsPageComponent {
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'SnakeDiabet', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
                     { name: 'ibrahim', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'MonsieurPoséMonsieurPosé', score: '05:30' },
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
                 ],
             ],
         },
@@ -40,14 +40,14 @@ export class SelectionsPageComponent {
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
                 ],
             ],
         },
@@ -60,14 +60,14 @@ export class SelectionsPageComponent {
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
+                    { name: 'CanardMilo', score: '05:30' },
                 ],
             ],
         },
@@ -80,14 +80,14 @@ export class SelectionsPageComponent {
             hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CheatRush', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
+                    { name: 'SnakeDiabet', score: '05:30' },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'CheatRush', score: '05:30' },
+                    { name: 'CanardMilo', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
                 ],
             ],
         },
