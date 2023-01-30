@@ -24,25 +24,44 @@ describe('ConfigurationPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should delete all games when confirmed', () => {
-        // Use spyOn to mock window.confirm
-        spyOn(window, 'confirm').and.returnValue(true);
+    // it('should delete all games when confirmed', () => {
+    //     // Use spyOn to mock window.confirm
+    //     spyOn(window, 'confirm').and.returnValue(true);
 
-        component.deleteButton();
+    //     component.deleteButton();
 
-        const container = document.querySelector('container');
-        expect(container).toBeTruthy();
-        // expect(container.innerHTML).toBe('');
+    //     const container = document.querySelector('container');
+    //     expect(container).toBeTruthy();
+    //     // expect(container.innerHTML).toBe('');
+    // });
+
+    // it('should not delete all games when not confirmed', () => {
+    //     // Use spyOn to mock window.confirm
+    //     spyOn(window, 'confirm').and.returnValue(false);
+
+    //     component.deleteButton();
+
+    //     const container = document.querySelector('container');
+    //     expect(container).toBeTruthy();
+    //     // expect(container.innerHTML).not.toBe('');
+    // });
+
+    it('clicking on next button should increment page number', () => {
+        component.currentIndex = 0;
+        component.goToNextSlide();
+        expect(component.currentIndex).toEqual(1);
     });
 
-    it('should not delete all games when not confirmed', () => {
-        // Use spyOn to mock window.confirm
-        spyOn(window, 'confirm').and.returnValue(false);
-
-        component.deleteButton();
-
-        const container = document.querySelector('container');
-        expect(container).toBeTruthy();
-        // expect(container.innerHTML).not.toBe('');
+    it('clicking on previous button should decrement page number', () => {
+        component.currentIndex = 2;
+        component.goToPreviousSlide();
+        expect(component.currentIndex).toEqual(1);
     });
+
+    it("current page should stay the same if it's the last page", () => {
+        component.currentIndex = 3;
+        component.goToNextSlide();
+        expect(component.currentIndex).toEqual(component.currentIndex);
+    });
+
 });

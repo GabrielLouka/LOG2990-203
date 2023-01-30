@@ -176,21 +176,21 @@ export class ConfigurationPageComponent {
         const newIndex = isFirstPage ? this.currentIndex : this.currentIndex - 1;
         this.currentIndex = newIndex;
     }
-    resetButton() {
-        // if (confirm('Are you sure you want to reset all the games')) {
-        //     for (let i = 0; i < this.games.length; i++) {
-        //         for (let j = 0; j < this.games[i].ranking.length; j++) {
-        //             this.games[i].ranking[j] = this.resetClassement;
-        //         }
-        //     }
-        // }
-    }
-    deleteButton() {
-        // if (confirm('Are you sure you want to delete all the games')) {
-        //     const divContainer: HTMLCollectionOf<Element> = document.getElementsByClassName('container') as HTMLCollectionOf<Element>;
-        //     for (let i = 0; i < divContainer.length; i++) {
-        //         divContainer[i].innerHTML = '';
-        //     }
-        // }
-    }
+    // resetButton() {
+    //     if (confirm('Are you sure you want to reset all the games')) {
+    //         for (let i = 0; i < this.games.length; i++) {
+    //             for (let j = 0; j < this.games[i].ranking.length; j++) {
+    //                 this.games[i].ranking[j] = this.resetClassement;
+    //             }
+    //         }
+    //     }
+    // }
+    // deleteButton() {
+    //     if (confirm('Are you sure you want to delete all the games')) {
+    //         const divContainer: HTMLCollectionOf<Element> = document.getElementsByClassName('container') as HTMLCollectionOf<Element>;
+    //         for (let i = 0; i < divContainer.length; i++) {
+    //             divContainer[i].innerHTML = '';
+    //         }
+    //     }
+    // }
 }
