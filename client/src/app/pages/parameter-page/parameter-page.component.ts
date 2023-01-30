@@ -6,6 +6,7 @@ import { History } from '@app/interfaces/history';
   styleUrls: ['./parameter-page.component.scss']
 })
 export class ParameterPageComponent {
+  title = "Page de paramètres"
   gamesHistory: History[] = [
     {
       startingTime: new Date(Date.parse("23 Janvier, 2023 11:13:10")),

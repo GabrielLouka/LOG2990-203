@@ -81,6 +81,8 @@
     flex-direction: column;
     justify-content: space-evenly;
     height: 80%;
+    border: 2px solid black;
+
 }
 
 .title {
@@ -91,6 +93,10 @@
 
 body {
     background-color: lightblue;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid red;
+    height: 100%;
 }
 
 .history-section {
