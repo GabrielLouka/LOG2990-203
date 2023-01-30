@@ -20,6 +20,7 @@ import { ClassicPageComponent } from './pages/classic-page/classic-page.componen
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
+import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -42,7 +43,8 @@ import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-de
         SelectionsPageComponent,
         HintComponent,
         InfoIconComponent,
-        ServerDebugPageComponent
+        ServerDebugPageComponent,
+        GameCreationPageComponent
     ],
     imports: [
         AppMaterialModule,
