@@ -1,0 +1,44 @@
+<body>
+    <h3 class="title-params">Paramètres</h3>
+    <div class="header">
+        <button class="button-style return-button" routerLink="">Retour</button>
+    </div>
+
+    <div class="body">
+        <div class="buttons-section">
+            <button class="button-style edit-button" routerLink="/config">
+                Éditer un jeu
+            </button>
+            <button class="button-style change-times-button" id="clearHistory" (click)="clearHistory()">
+                Réinitialiser l'historique
+            </button>
+        </div>
+
+        <div class="middle-section">
+            <div class="parameters">
+                <p class="title"> Paramètres</p>
+                <div class="time-option">
+                    <input type="time">
+                </div>
+            </div>
+            <div class="sub-section-history">
+                <p class="title"> Historique des parties jouées</p>
+                <div class="history-section">
+                    <div class="history-container" *ngFor="let history of gamesHistory">
+                        <p class="history-line" *ngIf="history && history.gameMode === 'Solo'">{{history.startingTime}}
+                            |
+                            {{history.endingTime}},
+                            {{history.gameMode}}, Jouée par {{history.player1}}
+                        </p>
+                        <p class="history-line" *ngIf="history && history.gameMode === '1v1'">{{history.startingTime}})
+                            |
+                            {{history.endingTime}},
+                            {{history.gameMode}}, Jouée par {{history.player1}} et {{history.player2}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>

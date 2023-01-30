@@ -20,6 +20,7 @@ import { ClassicPageComponent } from './pages/classic-page/classic-page.componen
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
+import { ParameterPageComponent } from './pages/parameter-page/parameter-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -42,6 +43,7 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         HintComponent,
         InfoIconComponent,
         RegistrationPageComponent,
+        ParameterPageComponent,
     ],
     imports: [
         AppMaterialModule,

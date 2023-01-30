@@ -1,0 +1,117 @@
+.button-style {
+    font-weight: 600;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
+
+    border-radius: 2vw;
+    border: solid 0.3vh;
+
+    padding: 2vh 4vh;
+
+    background-color: white;
+
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(0.9);
+        background-color: lightsalmon;
+    }
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    padding: 1%;
+
+}
+
+.title-params {
+    text-align: center;
+    font-family: monospace;
+    font-size: xx-large;
+
+}
+
+.buttons-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+
+.parameters {
+    border: 2px solid black;
+    border-radius: 20px;
+    height: 30%;
+    width: 20%;
+    margin-top: 8%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.time-option {
+    border: 2px solid black;
+    height: 40%;
+    margin: auto;
+    width: 60%;
+}
+
+.middle-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    height: 80%;
+    padding: 20px;
+}
+
+.sub-section-history {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid black;
+    padding: 20px;
+    margin-top: 70px;
+    border-radius: 20px;
+    height: 70%;
+    width: 50%;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 80%;
+}
+
+.title {
+    text-align: center;
+    margin-top: 10px;
+}
+
+
+body {
+    background-color: lightblue;
+}
+
+.history-section {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    overflow-y: auto
+}
+
+.history-line {
+    text-align: center;
+}
+
+.history-container {
+    border: 2px solid black;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+
+    &:hover {
+        transform: scale(0.97);
+    }
+}
