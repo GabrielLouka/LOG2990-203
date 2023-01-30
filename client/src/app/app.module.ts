@@ -1,20 +1,26 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { PlayAreaComponent } from '@app/components/play-area/play-area.component';
-import { SidebarComponent } from '@app/components/sidebar/sidebar.component';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
-import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { MaterialPageComponent } from '@app/pages/material-page/material-page.component';
+import { BackButtonComponent } from './components/back-button/back-button.component';
+import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameSheetComponent } from './components/game-sheet/game-sheet.component';
-import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
-import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
+import { HintComponent } from './components/hint/hint.component';
+import { InfoIconComponent } from './components/info-icon/info-icon.component';
+import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
+import { OverlayComponent } from './components/overlay/overlay.component';
+import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
+import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
+import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
+import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
+import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -25,17 +31,31 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
 @NgModule({
     declarations: [
         AppComponent,
-        GamePageComponent,
         MainPageComponent,
-        MaterialPageComponent,
-        PlayAreaComponent,
-        SidebarComponent,
-        SelectionsPageComponent,
-        RegistrationPageComponent,
         GameSheetComponent,
-        GameCreationPageComponent,
+        ConfigurationPageComponent,
+        OverlayComponent,
+        PreviousPageButtonComponent,
+        NextPageButtonComponent,
+        GameCardComponent,
+        BackButtonComponent,
+        ClassicPageComponent,
+        SelectionsPageComponent,
+        HintComponent,
+        InfoIconComponent,
+        ServerDebugPageComponent,
+        GameCreationPageComponent
     ],
-    imports: [AppMaterialModule, AppRoutingModule, BrowserAnimationsModule, BrowserModule, FormsModule, HttpClientModule, ReactiveFormsModule],
+    imports: [
+        AppMaterialModule,
+        AppRoutingModule,
+        BrowserAnimationsModule,
+        BrowserModule,
+        FormsModule,
+        HttpClientModule,
+        MatGridListModule,
+        ReactiveFormsModule,
+    ],
     providers: [],
     bootstrap: [AppComponent],
 })

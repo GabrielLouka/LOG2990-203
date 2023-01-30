@@ -2,6 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
+import { ImageUploadForm } from '@common/image.upload.form';
+import { ImageUploadResult } from '@common/image.upload.result';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -18,6 +20,7 @@ export class ServerDebugPageComponent {
         const routeToSend = '/image_processing/send-image';
         const inputValue1 = (document.getElementById('browseButton1') as HTMLInputElement).files?.[0];
         const inputValue2 = (document.getElementById('browseButton2') as HTMLInputElement).files?.[0];
+        const radiusValue = (document.getElementById('radiusInput') as HTMLInputElement).value;
 
         if (inputValue1 !== undefined && inputValue2 !== undefined) {
             const buffer1 = await inputValue1.arrayBuffer();
@@ -27,19 +30,37 @@ export class ServerDebugPageComponent {
             const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
             const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
 
+            // clear image preview
+            this.updateImageDisplay(new ArrayBuffer(0));
+
+            this.debugDisplayMessage.next('Sending image to server...');
+
             const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
             const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
+            const radius = radiusValue === '' ? 0 : parseInt(radiusValue, 10);
 
-            this.communicationService.post<DifferenceImage[]>([firstImage, secondImage], routeToSend).subscribe({
+            const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
+            this.communicationService.post<ImageUploadForm>(imageUploadForm, routeToSend).subscribe({
                 next: (response) => {
-                    const responseString = `Success : ${response.status} - 
+                    const responseString = ` ${response.status} - 
                     ${response.statusText} \n`;
-                    this.updateImageDisplay(this.convertToBuffer(JSON.parse(response.body as string)));
-                    this.debugDisplayMessage.next(responseString);
+                    if (response.body !== null) {
+                        const serverResult: ImageUploadResult = JSON.parse(response.body);
+                        this.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
+                        this.debugDisplayMessage.next(
+                            responseString +
+                                serverResult.message +
+                                '\n Number of differences = ' +
+                                serverResult.numberOfDifferences +
+                                '\n Generated game id = ' +
+                                serverResult.generatedGameId,
+                        );
+                    }
                 },
                 error: (err: HttpErrorResponse) => {
                     const responseString = `Server Error : ${err.message}`;
-                    this.debugDisplayMessage.next(responseString);
+                    const serverResult: ImageUploadResult = JSON.parse(err.error);
+                    this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
         }

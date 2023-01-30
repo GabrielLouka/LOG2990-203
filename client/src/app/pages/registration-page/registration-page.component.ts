@@ -8,6 +8,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 })
 export class RegistrationPageComponent {
     title = 'Register Page';
+
     registrationForm = new FormGroup({
         pseudo: new FormControl('', Validators.required),
     });

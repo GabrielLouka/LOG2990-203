@@ -2,16 +2,15 @@
     <meta charset="UTF-8" />
     <title>{{ title }}</title>
 </head>
+
 <body>
     <Section class="header">
         <button class="button-style return-button" (click)="previousPage()">Retour</button>
-        <img src=".\assets\img\ProjectLogo.png" alt="Logo Projet" width="180" height="180" />
+        <a id="projectLogo"><img src=".\assets\img\game-icon.png" alt="Logo Projet" width="180" height="180" /></a>
         <div class="btn">
-                
-            <button class="button-style button" routerLink='/creation'>Créer un jeu</button>
-            
-            <button class="game-btn">Supprimer les jeux</button>
-            <button class="game-btn">Réinitialiser les jeux</button>
+            <button class="game-btn">Créer un jeu</button>
+            <button class="game-btn" (click)="deleteButton()">Supprimer les jeux</button>
+            <button class="game-btn" (click)="resetButton()">Réinitialiser les jeux</button>
         </div>
     </Section>
 
@@ -20,93 +19,16 @@
             <div class="previous-arrow-top"></div>
             <div class="previous-arrow-bottom"></div>
         </div>
-        <div class="sub-container">
-            <div id="sub-box" class="box">
-                <div class="game-buttons">
-                    <p class="description">Jeux 1</p>
-                    <div class="image-stats-container">
-                        <div class="image-show">
-                            <img src=".\assets\img\ProjectLogo.png" alt="Logo" width="200" height="200" />
-                        </div>
-                        <div class="stats-box">
-                            <div class="ranking-box">
-                                <p class="difficulty">Difficulté</p>
-                                <p class="difficulty">classement</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="overlay">
-                        <button class="button-style button-1" routerLink="/registration">Supprimer</button>
-                        <button class="button-style button-2">Réinitialiser</button>
-                    </div> -->
-                </div>
-            </div>
-            <div class="box">
-                <div class="game-buttons">
-                    <p class="description">Jeux 2</p>
-                    <div class="image-stats-container">
-                        <div class="image-show">
-                            <img src=".\assets\img\ProjectLogo.png" alt="Logo" width="200" height="200" />
-                        </div>
-                        <div class="stats-box">
-                            <div class="ranking-box">
-                                <p class="difficulty">Difficulté</p>
-                                <p class="difficulty">classement</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="overlay">
-                        <button class="button-style button-1" routerLink="/registration">Supprimer</button>
-                        <button class="button-style button-2">Réinitialiser</button>
-                    </div> -->
-                </div>
-            </div>
+
+        <div class="sub-container" *ngFor="let game of games">
+            <app-game-sheet *ngIf="game" [singleGame]="game"></app-game-sheet>
         </div>
-        <div class="sub-container">
-            <div class="box">
-                <div class="game-buttons">
-                    <p class="description">Jeux 3</p>
-                    <div class="image-stats-container">
-                        <div class="image-show">
-                            <img src=".\assets\img\ProjectLogo.png" alt="Logo" width="200" height="200" />
-                        </div>
-                        <div class="stats-box">
-                            <div class="ranking-box">
-                                <p class="difficulty">Difficulté</p>
-                                <p class="difficulty">classement</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="overlay">
-                        <button class="button-style button-1" routerLink="/registration">Supprimer</button>
-                        <button class="button-style button-2">Réinitialiser</button>
-                    </div> -->
-                </div>
-            </div>
-            <div class="box">
-                <div class="game-buttons">
-                    <p class="description">Jeux 4</p>
-                    <div class="image-stats-container">
-                        <div class="image-show">
-                            <img src=".\assets\img\ProjectLogo.png" alt="Logo" width="200" height="200" />
-                        </div>
-                        <div class="stats-box">
-                            <div class="ranking-box">
-                                <p class="difficulty">Difficulté</p>
-                                <p class="difficulty">classement</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="overlay">
-                        <button class="button-style button-1" routerLink="/registration">Supprimer</button>
-                        <button class="button-style button-2">Réinitialiser</button>
-                    </div> -->
-                </div>
-            </div>
-        </div>
+
+
         <div class="next-arrow">
             <div class="next-arrow-top"></div>
             <div class="next-arrow-bottom"></div>
         </div>
     </section>
+
 </body>

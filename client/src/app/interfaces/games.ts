@@ -1,7 +1,8 @@
 import { Classements } from './classements';
-export interface Games {
+
+export interface Game {
     description: string;
     image: string;
     difficulty: string;
-    classements: Classements[];
+    ranking: Classements[][];
 }

@@ -6,5 +6,12 @@ import { Component } from '@angular/core';
     styleUrls: ['./selections-page.component.scss'],
 })
 export class SelectionsPageComponent {
-    title = 'Selection Page';
+    originTitle = 'Bonjour';
+
+    games = [
+        { title: 'Glouton', difficulty: 'FACILE' },
+        { title: 'Hommes de Cro-Magnon', difficulty: 'MOYEN' },
+        { title: 'Bagnoles #Cars', difficulty: 'DIFFICILE' },
+        { title: 'Playa', difficulty: 'FACILE' },
+    ];
 }

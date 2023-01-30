@@ -1,62 +1,88 @@
+/* eslint-disable @typescript-eslint/quotes */
+/* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
 import { Location } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { Games } from '../../interfaces/games';
+import { Component } from '@angular/core';
+import { Classements } from '@app/interfaces/classements';
+import { Game } from '../../interfaces/games';
+
 @Component({
     selector: 'app-configuration-page',
     templateUrl: './configuration-page.component.html',
     styleUrls: ['./configuration-page.component.scss'],
 })
-export class ConfigurationPageComponent implements OnInit {
+
+export class ConfigurationPageComponent {
     title = 'Page de configuration';
-    games:Games[] = [
+    resetClassement:Classements[] = [ 
+        { name: 'PlayerA', score: 200 },
+        { name: 'PlayerB', score: 200 },
+        { name: 'PlayerC', score: 200 }
+    ];
+    
+    games: Game[] = [
         {
             description: 'Jeux 1',
-            image: '.\assets\img\ProjectLogo.png',
-            difficulty: 'Hard',
-            classements: [
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'DIFFICILE',
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 }
+            ],[
                 { name: 'ibrahim', score: 19996 },
-            ],
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 }
+            ]]
         },
         {
-            description: 'Jeux 1',
-            image: '.\assets\img\ProjectLogo.png',
-            difficulty: 'Hard',
-            classements: [
+            description: 'Jeux 2',
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'FACILE',
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
-            ],
+            ],[
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 }
+            ]]
         },
         {
-            description: 'Jeux 1',
-            image: '.\assets\img\ProjectLogo.png',
-            difficulty: 'Hard',
-            classements: [
+            description: 'Jeux 3',
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'MOYEN',
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 }
+            ],[
                 { name: 'ibrahim', score: 19996 },
-            ],
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 }
+            ]]
         },
         {
-            description: 'Jeux 1',
-            image: '.\assets\img\ProjectLogo.png',
-            difficulty: 'Hard',
-            classements: [
+            description: 'Jeux 4',
+            image: '.\\assets\\img\\game-icon.png',
+            difficulty: 'MOYEN',
+            ranking: [[
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
                 { name: 'ibrahim', score: 19996 },
-            ],
+            ],[
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 },
+                { name: 'ibrahim', score: 19996 }
+            ]]
         },
     ];
     constructor(private location: Location) {}
 
-    ngOnInit(): void {}
 
     over() {
         const subBox = document.getElementById('sub-box');
@@ -66,5 +92,25 @@ export class ConfigurationPageComponent implements OnInit {
     }
     previousPage() {
         this.location.back();
+    }
+    
+    resetButton(){
+        if(confirm('Are you sure you want to reset all the games')){
+            for(let i=0; i<this.games.length;i++ ){
+                for(let j=0; j<this.games[i].ranking.length;j++){
+                    this.games[i].ranking[j]=this.resetClassement;
+                }
+            }
+        }
+    }
+    deleteButton(){
+        if(confirm('Are you sure you want to delete all the games')){
+            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('sub-container') as HTMLCollectionOf<Element>;
+            for(let i=0; i<divContainer.length;i++){
+                divContainer[i].innerHTML='';
+            }      
+        }
+
+    
     }
 }

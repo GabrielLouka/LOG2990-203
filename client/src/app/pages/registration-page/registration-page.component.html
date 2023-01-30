@@ -4,21 +4,23 @@
 </head>
 <body>
     <Section class="header">
-        <button class="button-style return-button" routerLink="/selections">
+        <button class="button-style return-button" routerLink="/classic">
             <img src=".\assets\img\previous-icon.png" class="previous-icon" alt="gameLogo" />Retour
         </button>
     </Section>
-    <h1 class="button-style titre">Classic Game</h1>
+    <h1 class="button-style titre">Jeu classique</h1>
     <Section class="registerContainer">
-        <form [formGroup]="registrationForm" class="register-input">
-            <label class="button-style" for="input">NAME :</label>
+        <form class="register-input">
+            <label class="button-style" for="input">Pseudo :</label>
             <input class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="pseudo" required />
 
             <br />
 
-            <button class="button-style play-button" [disabled]="registrationForm.invalid" [ngClass]="{ 'not-allowed': registrationForm.invalid }">
+            <button class="button-style play-button" routerLink="/classic">
                 <img src=".\assets\img\play-icon.png" id="play-icon" alt="gameLogo" />
-            </button>
+            </button> 
+        
         </form>
+
     </Section>
 </body>
