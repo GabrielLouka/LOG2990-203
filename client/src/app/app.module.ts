@@ -8,6 +8,7 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GameSheetComponent } from './components/game-sheet/game-sheet.component';
@@ -18,9 +19,8 @@ import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
-import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
-import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
+import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -44,7 +44,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
         HintComponent,
         InfoIconComponent,
         ServerDebugPageComponent,
-        GameCreationPageComponent
+        GameCreationPageComponent,
     ],
     imports: [
         AppMaterialModule,
