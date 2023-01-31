@@ -20,9 +20,23 @@ describe('ParameterPageComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it("Clicking on 'Réinitialiser l'historique' should clear the history array", () => {
+  it("clearing history should empty it", () => {
     component.clearHistory();
     expect(component.gamesHistory.length).toEqual(0);
   });
+
+  it("deleting history when empty should signal that it is empty", () => {
+    const alertSpy = spyOn(window, "confirm");
+    component.gamesHistory = [];
+    component.clearHistory();
+    expect(alertSpy).toHaveBeenCalledWith("L'historique est déjà vide");
+  })
+
+  it("resetting time constants should gie them original values", () => {
+    component.resetConstants();
+    for (let i = 0; i < component.constants.length; i++) {
+      expect(component.constants[i].time).toEqual(component.defaultConstants[i]);
+    }
+  })
 
 });
