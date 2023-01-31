@@ -43,7 +43,7 @@ export class DrawService {
     }
 
     drawWord(word: string) {
-        const startPosition: Vec2 = { x: 175, y: 100 };
+        const startPosition: Coordinate = { x: 175, y: 100 };
         const step = 20;
         this.context.font = '20px system-ui';
         for (let i = 0; i < word.length; i++) {
