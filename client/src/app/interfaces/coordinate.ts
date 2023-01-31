@@ -1,4 +1,4 @@
-export interface Vec2 {
+export interface Coordinate {
     x: number;
     y: number;
 }

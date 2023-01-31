@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Coordinate } from '@app/interfaces/coordinate';
 
 // TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
 export const DEFAULT_WIDTH = 500;
@@ -10,7 +10,7 @@ export const DEFAULT_HEIGHT = 500;
 })
 export class DrawService {
     context: CanvasRenderingContext2D;
-    private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    private canvasSize: Coordinate = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
 
     get width(): number {
         return this.canvasSize.x;
