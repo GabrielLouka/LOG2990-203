@@ -17,11 +17,6 @@ export class DatabaseService {
         } catch {
             throw new Error('Database connection error');
         }
-
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        // if ((await this.db.collection(process.env.DB_COLLECTION_GAMES!).countDocuments()) === 0) {
-        //     await this.populateDb(DB_COLLECTION_GAMES);
-        // }
     }
 
     async closeConnection(): Promise<void> {

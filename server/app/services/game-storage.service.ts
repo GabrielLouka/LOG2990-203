@@ -1,9 +1,10 @@
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file_system_manager';
 import { GameData } from '@common/game-data';
+import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
-import { WithId } from 'mongodb';
+import { UpdateResult, WithId } from 'mongodb';
 import { Service } from 'typedi';
 @Service()
 export class GameStorageService {
@@ -12,6 +13,7 @@ export class GameStorageService {
     fileSystemManager: FileSystemManager;
     private readonly persistentDataFolderPath = './stored data/';
     private readonly lastGameIdFileName = 'lastGameId.txt';
+    private readonly collectionName = 'games';
 
     constructor(private databaseService: DatabaseService) {
         this.JSON_PATH = './app/data/default-games.json';
@@ -19,11 +21,8 @@ export class GameStorageService {
     }
     get collection() {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return this.databaseService.database.collection(process.env.DB_COLLECTION_GAMES!);
-    }
-
-    async addGame(body: ReadableStream<Uint8Array> | null): Promise<GameData> {
-        throw new Error('Method not implemented.');
+        // return this.databaseService.database.collection(process.env.DB_COLLECTION_GAMES! as string);
+        return this.databaseService.database.collection(this.collectionName);
     }
 
     async getAllGames() {
@@ -36,7 +35,7 @@ export class GameStorageService {
             return game;
         });
     }
-    async populateDb() {
+    async storeDefaultGames() {
         const games = JSON.parse(await this.fileSystemManager.readFile(this.JSON_PATH)).games;
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
@@ -91,5 +90,20 @@ export class GameStorageService {
                 console.log('File successfully written.');
             }
         });
+    }
+
+    storeGameResult(generatedGameId: number, _differences: Vector2[][]) {
+        const newGameToAdd: GameData = {
+            id: generatedGameId,
+            nbrDifferences: _differences.length,
+            differences: _differences,
+            name: 'Default game',
+            isEasy: true,
+        };
+        this.collection.insertOne(newGameToAdd);
+    }
+
+    async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
+        return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
     }
 }

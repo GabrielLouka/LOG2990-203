@@ -37,6 +37,7 @@ export class ImageProcessingController {
                 outputResultToSendToClient = out[0];
                 outputResultToSendToClient.generatedGameId = this.gameStorageService.getNextAvailableGameId();
                 this.gameStorageService.storeGameImages(outputResultToSendToClient.generatedGameId, buffer1, buffer2);
+                this.gameStorageService.storeGameResult(outputResultToSendToClient.generatedGameId, out[1]);
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.error(e);

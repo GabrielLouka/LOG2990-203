@@ -4,6 +4,9 @@
 <input type="file" id="browseButton2" name="imageToSend2" accept=".bmp" />
 <label for="radiusInput">Radius :</label>
 <input type="number" id="radiusInput" name="radiusInput" />
+<p id="gameNameField" hidden="true">
+    GAME NAME : <input type="text" id="gameName" name="gameName" /> <button class="button" (click)="sendGameNameToServer()">Send Name</button>
+</p>
 <p>--</p>
 <p>
     <button class="button" (click)="sendImageToServer()">Send Image</button>

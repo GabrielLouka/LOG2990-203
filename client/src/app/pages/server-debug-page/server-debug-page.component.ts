@@ -13,6 +13,8 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ServerDebugPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    generatedGameId = -1;
 
     constructor(private readonly communicationService: CommunicationService) {}
 
@@ -55,6 +57,8 @@ export class ServerDebugPageComponent {
                                 '\n Generated game id = ' +
                                 serverResult.generatedGameId,
                         );
+                        this.generatedGameId = serverResult.generatedGameId;
+                        (document.getElementById('gameNameField') as HTMLInputElement).hidden = false;
                     }
                 },
                 error: (err: HttpErrorResponse) => {
@@ -64,6 +68,29 @@ export class ServerDebugPageComponent {
                 },
             });
         }
+    }
+
+    async sendGameNameToServer(): Promise<void> {
+        const routeToSend = '/games/updateName';
+        const nameValue = (document.getElementById('gameName') as HTMLInputElement).value;
+        const gameId = this.generatedGameId;
+
+        // eslint-disable-next-line no-console
+        console.log('Sending ' + nameValue + 'to server (game id ' + gameId + ')...');
+
+        this.debugDisplayMessage.next('Sending ' + nameValue + 'to server (game id ' + gameId + ')...');
+        this.communicationService.post<[number, string]>([gameId, nameValue], routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+                this.debugDisplayMessage.next(responseString);
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
     }
 
     // Convert number[] to ArrayBuffer

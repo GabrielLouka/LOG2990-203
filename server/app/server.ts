@@ -37,11 +37,9 @@ export class Server {
         try {
             await this.databaseService.start();
             this.application.gamesController.gamesService = new GameStorageService(this.databaseService);
-            this.application.gamesController.gamesService.populateDb();
             console.log('Database connection successful !');
         } catch {
             console.error('Database connection failed !');
-            process.exit(1);
         }
     }
 
