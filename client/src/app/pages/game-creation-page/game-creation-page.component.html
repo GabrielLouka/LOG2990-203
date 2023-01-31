@@ -79,6 +79,23 @@
     </div>
 
     <div game-container></div>
+    <!-- <section>
+      <select class="button-style" id="enlargement-radius" [(ngModel)]="enlargementRadius">
+        <option value="0">0</option>
+        <option value="3">3</option>
+        <option value="9">9</option>
+        <option value="15">15</option>
+    </select> -->
+    <!-- <button class = "button-style" id="enlargement-radius" (click)="submitRadius(enlargementRadius)"> Rayon: {{enlargementRadius}}Confirmer</button>
+    <button class = "button-style" (click)="sendImageToServer()">Calculer differences</button>
+    <button class = "button-style">Nombre de differences : {{totalDifferences}}</button>
+    <input id="game-name" [(ngModel)]="gameName"/>
+    <button (click)="updateName(gameName)">Envoyer nom</button>
+    <button class = "button-style" (click)="sendGameNameToServer()">Creer un jeu: </button>
+        <div class="difference-canvas">
+            <canvas id="difference-image"></canvas>
+        </div>
+    </section>
 
     <!-- <div class="row">   
       <button class ="button-style crayon">Crayon:<span class="material-icons">mode</span></button>
