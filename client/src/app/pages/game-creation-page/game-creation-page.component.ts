@@ -1,5 +1,6 @@
-import { Location } from '@angular/common';
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component } from '@angular/core';
+
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -26,7 +27,6 @@ export class GameCreationPageComponent {
     private readonly characterMax: number = 20;
     private readonly minDifferences: number = 3;
     private readonly maxDifferences: number = 9;
-    constructor(private location: Location) {}
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     processImage(event: any, isModified: boolean) {
@@ -75,9 +75,7 @@ export class GameCreationPageComponent {
         // this.modifiedImage = new Image();
         return;
     }
-    previousPage() {
-        this.location.back();
-    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     updateName(name: string) {
         if (name.length === 0 || name.length > this.characterMax || name.trim().length === 0) {
