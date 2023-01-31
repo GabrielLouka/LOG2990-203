@@ -17,8 +17,10 @@ export class GamesController {
         this.router.get('/', async (req: Request, res: Response) => {
             // Can also use the async/await syntax
             try {
-                const games = await this.gamesService.getAllGames();
-                res.json(games);
+                // const games = await this.gamesService.getAllGames();
+                const games = await this.gamesService.getNextGames();
+                // res.json(games);
+                res.send(JSON.stringify(games));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }

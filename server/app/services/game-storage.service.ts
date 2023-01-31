@@ -3,7 +3,7 @@ import { FileSystemManager } from '@app/services/file_system_manager';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
-import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
+import { mkdir, readFileSync, rename, writeFile, writeFileSync } from 'fs';
 import { UpdateResult, WithId } from 'mongodb';
 import { Service } from 'typedi';
 @Service()
@@ -11,10 +11,11 @@ export class GameStorageService {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     JSON_PATH: string;
     fileSystemManager: FileSystemManager;
+    currentPageNbr: number = 0;
     private readonly persistentDataFolderPath = './stored data/';
     private readonly lastGameIdFileName = 'lastGameId.txt';
     private readonly collectionName = 'games';
-
+    private readonly gamesLimit = 4;
     constructor(private databaseService: DatabaseService) {
         this.JSON_PATH = './app/data/default-games.json';
         this.fileSystemManager = new FileSystemManager();
@@ -35,11 +36,64 @@ export class GameStorageService {
             return game;
         });
     }
+    async getNextGames() {
+        // this.recalculateIds();
+        if ((await this.getAllGames()).length < this.gamesLimit * this.currentPageNbr + this.gamesLimit) {
+            console.log('total games available: ' + (await this.getAllGames()).length);
+            console.log('games required: ' + (this.gamesLimit * this.currentPageNbr + this.gamesLimit));
+            return false;
+        }
+        const theGames = [];
+
+        const indexStart = this.gamesLimit * this.currentPageNbr;
+        const indexEnd = indexStart + this.gamesLimit;
+
+        for (let i = indexStart; i < indexEnd; i++) {
+            const folderPath = this.persistentDataFolderPath + i + '/';
+
+            // console.log('current index is' + i);
+            // console.log(await (await this.getGameById(i.toString())).name);
+            // console.log('path: ' + folderPath);
+            const firstImage = readFileSync(folderPath + '1.bmp');
+            const secondImage = readFileSync(folderPath + '2.bmp');
+            theGames.push({
+                game: this.getGameById(i.toString()),
+                originalImage: firstImage,
+                modifiedImage: secondImage,
+            });
+        }
+        this.currentPageNbr++;
+
+        return theGames;
+    }
+
     async storeDefaultGames() {
         const games = JSON.parse(await this.fileSystemManager.readFile(this.JSON_PATH)).games;
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
+    async recalculateIds() {
+        (await this.getAllGames()).forEach((game, i) => {
+            if (game.id !== i) {
+                const oldIdFolderPath = this.persistentDataFolderPath + game.id + '/';
+                const newIdFolderPath = this.persistentDataFolderPath + i + '/';
+
+                rename(oldIdFolderPath, newIdFolderPath, (err) => {
+                    if (err) throw err;
+                    console.log('Rename complete!');
+                });
+                rename(oldIdFolderPath + '1.bmp', newIdFolderPath + '1.bmp', (err) => {
+                    if (err) throw err;
+                    console.log('Rename complete!');
+                });
+                rename(oldIdFolderPath + '2.bmp', newIdFolderPath + '2.bmp', (err) => {
+                    if (err) throw err;
+                    console.log('Rename complete!');
+                });
+                this.collection.updateOne({ id_: game._id }, { $set: { id: i } });
+            }
+        });
+    }
     getNextAvailableGameId(): number {
         let output = -1;
         // read the next id from the file lastGameId.txt if it exists or create it with 0

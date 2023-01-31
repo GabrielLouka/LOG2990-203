@@ -15,9 +15,30 @@ export class ServerDebugPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     generatedGameId = -1;
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    games: any;
     constructor(private readonly communicationService: CommunicationService) {}
 
+    async getGames(): Promise<void> {
+        const routeToSend = '/games/';
+        this.communicationService.get(routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+
+                if (response.body !== null) {
+                    const serverResult = JSON.parse(response.body);
+                    this.debugDisplayMessage.next(responseString);
+                    this.games = serverResult;
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
+    }
     async sendImageToServer(): Promise<void> {
         const routeToSend = '/image_processing/send-image';
         const inputValue1 = (document.getElementById('browseButton1') as HTMLInputElement).files?.[0];

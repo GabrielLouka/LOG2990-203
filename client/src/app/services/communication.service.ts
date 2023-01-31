@@ -21,6 +21,10 @@ export class CommunicationService {
         return this.http.post(`${this.baseUrl}/example/send`, message, { observe: 'response', responseType: 'text' });
     }
 
+    get(route?: string): Observable<HttpResponse<string>> {
+        return this.http.get(`${this.baseUrl}${route}`, { observe: 'response', responseType: 'text' });
+    }
+
     post<Type>(message: Type, route: string): Observable<HttpResponse<string>> {
         return this.http.post(`${this.baseUrl}${route}`, message, { observe: 'response', responseType: 'text' });
     }
