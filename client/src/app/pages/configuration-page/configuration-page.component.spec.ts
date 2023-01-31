@@ -4,6 +4,7 @@ import { BackButtonComponent } from '@app/components/back-button/back-button.com
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { NextPageButtonComponent } from '@app/components/next-page-button/next-page-button.component';
 import { PreviousPageButtonComponent } from '@app/components/previous-page-button/previous-page-button.component';
+import { Game } from '@app/interfaces/games';
 import { ConfigurationPageComponent } from './configuration-page.component';
 
 describe('ConfigurationPageComponent', () => {
@@ -18,6 +19,10 @@ describe('ConfigurationPageComponent', () => {
         fixture = TestBed.createComponent(ConfigurationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        const game1: Game[] = [];
+        const game2: Game[] = [];
+        const game3: Game[] = [];
+        component.games = [game1, game2, game3];
     });
 
     it('should create', () => {
@@ -59,9 +64,13 @@ describe('ConfigurationPageComponent', () => {
     });
 
     it("current page should stay the same if it's the last page", () => {
-        component.currentIndex = 3;
+        component.currentIndex = 2;
         component.goToNextSlide();
         expect(component.currentIndex).toEqual(component.currentIndex);
     });
-
+    it("current page should stay the same if it's the last page", () => {
+        component.currentIndex = 0;
+        component.goToPreviousSlide();
+        expect(component.currentIndex).toEqual(component.currentIndex);
+    });
 });
