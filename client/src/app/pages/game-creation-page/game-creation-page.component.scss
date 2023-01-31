@@ -80,11 +80,13 @@ h1 {
   flex-direction: row;
   scale: 0.9;
 
-  
+  border:solid brown; 
 }
 
 .optionIcon{
-  scale: 0.7;
+  scale: 1.5;
+
+  margin-right: 10px;
 }
 
 
@@ -103,6 +105,13 @@ h1 {
 
   border: solid yellow; 
 }
+
+.reverse-controle {
+  display: flex;
+}
+
+
+
 
 // .creation-options {
 //   display: flex;

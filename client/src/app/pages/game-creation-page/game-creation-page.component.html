@@ -1,87 +1,91 @@
 <head>
-  <meta charset="UTF-8" />
-  <title>{{ title }}</title>
+    <meta charset="UTF-8" />
+    <title>Page de création de jeu</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 </head>
 <body>
-  <section class="header">
-    <h1>Création de jeux</h1>
-    <app-back-button></app-back-button>
-  </section>
-  <div class="main-container center">
+    <section class="header">
+        <h1>Création de jeux</h1>
+        <app-back-button></app-back-button>
+    </section>
+    <div class="main-container center">
+        <div class="canvas-container center">
+            <div class="canvas">
+                <canvas #originalImage width="640px" height="480px">IMAGE ORIGINALE</canvas>
+            </div>
+            <div class="picture-option">
+                <button class="button-style center" (click)="originalButton.click()">
+                    <span class="material-symbols-outlined optionIcon"> upload_file </span>
+                    Ajouter une image
+                </button>
+                <input type="file" class="display" accept="image/bmp" #originalButton (change)="processImage($event, false)" />
+                <button class="button-style center" (click)="resetCanvas(false)">
+                    <span class="material-symbols-outlined optionIcon"> reset_image </span>
+                    <p>Réinitialiser image</p>
+                </button>
+                <button class="button-style center">
+                    <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
+                </button>
+            </div>
+        </div>
 
-    <div class="canvas-container center">
-      <div class="canvas">   
-        <canvas id="original-image" width="640px" height="480px">IMAGE ORIGINALE</canvas>
+        <div class="middle-container center">
+            <div class="main-options">
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> edit </span></button>
+                <button class="button-style center"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
+                <button class="button-style center"><input type="color" ng-model="test" id="" /></button>
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> crop_7_5 </span></button>
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> swap_horiz </span></button>
+            </div>
+            <br />
+            <br />
+            <div class="reverse-controle center">
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> undo </span></button>
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> redo </span></button>
+            </div>
+            <div class="image-option">
+                <button class="button-style center" (click)="bothImagesButton.click()">
+                    <span class="material-symbols-outlined optionIcon"> upload_file </span>
+                    Ajouter la meme image
+                </button>
+                <input
+                    type="file"
+                    id="both-images"
+                    accept="image/bmp"
+                    #bothImagesButton
+                    (change)="processImage($event, false); processImage($event, true)"
+                    style="display: none"
+                />
+            </div>
+        </div>
 
-      </div>
-      <div class="picture-option">
-        <button class = "button-style center" (click)="originalButton.click()">
-          <img src=".\assets\img\upload-icon.png" class="optionIcon" alt="upload-Icon" />
-          Ajouter une image
-        </button>
-        <input type="file" class="display" accept="image/bmp" #originalButton (change)="processImage($event, false)">
-        <button class="button-style center" (click) = "resetCanvas(false)" >
-          <img src=".\assets\img\reset-icon.png" class="optionIcon" alt="reset-Icon" />
-          Réinitialiser image
-        </button>
-      </div>
+        <div class="canvas-container center">
+            <div class="canvas">
+                <canvas #modifiedImage width="640px" height="480px">IMAGE MODIFIÉE</canvas>
+            </div>
+            <div class="picture-option">
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span></button>
+                <button class="button-style center" (click)="modifiedButton.click()">
+                    <span class="material-symbols-outlined optionIcon"> upload_file </span>
+                    Ajouter une image
+                </button>
+                <input type="file" class="display" accept="image/bmp" #modifiedButton (change)="processImage($event, true)" />
+                <button class="button-style center" (click)="resetCanvas(true)">
+                    <span class="material-symbols-outlined optionIcon"> reset_image </span>
+                    <p>Réinitialiser image</p>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <div class="middle-container center">
-      <div class="main-options">
-        <button class ="button-style center"><img src=".\assets\img\pen-icon.png" class="optionIcon" alt="pen-Icon"/></button>
-        <button class ="button-style center"><img src=".\assets\img\rubber-icon.png" class="optionIcon" alt="rubber-Icon"/></button>
-        <button class ="button-style center"><input type="color" ng-model="test" id="" /></button>
-      </div>
-      <br>
-      <br>
-      <div class="image-option">
-        <button class = "button-style center" (click)="bothImagesButton.click()">
-          <img src=".\assets\img\upload-icon.png" class="optionIcon" alt="upload-Icon" />
-          Ajouter la meme image
-        </button>
-        <input type="file" id="both-images" accept="image/bmp" #bothImagesButton (change)="processImage($event, false); processImage($event, true)" style="display:none;"> 
-      </div>
-      
-    </div>
+    <div game-container></div>
 
-
-
-
-
-
-
-    <div class="canvas-container center">
-      <div class = "canvas">       
-          <canvas id="modified-image" width="640px" height="480px">IMAGE MODIFIÉE</canvas>
-      </div>
-      <div class="picture-option">
-        <button class = "button-style center" (click)="modifiedButton.click()">
-          <img src=".\assets\img\upload-icon.png" class="optionIcon" alt="upload-Icon" />
-          Ajouter une image
-        </button>
-        <input type="file" class="display center" accept="image/bmp" #modifiedButton (change)="processImage($event, true)">
-        <button class="button-style center"(click) = "resetCanvas(true)">
-          <img src=".\assets\img\reset-icon.png" class="optionIcon" alt="upload-Icon" />
-          Réinitialiser image
-        </button>
-      </div>
-    </div>
-  </div>
-
-  
-
-
-
-
-
-
-  <!-- <div class="row">   
+    <!-- <div class="row">   
       <button class ="button-style crayon">Crayon:<span class="material-icons">mode</span></button>
       <button class ="button-style gomme">Gomme: <span class="material-icons" style="font-size: 30px; color: rgb(254, 0, 161); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
       <button class ="button-style rectangle">Rectangle:<span class="material-icons" style="font-size: 30px; color: rgb(0, 0, 0); -webkit-text-stroke-width: 10px;">crop_7_5</span></button>
   </div> -->
-  <!-- <div class = "row"> -->
+    <!-- <div class = "row"> -->
     <!-- <section class = "steps-container">
       <ol> Pour créer un jeu, veuillez suivre ces étapes dans l'ordre:
         <li *ngFor = "let step of steps; index as stepId" [ngClass]="{'in-progress': this.currentStep === stepId, 'completed': this.currentStep > stepId, 'upcoming': this.currentStep < stepId}">
@@ -108,9 +112,10 @@
         </li>
     </ol>
     </section> -->
-    
+
     <!-- <section>       
       <div class = "difference-canvas">       
       <canvas id = "difference-canvas"></canvas>
   </div></section>
   </div> -->
+</body>
