@@ -1,15 +1,14 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, ViewChild } from '@angular/core';
+
+import { HttpErrorResponse } from '@angular/common/http';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { BehaviorSubject } from 'rxjs';
-
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -18,15 +17,24 @@ import { BehaviorSubject } from 'rxjs';
 export class GameCreationPageComponent {
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
-    @ViewChild('input1') image1!: ElementRef;
-    @ViewChild('input2') image2!: ElementRef;
-    @ViewChild('radiusInput', { static: false }) radius: ElementRef;
+
+    gameName: string = '';
+    totalDifferences = 0;
+    enlargementRadius: number = 3;
+    originalImage: File;
+    modifiedImage: File;
+    differencesImage: Blob;
+    modifiedContainsImage = false;
+    originalContainsImage = false;
 
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     generatedGameId = -1;
 
+    private readonly characterMax: number = 20;
+    private readonly minDifferences: number = 3;
+    private readonly maxDifferences: number = 9;
+
     constructor(private readonly communicationService: CommunicationService) {}
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     processImage(event: any, isModified: boolean) {
         const image: HTMLImageElement = new Image();
         image.src = URL.createObjectURL(event.target.files[0]);
@@ -40,6 +48,13 @@ export class GameCreationPageComponent {
                 const context = this.getCanvas(isModified);
                 context?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
             }
+            if (isModified) {
+                this.modifiedImage = event.target.files[0];
+                this.modifiedContainsImage = true;
+            } else {
+                this.originalImage = event.target.files[0];
+                this.originalContainsImage = true;
+            }
         };
     }
 
@@ -47,71 +62,10 @@ export class GameCreationPageComponent {
         const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
         const context = this.getCanvas(isModified);
         context?.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    async sendImageToServer(): Promise<void> {
-        const routeToSend = '/image_processing/send-image';
-
-        const picture1: File = this.image1.nativeElement.files?.[0];
-        const picture2: File = this.image2.nativeElement.files?.[0];
-        const radiusValue: string = this.radius.nativeElement.value;
-
-        console.log(radiusValue);
-        console.log(picture1);
-        console.log(picture2);
-
-        if (picture1 !== undefined && picture2 !== undefined) {
-            const buffer1 = await picture1.arrayBuffer();
-            const buffer2 = await picture2.arrayBuffer();
-
-            // convert buffer to int array
-            const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
-            const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
-
-            // clear image preview
-            this.updateImageDisplay(new ArrayBuffer(0));
-
-            this.debugDisplayMessage.next('Sending image to server...');
-
-            const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
-            const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
-            const radius = radiusValue === '' ? 0 : parseInt(radiusValue, 10);
-
-            const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
-            this.communicationService.post<ImageUploadForm>(imageUploadForm, routeToSend).subscribe({
-                next: (response) => {
-                    const responseString = ` ${response.status} - 
-                        ${response.statusText} \n`;
-                    if (response.body !== null) {
-                        const serverResult: ImageUploadResult = JSON.parse(response.body);
-                        this.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
-                        this.debugDisplayMessage.next(
-                            responseString +
-                                serverResult.message +
-                                '\n Number of differences = ' +
-                                serverResult.numberOfDifferences +
-                                '\n Generated game id = ' +
-                                serverResult.generatedGameId,
-                        );
-                        console.log(
-                            responseString +
-                                serverResult.message +
-                                '\n Number of differences = ' +
-                                serverResult.numberOfDifferences +
-                                '\n Generated game id = ' +
-                                serverResult.generatedGameId,
-                        );
-                        this.generatedGameId = serverResult.generatedGameId;
-                        (document.getElementById('gameNameField') as HTMLInputElement).hidden = false;
-                    }
-                },
-                error: (err: HttpErrorResponse) => {
-                    const responseString = `Server Error : ${err.message}`;
-                    const serverResult: ImageUploadResult = JSON.parse(err.error);
-                    this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
-                    console.log('nombre de différences : ' + serverResult.numberOfDifferences);
-                },
-            });
+        if (isModified) {
+            this.modifiedContainsImage = false;
+        } else {
+            this.originalContainsImage = false;
         }
     }
 
@@ -127,18 +81,98 @@ export class GameCreationPageComponent {
         }
     }
 
+    async sendImageToServer(): Promise<void> {
+        const routeToSend = '/image_processing/send-image';
+
+        if (this.originalImage !== undefined && this.modifiedImage !== undefined) {
+            const buffer1 = await this.originalImage.arrayBuffer();
+            const buffer2 = await this.modifiedImage.arrayBuffer();
+
+            // convert buffer to int array
+            const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
+            const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
+
+            this.debugDisplayMessage.next('Sending image to server...');
+
+            const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
+            const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
+            const radius = this.enlargementRadius;
+            const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
+            this.communicationService.post<ImageUploadForm>(imageUploadForm, routeToSend).subscribe({
+                next: (response) => {
+                    const responseString = ` ${response.status} - 
+                    ${response.statusText} \n`;
+                    if (response.body !== null) {
+                        const serverResult: ImageUploadResult = JSON.parse(response.body);
+                        this.differencesImage = new Blob([this.convertToBuffer(serverResult.resultImageByteArray)]);
+                        const differenceImage: HTMLImageElement = new Image();
+                        differenceImage.src = URL.createObjectURL(this.differencesImage);
+                        if (serverResult.numberOfDifferences < this.minDifferences || serverResult.numberOfDifferences > this.maxDifferences) {
+                            alert(
+                                'Il faut que le nombre total de différences' +
+                                    "soit compris entre 3 et 9, veuillez changer d'images ou bien de rayon d'élargissement: " +
+                                    +this.totalDifferences +
+                                    ' différences détectées',
+                            );
+                            this.resetCanvas(true);
+                            this.resetCanvas(false);
+                            this.originalContainsImage = false;
+                            this.modifiedContainsImage = false;
+                            return;
+                        }
+                        this.totalDifferences = serverResult.numberOfDifferences;
+                        differenceImage.onload = () => {
+                            // TODO : A adapter avec la futur popup et changer la manière de faire
+                            // let canvas;
+                            // canvas = document.getElementById('difference-image') as HTMLCanvasElement;
+                            // canvas
+                            //     .getContext('2d')
+                            // ?.drawImage(differenceImage, 0, 0, differenceImage.width, differenceImage.height, 0, 0, canvas.width, canvas.height);
+                        };
+                        this.debugDisplayMessage.next(
+                            responseString +
+                                serverResult.message +
+                                '\n Number of differences = ' +
+                                serverResult.numberOfDifferences +
+                                '\n Generated game id = ' +
+                                serverResult.generatedGameId,
+                        );
+                        this.generatedGameId = serverResult.generatedGameId;
+                        // (document.getElementById('gameNameField') as HTMLInputElement).hidden = false;
+                    }
+                },
+                error: (err: HttpErrorResponse) => {
+                    const responseString = `Server Error : ${err.message}`;
+                    const serverResult: ImageUploadResult = JSON.parse(err.error);
+                    this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+                },
+            });
+        }
+    }
+
+    updateName(name: string) {
+        // TODO utiliser un regex ? '^[a-zA-Z0-9]{3,20}$' (même que celui de registration min : 3 char/ max : 20 char)
+        if (name.length === 0 || name.length > this.characterMax || name.trim().length === 0) {
+            alert("Nom invalide. Veuillez entrer une chaine non vide d'une taille de 20 caracteres maximum");
+        } else {
+            this.gameName = name;
+        }
+    }
+
+    submitRadius(radius: number) {
+        this.enlargementRadius = radius;
+    }
+
     async sendGameNameToServer(): Promise<void> {
         const routeToSend = '/games/updateName';
-        const nameValue = (document.getElementById('gameName') as HTMLInputElement).value;
         const gameId = this.generatedGameId;
 
-        // eslint-disable-next-line no-console
-        console.log('Sending ' + nameValue + 'to server (game id ' + gameId + ')...');
+        console.log('Sending ' + this.gameName + 'to server (game id ' + gameId + ')...');
 
-        this.debugDisplayMessage.next('Sending ' + nameValue + 'to server (game id ' + gameId + ')...');
-        this.communicationService.post<[number, string]>([gameId, nameValue], routeToSend).subscribe({
+        this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + gameId + ')...');
+        this.communicationService.post<[number, string]>([gameId, this.gameName], routeToSend).subscribe({
             next: (response) => {
-                const responseString = ` ${response.status} -
+                const responseString = ` ${response.status} - 
                 ${response.statusText} \n`;
                 this.debugDisplayMessage.next(responseString);
             },
@@ -160,20 +194,6 @@ export class GameCreationPageComponent {
         return buffer;
     }
 
-    updateImageDisplay(imgData: ArrayBuffer) {
-        const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
-        if (imagePreview !== null) imagePreview.src = URL.createObjectURL(new Blob([imgData]));
-    }
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
     // ADAPTER POUR L'AVANT PLAN
     // switchCanvas(isModified: boolean) {
     //     const leftCanvas: HTMLCanvasElement = this.leftCanvas.nativeElement;
