@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
-import { MouseHandlerService } from './mouse-handler.service';
 import { Coordinate } from '@app/interfaces/coordinate';
+import { MouseHandlerService } from './mouse-handler.service';
 
 describe('MouseHandlerService', () => {
     let service: MouseHandlerService;
@@ -94,7 +94,7 @@ describe('MouseHandlerService', () => {
         //
         // Using a Spy to mock only a part of an objet can be useful but it should be used with caution.
         // Having to use it a lot can mean that your methods are highly coupled and can have side effets.
-        const spy = spyOn<any>(service, 'printToConsole').and.callFake(fakePrint);
+        const spy = spyOn<unknown>(service, 'printToConsole').and.callFake(fakePrint);
 
         const calculatedDistance = service.calculateDistanceWrapper();
 

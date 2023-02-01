@@ -9,7 +9,6 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class RegistrationPageComponent {
     title = 'Register Page';
-    btnType = 'Retour';
 
     registrationForm = new FormGroup({
         pseudo: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),

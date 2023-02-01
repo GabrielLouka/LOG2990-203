@@ -10,7 +10,7 @@ export class InfoCardComponent {
     info: Info = {
         description: 'Jeu 1 ',
         difficulty: 'Facile ',
-        mode: 'Solo ',
+        mode: 'Solo',
         nbHints: 3,
         hintsPenalty: 10,
     };
