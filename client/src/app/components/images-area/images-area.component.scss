@@ -1,22 +1,18 @@
 .img-container {
     display: flex;
     flex-direction: row;
-
-    justify-content: space-around;
     align-items: center;
 
-    width: 60vw;
-    height: 70vh;
     margin-top: 10%;
     align-content: center;
-
-    border:solid green; 
 }
 
 .image {
     border: solid; 
     width: 640px;
     height: 480px;
+    padding: 10px;
+    
 }
 
 

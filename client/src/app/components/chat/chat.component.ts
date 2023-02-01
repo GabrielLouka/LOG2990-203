@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component } from '@angular/core';
-
+import { AuthService } from '@app/services/auth.service';
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
@@ -10,14 +10,17 @@ export class ChatComponent {
     messages: any[] = [];
     newMessage = '';
     text: any;
-    username: string;
     sentByplayer1: boolean;
     sentByPlayer2: boolean;
+
+    username = this.auth.registerUserName();
+
+    constructor(private auth: AuthService) {}
 
     sendMessage(playerNumber: number) {
         this.messages.push({
             text: this.newMessage,
-            username: `Player ${playerNumber}`,
+            username: `${this.username}`,
             sentByPlayer1: playerNumber === 1,
             sentByPlayer2: playerNumber === 2,
         });
