@@ -18,7 +18,7 @@
                     <span class="material-symbols-outlined optionIcon"> upload_file </span>
                     Ajouter une image
                 </button>
-                <input #input1 type="file" class="display" accept="image/bmp" (change)="processImage($event, false)" />
+                <input #input1 type="file" class="display" accept="image/bmp" (input)="processImage($event, false)" />
                 <button class="button-style center" (click)="resetCanvas(false)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>

@@ -22,8 +22,8 @@ export class GameCreationPageComponent {
     gameName: string = '';
     totalDifferences = 0;
     enlargementRadius: number = 3;
-    originalImage: File;
-    modifiedImage: File;
+    originalImage: File | null;
+    modifiedImage: File | null;
     differencesImage: Blob;
     modifiedContainsImage = false;
     originalContainsImage = false;
@@ -37,6 +37,8 @@ export class GameCreationPageComponent {
 
     constructor(private readonly communicationService: CommunicationService) {}
     async processImage(event: any, isModified: boolean) {
+        console.log('Hello');
+        if (event.target.files.length === 0) return;
         const image: HTMLImageElement = new Image();
         const imageBuffer: ArrayBuffer = await event.target.files[0].arrayBuffer();
         image.src = URL.createObjectURL(event.target.files[0]);
@@ -55,6 +57,8 @@ export class GameCreationPageComponent {
 
             const context = this.getCanvas(isModified);
             context?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+
+            console.log(event.target.files[0]);
 
             if (isModified) {
                 this.modifiedImage = event.target.files[0];
@@ -77,6 +81,12 @@ export class GameCreationPageComponent {
         const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
         const context = this.getCanvas(isModified);
         context?.clearRect(0, 0, canvas.width, canvas.height);
+
+        this.leftCanvas.nativeElement.src = '';
+        this.rightCanvas.nativeElement.src = '';
+        this.modifiedImage = null;
+        this.originalImage = null;
+
         if (isModified) {
             this.modifiedContainsImage = false;
         } else {
@@ -99,7 +109,14 @@ export class GameCreationPageComponent {
     async sendImageToServer(): Promise<void> {
         const routeToSend = '/image_processing/send-image';
 
-        if (this.originalImage !== undefined && this.modifiedImage !== undefined) {
+        if (
+            this.originalImage !== undefined &&
+            this.modifiedImage !== undefined &&
+            this.originalContainsImage &&
+            this.modifiedContainsImage &&
+            this.originalImage !== null &&
+            this.modifiedImage !== null
+        ) {
             const buffer1 = await this.originalImage.arrayBuffer();
             const buffer2 = await this.modifiedImage.arrayBuffer();
 
@@ -145,6 +162,14 @@ export class GameCreationPageComponent {
                             // ?.drawImage(differenceImage, 0, 0, differenceImage.width, differenceImage.height, 0, 0, canvas.width, canvas.height);
                         };
                         this.debugDisplayMessage.next(
+                            responseString +
+                                serverResult.message +
+                                '\n Number of differences = ' +
+                                serverResult.numberOfDifferences +
+                                '\n Generated game id = ' +
+                                serverResult.generatedGameId,
+                        );
+                        console.log(
                             responseString +
                                 serverResult.message +
                                 '\n Number of differences = ' +
