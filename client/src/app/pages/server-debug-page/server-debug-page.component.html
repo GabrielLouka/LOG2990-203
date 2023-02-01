@@ -11,5 +11,12 @@
 <p>
     <button class="button" (click)="sendImageToServer()">Send Image</button>
     <button class="button" routerLink="/">Home</button>
-    <button class="button" (click)="getGames()">Gimme games</button>
+    <button class="button" (click)="getGames()">Retrieve games</button>
+    <button class="button" (click)="giveImages()">Display images (click retrieve games first)</button>
 </p>
+<div *ngFor="let game of games">
+    <p>id: {{ game.gameData.id }}</p>
+    <p>Name: {{ game.gameData.name }}</p>
+    <p>Number of differences: {{ game.gameData.nbrDifferences }}</p>
+    <p>{{ game.originalImage.length }}</p>
+</div>

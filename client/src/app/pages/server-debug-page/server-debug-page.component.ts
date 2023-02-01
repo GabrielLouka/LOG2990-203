@@ -4,8 +4,8 @@ import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
-
 @Component({
     selector: 'app-server-debug-page',
     templateUrl: './server-debug-page.component.html',
@@ -19,8 +19,19 @@ export class ServerDebugPageComponent {
     games: any;
     constructor(private readonly communicationService: CommunicationService) {}
 
+    async giveImages() {
+        for (const game of this.games) {
+            const originalImage = game.originalImage;
+            const imageElement = new Image();
+
+            imageElement.src = `data:image/bmp;base64,${Buffer.from(originalImage).toString('base64')}`;
+            imageElement.style.width = '100px';
+            imageElement.style.height = '100px';
+            document.body.appendChild(imageElement);
+        }
+    }
     async getGames(): Promise<void> {
-        const routeToSend = '/games/';
+        const routeToSend = '/games/0';
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 const responseString = ` ${response.status} - 

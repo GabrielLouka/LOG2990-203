@@ -3,7 +3,7 @@ import { FileSystemManager } from '@app/services/file_system_manager';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
-import { mkdir, readFileSync, rename, writeFile, writeFileSync } from 'fs';
+import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { UpdateResult, WithId } from 'mongodb';
 import { Service } from 'typedi';
 @Service()
@@ -36,35 +36,75 @@ export class GameStorageService {
             return game;
         });
     }
-    async getNextGames() {
+
+    // async function getDocumentsByPage(page: number, collection: any): Promise<any[]> {
+    //     const pageSize = 4;
+    //     const skip = page * pageSize;
+    //     const documents = await collection.find({}).skip(skip).limit(pageSize).toArray();
+    //     return documents;
+    //   }
+
+    async getNextGames(pageNbr: number) {
+        const skipNbr = pageNbr * this.gamesLimit;
+        if ((await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()).length < this.gamesLimit) {
+            return;
+        } else {
+            let folderPath;
+            const theGames = [];
+            for (const game of await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()) {
+                folderPath = this.persistentDataFolderPath + game.id + '/';
+                const firstImage = readFileSync(folderPath + '1.bmp');
+                const secondImage = readFileSync(folderPath + '2.bmp');
+
+                const originalImagePath = folderPath + '1.bmp';
+                console.log(`Original image path: ${originalImagePath}`);
+
+                try {
+                    const originalImage = readFileSync(originalImagePath);
+                    console.log(`Buffer length: ${originalImage.length} bytes`);
+                    // const imageElement = new Image();
+                    // imageElement.src = `data:image/bmp;base64,${originalImage.toString('base64')}`;
+                    // document.body.appendChild(imageElement);
+                } catch (error) {
+                    console.error(`Error reading image file: ${error.message}`);
+                }
+                theGames.push({
+                    gameData: game,
+                    originalImage: firstImage,
+                    modifiedImage: secondImage,
+                });
+            }
+            this.currentPageNbr++;
+            return theGames;
+        }
+
         // this.recalculateIds();
-        if ((await this.getAllGames()).length < this.gamesLimit * this.currentPageNbr + this.gamesLimit) {
-            console.log('total games available: ' + (await this.getAllGames()).length);
-            console.log('games required: ' + (this.gamesLimit * this.currentPageNbr + this.gamesLimit));
-            return false;
-        }
-        const theGames = [];
+        // if ((await this.getAllGames()).length < this.gamesLimit * this.currentPageNbr + this.gamesLimit) {
+        //     console.log('total games available: ' + (await this.getAllGames()).length);
+        //     console.log('games required: ' + (this.gamesLimit * this.currentPageNbr + this.gamesLimit));
+        //     return false;
+        // }
 
-        const indexStart = this.gamesLimit * this.currentPageNbr;
-        const indexEnd = indexStart + this.gamesLimit;
+        // const indexStart = this.gamesLimit * this.currentPageNbr;
+        // const indexEnd = indexStart + this.gamesLimit;
 
-        for (let i = indexStart; i < indexEnd; i++) {
-            const folderPath = this.persistentDataFolderPath + i + '/';
+        // for (let i = indexStart; i < indexEnd; i++) {
+        //     const folderPath = this.persistentDataFolderPath + i + '/';
 
-            // console.log('current index is' + i);
-            // console.log(await (await this.getGameById(i.toString())).name);
-            // console.log('path: ' + folderPath);
-            const firstImage = readFileSync(folderPath + '1.bmp');
-            const secondImage = readFileSync(folderPath + '2.bmp');
-            theGames.push({
-                game: this.getGameById(i.toString()),
-                originalImage: firstImage,
-                modifiedImage: secondImage,
-            });
-        }
-        this.currentPageNbr++;
+        //     // console.log('current index is' + i);
+        //     // console.log(await (await this.getGameById(i.toString())).name);
+        //     // console.log('path: ' + folderPath);
+        //     const firstImage = readFileSync(folderPath + '1.bmp');
+        //     const secondImage = readFileSync(folderPath + '2.bmp');
+        //     theGames.push({
+        //         game: this.getGameById(i.toString()),
+        //         originalImage: firstImage,
+        //         modifiedImage: secondImage,
+        //     });
+        // }
+        // this.currentPageNbr++;
 
-        return theGames;
+        // return theGames;
     }
 
     async storeDefaultGames() {
@@ -72,28 +112,28 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
-    async recalculateIds() {
-        (await this.getAllGames()).forEach((game, i) => {
-            if (game.id !== i) {
-                const oldIdFolderPath = this.persistentDataFolderPath + game.id + '/';
-                const newIdFolderPath = this.persistentDataFolderPath + i + '/';
+    // async recalculateIds() {
+    //     (await this.getAllGames()).forEach((game, i) => {
+    //         if (game.id !== i) {
+    //             const oldIdFolderPath = this.persistentDataFolderPath + game.id + '/';
+    //             const newIdFolderPath = this.persistentDataFolderPath + i + '/';
 
-                rename(oldIdFolderPath, newIdFolderPath, (err) => {
-                    if (err) throw err;
-                    console.log('Rename complete!');
-                });
-                rename(oldIdFolderPath + '1.bmp', newIdFolderPath + '1.bmp', (err) => {
-                    if (err) throw err;
-                    console.log('Rename complete!');
-                });
-                rename(oldIdFolderPath + '2.bmp', newIdFolderPath + '2.bmp', (err) => {
-                    if (err) throw err;
-                    console.log('Rename complete!');
-                });
-                this.collection.updateOne({ id_: game._id }, { $set: { id: i } });
-            }
-        });
-    }
+    //             rename(oldIdFolderPath, newIdFolderPath, (err) => {
+    //                 if (err) throw err;
+    //                 console.log('Rename complete!');
+    //             });
+    //             rename(oldIdFolderPath + '1.bmp', newIdFolderPath + '1.bmp', (err) => {
+    //                 if (err) throw err;
+    //                 console.log('Rename complete!');
+    //             });
+    //             rename(oldIdFolderPath + '2.bmp', newIdFolderPath + '2.bmp', (err) => {
+    //                 if (err) throw err;
+    //                 console.log('Rename complete!');
+    //             });
+    //             this.collection.updateOne({ id_: game._id }, { $set: { id: i } });
+    //         }
+    //     });
+    // }
     getNextAvailableGameId(): number {
         let output = -1;
         // read the next id from the file lastGameId.txt if it exists or create it with 0
