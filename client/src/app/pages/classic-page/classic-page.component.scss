@@ -1,14 +1,12 @@
 body {
     justify-content: center;
     align-items: center;
-    border: solid yellow; 
 }
+
 .header {
     display: flex;
     flex-direction: row;
     justify-content: center;
-
-    border:solid red; 
 
     height: 20vh;
     width: 100%;
@@ -16,10 +14,34 @@ body {
 
 .difference-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+
+    height: 12vh;
+    width: 100%;
 }
 
 .titre {
     font-size: 5vh;
+}
+
+.middle-container {
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+
+    border:solid;
+    border-color:red;
+}
+
+.left-container {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    top: 50vh;
+    right: 0;
+    margin: 4vh 2vh;
 }

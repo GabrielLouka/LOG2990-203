@@ -1,6 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component } from '@angular/core';
-import { Coordinate } from '@app/interfaces/coordinate';
-import { MouseClickHandlerService } from '@app/services/mouse-click-handler.service';
 
 @Component({
     selector: 'app-chat',
@@ -8,12 +7,20 @@ import { MouseClickHandlerService } from '@app/services/mouse-click-handler.serv
     styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent {
-    constructor(private mouse: MouseClickHandlerService) {}
+    messages: any[] = [];
+    newMessage = '';
+    text: any;
+    username: string;
+    sentByplayer1: boolean;
+    sentByPlayer2: boolean;
 
-    onMouseClick(coordinate: Coordinate) {
-      this.mouse.onClick() {
-        
-      }
+    sendMessage(playerNumber: number) {
+        this.messages.push({
+            text: this.newMessage,
+            username: `Player ${playerNumber}`,
+            sentByPlayer1: playerNumber === 1,
+            sentByPlayer2: playerNumber === 2,
+        });
+        this.newMessage = '';
     }
-
 }

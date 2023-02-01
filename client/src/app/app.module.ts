@@ -25,6 +25,8 @@ import { RegistrationPageComponent } from './pages/registration-page/registratio
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
 import { QuitButtonComponent } from './components/quit-button/quit-button.component';
+import { ChatComponent } from './components/chat/chat.component';
+import { MouseComponent } from './components/mouse/mouse.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -51,6 +53,8 @@ import { QuitButtonComponent } from './components/quit-button/quit-button.compon
         ImagesAreaComponent,
         TimerComponent,
         QuitButtonComponent,
+        ChatComponent,
+        MouseComponent,
     ],
     imports: [
         AppMaterialModule,

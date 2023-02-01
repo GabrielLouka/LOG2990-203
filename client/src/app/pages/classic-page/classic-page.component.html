@@ -8,12 +8,20 @@
         <app-hint></app-hint>
         <h1 class="button-style titre">Jeu classique</h1>
     </section>
-    <section class="difference-container">
+
+    <div class="difference-container">
         <app-found-hints-counter></app-found-hints-counter>
-        <app-images-area></app-images-area>
-        <app-timer [init]="timeInSeconds"></app-timer>
-    </section>
-    <section>
+        <div class="timer-container">
+            <app-timer [init]="timeInSeconds"></app-timer>
+        </div>
+    </div>
+    <div class="middle-container">
+        <div class= "center-container">
+            <app-images-area></app-images-area>
+        </div>
+        <div class= "left-container">
+            <app-chat></app-chat>
+        </div>
         <app-info-card></app-info-card>
-    </section>
+    </div>
 </body>

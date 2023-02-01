@@ -1,1 +1,18 @@
-<div class="chat-container"></div>
+
+<div class="chat-container">
+    <div class="chat-header"> MANIA CHAT
+    </div>
+    <div class="chat-body">
+    <div *ngFor="let message of messages">
+        <div class="message-container" [ngClass]="{ 'sent-by-player-1': message.sentByPlayer1, 'sent-by-player-2': message.sentByPlayer2 }">
+        <div class="message-text">{{ message.text }}</div>
+        <div class="message-username">{{ message.username }}</div>
+        </div>
+    </div>
+    </div>
+    <div class="chat-footer">
+    <input type="text" [(ngModel)]="newMessage">
+    <button (click)="sendMessage(1)">Player 1</button>
+    <button (click)="sendMessage(2)">Player 2</button>
+    </div>
+</div>

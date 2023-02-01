@@ -4,7 +4,7 @@ import { Coordinate } from '@app/interfaces/coordinate';
 @Injectable({
     providedIn: 'root',
 })
-export class MouseClickHandlerService {
+export class MouseHandlerService {
     startCoordinate: Coordinate;
     endCoordinate: Coordinate;
 
