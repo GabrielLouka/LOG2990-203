@@ -1,18 +1,22 @@
 .img-container {
     display: flex;
+    position:absolute;
     flex-direction: row;
-    align-items: center;
-
-    margin-top: 10%;
     align-content: center;
+    top: 40vh;
+    left: 10%;
 }
 
-.image {
+.original .difference {
     border: solid; 
     width: 640px;
-    height: 480px;
-    padding: 10px;
-    
+    height: 480px;   
+
 }
 
+
+#good  {
+    display: flex;
+    margin: 20px;
+}
 

@@ -51,18 +51,20 @@
 
 
 button {
-    width: 30%;
-    height: 3vh;
     padding: 10px;
-    background-color: #4CAF50;
-    color: #fff;
+    background-color: rgb(228, 228, 0);
     border: none;
-    border-radius: 5px;
+    padding: 2vh 4vh;
+    border-radius: 2vw;
     cursor: pointer;
+    font-weight: 600;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
 }
 
 input {
   width: 60%;
   height:3vh;
-  border-radius: 5px;
+  border-radius: 2vw;
+  padding: 2vh 4vh;
 }
