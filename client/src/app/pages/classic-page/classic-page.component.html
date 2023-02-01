@@ -10,6 +10,9 @@
     </section>
 
     <div class="difference-container">
+        <div class="left-info">
+            <app-info-card></app-info-card>
+        </div>
         <app-found-hints-counter></app-found-hints-counter>
         <div class="timer-container">
             <app-timer [init]="timeInSeconds"></app-timer>
@@ -19,9 +22,8 @@
         <div class= "center-container">
             <app-images-area></app-images-area>
         </div>
-        <div class= "left-container">
+        <div class= "right-chat">
             <app-chat></app-chat>
         </div>
-        <app-info-card></app-info-card>
     </div>
 </body>

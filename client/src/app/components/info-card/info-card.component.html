@@ -1,12 +1,18 @@
 <div class="info-container">
     <div class="game-info">
-        <p> {{info.description}}</p>
-        <p> {{info.difficulty}}</p>
-        <p> {{info.mode}}</p>
-        <p> Nombre d'indices : {{info.nbHints}}</p>
-        <p> Temps pénalité : {{info.hintsPenalty}}</p>
-        <div class="info-icon">
-            <img src=".\assets\img\info-icon.png" class="info-icon" alt="gameInfoIcon"/>
+        <div class="description">
+            <div class="row">
+            <div class="info-icon">
+                <img src=".\assets\img\info-icon.png" class="info-icon" alt="gameInfoIcon"/>
+            </div>
+                <p>{{info.description}}</p>
+                <p>{{info.difficulty}} </p>
+                <p>{{info.mode}}</p>
+            </div>
+            <div class="row">
+                <p> <strong>{{info.nbHints}}</strong> indices </p>
+                <p> Pénalité : {{info.hintsPenalty}} s</p>
+            </div>
         </div>
     </div>
 </div>

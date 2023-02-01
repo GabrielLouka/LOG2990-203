@@ -1,11 +1,11 @@
 .container {
-    display: flex;
-    justify-content: center;
-    border: solid;
-    border-color: rgb(228, 228, 0);
-    border-radius: 5%;
-
     width: max-content;
     height: auto;
+    border-radius: 10px;
+    margin-left: 10px;
+    transition: 0.3s;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
     padding: 10px;
+    border: solid;
 }
