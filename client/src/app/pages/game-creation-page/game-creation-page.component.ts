@@ -9,6 +9,7 @@ import { DifferenceImage } from '@common/difference.image';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { BehaviorSubject } from 'rxjs';
+
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -35,19 +36,26 @@ export class GameCreationPageComponent {
     private readonly maxDifferences: number = 9;
 
     constructor(private readonly communicationService: CommunicationService) {}
-    processImage(event: any, isModified: boolean) {
+    async processImage(event: any, isModified: boolean) {
         const image: HTMLImageElement = new Image();
+        const imageBuffer: ArrayBuffer = await event.target.files[0].arrayBuffer();
         image.src = URL.createObjectURL(event.target.files[0]);
         const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
 
         image.onload = () => {
+            if (!this.is24BitDepthBMP(imageBuffer)) {
+                alert("L'image doit être en 24-bits");
+                return;
+            }
+
             if (image.height !== 480 || image.width !== 640) {
                 alert('Taille invalide (' + image.width + 'x' + image.height + '), la taille doit être de : 640x480 pixels');
                 return;
-            } else {
-                const context = this.getCanvas(isModified);
-                context?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
             }
+
+            const context = this.getCanvas(isModified);
+            context?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+
             if (isModified) {
                 this.modifiedImage = event.target.files[0];
                 this.modifiedContainsImage = true;
@@ -57,6 +65,13 @@ export class GameCreationPageComponent {
             }
         };
     }
+
+    is24BitDepthBMP = (imageBuffer: ArrayBuffer): boolean => {
+        const BITMAP_TYPE_OFFSET = 28;
+        const BIT_COUNT_24 = 24;
+        const dataView = new DataView(imageBuffer);
+        return dataView.getUint16(BITMAP_TYPE_OFFSET, true) === BIT_COUNT_24;
+    };
 
     resetCanvas(isModified: boolean) {
         const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
