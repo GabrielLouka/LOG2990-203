@@ -3,6 +3,8 @@
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file_system_manager';
 import { GameData } from '@common/game-data';
+// eslint-disable-next-line no-unused-vars
+import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
@@ -13,7 +15,6 @@ export class GameStorageService {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     JSON_PATH: string;
     fileSystemManager: FileSystemManager;
-    currentPageNbr: number = 0;
     private readonly persistentDataFolderPath = './stored data/';
     private readonly lastGameIdFileName = 'lastGameId.txt';
     private readonly collectionName = 'games';
@@ -47,6 +48,7 @@ export class GameStorageService {
     //   }
 
     async getNextGames(pageNbr: number) {
+        console.log('je suis dans le getNextGames' + pageNbr);
         const skipNbr = pageNbr * this.gamesLimit;
         if ((await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()).length < this.gamesLimit) {
             return;
@@ -54,6 +56,7 @@ export class GameStorageService {
             let folderPath;
             const theGames = [];
             for (const game of await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()) {
+                console.log(game.id);
                 folderPath = this.persistentDataFolderPath + game.id + '/';
                 const firstImage = readFileSync(folderPath + '1.bmp');
                 const secondImage = readFileSync(folderPath + '2.bmp');
@@ -73,13 +76,15 @@ export class GameStorageService {
                     // eslint-disable-next-line no-console
                     console.error(`Error reading image file: ${error.message}`);
                 }
+                console.log('yy');
+                game.ranking = defaultRankings;
                 theGames.push({
                     gameData: game,
                     originalImage: firstImage,
                     modifiedImage: secondImage,
                 });
             }
-            this.currentPageNbr++;
+
             return theGames;
         }
 
@@ -117,6 +122,28 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
+    // async recalculateIds() {
+    //     (await this.getAllGames()).forEach((game, i) => {
+    //         if (game.id !== i) {
+    //             const oldIdFolderPath = this.persistentDataFolderPath + game.id + '/';
+    //             const newIdFolderPath = this.persistentDataFolderPath + i + '/';
+
+    //             rename(oldIdFolderPath, newIdFolderPath, (err) => {
+    //                 if (err) throw err;
+    //                 console.log('Rename complete!');
+    //             });
+    //             rename(oldIdFolderPath + '1.bmp', newIdFolderPath + '1.bmp', (err) => {
+    //                 if (err) throw err;
+    //                 console.log('Rename complete!');
+    //             });
+    //             rename(oldIdFolderPath + '2.bmp', newIdFolderPath + '2.bmp', (err) => {
+    //                 if (err) throw err;
+    //                 console.log('Rename complete!');
+    //             });
+    //             this.collection.updateOne({ id_: game._id }, { $set: { id: i } });
+    //         }
+    //     });
+    // }
     getNextAvailableGameId(): number {
         let output = -1;
         // read the next id from the file lastGameId.txt if it exists or create it with 0
@@ -176,14 +203,14 @@ export class GameStorageService {
             differences: _differences,
             name: 'Default game',
             isEasy: _isEasy,
+            ranking: defaultRankings,
         };
-        return this.collection.insertOne(newGameToAdd);
+        this.collection.insertOne(newGameToAdd);
     }
 
     async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
         return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
     }
-
     async deleteAllGames(): Promise<DeleteResult> {
         return this.collection.deleteMany({});
     }

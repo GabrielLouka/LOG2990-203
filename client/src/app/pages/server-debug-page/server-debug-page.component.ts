@@ -33,6 +33,7 @@ export class ServerDebugPageComponent {
     }
     async getGames(): Promise<void> {
         const routeToSend = '/games/0';
+
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 const responseString = ` ${response.status} - 
