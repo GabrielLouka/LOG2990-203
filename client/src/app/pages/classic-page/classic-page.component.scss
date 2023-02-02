@@ -1,25 +1,36 @@
 body {
+    justify-content: center;
+    align-items: center;
+}
+
+.header {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: center;
 
-    max-height: 100vh;
-    background-color: lightblue;
+    height: 20vh;
+    width: 100%;
 }
 
-.header #mode {
-    position: relative;
-    margin: 5vh;
-    top: 1vh;
-    left: 40%;
-    font-size: large;
-    font-weight: bold;
+.difference-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 12vh;
+    width: 100%;
 }
 
-.footer #info-icon {
+.titre {
+    font-size: 5vh;
+}
+
+.left-info {
     position: absolute;
-    margin: 5vh;
-    bottom: 0vh;
-    left: 2vh;
-    width: 50px;
-    height: auto;
+    left: 0;
+}
+
+.right-chat {
+    position: absolute;
+    right: 0;
+    margin: 4vh 2vh;
 }

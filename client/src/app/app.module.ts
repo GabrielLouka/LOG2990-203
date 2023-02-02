@@ -10,17 +10,24 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
+import { ChatComponent } from './components/chat/chat.component';
+import { FoundHintsCounterComponent } from './components/found-hints-counter/found-hints-counter.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
-import { GameSheetComponent } from './components/game-sheet/game-sheet.component';
 import { HintComponent } from './components/hint/hint.component';
-import { InfoIconComponent } from './components/info-icon/info-icon.component';
+import { ImagesAreaComponent } from './components/images-area/images-area.component';
+import { InfoCardComponent } from './components/info-card/info-card.component';
+import { MouseComponent } from './components/mouse/mouse.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
+import { QuitButtonComponent } from './components/quit-button/quit-button.component';
+import { TimerComponent } from './components/timer/timer.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
-import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
+import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
+import { AuthService } from './services/auth.service';
+import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -32,7 +39,6 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
     declarations: [
         AppComponent,
         MainPageComponent,
-        GameSheetComponent,
         ConfigurationPageComponent,
         OverlayComponent,
         PreviousPageButtonComponent,
@@ -42,7 +48,15 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         ClassicPageComponent,
         SelectionsPageComponent,
         HintComponent,
-        InfoIconComponent,
+        InfoCardComponent,
+        ServerDebugPageComponent,
+        RegistrationPageComponent,
+        FoundHintsCounterComponent,
+        ImagesAreaComponent,
+        TimerComponent,
+        QuitButtonComponent,
+        ChatComponent,
+        MouseComponent,
         ServerDebugPageComponent,
         GameCreationPageComponent,
     ],
@@ -56,7 +70,7 @@ import { SelectionsPageComponent } from './pages/selections-page/selections-page
         MatGridListModule,
         ReactiveFormsModule,
     ],
-    providers: [],
+    providers: [AuthService],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

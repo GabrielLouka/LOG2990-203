@@ -24,11 +24,21 @@
             <app-game-sheet *ngIf="game" [singleGame]="game"></app-game-sheet>
         </div>
 
+        <a routerLink=""><img src=".\assets\img\game-icon.png" id="gameIcon" alt="gameLogo" /></a>
+        
+        <button class="game-btn">Créer un jeu</button>
+        <button class="game-btn" (click)="deleteButton()">Supprimer les jeux</button>
+        <button class="game-btn" (click)="resetButton()">Réinitialiser les jeux</button>
+    </Section>
 
-        <div class="next-arrow">
-            <div class="next-arrow-top"></div>
-            <div class="next-arrow-bottom"></div>
-        </div>
-    </section>
+    <div class="container">
+        <mat-grid-list cols="2" rowHeight="42vh">
+            <mat-grid-tile *ngFor="let game of games">
+                <app-game-card [game]="game" [playable]="playable"></app-game-card>
+            </mat-grid-tile>
+        </mat-grid-list>
+    </div>
 
+    <app-next-page-button></app-next-page-button>
+    <app-previous-page-button></app-previous-page-button>
 </body>

@@ -1,0 +1,50 @@
+.count-down-timer {
+    box-shadow: 2px 6px 9px 2px rgb(0 0 0 / 20%);
+    text-align: center;
+    background-color: rgb(228, 228, 0);
+    max-width: 500px;
+    margin: 20px auto;
+    color: orange;
+    border-radius: 6px;
+    padding: 10px;
+    font-family: sans-serif;
+
+    position: absolute;
+    top: 12;
+    right:0;
+    margin: 0 4vh;
+}
+  
+    .wrapper {
+      .description,
+      .times {
+        display: grid;
+        grid-template-columns: repeat(2, calc(25%));
+        grid-column-gap: 50px;
+      }
+  
+      .description {
+        > p {
+          margin: 0;
+          font: normal 14px sans-serif;
+        }
+      }
+  
+      .times {
+        p {
+          position: relative;
+          margin: 0;
+          font: normal 40px courier, sans-serif;
+          ::ng-deep img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: block;
+            height: 60px;
+          }
+        }
+      }
+    }
+  
+  

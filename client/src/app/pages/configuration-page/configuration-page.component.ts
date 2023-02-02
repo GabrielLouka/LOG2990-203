@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
-import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { Ranking } from '@common/classements';
 import { Game } from '../../interfaces/games';
@@ -15,6 +13,7 @@ import { Game } from '../../interfaces/games';
     styleUrls: ['./configuration-page.component.scss'],
 })
 export class ConfigurationPageComponent {
+    btnType = 'Retour';
     title = 'Page de configuration';
     resetClassement: Ranking[] = [
         { name: 'PlayerA', score: 200 },
@@ -24,7 +23,7 @@ export class ConfigurationPageComponent {
 
     games: Game[] = [
         {
-            description: 'Jeux 1',
+            description: 'Glouton',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'DIFFICILE',
             ranking: [
@@ -41,7 +40,7 @@ export class ConfigurationPageComponent {
             ],
         },
         {
-            description: 'Jeux 2',
+            description: 'Hommes de Cro-Magnon',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'FACILE',
             ranking: [
@@ -58,7 +57,7 @@ export class ConfigurationPageComponent {
             ],
         },
         {
-            description: 'Jeux 3',
+            description: 'Bagnoles',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'MOYEN',
             ranking: [
@@ -75,7 +74,7 @@ export class ConfigurationPageComponent {
             ],
         },
         {
-            description: 'Jeux 4',
+            description: 'Playa',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'MOYEN',
             ranking: [
@@ -92,23 +91,13 @@ export class ConfigurationPageComponent {
             ],
         },
     ];
-    constructor(private location: Location) {}
 
-    over() {
-        const subBox = document.getElementById('sub-box');
-        if (subBox) {
-            subBox.className = 'game-buttons';
-        }
-    }
-    previousPage() {
-        this.location.back();
-    }
-
-    resetButton() {
-        if (confirm('Are you sure you want to reset all the games')) {
-            for (let i = 0; i < this.games.length; i++) {
-                for (let j = 0; j < this.games[i].ranking.length; j++) {
-                    this.games[i].ranking[j] = this.resetClassement;
+    
+    resetButton(){
+        if(confirm('Are you sure you want to reset all the games')){
+            for(let i=0; i<this.games.length;i++ ){
+                for(let j=0; j<this.games[i].ranking.length;j++){
+                    this.games[i].ranking[j]=this.resetClassement;
                 }
             }
         }

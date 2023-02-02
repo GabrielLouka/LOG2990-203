@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Game } from '@app/interfaces/games';
 
 @Component({
     selector: 'app-game-card',
@@ -6,16 +7,13 @@ import { Component, Input } from '@angular/core';
     styleUrls: ['./game-card.component.scss'],
 })
 export class GameCardComponent {
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    @Input() title: unknown;
-    @Input() difficulty: unknown;
+    @Input() game: Game;
+    @Input() playable: boolean;
 
-    getDifficultyColor(difficulty: unknown) {
-        switch (difficulty) {
+    getDifficultyColor(game: { difficulty: unknown }) {
+        switch (game.difficulty) {
             case 'FACILE':
                 return 'green';
-            case 'MOYEN':
-                return 'darkorange';
             case 'DIFFICILE':
                 return 'red';
             default:

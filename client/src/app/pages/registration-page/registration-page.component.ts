@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
     selector: 'app-registration-page',
@@ -10,6 +11,12 @@ export class RegistrationPageComponent {
     title = 'Register Page';
 
     registrationForm = new FormGroup({
-        pseudo: new FormControl('', Validators.required),
+        pseudo: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
     });
+
+    constructor(private auth: AuthService) {}
+
+    registerUser() {
+        this.auth.registerUser(this.registrationForm.value.pseudo);
+    }
 }

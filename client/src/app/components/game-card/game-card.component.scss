@@ -8,7 +8,7 @@
     border: solid;
     border-radius: 2vh;
 
-    border: solid yellow;
+    border: solid rgb(228, 228, 0);
 }
 
 .description-container {
@@ -34,6 +34,10 @@
     letter-spacing: 0.1vw;
 }
 
+.difficulty {
+    display: flex;
+}
+
 .content-container {
     display: flex;
     flex-direction: row;
@@ -42,7 +46,7 @@
     align-items: center;
     height: 39vh;
 
-    //border: solid;
+    
 }
 
 .original-picture {
@@ -50,18 +54,67 @@
     border-radius: 20px;
     border: solid black;
 }
-.classement {
+.classement-container {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 
     justify-content: space-around;
     align-items: center;
 
     border: solid;
+    border-radius: 20px;
     height: 30vh;
+    width: 20vw;
+
+    border: solid;
+}
+
+
+.mode {
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+
+    font-weight: 600;
+
+}
+
+.divider {
+    border: solid 1px;
+    height: 20vh;
+}
+
+.badge-container{
+    display: flex;
+    flex-direction: column;
+    margin-top: 7vh;
+}
+.badge-icon {
+    height: 5vh;
+    scale: 0.75;
+}
+
+.data-container {
+    display: flex;
+    flex-direction: row;
+}
+.pseudo {
+    text-overflow: ellipsis;
+    width: 4vw;
+    overflow: hidden;
+}
+
+.test {
+    display:flex; 
+    flex-direction: row;
+
+    justify-content: space-around;
+    align-items: center;
+
     width: 20vw;
 }
 
-.difficulty {
-    display: flex;
+.description {
+    font-size: larger;
+    font-weight: 600;
 }

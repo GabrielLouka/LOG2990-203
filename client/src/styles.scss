@@ -2,13 +2,12 @@
 
 html,
 body {
-    height: 100%;
-}
-body {
     display: flex;
     flex-direction: column;
-
+    
     margin: 0;
     font-family: Roboto, 'Helvetica Neue', sans-serif;
     background-color: lightblue;
+    height: 1080;
+    width: 1920;
 }
