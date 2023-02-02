@@ -7,6 +7,7 @@ import { Component, Input } from '@angular/core';
 })
 export class OverlayComponent {
     @Input() isPlayable: boolean;
+    @Input() id: string;
     mode: string = '';
 
     // Si le joueur appuie sur Jouer ou Joindre

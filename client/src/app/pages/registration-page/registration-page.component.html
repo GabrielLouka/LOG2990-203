@@ -3,7 +3,6 @@
     <title>{{ title }}</title>
 </head>
 <body>
-    
     <Section class="header">
         <app-back-button></app-back-button>
         <h1 class="button-style titre">Jeu classique</h1>
@@ -15,11 +14,13 @@
             <input name="userName" class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="pseudo" required />
             <br />
 
-            <button class="button-style play-button" 
-                    (click)="registerUser()" 
-                    routerLink="/classic"
-                    [disabled]="registrationForm.invalid" 
-                    [ngClass]="{ 'not-allowed': registrationForm.invalid, 'allowed': registrationForm.valid}">
+            <button
+                class="button-style play-button"
+                (click)="registerUser()"
+                [routerLink]="['/classic', id]"
+                [disabled]="registrationForm.invalid"
+                [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
+            >
                 <img src=".\assets\img\play-icon.png" id="play-icon" alt="gameLogo" />
             </button>
         </form>

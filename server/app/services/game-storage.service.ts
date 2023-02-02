@@ -42,21 +42,21 @@ export class GameStorageService {
 
     async getNextGames(pageNbr: number) {
         const skipNbr = pageNbr * this.gamesLimit;
+        // checks if the number of games available for one page is under four
 
         let folderPath;
         const theGames = [];
         for (const game of await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()) {
+            console.log(game.id);
             folderPath = this.persistentDataFolderPath + game.id + '/';
             const firstImage = readFileSync(folderPath + '1.bmp');
             const secondImage = readFileSync(folderPath + '2.bmp');
 
             const originalImagePath = folderPath + '1.bmp';
-            // eslint-disable-next-line no-console
             console.log(`Original image path: ${originalImagePath}`);
 
             try {
                 const originalImage = readFileSync(originalImagePath);
-                // eslint-disable-next-line no-console
                 console.log(`Buffer length: ${originalImage.length} bytes`);
                 // const imageElement = new Image();
                 // imageElement.src = `data:image/bmp;base64,${originalImage.toString('base64')}`;
@@ -72,7 +72,6 @@ export class GameStorageService {
                 modifiedImage: secondImage,
             });
         }
-
         return theGames;
     }
 
