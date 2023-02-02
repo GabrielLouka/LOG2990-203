@@ -10,7 +10,7 @@ export class GameCardComponent {
     @Input() game: Game;
     @Input() playable: boolean;
 
-    getDifficultyColor(game: { difficulty: unknown }) {
+    getDifficultyColor(game: Game) {
         switch (game.difficulty) {
             case 'FACILE':
                 return 'green';
