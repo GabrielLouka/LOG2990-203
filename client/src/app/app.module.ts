@@ -27,6 +27,10 @@ import { AuthService } from './services/auth.service';
 import { QuitButtonComponent } from './components/quit-button/quit-button.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { MouseComponent } from './components/mouse/mouse.component';
+
+import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
+import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -46,6 +50,7 @@ import { MouseComponent } from './components/mouse/mouse.component';
         ClassicPageComponent,
         SelectionsPageComponent,
         HintComponent,
+
         InfoCardComponent,
         ServerDebugPageComponent,
         RegistrationPageComponent,
@@ -55,6 +60,9 @@ import { MouseComponent } from './components/mouse/mouse.component';
         QuitButtonComponent,
         ChatComponent,
         MouseComponent,
+        InfoIconComponent,
+        ServerDebugPageComponent,
+        GameCreationPageComponent
     ],
     imports: [
         AppMaterialModule,
