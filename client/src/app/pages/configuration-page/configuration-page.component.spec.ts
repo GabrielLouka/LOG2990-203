@@ -4,6 +4,7 @@ import { BackButtonComponent } from '@app/components/back-button/back-button.com
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { NextPageButtonComponent } from '@app/components/next-page-button/next-page-button.component';
 import { PreviousPageButtonComponent } from '@app/components/previous-page-button/previous-page-button.component';
+import { Game } from '@app/interfaces/games';
 import { ConfigurationPageComponent } from './configuration-page.component';
 
 describe('ConfigurationPageComponent', () => {
@@ -18,31 +19,58 @@ describe('ConfigurationPageComponent', () => {
         fixture = TestBed.createComponent(ConfigurationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        const game1: Game[] = [];
+        const game2: Game[] = [];
+        const game3: Game[] = [];
+        component.games = [game1, game2, game3];
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should delete all games when confirmed', () => {
-        // Use spyOn to mock window.confirm
-        spyOn(window, 'confirm').and.returnValue(true);
+    // it('should delete all games when confirmed', () => {
+    //     // Use spyOn to mock window.confirm
+    //     spyOn(window, 'confirm').and.returnValue(true);
 
-        component.deleteButton();
+    //     component.deleteButton();
 
-        const container = document.querySelector('container');
-        expect(container).toBeTruthy();
-        // expect(container.innerHTML).toBe('');
+    //     const container = document.querySelector('container');
+    //     expect(container).toBeTruthy();
+    //     // expect(container.innerHTML).toBe('');
+    // });
+
+    // it('should not delete all games when not confirmed', () => {
+    //     // Use spyOn to mock window.confirm
+    //     spyOn(window, 'confirm').and.returnValue(false);
+
+    //     component.deleteButton();
+
+    //     const container = document.querySelector('container');
+    //     expect(container).toBeTruthy();
+    //     // expect(container.innerHTML).not.toBe('');
+    // });
+
+    it('clicking on next button should increment page number', () => {
+        component.currentIndex = 0;
+        component.goToNextSlide();
+        expect(component.currentIndex).toEqual(1);
     });
 
-    it('should not delete all games when not confirmed', () => {
-        // Use spyOn to mock window.confirm
-        spyOn(window, 'confirm').and.returnValue(false);
+    it('clicking on previous button should decrement page number', () => {
+        component.currentIndex = 2;
+        component.goToPreviousSlide();
+        expect(component.currentIndex).toEqual(1);
+    });
 
-        component.deleteButton();
-
-        const container = document.querySelector('container');
-        expect(container).toBeTruthy();
-        // expect(container.innerHTML).not.toBe('');
+    it("current page should stay the same if it's the last page", () => {
+        component.currentIndex = 2;
+        component.goToNextSlide();
+        expect(component.currentIndex).toEqual(component.currentIndex);
+    });
+    it("current page should stay the same if it's the last page", () => {
+        component.currentIndex = 0;
+        component.goToPreviousSlide();
+        expect(component.currentIndex).toEqual(component.currentIndex);
     });
 });

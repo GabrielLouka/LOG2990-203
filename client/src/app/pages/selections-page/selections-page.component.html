@@ -2,6 +2,7 @@
     <meta charset="UTF-8" />
     <title>Selection page</title>
 </head>
+
 <body>
     <Section class="header">
         <app-back-button></app-back-button>
@@ -10,12 +11,12 @@
 
     <div class="container">
         <mat-grid-list cols="2" rowHeight="42vh">
-            <mat-grid-tile *ngFor="let game of games">
+            <mat-grid-tile *ngFor="let game of games[this.currentIndex]">
                 <app-game-card [game]="game" [playable]="playable"></app-game-card>
             </mat-grid-tile>
         </mat-grid-list>
     </div>
 
-    <app-next-page-button></app-next-page-button>
-    <app-previous-page-button></app-previous-page-button>
+    <app-next-page-button (click)="goToNextSlide()"></app-next-page-button>
+    <app-previous-page-button (click)="goToPreviousSlide()"></app-previous-page-button>
 </body>

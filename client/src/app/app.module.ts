@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -24,6 +25,7 @@ import { QuitButtonComponent } from './components/quit-button/quit-button.compon
 import { TimerComponent } from './components/timer/timer.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
+import { ParameterPageComponent } from './pages/parameter-page/parameter-page.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
@@ -51,13 +53,13 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
         InfoCardComponent,
         ServerDebugPageComponent,
         RegistrationPageComponent,
+        ParameterPageComponent,
         FoundHintsCounterComponent,
         ImagesAreaComponent,
         TimerComponent,
         QuitButtonComponent,
         ChatComponent,
         MouseComponent,
-        ServerDebugPageComponent,
         GameCreationPageComponent,
     ],
     imports: [
@@ -69,6 +71,7 @@ import { GameCreationPageComponent } from './pages/game-creation-page/game-creat
         HttpClientModule,
         MatGridListModule,
         ReactiveFormsModule,
+        CommonModule,
     ],
     providers: [AuthService],
     bootstrap: [AppComponent],

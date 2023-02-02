@@ -5,7 +5,7 @@ import { HintComponent } from './hint.component';
 describe('HintComponent', () => {
     let component: HintComponent;
     let fixture: ComponentFixture<HintComponent>;
-
+    let maxGivenHints: number;
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [HintComponent],
@@ -19,8 +19,6 @@ describe('HintComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-    let maxGivenHints: number;
-
     beforeEach(() => {
         maxGivenHints = 3;
     });
@@ -31,7 +29,7 @@ describe('HintComponent', () => {
     });
 
     it('should alert when all hints are used', () => {
-        maxGivenHints = 0;
+        component.maxGivenHints = 0;
         const spy = spyOn(window, 'alert');
 
         component.giveHint();

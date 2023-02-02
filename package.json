@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@ng-bootstrap/ng-bootstrap": "^14.0.1",
+    "ng-carousel": "^0.2.0"
+  }
+}

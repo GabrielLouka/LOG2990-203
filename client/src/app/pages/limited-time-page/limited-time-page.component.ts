@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-
 @Component({
     selector: 'app-limited-time-page',
     templateUrl: './limited-time-page.component.html',

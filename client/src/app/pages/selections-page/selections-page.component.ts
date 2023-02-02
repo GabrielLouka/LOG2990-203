@@ -9,87 +9,157 @@ import { Game } from '@app/interfaces/games';
 })
 export class SelectionsPageComponent {
     playable = true;
-
-    games: Game[] = [
-        {
-            description: 'Glouton',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'DIFFICILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
-            ranking: [
-                [
-                    { name: 'SnakeDiabet', score: '05:30' },
-                    { name: 'NeverTroll', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+    currentIndex = 0;
+    games: Game[][] = [
+        [
+            {
+                description: 'Glouton',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'DIFFICILE',
+                ranking: [
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
                 ],
-                [
-                    { name: 'MonsieurPoséMonsieurPosé', score: '05:30' },
-                    { name: 'VirusFlying', score: '05:30' },
-                    { name: 'CovidSushi', score: '05:30' },
+            },
+            {
+                description: 'Hommes de Cro-Magnon',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'FACILE',
+                ranking: [
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
                 ],
-            ],
-        },
-        {
-            description: 'Hommes de Cro-Magnon',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'FACILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
-            ranking: [
-                [
-                    { name: 'VirusFlying', score: '05:30' },
-                    { name: 'MonsieurPosé', score: '05:30' },
-                    { name: 'GalacticNoob', score: '05:30' },
+            },
+            {
+                description: 'Bagnoles',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'FACILE',
+                ranking: [
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
                 ],
-                [
-                    { name: 'VirusFlying', score: '05:30' },
-                    { name: 'CovidSushi', score: '05:30' },
-                    { name: 'GalacticNoob', score: '05:30' },
+            },
+            {
+                description: 'Playa',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'DIFFICILE',
+                ranking: [
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
+                    [
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                        { name: 'gabriel', score: '05:30' },
+                    ],
                 ],
-            ],
-        },
-        {
-            description: 'Bagnoles',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'FACILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
-            ranking: [
-                [
-                    { name: 'CovidSushi', score: '05:30' },
-                    { name: 'NeverTroll', score: '05:30' },
-                    { name: 'MonsieurPosé', score: '05:30' },
+            },
+        ],
+        [
+            {
+                description: 'Glouton',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'DIFFICILE',
+                ranking: [
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
                 ],
-                [
-                    { name: 'CovidSushi', score: '05:30' },
-                    { name: 'GalacticNoob', score: '05:30' },
-                    { name: 'CanardMilo', score: '05:30' },
+            },
+            {
+                description: 'Hommes de Cro-Magnon',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'FACILE',
+                ranking: [
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
                 ],
-            ],
-        },
-        {
-            description: 'Playa',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'DIFFICILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
-            ranking: [
-                [
-                    { name: 'CheatRush', score: '05:30' },
-                    { name: 'MonsieurPosé', score: '05:30' },
-                    { name: 'SnakeDiabet', score: '05:30' },
+            },
+            {
+                description: 'Bagnoles',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'FACILE',
+                ranking: [
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
                 ],
-                [
-                    { name: 'CheatRush', score: '05:30' },
-                    { name: 'CanardMilo', score: '05:30' },
-                    { name: 'NeverTroll', score: '05:30' },
+            },
+            {
+                description: 'Playa',
+                image: '.\\assets\\img\\game-icon.png',
+                difficulty: 'DIFFICILE',
+                ranking: [
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
+                    [
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                        { name: 'ibrahim', score: '05:30' },
+                    ],
                 ],
-            ],
-        },
+            },
+        ],
     ];
+    goToNextSlide() {
+        const isLastPage = this.currentIndex === this.games.length - 1;
+        const newIndex = isLastPage ? this.currentIndex : this.currentIndex + 1;
+        this.currentIndex = newIndex;
+    }
+    goToPreviousSlide() {
+        const isFirstPage = this.currentIndex === 0;
+        const newIndex = isFirstPage ? this.currentIndex : this.currentIndex - 1;
+        this.currentIndex = newIndex;
+    }
 }
