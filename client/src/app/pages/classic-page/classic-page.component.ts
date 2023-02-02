@@ -21,6 +21,7 @@ export class ClassicPageComponent implements OnInit {
     ngOnInit(): void {
         this.id = this.route.snapshot.paramMap.get('id');
         this.connect();
+        this.socketService.send('createGame', [this.id, this.name])
     }
 
     connect() {
@@ -40,7 +41,7 @@ export class ClassicPageComponent implements OnInit {
         });
 
         // Afficher le message envoyé à chaque émission de l'événement "clock" du serveur
-        this.socketService.on('clock', (time: Date) => {
+        this.socketService.on('clock', (time: Date) => { 
             this.serverClock = time;
         });
 
@@ -59,15 +60,5 @@ export class ClassicPageComponent implements OnInit {
         this.socketService.on('roomMessage', (roomMessage: string) => {
             this.roomMessages.push(roomMessage);
         });
-    }
-
-    sendWordValidation() {
-        this.socketService.send('validate', this.wordInput);
-        this.wordInput = '';
-    }
-
-    sendToServer() {
-        this.socketService.send('message', this.messageToServer);
-        this.messageToServer = '';
     }
 }
