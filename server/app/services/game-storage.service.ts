@@ -205,7 +205,7 @@ export class GameStorageService {
             isEasy: _isEasy,
             ranking: defaultRankings,
         };
-        this.collection.insertOne(newGameToAdd);
+        return this.collection.insertOne(newGameToAdd);
     }
 
     async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
