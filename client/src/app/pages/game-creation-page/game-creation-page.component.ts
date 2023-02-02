@@ -202,7 +202,7 @@ export class GameCreationPageComponent {
     }
 
     async sendGameNameToServer(): Promise<void> {
-        const routeToSend = '/games/updateName';
+        const routeToSend = '/games/saveGame';
         const gameId = this.generatedGameId;
 
         console.log('Sending ' + this.gameName + 'to server (game id ' + gameId + ')...');
