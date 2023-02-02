@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InfoIconComponent } from './info-card.component';
+import { InfoCardComponent } from './info-card.component';
 
 describe('InfoIconComponent', () => {
-    let component: InfoIconComponent;
-    let fixture: ComponentFixture<InfoIconComponent>;
+    let component: InfoCardComponent;
+    let fixture: ComponentFixture<InfoCardComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [InfoIconComponent],
+            declarations: [InfoCardComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(InfoIconComponent);
+        fixture = TestBed.createComponent(InfoCardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

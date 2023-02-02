@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Injectable } from '@angular/core';
 import { Coordinate } from '@app/interfaces/coordinate';
 
@@ -22,7 +23,7 @@ export class MouseHandlerService {
         this.endCoordinate = coordinate;
         console.log(`Mouse Up on x: ${this.endCoordinate.x} y: ${this.endCoordinate.y}`);
 
-        this.printToConsole(this.calculateDistance(this.startCoordinate, this.endCoordinate));
+        // this.printToConsole(this.calculateDistance(this.startCoordinate, this.endCoordinate));
 
         // Can call one or the other
         // this.calculateDistanceWrapper();
@@ -30,7 +31,7 @@ export class MouseHandlerService {
 
     calculateDistanceWrapper() {
         const distance = this.calculateDistance(this.startCoordinate, this.endCoordinate);
-        this.printToConsole(distance);
+        // this.printToConsole(distance);
         return distance;
     }
 
@@ -43,7 +44,7 @@ export class MouseHandlerService {
         return totalDistance;
     }
 
-    private printToConsole(x: number): void {
-        console.log(`Total distance is ${x}`);
-    }
+    // private printToConsole(x: number): void {
+    //     console.log(`Total distance is ${x}`);
+    // }
 }
