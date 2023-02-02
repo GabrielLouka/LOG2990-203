@@ -4,7 +4,7 @@
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
 import { Component } from '@angular/core';
-import { Classements } from '@app/interfaces/classements';
+import { Ranking } from '@common/classements';
 import { Game } from '../../interfaces/games';
 
 @Component({
@@ -12,36 +12,30 @@ import { Game } from '../../interfaces/games';
     templateUrl: './configuration-page.component.html',
     styleUrls: ['./configuration-page.component.scss'],
 })
-
 export class ConfigurationPageComponent {
     btnType = 'Retour';
     title = 'Page de configuration';
-    playable = false;
-    
-    resetClassement:Classements[] = [ 
-        { name: 'PlayerA', score: '10:00' },
-        { name: 'PlayerB', score: '10:00' },
-        { name: 'PlayerC', score: '10:00' }
+    resetClassement: Ranking[] = [
+        { name: 'PlayerA', score: 200 },
+        { name: 'PlayerB', score: 200 },
+        { name: 'PlayerC', score: 200 },
     ];
-    
+
     games: Game[] = [
         {
             description: 'Glouton',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'DIFFICILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'SnakeDiabet', score: '05:30' },
-                    { name: 'NeverTroll', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'MonsieurPoséMonsieurPosé', score: '05:30' },
-                    { name: 'VirusFlying', score: '05:30' },
-                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
@@ -49,59 +43,50 @@ export class ConfigurationPageComponent {
             description: 'Hommes de Cro-Magnon',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'FACILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
             ranking: [
                 [
-                    { name: 'VirusFlying', score: '05:30' },
-                    { name: 'MonsieurPosé', score: '05:30' },
-                    { name: 'GalacticNoob', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'VirusFlying', score: '05:30' },
-                    { name: 'CovidSushi', score: '05:30' },
-                    { name: 'GalacticNoob', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
         {
             description: 'Bagnoles',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'FACILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
+            difficulty: 'MOYEN',
             ranking: [
                 [
-                    { name: 'CovidSushi', score: '05:30' },
-                    { name: 'NeverTroll', score: '05:30' },
-                    { name: 'MonsieurPosé', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'CovidSushi', score: '05:30' },
-                    { name: 'GalacticNoob', score: '05:30' },
-                    { name: 'CanardMilo', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
         {
             description: 'Playa',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'DIFFICILE',
-            mode: 'Classique',
-            nbHints: 3,
-            hintsPenalty: 10,
+            difficulty: 'MOYEN',
             ranking: [
                 [
-                    { name: 'CheatRush', score: '05:30' },
-                    { name: 'MonsieurPosé', score: '05:30' },
-                    { name: 'SnakeDiabet', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'CheatRush', score: '05:30' },
-                    { name: 'CanardMilo', score: '05:30' },
-                    { name: 'NeverTroll', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
@@ -117,12 +102,12 @@ export class ConfigurationPageComponent {
             }
         }
     }
-    deleteButton(){
-        if(confirm('Are you sure you want to delete all the games')){
-            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('container') as HTMLCollectionOf<Element>;
-            for(let i=0; i<divContainer.length;i++){
-                divContainer[i].innerHTML='';
-            }      
+    deleteButton() {
+        if (confirm('Are you sure you want to delete all the games')) {
+            const divContainer: HTMLCollectionOf<Element> = document.getElementsByClassName('sub-container') as HTMLCollectionOf<Element>;
+            for (let i = 0; i < divContainer.length; i++) {
+                divContainer[i].innerHTML = '';
+            }
         }
     }
 }

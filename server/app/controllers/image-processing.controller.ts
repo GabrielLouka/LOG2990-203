@@ -1,4 +1,4 @@
-import { GameStoreService } from '@app/services/game-store.service';
+import { GameStorageService } from '@app/services/game-storage.service';
 import { ImageProcessingService } from '@app/services/image-processing.service';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
@@ -12,7 +12,7 @@ const HTTP_BAD_REQUEST = 400;
 export class ImageProcessingController {
     router: Router;
 
-    constructor(private readonly imageProcessingService: ImageProcessingService, private readonly gameStoreService: GameStoreService) {
+    constructor(private readonly imageProcessingService: ImageProcessingService, private readonly gameStorageService: GameStorageService) {
         this.configureRouter();
     }
 
@@ -23,16 +23,6 @@ export class ImageProcessingController {
             const receivedDifferenceImages: ImageUploadForm = req.body;
             const buffer1 = Buffer.from(receivedDifferenceImages.firstImage.background);
             const buffer2 = Buffer.from(receivedDifferenceImages.secondImage.background);
-
-            // writeFile('./assets/file.bmp', buffer1, (err) => {
-            //     if (err) {
-            //         // eslint-disable-next-line no-console
-            //         console.error(err);
-            //     } else {
-            //         // eslint-disable-next-line no-console
-            //         console.log('File successfully written.');
-            //     }
-            // });
 
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             let status = HTTP_STATUS_CREATED;
@@ -45,8 +35,9 @@ export class ImageProcessingController {
             try {
                 const out = this.imageProcessingService.getDifferencesBlackAndWhiteImage(buffer1, buffer2, receivedDifferenceImages.radius);
                 outputResultToSendToClient = out[0];
-                outputResultToSendToClient.generatedGameId = this.gameStoreService.getNextAvailableGameId();
-                this.gameStoreService.storeGameImages(outputResultToSendToClient.generatedGameId, buffer1, buffer2);
+                outputResultToSendToClient.generatedGameId = this.gameStorageService.getNextAvailableGameId();
+                this.gameStorageService.storeGameImages(outputResultToSendToClient.generatedGameId, buffer1, buffer2);
+                this.gameStorageService.storeGameResult(outputResultToSendToClient.generatedGameId, out[1]);
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.error(e);

@@ -1,7 +1,7 @@
 import { Pixel } from '@app/classes/pixel';
 import { Queue } from '@app/classes/queue';
-import { Vector2 } from '@app/classes/vector2';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Vector2 } from '@common/vector2';
 import { Service } from 'typedi';
 
 @Service()

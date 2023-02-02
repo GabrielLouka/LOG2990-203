@@ -27,7 +27,6 @@ import { ConfigurationPageComponent } from './pages/configuration-page/configura
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
-
 import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 
 /**

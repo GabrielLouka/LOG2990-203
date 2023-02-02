@@ -3,7 +3,7 @@ import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { DatabaseService } from './services/database.service';
-import { GamesService } from './services/games.service';
+import { GameStorageService } from './services/game-storage.service';
 
 @Service()
 export class Server {
@@ -36,12 +36,10 @@ export class Server {
 
         try {
             await this.databaseService.start();
-            this.application.gamesController.gamesService = new GamesService(this.databaseService);
-            this.application.gamesController.gamesService.populateDb();
+            this.application.gamesController.gamesService = new GameStorageService(this.databaseService);
             console.log('Database connection successful !');
         } catch {
             console.error('Database connection failed !');
-            process.exit(1);
         }
     }
 
