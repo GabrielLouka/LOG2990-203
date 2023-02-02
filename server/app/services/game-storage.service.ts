@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file_system_manager';
 import { GameData } from '@common/game-data';
