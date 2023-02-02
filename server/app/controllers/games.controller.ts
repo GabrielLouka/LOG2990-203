@@ -67,7 +67,7 @@ export class GamesController {
             const buffer2 = Buffer.from(receivedNameForm.secondImage.background);
 
             this.gameStorageService.storeGameImages(receivedNameForm.gameId, buffer1, buffer2);
-            await this.gameStorageService.storeGameResult(receivedNameForm.gameId, receivedNameForm.differences);
+            await this.gameStorageService.storeGameResult(receivedNameForm.gameId, receivedNameForm.differences, receivedNameForm.isEasy);
             this.gameStorageService
                 .updateGameName(receivedNameForm.gameId, receivedNameForm.gameName)
                 .then(() => {

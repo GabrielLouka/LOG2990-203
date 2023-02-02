@@ -6,4 +6,5 @@ export interface ImageUploadResult {
     generatedGameId: number;
     message: string;
     differences: Vector2[][];
+    isEasy: boolean;
 }

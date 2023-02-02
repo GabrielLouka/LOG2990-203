@@ -10,6 +10,10 @@ export class ImageProcessingService {
     private static readonly requiredImageWidth = 640;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     private static readonly requiredImageHeight = 480;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    private static readonly minDifferencesForHardMode = 7;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    private static readonly hardModeImageSurfaceRequiredPercentage = 0.15;
 
     getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): ImageUploadResult => {
         const imageOutput: Buffer = Buffer.from(imageBuffer1);
@@ -59,9 +63,18 @@ export class ImageProcessingService {
             message: 'Success!',
             generatedGameId: -1,
             differences: allDifferences,
+            isEasy: !this.isHard(allDifferences.length, sumOfAllDifferences),
         };
+    };
 
-        // return imageOutput;
+    private isHard = (numberOfDifferences: number, sumOfAllDifferences: Vector2[]): boolean => {
+        return (
+            numberOfDifferences >= ImageProcessingService.minDifferencesForHardMode &&
+            sumOfAllDifferences.length <=
+                ImageProcessingService.requiredImageHeight *
+                    ImageProcessingService.requiredImageWidth *
+                    ImageProcessingService.hardModeImageSurfaceRequiredPercentage
+        );
     };
 
     private getDifferentPixelPositionsBetweenImages = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[] => {

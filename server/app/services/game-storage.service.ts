@@ -59,15 +59,18 @@ export class GameStorageService {
                 const secondImage = readFileSync(folderPath + '2.bmp');
 
                 const originalImagePath = folderPath + '1.bmp';
+                // eslint-disable-next-line no-console
                 console.log(`Original image path: ${originalImagePath}`);
 
                 try {
                     const originalImage = readFileSync(originalImagePath);
+                    // eslint-disable-next-line no-console
                     console.log(`Buffer length: ${originalImage.length} bytes`);
                     // const imageElement = new Image();
                     // imageElement.src = `data:image/bmp;base64,${originalImage.toString('base64')}`;
                     // document.body.appendChild(imageElement);
                 } catch (error) {
+                    // eslint-disable-next-line no-console
                     console.error(`Error reading image file: ${error.message}`);
                 }
                 theGames.push({
@@ -166,13 +169,13 @@ export class GameStorageService {
         });
     }
 
-    async storeGameResult(generatedGameId: number, _differences: Vector2[][]) {
+    async storeGameResult(generatedGameId: number, _differences: Vector2[][], _isEasy: boolean) {
         const newGameToAdd: GameData = {
             id: generatedGameId,
             nbrDifferences: _differences.length,
             differences: _differences,
             name: 'Default game',
-            isEasy: true,
+            isEasy: _isEasy,
         };
         return this.collection.insertOne(newGameToAdd);
     }
