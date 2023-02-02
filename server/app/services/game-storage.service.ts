@@ -40,81 +40,40 @@ export class GameStorageService {
         });
     }
 
-    // async function getDocumentsByPage(page: number, collection: any): Promise<any[]> {
-    //     const pageSize = 4;
-    //     const skip = page * pageSize;
-    //     const documents = await collection.find({}).skip(skip).limit(pageSize).toArray();
-    //     return documents;
-    //   }
-
     async getNextGames(pageNbr: number) {
-        console.log('je suis dans le getNextGames' + pageNbr);
         const skipNbr = pageNbr * this.gamesLimit;
-        if ((await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()).length < this.gamesLimit) {
-            return;
-        } else {
-            let folderPath;
-            const theGames = [];
-            for (const game of await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()) {
-                console.log(game.id);
-                folderPath = this.persistentDataFolderPath + game.id + '/';
-                const firstImage = readFileSync(folderPath + '1.bmp');
-                const secondImage = readFileSync(folderPath + '2.bmp');
 
-                const originalImagePath = folderPath + '1.bmp';
+        let folderPath;
+        const theGames = [];
+        for (const game of await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()) {
+            folderPath = this.persistentDataFolderPath + game.id + '/';
+            const firstImage = readFileSync(folderPath + '1.bmp');
+            const secondImage = readFileSync(folderPath + '2.bmp');
+
+            const originalImagePath = folderPath + '1.bmp';
+            // eslint-disable-next-line no-console
+            console.log(`Original image path: ${originalImagePath}`);
+
+            try {
+                const originalImage = readFileSync(originalImagePath);
                 // eslint-disable-next-line no-console
-                console.log(`Original image path: ${originalImagePath}`);
-
-                try {
-                    const originalImage = readFileSync(originalImagePath);
-                    // eslint-disable-next-line no-console
-                    console.log(`Buffer length: ${originalImage.length} bytes`);
-                    // const imageElement = new Image();
-                    // imageElement.src = `data:image/bmp;base64,${originalImage.toString('base64')}`;
-                    // document.body.appendChild(imageElement);
-                } catch (error) {
-                    // eslint-disable-next-line no-console
-                    console.error(`Error reading image file: ${error.message}`);
-                }
-                console.log('yy');
-                game.ranking = defaultRankings;
-                theGames.push({
-                    gameData: game,
-                    originalImage: firstImage,
-                    modifiedImage: secondImage,
-                });
+                console.log(`Buffer length: ${originalImage.length} bytes`);
+                // const imageElement = new Image();
+                // imageElement.src = `data:image/bmp;base64,${originalImage.toString('base64')}`;
+                // document.body.appendChild(imageElement);
+            } catch (error) {
+                // eslint-disable-next-line no-console
+                console.error(`Error reading image file: ${error.message}`);
             }
-
-            return theGames;
+            game.ranking = defaultRankings;
+            theGames.push({
+                gameData: game,
+                originalImage: firstImage,
+                modifiedImage: secondImage,
+            });
         }
 
-        // this.recalculateIds();
-        // if ((await this.getAllGames()).length < this.gamesLimit * this.currentPageNbr + this.gamesLimit) {
-        //     console.log('total games available: ' + (await this.getAllGames()).length);
-        //     console.log('games required: ' + (this.gamesLimit * this.currentPageNbr + this.gamesLimit));
-        //     return false;
-        // }
-
-        // const indexStart = this.gamesLimit * this.currentPageNbr;
-        // const indexEnd = indexStart + this.gamesLimit;
-
-        // for (let i = indexStart; i < indexEnd; i++) {
-        //     const folderPath = this.persistentDataFolderPath + i + '/';
-
-        //     // console.log('current index is' + i);
-        //     // console.log(await (await this.getGameById(i.toString())).name);
-        //     // console.log('path: ' + folderPath);
-        //     const firstImage = readFileSync(folderPath + '1.bmp');
-        //     const secondImage = readFileSync(folderPath + '2.bmp');
-        //     theGames.push({
-        //         game: this.getGameById(i.toString()),
-        //         originalImage: firstImage,
-        //         modifiedImage: secondImage,
-        //     });
-        // }
-        // this.currentPageNbr++;
-
-        // return theGames;
+        return theGames;
     }
 
     async storeDefaultGames() {
@@ -122,28 +81,6 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
-    // async recalculateIds() {
-    //     (await this.getAllGames()).forEach((game, i) => {
-    //         if (game.id !== i) {
-    //             const oldIdFolderPath = this.persistentDataFolderPath + game.id + '/';
-    //             const newIdFolderPath = this.persistentDataFolderPath + i + '/';
-
-    //             rename(oldIdFolderPath, newIdFolderPath, (err) => {
-    //                 if (err) throw err;
-    //                 console.log('Rename complete!');
-    //             });
-    //             rename(oldIdFolderPath + '1.bmp', newIdFolderPath + '1.bmp', (err) => {
-    //                 if (err) throw err;
-    //                 console.log('Rename complete!');
-    //             });
-    //             rename(oldIdFolderPath + '2.bmp', newIdFolderPath + '2.bmp', (err) => {
-    //                 if (err) throw err;
-    //                 console.log('Rename complete!');
-    //             });
-    //             this.collection.updateOne({ id_: game._id }, { $set: { id: i } });
-    //         }
-    //     });
-    // }
     getNextAvailableGameId(): number {
         let output = -1;
         // read the next id from the file lastGameId.txt if it exists or create it with 0
