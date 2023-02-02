@@ -1,4 +1,4 @@
-import { Ranking } from '../../../../common/classements';
+import { Ranking } from '@common/ranking';
 
 export interface Game {
     description: string;

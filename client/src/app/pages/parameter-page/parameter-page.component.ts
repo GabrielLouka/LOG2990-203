@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable prettier/prettier */
 import { Component } from '@angular/core';
 import { History } from '@app/interfaces/history';
@@ -67,7 +68,5 @@ export class ParameterPageComponent {
       }
   }
 
-  // saveConstants() {
 
-  // }
 }

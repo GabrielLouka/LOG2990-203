@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
 import { Component } from '@angular/core';
-import { Ranking } from '@common/classements';
+import { Ranking } from '@common/ranking';
 import { Game } from '../../interfaces/games';
 
 @Component({
@@ -17,7 +18,7 @@ export class ConfigurationPageComponent {
     title = 'Page de configuration';
     playable = false;
 
-    resetClassement: Classements[] = [
+    resetClassement: Ranking[] = [
         { name: 'PlayerA', score: "10:00" },
         { name: 'PlayerB', score: "10:00" },
         { name: 'PlayerC', score: "10:00" }
@@ -100,14 +101,14 @@ export class ConfigurationPageComponent {
             difficulty: 'DIFFICILE',
             ranking: [
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
             ],
         },
@@ -117,14 +118,14 @@ export class ConfigurationPageComponent {
             difficulty: 'FACILE',
             ranking: [
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
             ],
         },
@@ -134,14 +135,14 @@ export class ConfigurationPageComponent {
             difficulty: 'MOYEN',
             ranking: [
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
             ],
         },
@@ -151,14 +152,14 @@ export class ConfigurationPageComponent {
             difficulty: 'MOYEN',
             ranking: [
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
                 [
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
-                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
+                    { name: 'ibrahim', score: '19996' },
                 ],
             ],
         },
@@ -175,6 +176,7 @@ export class ConfigurationPageComponent {
         const newIndex = isFirstPage ? this.currentIndex : this.currentIndex - 1;
         this.currentIndex = newIndex;
     }
+
     // resetButton() {
     //     if (confirm('Are you sure you want to reset all the games')) {
     //         for (let i = 0; i < this.games.length; i++) {
