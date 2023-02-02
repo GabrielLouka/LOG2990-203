@@ -133,3 +133,70 @@ h1 {
   align-items: center;
 }
 
+
+// ---------------------
+
+.bgModal {
+	background-color: rgba(0, 0, 0, 0.8);
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	display: none;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-contents {
+	height: 800px;
+	width: 1200px;
+	background-color: white;
+	text-align: center;
+	padding: 20px;
+	position: relative;
+	border-radius: 5px;
+}
+
+input {
+	margin: 15px auto;
+	display: block;
+	width: 50%;
+	padding: 8px;
+	border: 1px solid gray;
+}
+
+.close {
+	position: absolute;
+	top: 0;
+	right: 10px;
+	font-size: 42px;
+	color: #333;
+	transform: rotate(45deg);
+	cursor: pointer;
+	&:hover {
+		color: #666;
+	}
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
+
+input.ng-invalid {
+  background-color:rgb(249, 99, 99);
+}
+input.ng-valid {
+  background-color:lightgreen;
+}
+
+.not-allowed {
+  cursor: not-allowed;
+}
+.allowed {
+  cursor: pointer;
+}

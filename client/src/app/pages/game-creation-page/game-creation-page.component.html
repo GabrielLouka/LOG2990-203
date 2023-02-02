@@ -100,6 +100,26 @@
         <button mat-raised-button class="button-style bigger" (click)="sendImageToServer()">
             <span class="material-symbols-outlined optionIcon"> search </span>RECHERCHE DE DIFFERENCES
         </button>
-        <div class="button-style bigger"><span class="material-symbols-outlined optionIcon"> fact_check </span>AJOUTER LE JEU</div>
+    </div>
+
+    <div #bgModal class="bgModal">
+        <div class="modal-contents">
+            <div #close class="close" (click)="closePopUp()">+</div>
+            <h2>Différences entre les deux images</h2>
+            <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
+
+            <form [formGroup]="titleRegistration" class="form-container">
+                <p>Ajouter un titre le jeu :</p>
+                <input type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" required />
+                <button
+                    class="button-style bigger no-hover center"
+                    [disabled]="titleRegistration.invalid"
+                    [ngClass]="{ 'not-allowed': titleRegistration.invalid, allowed: titleRegistration.valid }"
+                    (click)="sendConsoleLog()"
+                >
+                    <span class="material-symbols-outlined optionIcon"> fact_check </span>Sauvegarder le jeu
+                </button>
+            </form>
+        </div>
     </div>
 </body>
