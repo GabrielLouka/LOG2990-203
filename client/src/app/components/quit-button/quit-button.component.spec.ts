@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { InfoIconComponent } from './info-icon.component';
+import { QuitButtonComponent } from './quit-button.component';
 
-describe('InfoIconComponent', () => {
-    let component: InfoIconComponent;
-    let fixture: ComponentFixture<InfoIconComponent>;
+describe('QuitButtonComponent', () => {
+    let component: QuitButtonComponent;
+    let fixture: ComponentFixture<QuitButtonComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [InfoIconComponent],
+            declarations: [QuitButtonComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(InfoIconComponent);
+        fixture = TestBed.createComponent(QuitButtonComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

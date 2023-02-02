@@ -1,4 +1,16 @@
-.hints-icon {
+
+.hint-container {
+    display: flex;
+    position: absolute;
+
+    width: 20vh;
+    height: 20vh;
+    top: 0;
+    right: 0;
+
+}
+
+.hint-icon {
     display: flex;
     position: absolute;
     background-color: white;
@@ -9,4 +21,13 @@
     width: auto;
     top: 0;
     right: 0;
+    margin: 2vh 4vh;
+}
+
+.nbHints {
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin:3vh 7vh;
 }

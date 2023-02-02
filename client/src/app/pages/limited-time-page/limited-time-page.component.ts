@@ -1,15 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-limited-time-page',
-  templateUrl: './limited-time-page.component.html',
-  styleUrls: ['./limited-time-page.component.scss']
+    selector: 'app-limited-time-page',
+    templateUrl: './limited-time-page.component.html',
+    styleUrls: ['./limited-time-page.component.scss'],
 })
-export class LimitedTimePageComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
-}
+export class LimitedTimePageComponent {}

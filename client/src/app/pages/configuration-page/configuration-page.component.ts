@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
-import { Location } from '@angular/common';
 import { Component } from '@angular/core';
 import { Classements } from '@app/interfaces/classements';
 import { Game } from '../../interfaces/games';
@@ -16,83 +14,99 @@ import { Game } from '../../interfaces/games';
 })
 
 export class ConfigurationPageComponent {
+    btnType = 'Retour';
     title = 'Page de configuration';
+    playable = false;
+    
     resetClassement:Classements[] = [ 
-        { name: 'PlayerA', score: 200 },
-        { name: 'PlayerB', score: 200 },
-        { name: 'PlayerC', score: 200 }
+        { name: 'PlayerA', score: '10:00' },
+        { name: 'PlayerB', score: '10:00' },
+        { name: 'PlayerC', score: '10:00' }
     ];
     
     games: Game[] = [
         {
-            description: 'Jeux 1',
+            description: 'Glouton',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'DIFFICILE',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            mode: 'Classique',
+            nbHints: 3,
+            hintsPenalty: 10,
+            ranking: [
+                [
+                    { name: 'SnakeDiabet', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
+                    { name: 'ibrahim', score: '05:30' },
+                ],
+                [
+                    { name: 'MonsieurPoséMonsieurPosé', score: '05:30' },
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                ],
+            ],
         },
         {
-            description: 'Jeux 2',
+            description: 'Hommes de Cro-Magnon',
             image: '.\\assets\\img\\game-icon.png',
             difficulty: 'FACILE',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            mode: 'Classique',
+            nbHints: 3,
+            hintsPenalty: 10,
+            ranking: [
+                [
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
+                ],
+                [
+                    { name: 'VirusFlying', score: '05:30' },
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
+                ],
+            ],
         },
         {
-            description: 'Jeux 3',
+            description: 'Bagnoles',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'MOYEN',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            difficulty: 'FACILE',
+            mode: 'Classique',
+            nbHints: 3,
+            hintsPenalty: 10,
+            ranking: [
+                [
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
+                ],
+                [
+                    { name: 'CovidSushi', score: '05:30' },
+                    { name: 'GalacticNoob', score: '05:30' },
+                    { name: 'CanardMilo', score: '05:30' },
+                ],
+            ],
         },
         {
-            description: 'Jeux 4',
+            description: 'Playa',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'MOYEN',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
+            difficulty: 'DIFFICILE',
+            mode: 'Classique',
+            nbHints: 3,
+            hintsPenalty: 10,
+            ranking: [
+                [
+                    { name: 'CheatRush', score: '05:30' },
+                    { name: 'MonsieurPosé', score: '05:30' },
+                    { name: 'SnakeDiabet', score: '05:30' },
+                ],
+                [
+                    { name: 'CheatRush', score: '05:30' },
+                    { name: 'CanardMilo', score: '05:30' },
+                    { name: 'NeverTroll', score: '05:30' },
+                ],
+            ],
         },
     ];
-    constructor(private location: Location) {}
 
-
-    over() {
-        const subBox = document.getElementById('sub-box');
-        if (subBox) {
-            subBox.className = 'game-buttons';
-        }
-    }
-    previousPage() {
-        this.location.back();
-    }
     
     resetButton(){
         if(confirm('Are you sure you want to reset all the games')){
@@ -105,12 +119,10 @@ export class ConfigurationPageComponent {
     }
     deleteButton(){
         if(confirm('Are you sure you want to delete all the games')){
-            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('sub-container') as HTMLCollectionOf<Element>;
+            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('container') as HTMLCollectionOf<Element>;
             for(let i=0; i<divContainer.length;i++){
                 divContainer[i].innerHTML='';
             }      
         }
-
-    
     }
 }
