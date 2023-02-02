@@ -184,6 +184,7 @@ export class GameCreationPageComponent {
                             gameId: serverResult.generatedGameId,
                             gameName: '',
                         };
+                        this.totalDifferences = serverResult.numberOfDifferences;
                     }
                 },
                 error: (err: HttpErrorResponse) => {

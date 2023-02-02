@@ -166,7 +166,7 @@ export class GameStorageService {
         });
     }
 
-    storeGameResult(generatedGameId: number, _differences: Vector2[][]) {
+    async storeGameResult(generatedGameId: number, _differences: Vector2[][]) {
         const newGameToAdd: GameData = {
             id: generatedGameId,
             nbrDifferences: _differences.length,
@@ -174,7 +174,7 @@ export class GameStorageService {
             name: 'Default game',
             isEasy: true,
         };
-        this.collection.insertOne(newGameToAdd);
+        return this.collection.insertOne(newGameToAdd);
     }
 
     async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
