@@ -4,10 +4,26 @@
 </head>
 <body>
     <section class="header">
-        <app-back-button></app-back-button>
+        <app-quit-button></app-quit-button>
         <app-hint></app-hint>
+        <h1 class="button-style titre">Jeu classique</h1>
     </section>
-    <section class="footer">
-        <app-info-icon></app-info-icon>
-    </section>
+
+    <div class="difference-container">
+        <div class="left-info">
+            <app-info-card></app-info-card>
+        </div>
+        <app-found-hints-counter></app-found-hints-counter>
+        <div class="timer-container">
+            <app-timer [init]="timeInSeconds"></app-timer>
+        </div>
+    </div>
+    <div class="middle-container">
+        <div class= "center-container">
+            <app-images-area></app-images-area>
+        </div>
+        <div class= "right-chat">
+            <app-chat></app-chat>
+        </div>
+    </div>
 </body>

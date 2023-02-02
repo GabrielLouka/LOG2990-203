@@ -11,16 +11,17 @@
     <Section class="registerContainer">
         <form [formGroup]="registrationForm" class="register-input">
             <label class="button-style" for="input">Username :</label>
-            <input class="button-style" id="input" type="text" placeholder="Write here" formControlName="pseudo" required />
+            <!-- <input class="button-style" id="input" type="text" placeholder="Write here" formControlName="pseudo" required /> -->
+            <input name="userName" class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="pseudo" required />
             <br />
+
             <button class="button-style play-button" 
+                    (click)="registerUser()" 
+                    routerLink="/classic"
                     [disabled]="registrationForm.invalid" 
-                    [ngClass]="{ 'not-allowed': registrationForm.invalid, 'allowed': registrationForm.valid}"
-                    routerLink="/classic">
+                    [ngClass]="{ 'not-allowed': registrationForm.invalid, 'allowed': registrationForm.valid}">
                 <img src=".\assets\img\play-icon.png" id="play-icon" alt="gameLogo" />
             </button>
         </form>
-
-
     </Section>
 </body>

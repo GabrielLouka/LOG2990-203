@@ -1,0 +1,125 @@
+<head>
+    <meta charset="UTF-8" />
+    <title>Page de création de jeu</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+</head>
+<body class="center">
+    <section class="header">
+        <h1>Création de jeux</h1>
+        <app-back-button></app-back-button>
+    </section>
+    <div class="main-container center">
+        <div class="canvas-container center">
+            <div class="canvas">
+                <canvas #originalImage width="640px" height="480px">IMAGE ORIGINALE</canvas>
+            </div>
+            <div class="picture-option">
+                <button class="button-style center" (click)="input1.click()">
+                    <span class="material-symbols-outlined optionIcon"> upload_file </span>
+                    Ajouter une image
+                </button>
+                <input #input1 type="file" class="display" accept="image/bmp" (input)="processImage($event, false)" />
+                <button class="button-style center" (click)="resetCanvas(false)">
+                    <span class="material-symbols-outlined optionIcon"> reset_image </span>
+                    <p>Réinitialiser image</p>
+                </button>
+                <button class="button-style center">
+                    <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
+                </button>
+            </div>
+        </div>
+
+        <div class="middle-container center">
+            <div class="main-options">
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> edit </span></button>
+                <button class="button-style center"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
+                <button class="button-style center"><input type="color" ng-model="test" id="" /></button>
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> crop_7_5 </span></button>
+                <button class="button-style center">
+                    <span class="material-symbols-outlined optionIcon"> swap_horiz </span>
+                </button>
+            </div>
+            <br />
+            <br />
+            <br />
+            <br />
+            <div class="reverse-controle center">
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> undo </span></button>
+                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> redo </span></button>
+            </div>
+            <div class="image-option">
+                <button class="button-style center" (click)="bothImagesButton.click()">
+                    <span class="material-symbols-outlined optionIcon"> upload_file </span>
+                    Ajouter la meme image
+                </button>
+                <input
+                    type="file"
+                    id="both-images"
+                    accept="image/bmp"
+                    #bothImagesButton
+                    (change)="processImage($event, false); processImage($event, true)"
+                    style="display: none"
+                />
+            </div>
+        </div>
+
+        <div class="canvas-container center">
+            <div class="canvas">
+                <canvas #modifiedImage width="640px" height="480px">IMAGE MODIFIÉE</canvas>
+            </div>
+            <div class="picture-option">
+                <button class="button-style center">
+                    <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
+                </button>
+                <button class="button-style center" (click)="input2.click()">
+                    <span class="material-symbols-outlined optionIcon"> upload_file </span>
+                    Ajouter une image
+                </button>
+                <input #input2 type="file" class="display" accept="image/bmp" (change)="processImage($event, true)" />
+                <button class="button-style center" (click)="resetCanvas(true)">
+                    <span class="material-symbols-outlined optionIcon"> reset_image </span>
+                    <p>Réinitialiser image</p>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-container center">
+        <div>
+            <div class="button-style center no-hover bigger">
+                RAYON POUR LES DIFFÉRENCES
+                <select #radiusInput class="button-style" [(ngModel)]="enlargementRadius">
+                    <option value="0">0</option>
+                    <option value="3">3</option>
+                    <option value="9">9</option>
+                    <option value="15">15</option>
+                </select>
+            </div>
+        </div>
+
+        <button mat-raised-button class="button-style bigger" (click)="sendImageToServer()">
+            <span class="material-symbols-outlined optionIcon"> search </span>RECHERCHE DE DIFFERENCES
+        </button>
+    </div>
+
+    <div #bgModal class="bgModal">
+        <div class="modal-contents">
+            <div #close class="close" (click)="closePopUp()">+</div>
+            <h2>Différences entre les deux images</h2>
+            <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
+
+            <form [formGroup]="titleRegistration" class="form-container">
+                <p>Ajouter un titre le jeu :</p>
+                <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />
+                <button
+                    class="button-style bigger no-hover center"
+                    [disabled]="titleRegistration.invalid"
+                    [ngClass]="{ 'not-allowed': titleRegistration.invalid, allowed: titleRegistration.valid }"
+                    (click)="sendGameNameToServer()"
+                >
+                    <span class="material-symbols-outlined optionIcon"> fact_check </span>Sauvegarder le jeu
+                </button>
+            </form>
+        </div>
+    </div>
+</body>

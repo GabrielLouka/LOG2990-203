@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BackButtonComponent } from '@app/components/back-button/back-button.component';
 import { HintComponent } from '@app/components/hint/hint.component';
-import { InfoIconComponent } from '@app/components/info-icon/info-icon.component';
+import { InfoCardComponent } from '@app/components/info-card/info-card.component';
 import { ClassicPageComponent } from './classic-page.component';
 
 describe('ClassicPageComponent', () => {
@@ -11,7 +11,7 @@ describe('ClassicPageComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [ClassicPageComponent, HintComponent, BackButtonComponent, InfoIconComponent],
+            declarations: [ClassicPageComponent, HintComponent, BackButtonComponent, InfoCardComponent],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ClassicPageComponent);

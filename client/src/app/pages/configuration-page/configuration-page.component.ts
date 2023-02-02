@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
 import { Component } from '@angular/core';
-import { Classements } from '@app/interfaces/classements';
+import { Ranking } from '@common/classements';
 import { Game } from '../../interfaces/games';
 
 @Component({
@@ -13,8 +12,8 @@ import { Game } from '../../interfaces/games';
     templateUrl: './configuration-page.component.html',
     styleUrls: ['./configuration-page.component.scss'],
 })
-
 export class ConfigurationPageComponent {
+    btnType = 'Retour';
     title = 'Page de configuration';
     playable = false;
 
@@ -101,14 +100,14 @@ export class ConfigurationPageComponent {
             difficulty: 'DIFFICILE',
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
@@ -118,48 +117,48 @@ export class ConfigurationPageComponent {
             difficulty: 'FACILE',
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
         {
             description: 'Bagnoles',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'FACILE',
+            difficulty: 'MOYEN',
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
         {
             description: 'Playa',
             image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'DIFFICILE',
+            difficulty: 'MOYEN',
             ranking: [
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
                 [
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
-                    { name: 'ibrahim', score: '05:30' },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
+                    { name: 'ibrahim', score: 19996 },
                 ],
             ],
         },
