@@ -32,6 +32,7 @@ export class ImageProcessingController {
                 message: '',
                 generatedGameId: -1,
                 differences: [],
+                isEasy: true,
             };
             try {
                 const out = this.imageProcessingService.getDifferencesBlackAndWhiteImage(buffer1, buffer2, receivedDifferenceImages.radius);

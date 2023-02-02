@@ -25,6 +25,7 @@ export class GameCreationPageComponent {
 
     gameName: string = '';
     totalDifferences = 0;
+    isEasy = true;
     enlargementRadius: number = 3;
     originalImage: File | null;
     modifiedImage: File | null;
@@ -183,8 +184,10 @@ export class GameCreationPageComponent {
                             secondImage,
                             gameId: serverResult.generatedGameId,
                             gameName: '',
+                            isEasy: serverResult.isEasy,
                         };
                         this.totalDifferences = serverResult.numberOfDifferences;
+                        this.isEasy = serverResult.isEasy;
                     }
                 },
                 error: (err: HttpErrorResponse) => {

@@ -7,4 +7,5 @@ export interface EntireGameUploadForm {
     secondImage: DifferenceImage;
     differences: Vector2[][];
     gameName: string;
+    isEasy: boolean;
 }

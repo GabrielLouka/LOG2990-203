@@ -107,7 +107,7 @@
             <div #close class="close" (click)="closePopUp()">+</div>
             <h2>Différences entre les deux images</h2>
             <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
-            <p>Il y a {{ totalDifferences }} differences</p>
+            <p>Il y a {{ totalDifferences }} differences ( easy: {{ isEasy }})</p>
             <form [formGroup]="titleRegistration" class="form-container">
                 <p>Ajouter un titre le jeu :</p>
                 <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />

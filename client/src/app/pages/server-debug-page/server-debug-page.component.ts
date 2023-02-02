@@ -97,6 +97,7 @@ export class ServerDebugPageComponent {
                             secondImage,
                             gameId: serverResult.generatedGameId,
                             gameName: '',
+                            isEasy: serverResult.isEasy,
                         };
                         // this.formToSendAfterServerConfirmation.differences = serverResult.differences;
                         // this.formToSendAfterServerConfirmation.firstImage = firstImage;
