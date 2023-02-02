@@ -10,11 +10,13 @@ import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult, UpdateResult, WithId } from 'mongodb';
 import { Service } from 'typedi';
+import { SocketManager } from './socketManager.service';
 @Service()
 export class GameStorageService {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     JSON_PATH: string;
     fileSystemManager: FileSystemManager;
+    socketManager: SocketManager;
     private readonly persistentDataFolderPath = './stored data/';
     private readonly lastGameIdFileName = 'lastGameId.txt';
     private readonly collectionName = 'games';

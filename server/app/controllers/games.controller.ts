@@ -14,18 +14,6 @@ export class GamesController {
     private configureRouter(): void {
         this.router = Router();
 
-        // this.router.get('/', async (req: Request, res: Response) => {
-        //     // Can also use the async/await syntax
-        //     try {
-        //         // const games = await this.gamesService.getAllGames();
-        //         const games = await this.gamesService.getNextGames();
-        //         // res.json(games);
-        //         res.send(JSON.stringify(games));
-        //     } catch (error) {
-        //         res.status(StatusCodes.NOT_FOUND).send(error.message);
-        //     }
-        // });
-
         this.router.get('/:id', async (req: Request, res: Response) => {
             try {
                 const games = await this.gameStorageService.getNextGames(parseInt(req.params.id, 10));

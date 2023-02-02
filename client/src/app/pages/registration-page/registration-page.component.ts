@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
     selector: 'app-registration-page',
@@ -15,13 +16,21 @@ export class RegistrationPageComponent implements OnInit {
         username: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
     });
 
-    constructor(private auth: AuthService, private route: ActivatedRoute) {}
+    constructor(private auth: AuthService, private route: ActivatedRoute, public socketService: SocketClientService) {}
 
     ngOnInit(): void {
         this.id = this.route.snapshot.paramMap.get('id');
     }
     registerUser() {
         this.auth.registerUser(this.registrationForm.value.username);
+        this.connect();
+        this.socketService.send('launchGame', [this.id, this.getUser()]);
+    }
+
+    connect() {
+        if (!this.socketService.isSocketAlive()) {
+            this.socketService.connect();
+        }
     }
 
     getUser() {
