@@ -126,7 +126,13 @@ export class GameCreationPageComponent {
         }
     }
 
+    canSendToServer(): boolean {
+        return this.originalContainsImage && this.modifiedContainsImage;
+    }
+
     async sendImageToServer(): Promise<void> {
+        if (!this.canSendToServer()) return;
+
         this.showPopUp();
 
         const routeToSend = '/image_processing/send-image';
@@ -207,6 +213,7 @@ export class GameCreationPageComponent {
                 const responseString = ` ${response.status} - 
                 ${response.statusText} \n`;
                 this.debugDisplayMessage.next(responseString);
+                this.closePopUp();
             },
             error: (err: HttpErrorResponse) => {
                 const responseString = `Server Error : ${err.message}`;

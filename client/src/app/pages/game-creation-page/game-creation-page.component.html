@@ -110,12 +110,12 @@
 
             <form [formGroup]="titleRegistration" class="form-container">
                 <p>Ajouter un titre le jeu :</p>
-                <input type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" required />
+                <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />
                 <button
                     class="button-style bigger no-hover center"
                     [disabled]="titleRegistration.invalid"
                     [ngClass]="{ 'not-allowed': titleRegistration.invalid, allowed: titleRegistration.valid }"
-                    (click)="sendConsoleLog()"
+                    (click)="sendGameNameToServer()"
                 >
                     <span class="material-symbols-outlined optionIcon"> fact_check </span>Sauvegarder le jeu
                 </button>
