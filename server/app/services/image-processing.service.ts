@@ -11,7 +11,7 @@ export class ImageProcessingService {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     private static readonly requiredImageHeight = 480;
 
-    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): [ImageUploadResult, Vector2[][]] => {
+    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): ImageUploadResult => {
         const imageOutput: Buffer = Buffer.from(imageBuffer1);
 
         const image1Dimensions: Vector2 = this.getImageDimensions(imageBuffer1);
@@ -53,15 +53,14 @@ export class ImageProcessingService {
         }
         this.paintBlackPixelsAtPositions(sumOfAllDifferences, imageOutput);
 
-        return [
-            {
-                resultImageByteArray: Array.from(new Uint8Array(imageOutput)),
-                numberOfDifferences: allDifferences.length,
-                message: 'Success!',
-                generatedGameId: -1,
-            },
-            allDifferences,
-        ];
+        return {
+            resultImageByteArray: Array.from(new Uint8Array(imageOutput)),
+            numberOfDifferences: allDifferences.length,
+            message: 'Success!',
+            generatedGameId: -1,
+            differences: allDifferences,
+        };
+
         // return imageOutput;
     };
 

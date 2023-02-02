@@ -31,13 +31,12 @@ export class ImageProcessingController {
                 numberOfDifferences: 0,
                 message: '',
                 generatedGameId: -1,
+                differences: [],
             };
             try {
                 const out = this.imageProcessingService.getDifferencesBlackAndWhiteImage(buffer1, buffer2, receivedDifferenceImages.radius);
-                outputResultToSendToClient = out[0];
+                outputResultToSendToClient = out;
                 outputResultToSendToClient.generatedGameId = this.gameStorageService.getNextAvailableGameId();
-                this.gameStorageService.storeGameImages(outputResultToSendToClient.generatedGameId, buffer1, buffer2);
-                this.gameStorageService.storeGameResult(outputResultToSendToClient.generatedGameId, out[1]);
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.error(e);

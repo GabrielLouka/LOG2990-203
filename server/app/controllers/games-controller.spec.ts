@@ -3,21 +3,20 @@
 /* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable prettier/prettier */
 // eslint-disable-next-line @typescript-eslint/quotes
-import { Application } from "@app/app";
+import { Application } from '@app/app';
 // eslint-disable-next-line @typescript-eslint/quotes
-import { GameStorageService } from "@app/services/game-storage.service";
-import { expect } from "chai";
+import { GameStorageService } from '@app/services/game-storage.service';
+import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import Container from "typedi";
-import { GamesController } from "./games.controller";
-import supertest = require("supertest");
-
+import Container from 'typedi';
+import { GamesController } from './games.controller';
+import supertest = require('supertest');
 
 // const HTTP_STATUS_OK = StatusCodes.OK;
 const HTTP_SATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
 
-describe("GameController", () => {
+describe('GameController', () => {
     let gameController: GamesController;
     let gameService: SinonStubbedInstance<GameStorageService>;
     let expressApp: Express.Application;
@@ -29,20 +28,19 @@ describe("GameController", () => {
         expressApp = app.app;
     });
 
-    it("get request on initial page should return all games from databse", async () => {
-        await gameController.gamesService.getAllGames();
+    it('get request on initial page should return all games from databse', async () => {
+        await gameController.gameStorageService.getAllGames();
         return supertest(expressApp)
-            .get("/")
+            .get('/')
             .expect(302)
             .then((response) => {
                 expect(response.body).to.be.deep.equal({});
             });
     });
 
-    it("get query should handle error and send status code on error", async () => {
+    it('get query should handle error and send status code on error', async () => {
         try {
-            await gameController.gamesService.getAllGames();
-
+            await gameController.gameStorageService.getAllGames();
         } catch (e) {
             expect(e.message).to.equal(HTTP_SATUS_NOT_FOUND);
         }

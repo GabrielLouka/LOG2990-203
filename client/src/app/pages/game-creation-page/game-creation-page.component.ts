@@ -7,6 +7,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
+import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { BehaviorSubject } from 'rxjs';
@@ -32,12 +33,12 @@ export class GameCreationPageComponent {
     originalContainsImage = false;
 
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    generatedGameId = -1;
 
     titleRegistration = new FormGroup({
         title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
     });
 
+    formToSendAfterServerConfirmation: EntireGameUploadForm;
     private readonly characterMax: number = 20;
     // private readonly minDifferences: number = 3;
     // private readonly maxDifferences: number = 9;
@@ -176,7 +177,14 @@ export class GameCreationPageComponent {
                                 '\n Generated game id = ' +
                                 serverResult.generatedGameId,
                         );
-                        this.generatedGameId = serverResult.generatedGameId;
+                        this.formToSendAfterServerConfirmation = {
+                            differences: serverResult.differences,
+                            firstImage,
+                            secondImage,
+                            gameId: serverResult.generatedGameId,
+                            gameName: '',
+                        };
+                        this.totalDifferences = serverResult.numberOfDifferences;
                     }
                 },
                 error: (err: HttpErrorResponse) => {
@@ -202,13 +210,13 @@ export class GameCreationPageComponent {
     }
 
     async sendGameNameToServer(): Promise<void> {
-        const routeToSend = '/games/updateName';
-        const gameId = this.generatedGameId;
+        const routeToSend = '/games/saveGame';
+        this.formToSendAfterServerConfirmation.gameName = this.gameName;
 
-        console.log('Sending ' + this.gameName + 'to server (game id ' + gameId + ')...');
+        console.log('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
 
-        this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + gameId + ')...');
-        this.communicationService.post<[number, string]>([gameId, this.gameName], routeToSend).subscribe({
+        this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
+        this.communicationService.post<EntireGameUploadForm>(this.formToSendAfterServerConfirmation, routeToSend).subscribe({
             next: (response) => {
                 const responseString = ` ${response.status} - 
                 ${response.statusText} \n`;

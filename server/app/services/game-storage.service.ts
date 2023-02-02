@@ -6,7 +6,7 @@ import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
-import { UpdateResult, WithId } from 'mongodb';
+import { DeleteResult, UpdateResult, WithId } from 'mongodb';
 import { Service } from 'typedi';
 @Service()
 export class GameStorageService {
@@ -114,28 +114,6 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
-    // async recalculateIds() {
-    //     (await this.getAllGames()).forEach((game, i) => {
-    //         if (game.id !== i) {
-    //             const oldIdFolderPath = this.persistentDataFolderPath + game.id + '/';
-    //             const newIdFolderPath = this.persistentDataFolderPath + i + '/';
-
-    //             rename(oldIdFolderPath, newIdFolderPath, (err) => {
-    //                 if (err) throw err;
-    //                 console.log('Rename complete!');
-    //             });
-    //             rename(oldIdFolderPath + '1.bmp', newIdFolderPath + '1.bmp', (err) => {
-    //                 if (err) throw err;
-    //                 console.log('Rename complete!');
-    //             });
-    //             rename(oldIdFolderPath + '2.bmp', newIdFolderPath + '2.bmp', (err) => {
-    //                 if (err) throw err;
-    //                 console.log('Rename complete!');
-    //             });
-    //             this.collection.updateOne({ id_: game._id }, { $set: { id: i } });
-    //         }
-    //     });
-    // }
     getNextAvailableGameId(): number {
         let output = -1;
         // read the next id from the file lastGameId.txt if it exists or create it with 0
@@ -188,7 +166,7 @@ export class GameStorageService {
         });
     }
 
-    storeGameResult(generatedGameId: number, _differences: Vector2[][]) {
+    async storeGameResult(generatedGameId: number, _differences: Vector2[][]) {
         const newGameToAdd: GameData = {
             id: generatedGameId,
             nbrDifferences: _differences.length,
@@ -196,10 +174,14 @@ export class GameStorageService {
             name: 'Default game',
             isEasy: true,
         };
-        this.collection.insertOne(newGameToAdd);
+        return this.collection.insertOne(newGameToAdd);
     }
 
     async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
         return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
+    }
+
+    async deleteAllGames(): Promise<DeleteResult> {
+        return this.collection.deleteMany({});
     }
 }

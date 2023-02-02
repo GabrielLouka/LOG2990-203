@@ -4,8 +4,8 @@
 <input type="file" id="browseButton2" name="imageToSend2" accept=".bmp" />
 <label for="radiusInput">Radius :</label>
 <input type="number" id="radiusInput" name="radiusInput" />
-<p id="gameNameField" hidden="true">
-    GAME NAME : <input type="text" id="gameName" name="gameName" /> <button class="button" (click)="sendGameNameToServer()">Send Name</button>
+<p id="gameNameField">
+    GAME NAME : <input type="text" id="gameName" name="gameName" /> <button class="button" (click)="sendGameAndNameToServer()">pls Send Name</button>
 </p>
 <p>--</p>
 <p>
@@ -14,6 +14,7 @@
     <button class="button" (click)="getGames()">Retrieve games</button>
     <button class="button" (click)="giveImages()">Display images (click retrieve games first)</button>
 </p>
+<p><button class="button" (click)="deleteAllGames()">DELETE EVERYTHING (BEGONE)</button></p>
 <div *ngFor="let game of games">
     <p>id: {{ game.gameData.id }}</p>
     <p>Name: {{ game.gameData.name }}</p>

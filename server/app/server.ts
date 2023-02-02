@@ -36,7 +36,7 @@ export class Server {
 
         try {
             await this.databaseService.start();
-            this.application.gamesController.gamesService = new GameStorageService(this.databaseService);
+            this.application.gamesController.gameStorageService = new GameStorageService(this.databaseService);
             console.log('Database connection successful !');
         } catch {
             console.error('Database connection failed !');
