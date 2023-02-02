@@ -77,5 +77,16 @@ export class GamesController {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
+
+        this.router.post('/deleteAllGames', async (req: Request, res: Response) => {
+            this.gameStorageService
+                .deleteAllGames()
+                .then(() => {
+                    res.status(StatusCodes.OK).send();
+                })
+                .catch((error: Error) => {
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
+                });
+        });
     }
 }

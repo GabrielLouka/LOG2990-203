@@ -14,6 +14,7 @@
     <button class="button" (click)="getGames()">Retrieve games</button>
     <button class="button" (click)="giveImages()">Display images (click retrieve games first)</button>
 </p>
+<p><button class="button" (click)="deleteAllGames()">DELETE EVERYTHING (BEGONE)</button></p>
 <div *ngFor="let game of games">
     <p>id: {{ game.gameData.id }}</p>
     <p>Name: {{ game.gameData.name }}</p>

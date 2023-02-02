@@ -136,6 +136,21 @@ export class ServerDebugPageComponent {
         });
     }
 
+    async deleteAllGames(): Promise<void> {
+        const routeToSend = '/games/deleteAllGames';
+        this.communicationService.post<null>(null, routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+                this.debugDisplayMessage.next(responseString);
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                this.debugDisplayMessage.next(responseString);
+            },
+        });
+    }
+
     // Convert number[] to ArrayBuffer
     convertToBuffer(byteArray: number[]): ArrayBuffer {
         const buffer = new ArrayBuffer(byteArray.length);
