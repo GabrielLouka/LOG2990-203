@@ -18,11 +18,11 @@ export class SocketManager {
                 console.log(message);
             });
 
-            socket.on('launchGame', (gameId: string, username: string) => {
-                const isValid = word.length > 5;
-                socket.join(gameId + username);
-                this.sio.to(gameId).emit('User:' + username + 'has joined the game with id #' + gameId);
-                socket.emit('wordValidated', isValid);
+            socket.on('launchGame', (matchInfo: { gameId: string; username: string }) => {
+                socket.join(matchInfo.gameId + matchInfo.username);
+                this.sio
+                    .to(matchInfo.gameId + matchInfo.username)
+                    .emit('matchJoined', 'User:' + matchInfo.username + 'has joined the game with id #' + matchInfo.gameId);
             });
 
             socket.on('broadcastAll', (message: string) => {
