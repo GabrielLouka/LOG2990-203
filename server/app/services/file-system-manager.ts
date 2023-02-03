@@ -7,10 +7,10 @@ class FileSystemManager {
      * @param path : le chemin qui correspond au fichier JSON
      * @returns le cotenu du fichier sous la forme de Buffer
      */
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async readFile(path: any) {
+    async readFile(path: any | Buffer) {
         return await fs.promises.readFile(path);
     }
 }
 export { FileSystemManager };
-

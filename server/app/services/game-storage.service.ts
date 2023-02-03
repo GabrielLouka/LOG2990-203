@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DatabaseService } from '@app/services/database.service';
-import { FileSystemManager } from '@app/services/file_system_manager';
+import { FileSystemManager } from '@app/services/file-system-manager';
 import { GameData } from '@common/game-data';
 // eslint-disable-next-line no-unused-vars
+import { DB_CONST, R_ONLY } from '@app/utils/env';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
@@ -13,27 +14,33 @@ import { Service } from 'typedi';
 import { SocketManager } from './socketManager.service';
 @Service()
 export class GameStorageService {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     JSON_PATH: string;
     fileSystemManager: FileSystemManager;
     socketManager: SocketManager;
-    private readonly persistentDataFolderPath = './stored data/';
-    private readonly lastGameIdFileName = 'lastGameId.txt';
-    private readonly collectionName = 'games';
-    private readonly gamesLimit = 4;
+
     constructor(private databaseService: DatabaseService) {
         this.JSON_PATH = './app/data/default-games.json';
         this.fileSystemManager = new FileSystemManager();
     }
     get collection() {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        // return this.databaseService.database.collection(process.env.DB_COLLECTION_GAMES! as string);
-        return this.databaseService.database.collection(this.collectionName);
+        return this.databaseService.database.collection(DB_CONST.DB_COLLECTION_GAMES);
     }
 
-    async getAllGames() {
+    /**
+     * Returns all the available games
+     *
+     * @returns the games list
+     */
+    async getAllGames(): Promise<unknown[]> {
         return await this.collection.find({}).toArray();
     }
+
+    /**
+     * Gets the game per id
+     *
+     * @param id identifier of the game
+     * @returns returns the matching game
+     */
     async getGameById(id: string): Promise<GameData> {
         const query = { id: parseInt(id, 10) };
         // return await this.collection.findOne(query);
@@ -42,15 +49,34 @@ export class GameStorageService {
         });
     }
 
+    async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
+        return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
+    }
+
+    // TODO À tester !!
+    /**
+     * @param id game identifier
+     * @returns true if deleted, false if not
+     */
+    async deleteGame(id: string): Promise<boolean> {
+        const res = await this.collection.findOneAndDelete({ id });
+        return res.value !== null;
+    }
+
+    async deleteAllGames(): Promise<DeleteResult> {
+        return this.collection.deleteMany({});
+    }
+
     async getNextGames(pageNbr: number) {
-        const skipNbr = pageNbr * this.gamesLimit;
         // checks if the number of games available for one page is under four
+        const skipNbr = pageNbr * R_ONLY.gamesLimit;
+        const nextGames = await this.collection.find({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
 
         let folderPath;
         const theGames = [];
-        for (const game of await this.collection.find({}).skip(skipNbr).limit(this.gamesLimit).toArray()) {
+        for (const game of nextGames) {
             console.log(game.id);
-            folderPath = this.persistentDataFolderPath + game.id + '/';
+            folderPath = R_ONLY.persistentDataFolderPath + game.id + '/';
             const firstImage = readFileSync(folderPath + '1.bmp');
             const secondImage = readFileSync(folderPath + '2.bmp');
 
@@ -87,22 +113,20 @@ export class GameStorageService {
         // read the next id from the file lastGameId.txt if it exists or create it with 0
         try {
             let lastGameId = 0;
-            const data = readFileSync(this.persistentDataFolderPath + this.lastGameIdFileName);
+            const data = readFileSync(R_ONLY.gamesLimit + R_ONLY.lastGameIdFileName);
             lastGameId = parseInt(data.toString(), 10);
             const nextGameId = lastGameId + 1;
-            writeFileSync(this.persistentDataFolderPath + this.lastGameIdFileName, nextGameId.toString());
+            writeFileSync(R_ONLY.gamesLimit + R_ONLY.lastGameIdFileName, nextGameId.toString());
             output = nextGameId;
         } catch (err) {
-            writeFileSync(this.persistentDataFolderPath + this.lastGameIdFileName, '0');
+            writeFileSync(R_ONLY.gamesLimit + R_ONLY.lastGameIdFileName, '0');
             output = 0;
         }
 
         return output;
     }
 
-    storeGameImages(gameId: number, firstImage: Buffer, secondImage: Buffer): void {
-        const folderPath = this.persistentDataFolderPath + gameId + '/';
-        // first, create the subfolder for the game if it does not exist
+    createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
                 // eslint-disable-next-line no-console
@@ -112,6 +136,12 @@ export class GameStorageService {
                 console.log('Folder successfully created.');
             }
         });
+    }
+
+    storeGameImages(gameId: number, firstImage: Buffer, secondImage: Buffer): void {
+        const folderPath = R_ONLY.gamesLimit + gameId + '/';
+        // Creates the subfolder for the game if it does not exist
+        this.createFolder(folderPath);
 
         writeFile(folderPath + '1.bmp', firstImage, (err) => {
             if (err) {
@@ -146,10 +176,8 @@ export class GameStorageService {
         return this.collection.insertOne(newGameToAdd);
     }
 
-    async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
-        return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
-    }
-    async deleteAllGames(): Promise<DeleteResult> {
-        return this.collection.deleteMany({});
-    }
+    // async populateDb() {
+    //     const playlists = JSON.parse(await this.fileSystemManager.readFile(this.JSON_PATH)).playlists;
+    //     await this.databaseService.populateDb(DB_CONST.DB_COLLECTION_GAMES, games);
+    // }
 }
