@@ -25,12 +25,11 @@ import { QuitButtonComponent } from './components/quit-button/quit-button.compon
 import { TimerComponent } from './components/timer/timer.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
+import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
 import { ParameterPageComponent } from './pages/parameter-page/parameter-page.component';
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
-import { GameCreationPageComponent } from './pages/game-creation-page/game-creation-page.component';
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
