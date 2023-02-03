@@ -11,7 +11,7 @@ import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult, UpdateResult, WithId } from 'mongodb';
 import { Service } from 'typedi';
-import { SocketManager } from './socketManager.service';
+import { SocketManager } from './socket-manager.service';
 @Service()
 export class GameStorageService {
     JSON_PATH: string;

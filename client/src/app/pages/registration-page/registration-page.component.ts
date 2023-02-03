@@ -12,6 +12,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class RegistrationPageComponent implements OnInit {
     title = 'Register Page';
+    username: string | null | undefined;
     id: string | null;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     registrationForm = new FormGroup({
@@ -25,20 +26,24 @@ export class RegistrationPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.connect();
         this.id = this.route.snapshot.paramMap.get('id');
-        this.debugDisplayMessage.next(this.id!);
+        // this.debugDisplayMessage.next(this.id!);
     }
     registerUser() {
         this.auth.registerUser(this.registrationForm.value.username);
-        this.debugDisplayMessage.next(this.registrationForm.value.username!);
-        this.connect();
+        this.username = this.registrationForm.value.username;
+        this.debugDisplayMessage.next('yo');
+        // this.debugDisplayMessage.next(this.registrationForm.value.username!);
         this.socketService.send('launchGame', { gameId: this.id, username: this.registrationForm.value.username });
     }
 
     connect() {
         if (!this.socketService.isSocketAlive()) {
             this.socketService.connect();
+            this.debugDisplayMessage.next('hey');
             this.configureBaseSocketFeatures();
+            this.debugDisplayMessage.next(this.socketId);
         }
     }
     configureBaseSocketFeatures() {

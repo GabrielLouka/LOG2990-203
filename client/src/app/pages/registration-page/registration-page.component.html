@@ -18,6 +18,7 @@
             <button
                 class="button-style play-button"
                 (click)="registerUser()"
+                [routerLink]="['/classic', username + id!]"
                 [disabled]="registrationForm.invalid"
                 [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
             >

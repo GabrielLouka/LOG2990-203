@@ -4,7 +4,7 @@ import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { DatabaseService } from './services/database.service';
 import { GameStorageService } from './services/game-storage.service';
-import { SocketManager } from './services/socketManager.service';
+import { SocketManager } from './services/socket-manager.service';
 
 @Service()
 export class Server {

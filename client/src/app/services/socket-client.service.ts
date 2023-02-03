@@ -14,6 +14,7 @@ export class SocketClientService {
 
     connect() {
         this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
+        //this.socket = io(environment.serverUrl, { transports: ['websocket'] });
     }
 
     disconnect() {

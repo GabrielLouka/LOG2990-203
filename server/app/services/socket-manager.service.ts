@@ -20,9 +20,11 @@ export class SocketManager {
 
             socket.on('launchGame', (matchInfo: { gameId: string; username: string }) => {
                 socket.join(matchInfo.gameId + matchInfo.username);
-                this.sio
-                    .to(matchInfo.gameId + matchInfo.username)
-                    .emit('matchJoined', 'User:' + matchInfo.username + 'has joined the game with id #' + matchInfo.gameId);
+                if (socket.rooms.has(matchInfo.gameId + matchInfo.username)) {
+                    this.sio
+                        .to(matchInfo.gameId + matchInfo.username)
+                        .emit('matchJoined', 'User:' + matchInfo.username + 'has joined the game with id #' + matchInfo.gameId);
+                }
             });
 
             socket.on('broadcastAll', (message: string) => {

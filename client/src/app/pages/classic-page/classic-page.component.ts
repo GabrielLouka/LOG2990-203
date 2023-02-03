@@ -10,7 +10,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 export class ClassicPageComponent implements OnInit {
     title = 'JEUX CLASSIQUE';
     timeInSeconds = 3000;
-    id: string | null;
+    matchId: string | null;
 
     constructor(public socketService: SocketClientService, private route: ActivatedRoute) {}
 
@@ -19,8 +19,9 @@ export class ClassicPageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.id = this.route.snapshot.paramMap.get('id');
+        this.matchId = this.route.snapshot.paramMap.get('id');
         this.connect();
+        this.socketService.send('joinRoom', this.matchId);
     }
 
     connect() {
