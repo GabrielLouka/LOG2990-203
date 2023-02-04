@@ -9,7 +9,7 @@ import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
-import { DeleteResult, UpdateResult, WithId } from 'mongodb';
+import { DeleteResult, UpdateResult } from 'mongodb';
 import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
 @Service()
@@ -41,12 +41,26 @@ export class GameStorageService {
      * @param id identifier of the game
      * @returns returns the matching game
      */
-    async getGameById(id: string): Promise<GameData> {
+    async getGameById(id: string) {
         const query = { id: parseInt(id, 10) };
         // return await this.collection.findOne(query);
-        return this.collection.findOne(query).then((game: WithId<GameData>) => {
-            return game;
-        });
+        const game = await this.collection.findOne(query);
+        const folderPath = R_ONLY.persistentDataFolderPath + id + '/';
+        const firstImage = readFileSync(folderPath + '1.bmp');
+        const secondImage = readFileSync(folderPath + '2.bmp');
+
+        try {
+            console.log(`Buffer length first image: ${firstImage.length} bytes`);
+            console.log(`Buffer length second image: ${secondImage.length} bytes`);
+            console.log('gameData is ' + game!.name + game!.id);
+            // const imageElement = new Image();
+            // imageElement.src = `data:image/bmp;base64,${originalImage.toString('base64')}`;
+            // document.body.appendChild(imageElement);
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(`Error reading image file: ${error.message}`);
+        }
+        return { gameData: game, originalImage: firstImage, modifiedImage: secondImage };
     }
 
     async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
