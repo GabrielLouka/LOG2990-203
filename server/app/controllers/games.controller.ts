@@ -36,10 +36,12 @@ export class GamesController {
 
         this.router.post('/updateName', async (req: Request, res: Response) => {
             const receivedArguments: [number, string] = req.body;
+            const idIndex = 0;
+            const nameIndex = 1;
             // eslint-disable-next-line no-console
-            console.log('updating name, id= ' + receivedArguments[0] + ' name=' + receivedArguments[1]);
+            console.log('updating name, id= ' + receivedArguments[idIndex] + ' name=' + receivedArguments[nameIndex]);
             this.gameStorageService
-                .updateGameName(receivedArguments[0], receivedArguments[1])
+                .updateGameName(receivedArguments[idIndex], receivedArguments[nameIndex])
                 .then(() => {
                     res.status(StatusCodes.OK).send();
                 })
