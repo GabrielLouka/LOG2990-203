@@ -17,7 +17,6 @@ export class GamesController {
         this.router.get('/:id', async (req: Request, res: Response) => {
             try {
                 const games = await this.gameStorageService.getNextGames(parseInt(req.params.id, 10));
-                // res.json(games);
                 res.send(JSON.stringify(games));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);

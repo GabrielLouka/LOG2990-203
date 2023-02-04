@@ -17,6 +17,8 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
+
+// TODO faire de ce component un service
 export class GameCreationPageComponent {
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
