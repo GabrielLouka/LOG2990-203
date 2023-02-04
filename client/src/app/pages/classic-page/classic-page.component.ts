@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SocketClientService } from '@app/services/socket-client.service';
-import { UploadImageService } from '@app/services/upload-image.service';
+import { UploadImagesService } from '@app/services/upload-images.service';
+import { Buffer } from 'buffer';
 
 @Component({
     selector: 'app-classic-page',
@@ -9,11 +11,21 @@ import { UploadImageService } from '@app/services/upload-image.service';
     styleUrls: ['./classic-page.component.scss'],
 })
 export class ClassicPageComponent implements OnInit {
+    @ViewChild('originalImage') leftCanvas!: ElementRef;
+    @ViewChild('modifiedImage') rightCanvas!: ElementRef;
+
     title = 'JEUX CLASSIQUE';
     timeInSeconds = 3000;
     matchId: string | null;
+    game: any;
+    originalImage: File | null;
+    modifiedImage: File | null;
 
-    constructor(public socketService: SocketClientService, private route: ActivatedRoute, public uploadImageService: UploadImageService) {}
+    constructor(
+        public socketService: SocketClientService,
+        private route: ActivatedRoute,
+        private readonly uploadImagesService: UploadImagesService,
+    ) {}
 
     get socketId() {
         return this.socketService.socket.id ? this.socketService.socket.id : '';
@@ -23,8 +35,20 @@ export class ClassicPageComponent implements OnInit {
         this.matchId = this.route.snapshot.paramMap.get('id');
         this.connect();
         this.socketService.send('joinRoom', this.matchId);
-        // this.uploadImageService.getImageFromServer();
-        this.uploadImageService.getImageResultsFromServer(this.socketId);
+        this.game = this.uploadImagesService.getGame();
+    }
+
+    async displayImages() {
+        const originalImage = this.game.originalImage;
+        const modifiedImage = this.game.modifiedImage;
+        const imageOriginalElement = new Image();
+        const imageModifiedElement = new Image();
+
+        imageOriginalElement.src = `data:image/bmp;base64,${Buffer.from(originalImage).toString('base64')}`;
+        imageModifiedElement.src = `data:image/bmp;base64,${Buffer.from(modifiedImage).toString('base64')}`;
+        imageOriginalElement.style.width = '680px';
+        imageOriginalElement.style.height = '420px';
+        document.body.appendChild(imageOriginalElement);
     }
 
     connect() {
