@@ -8,9 +8,9 @@ import { Info } from '@app/interfaces/info';
 })
 export class InfoCardComponent {
     info: Info = {
-        description: 'Jeu 1 ',
-        difficulty: 'Facile ',
-        mode: 'Solo',
+        description: 'Glouton ',
+        difficulty: 'Facile',
+        mode: 'Solo classic',
         nbHints: 3,
         hintsPenalty: 10,
     };

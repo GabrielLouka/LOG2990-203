@@ -1,8 +1,4 @@
-<div class="hint-container">
-        <div class="hint-icon">
-            <img src=".\assets\img\hints-icon.png" (click)="giveHint()" class="hints-icon" alt="gameHintsIcon" />
-        </div>
-        <div class="nbHints"> 
-            <p>{{maxGivenHints}}</p>
-        </div>
+<div class="hint-container" (click)="giveHint()">
+    <p class="nb-hints">{{ maxGivenHints }}</p>
+    <img class="hints-icon" src=".\assets\img\hints-icon.png" alt="gameHintsIcon" />
 </div>

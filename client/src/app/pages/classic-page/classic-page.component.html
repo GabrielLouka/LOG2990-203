@@ -1,29 +1,30 @@
 <head>
     <meta charset="UTF-8" />
-    <title>{{ title }}</title>
+    <title>Jeu classic</title>
 </head>
 <body>
-    <section class="header">
+    <div class="center-row header">
         <app-quit-button></app-quit-button>
+        <h1 class="titre">Jeu classique</h1>
         <app-hint></app-hint>
-        <h1 class="button-style titre">Jeu classique</h1>
-    </section>
-
-    <div class="difference-container">
-        <div class="left-info">
-            <app-info-card></app-info-card>
-        </div>
-        <app-found-hints-counter></app-found-hints-counter>
-        <div class="timer-container">
-            <app-timer [init]="timeInSeconds"></app-timer>
-        </div>
     </div>
-    <div class="middle-container">
-        <div class= "center-container">
-            <app-images-area></app-images-area>
+
+    <div class="center-column difference-container">
+        <div class="center-row data-container">
+            <app-found-hints-counter></app-found-hints-counter>
+            <div class="timer-container">
+                <app-timer></app-timer>
+            </div>
         </div>
-        <div class= "right-chat">
-            <app-chat></app-chat>
+
+        <app-info-card class="info-card"></app-info-card>
+
+        <div class="center-row canvas-container">
+            <canvas width="640px" height="480px"></canvas>
+            <canvas width="640px" height="480px"></canvas>
+            <!-- <canvas width="576px" height="432px"></canvas> -->
         </div>
+
+        <app-chat></app-chat>
     </div>
 </body>

@@ -6,52 +6,44 @@
 <body>
     <div class="header">
         <app-back-button></app-back-button>
-
     </div>
 
     <div class="body">
         <div class="buttons-section">
-            <button class="button-style edit-button" routerLink="/config">
-                Éditer un jeu
-            </button>
-            <button class="button-style change-times-button" id="clearHistory" (click)="clearHistory()">
-                Réinitialiser l'historique
-            </button>
+            <button class="button-style edit-button" routerLink="/config">Éditer un jeu</button>
+            <button class="button-style change-times-button" id="clearHistory" (click)="clearHistory()">Réinitialiser l'historique</button>
         </div>
 
         <div class="middle-section">
             <div class="parameters">
                 <p class="title"><b> Paramètres de temps globaux</b></p>
                 <div class="constants-option">
-                    <div class="label-input" *ngFor="let constant of constants; let index=index;">
-                        <label for="{{constant.fetchData}}">{{constant.label}}</label>
-                        <input type="number" id="{{constant.fetchData}}" name="{{constant.fetchData}}" step="1"
-                            value="{{constant.time}}">
+                    <div class="label-input" *ngFor="let constant of constants; let index = index">
+                        <label for="{{ constant.fetchData }}">{{ constant.label }}</label>
+                        <input type="number" id="{{ constant.fetchData }}" name="{{ constant.fetchData }}" step="1" value="{{ constant.time }}" />
                     </div>
                 </div>
                 <div class="two-btn">
-                    <button class="button-style reset-btn" (click)="resetConstants()">Mettre à défault les
-                        constantes</button>
+                    <button class="button-style reset-btn" (click)="resetConstants()">Mettre à défault les constantes</button>
                     <button class="button-style">Sauvegarder les constantes</button>
                 </div>
             </div>
             <div class="sub-section-history">
-                <p class="title"> <b> Historique des parties jouées</b></p>
+                <p class="title"><b> Historique des parties jouées</b></p>
                 <div class="history-section">
                     <div class="history-container" *ngFor="let history of gamesHistory">
-                        <p class="history-line" *ngIf="history">Début du jeu : {{history.startingTime}}</p>
-                        <p class="history-line" *ngIf="history">Fin du jeu : {{history.endingTime}}</p>
-                        <p class="history-line" *ngIf="history">Mode : {{history.gameMode}}</p>
-                        <p class="history-line" *ngIf="history && history.gameMode === 'Solo'"> Partie jouée par :
-                            {{history.player1}}
+                        <p class="history-line" *ngIf="history"><strong>Début du jeu :</strong> {{ history.startingTime.toLocaleString() }}</p>
+                        <p class="history-line" *ngIf="history"><strong>Fin du jeu :</strong> {{ history.endingTime.toLocaleString() }}</p>
+                        <p class="history-line" *ngIf="history"><strong>Mode :</strong> {{ history.gameMode }}</p>
+                        <p class="history-line" *ngIf="history && history.gameMode === 'Solo'">
+                            <strong>Partie jouée par :</strong> {{ history.player1 }}
                         </p>
-                        <p class="history-line" *ngIf="history && history.gameMode === '1v1'">Partie jouée par :
-                            {{history.player1}} et {{history.player2}}
+                        <p class="history-line" *ngIf="history && history.gameMode === '1v1'">
+                            <strong>Partie jouée par :</strong> {{ history.player1 }} <strong>et</strong> {{ history.player2 }}
                         </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 </body>

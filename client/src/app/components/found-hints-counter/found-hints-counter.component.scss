@@ -1,11 +1,14 @@
 .container {
-    width: max-content;
     height: auto;
+    //width: max-content;
+    padding: 10px;
+
     border-radius: 10px;
-    margin-left: 10px;
-    transition: 0.3s;
+    border: solid;
+
+    background-color: whitesmoke;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+
     font-size: 1.7vh;
     letter-spacing: 0.1vw;
-    padding: 10px;
-    border: solid;
 }
