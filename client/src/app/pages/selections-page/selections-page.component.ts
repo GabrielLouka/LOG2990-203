@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 // eslint-disable-next-line no-restricted-imports
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageUploadResult } from '@common/image.upload.result';
@@ -10,7 +10,7 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: './selections-page.component.html',
     styleUrls: ['./selections-page.component.scss'],
 })
-export class SelectionsPageComponent {
+export class SelectionsPageComponent implements OnInit {
     playable = true;
     currentIndex = 0;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -20,8 +20,6 @@ export class SelectionsPageComponent {
     currentPageNbr = 0;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     games: any;
-
-    btnType = 'Retour';
     title = 'Page de configuration';
 
     constructor(private readonly communicationService: CommunicationService) {}

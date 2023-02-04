@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SocketClientService } from '@app/services/socket-client.service';
+import { UploadImageService } from '@app/services/upload-image.service';
 
 @Component({
     selector: 'app-classic-page',
@@ -12,7 +13,7 @@ export class ClassicPageComponent implements OnInit {
     timeInSeconds = 3000;
     matchId: string | null;
 
-    constructor(public socketService: SocketClientService, private route: ActivatedRoute) {}
+    constructor(public socketService: SocketClientService, private route: ActivatedRoute, public uploadImageService: UploadImageService) {}
 
     get socketId() {
         return this.socketService.socket.id ? this.socketService.socket.id : '';
@@ -22,6 +23,8 @@ export class ClassicPageComponent implements OnInit {
         this.matchId = this.route.snapshot.paramMap.get('id');
         this.connect();
         this.socketService.send('joinRoom', this.matchId);
+        // this.uploadImageService.getImageFromServer();
+        this.uploadImageService.getImageResultsFromServer(this.socketId);
     }
 
     connect() {

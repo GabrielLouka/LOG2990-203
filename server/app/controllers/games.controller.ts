@@ -76,7 +76,7 @@ export class GamesController {
                 });
         });
 
-        this.router.post('/deleteAllGames', async (req: Request, res: Response) => {
+        this.router.delete('/deleteAllGames', async (req: Request, res: Response) => {
             this.gameStorageService
                 .deleteAllGames()
                 .then(() => {

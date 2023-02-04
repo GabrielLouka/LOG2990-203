@@ -3,6 +3,7 @@ import { ImageProcessingService } from '@app/services/image-processing.service';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
 const HTTP_STATUS_CREATED = 201;
@@ -46,6 +47,16 @@ export class ImageProcessingController {
             }
 
             res.status(status).send(JSON.stringify(outputResultToSendToClient));
+        });
+
+        // TODO returns only the default images
+        this.router.get('/images', async (req: Request, res: Response) => {
+            try {
+                const imgs = await this.gameStorageService.getDefaultImages();
+                res.send(JSON.stringify(imgs));
+            } catch (error) {
+                res.status(StatusCodes.NOT_FOUND).send(error.message);
+            }
         });
     }
 }

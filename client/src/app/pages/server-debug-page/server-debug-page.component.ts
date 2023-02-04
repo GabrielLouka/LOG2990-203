@@ -13,7 +13,6 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./server-debug-page.component.scss'],
 })
 export class ServerDebugPageComponent {
-
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,7 +21,7 @@ export class ServerDebugPageComponent {
     constructor(private readonly communicationService: CommunicationService) {}
 
     async getGame() {
-        const routeToSend = '/games/fetchGame/11';
+        const routeToSend = '/games/fetchGame/1';
 
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
@@ -41,7 +40,7 @@ export class ServerDebugPageComponent {
                 this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
             },
         });
-        }
+    }
     async giveImages() {
         for (const game of this.games) {
             const originalImage = game.originalImage;

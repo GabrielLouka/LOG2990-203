@@ -7,7 +7,6 @@ import { GameData } from '@common/game-data';
 import { DB_CONST, R_ONLY } from '@app/utils/env';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
-import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult, UpdateResult } from 'mongodb';
 import { Service } from 'typedi';
@@ -122,6 +121,11 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
+    // TODO enlever seulement hardCodé
+    async getDefaultImages() {
+        const images = JSON.parse(await this.fileSystemManager.readFile(R_ONLY.defaultImagesPath)).images;
+        return images;
+    }
     getNextAvailableGameId(): number {
         let output = -1;
         // read the next id from the file lastGameId.txt if it exists or create it with 0

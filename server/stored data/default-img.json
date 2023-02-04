@@ -1,8 +1,0 @@
-{
-    "images": [
-        {
-            "original": "server/assets/img/car1.bmp",
-            "modified": "server/assets/img/car2.bmp"
-        }
-    ]
-}
