@@ -13,6 +13,7 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./server-debug-page.component.scss'],
 })
 export class ServerDebugPageComponent {
+
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,6 +21,27 @@ export class ServerDebugPageComponent {
     formToSendAfterServerConfirmation: EntireGameUploadForm;
     constructor(private readonly communicationService: CommunicationService) {}
 
+    async getGame() {
+        const routeToSend = '/games/fetchGame/11';
+
+        this.communicationService.get(routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+
+                if (response.body !== null) {
+                    const serverResult = JSON.parse(response.body);
+                    this.debugDisplayMessage.next(responseString);
+                    this.games = serverResult;
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
+        }
     async giveImages() {
         for (const game of this.games) {
             const originalImage = game.originalImage;

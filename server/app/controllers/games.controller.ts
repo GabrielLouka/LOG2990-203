@@ -14,6 +14,17 @@ export class GamesController {
     private configureRouter(): void {
         this.router = Router();
 
+        this.router.get('/fetchGame/:id', async (req: Request, res: Response) => {
+            try {
+                console.log('in fetchGames with id = ' + req.params.id);
+                const game = await this.gameStorageService.getGameById(req.params.id);
+                // res.json(games);
+                res.send(JSON.stringify(game));
+            } catch (error) {
+                res.status(StatusCodes.NOT_FOUND).send(error.message);
+            }
+        });
+
         this.router.get('/:id', async (req: Request, res: Response) => {
             try {
                 const games = await this.gameStorageService.getNextGames(parseInt(req.params.id, 10));
