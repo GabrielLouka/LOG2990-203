@@ -31,7 +31,7 @@ export class ServerDebugPageComponent {
                 if (response.body !== null) {
                     const serverResult = JSON.parse(response.body);
                     this.debugDisplayMessage.next(responseString);
-                    this.games = serverResult;
+                    this.games = [serverResult];
                 }
             },
             error: (err: HttpErrorResponse) => {
