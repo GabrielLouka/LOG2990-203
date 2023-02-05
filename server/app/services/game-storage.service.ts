@@ -43,7 +43,7 @@ export class GameStorageService {
     async getGameById(id: string) {
         const query = { id: parseInt(id, 10) };
         const game = await this.collection.findOne<GameData>(query);
-        const images = this.getGameImages(game!.id.toString());
+        const images = this.getGameImages(id);
         return { gameData: game, originalImage: images.originalImage, modifiedImage: images.modifiedImage };
     }
 
