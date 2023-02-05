@@ -19,6 +19,7 @@ export class SocketManager {
             });
 
             socket.on('launchGame', (matchInfo: { gameId: string; username: string }) => {
+                console.log('launchGame called with ' + matchInfo.gameId + matchInfo.username);
                 socket.join(matchInfo.gameId + matchInfo.username);
                 if (socket.rooms.has(matchInfo.gameId + matchInfo.username)) {
                     this.sio

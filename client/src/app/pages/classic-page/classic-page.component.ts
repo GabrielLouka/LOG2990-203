@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Coordinate } from '@app/interfaces/coordinate';
+import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
 import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -32,6 +33,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         public mouseService: MouseHandlerService,
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
+        private auth: AuthService,
     ) {} // private route: ActivatedRoute, // private readonly uploadImagesService: UploadImagesService,
 
     get socketId() {
@@ -49,6 +51,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.connect();
+        console.log({ gameId: this.currentGameId, username: this.auth.registerUserName() });
+        this.socketService.send('launchGame', { gameId: this.currentGameId, username: this.auth.registerUserName() });
     }
 
     loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
