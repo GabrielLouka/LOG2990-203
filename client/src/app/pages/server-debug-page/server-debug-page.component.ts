@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
+import { GameData } from '@common/game-data';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Vector2 } from '@common/vector2';
@@ -17,7 +18,7 @@ export class ServerDebugPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    games: any;
+    games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[];
     formToSendAfterServerConfirmation: EntireGameUploadForm;
     constructor(private readonly communicationService: CommunicationService) {}
 
