@@ -1,10 +1,10 @@
+/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file-system-manager';
+import { DB, R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
-// eslint-disable-next-line no-unused-vars
-import { DB_CONST, R_ONLY } from '@app/utils/env';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
@@ -13,6 +13,7 @@ import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
 @Service()
 export class GameStorageService {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     JSON_PATH: string;
     fileSystemManager: FileSystemManager;
     socketManager: SocketManager;
@@ -22,7 +23,7 @@ export class GameStorageService {
         this.fileSystemManager = new FileSystemManager();
     }
     get collection() {
-        return this.databaseService.database.collection(DB_CONST.DB_COLLECTION_GAMES);
+        return this.databaseService.database.collection(DB.COLLECTION_GAMES);
     }
 
     /**
@@ -72,8 +73,8 @@ export class GameStorageService {
 
         const gamesToReturn = [];
         for (const game of nextGames) {
-            console.log('getting images from game id = ' + game.id);
             const images = this.getGameImages(game.id.toString());
+            console.log('getting images from game id = ' + game.id);
             console.log(`Buffer length first image: ${images.originalImage.length} bytes`);
             console.log(`Buffer length second image: ${images.modifiedImage.length} bytes`);
 
@@ -112,11 +113,6 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
-    // TODO enlever seulement hardCodé
-    async getDefaultImages() {
-        const images = JSON.parse(await this.fileSystemManager.readFile(R_ONLY.defaultImagesPath)).images;
-        return images;
-    }
     getNextAvailableGameId(): number {
         let output = -1;
         // read the next id from the file lastGameId.txt if it exists or create it with 0
@@ -138,10 +134,8 @@ export class GameStorageService {
     createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
-                // eslint-disable-next-line no-console
                 console.error(err);
             } else {
-                // eslint-disable-next-line no-console
                 console.log('Folder successfully created.');
             }
         });
@@ -152,26 +146,23 @@ export class GameStorageService {
         // Creates the subfolder for the game if it does not exist
         this.createFolder(folderPath);
 
-        writeFile(folderPath + R_ONLY.originalImageFileName, firstImage, (err) => {
-            if (err) {
-                // eslint-disable-next-line no-console
-                console.error(err);
-            } else {
-                // eslint-disable-next-line no-console
-                console.log('File successfully written.');
-            }
-        });
-
-        writeFile(folderPath + R_ONLY.modifiedImageFileName, secondImage, (err) => {
-            if (err) {
-                // eslint-disable-next-line no-console
-                console.error(err);
-            } else {
-                // eslint-disable-next-line no-console
-                console.log('File successfully written.');
-            }
-        });
+        writeFile(folderPath + R_ONLY.originalImageFileName, firstImage, this.writeFileErrorManagement);
+        writeFile(folderPath + R_ONLY.modifiedImageFileName, secondImage, this.writeFileErrorManagement);
     }
+
+    /**
+     * Checks and validates if the file was successfully written
+     *
+     * @param err
+     */
+    // TODO je ne vois pas de confirmations lorsque je crée un jeu
+    writeFileErrorManagement = (err: NodeJS.ErrnoException) => {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log('File successfully written.');
+        }
+    };
 
     async storeGameResult(generatedGameId: number, _differences: Vector2[][], _isEasy: boolean) {
         const newGameToAdd: GameData = {

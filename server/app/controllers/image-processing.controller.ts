@@ -1,5 +1,6 @@
 import { GameStorageService } from '@app/services/game-storage.service';
 import { ImageProcessingService } from '@app/services/image-processing.service';
+import { GAME_CONST } from '@app/utils/env';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Request, Response, Router } from 'express';
@@ -24,13 +25,12 @@ export class ImageProcessingController {
             const buffer1 = Buffer.from(receivedDifferenceImages.firstImage.background);
             const buffer2 = Buffer.from(receivedDifferenceImages.secondImage.background);
 
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             let status = HTTP_STATUS_CREATED;
             let outputResultToSendToClient: ImageUploadResult = {
                 resultImageByteArray: Array.from(new Uint8Array(buffer1)),
                 numberOfDifferences: 0,
                 message: '',
-                generatedGameId: -1,
+                generatedGameId: GAME_CONST.notFound,
                 differences: [],
                 isEasy: true,
             };

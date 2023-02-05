@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 // Database constants file
-const DB_CONST = {
-    DB_DB: 'LOG2990',
-    DB_COLLECTION_GAMES: 'games',
-    // TODO mettre Admin & password
-    DB_URL: 'mongodb+srv://Admin:admin@cluster0.z0ouwix.mongodb.net/?retryWrites=true&w=majority',
+const DB = {
+    NAME: 'LOG2990',
+    COLLECTION_GAMES: 'games',
+    URL: 'mongodb+srv://Admin:admin@cluster0.z0ouwix.mongodb.net/?retryWrites=true&w=majority',
 };
 
 const R_ONLY = {
@@ -14,5 +14,10 @@ const R_ONLY = {
     originalImageFileName: '1.bmp',
     modifiedImageFileName: '2.bmp',
 };
-export { DB_CONST };
+
+const GAME_CONST = {
+    notFound: -1,
+};
+export { DB };
 export { R_ONLY };
+export { GAME_CONST };

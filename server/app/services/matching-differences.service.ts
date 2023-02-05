@@ -1,3 +1,4 @@
+import { GAME_CONST } from '@app/utils/env';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import { Service } from 'typedi';
@@ -15,7 +16,6 @@ export class MatchingDifferencesService {
                 }
             }
         }
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        return -1;
+        return GAME_CONST.notFound;
     }
 }
