@@ -3,6 +3,7 @@ import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
 
+// I don't know what this is, but it's not used
 @Service()
 export class UploadGameImagesService {
     router: Router;

@@ -5,6 +5,7 @@ import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
 @Component({
@@ -21,7 +22,9 @@ export class ServerDebugPageComponent {
     constructor(private readonly communicationService: CommunicationService) {}
 
     async getGame() {
-        const routeToSend = '/games/fetchGame/1';
+        let gameId = (document.getElementById('gameId') as HTMLInputElement).value;
+        if (gameId === null || gameId === undefined || gameId === '') gameId = '0';
+        const routeToSend = '/games/fetchGame/' + gameId;
 
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
@@ -174,6 +177,28 @@ export class ServerDebugPageComponent {
                 this.debugDisplayMessage.next(responseString);
             },
         });
+    }
+
+    async getDifferenceIndex(): Promise<void> {
+        const routeToSend = '/match/getDifferenceIndex';
+        const gameId = (document.getElementById('gameId') as HTMLInputElement).value;
+        const pixelToCheckPositionX = (document.getElementById('pixelToCheckPositionX') as HTMLInputElement).value;
+        const pixelToCheckPositionY = (document.getElementById('pixelToCheckPositionY') as HTMLInputElement).value;
+        const pixelToCheckPosition: Vector2 = { x: parseInt(pixelToCheckPositionX, 10), y: parseInt(pixelToCheckPositionY, 10) };
+
+        this.communicationService
+            .post<{ gameId: string; clickPosition: Vector2 }>({ gameId, clickPosition: pixelToCheckPosition }, routeToSend)
+            .subscribe({
+                next: (response) => {
+                    const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+                    this.debugDisplayMessage.next(responseString + ' found ' + response.body);
+                },
+                error: (err: HttpErrorResponse) => {
+                    const responseString = `Server Error : ${err.message}`;
+                    this.debugDisplayMessage.next(responseString);
+                },
+            });
     }
 
     // Convert number[] to ArrayBuffer

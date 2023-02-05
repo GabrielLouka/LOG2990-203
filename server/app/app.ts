@@ -10,6 +10,7 @@ import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
 import { GamesController } from './controllers/games.controller';
 import { ImageProcessingController } from './controllers/image-processing.controller';
+import { MatchController } from './controllers/match.controller';
 
 @Service()
 export class Application {
@@ -23,6 +24,7 @@ export class Application {
         private readonly dateController: DateController,
         private readonly imageProcessingController: ImageProcessingController,
         readonly gamesController: GamesController,
+        readonly matchController: MatchController,
     ) {
         this.app = express();
 
@@ -48,6 +50,7 @@ export class Application {
         this.app.use('/api/image_processing', this.imageProcessingController.router);
         this.app.use('/api/date', this.dateController.router);
         this.app.use('/api/games', this.gamesController.router);
+        this.app.use('/api/match', this.matchController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });
