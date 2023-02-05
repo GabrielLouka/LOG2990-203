@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
@@ -13,8 +12,8 @@ export class SocketClientService {
     }
 
     connect() {
-        this.socket = io(environment.serverUrl, { transports: ['websocket'], upgrade: false });
-        //this.socket = io(environment.serverUrl, { transports: ['websocket'] });
+        this.socket = io('http://localhost:3000/api', { transports: ['websocket'], upgrade: false });
+        // this.socket = io(environment.serverUrl, { transports: ['websocket'] });
     }
 
     disconnect() {
