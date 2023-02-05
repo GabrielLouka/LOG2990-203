@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { SocketClientService } from '@app/services/socket-client.service';
-import { UploadImagesService } from '@app/services/upload-images.service';
-import { Buffer } from 'buffer';
 
 @Component({
     selector: 'app-classic-page',
     templateUrl: './classic-page.component.html',
     styleUrls: ['./classic-page.component.scss'],
 })
-export class ClassicPageComponent implements OnInit {
-    @ViewChild('originalImage') leftCanvas!: ElementRef;
-    @ViewChild('modifiedImage') rightCanvas!: ElementRef;
+export class ClassicPageComponent implements AfterViewInit {
+    @ViewChild('originalImage', { static: true }) leftCanvas: ElementRef<HTMLCanvasElement>;
+    @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
 
     title = 'JEUX CLASSIQUE';
     timeInSeconds = 3000;
@@ -22,33 +19,41 @@ export class ClassicPageComponent implements OnInit {
     modifiedImage: File | null;
 
     constructor(
-        public socketService: SocketClientService,
-        private route: ActivatedRoute,
-        private readonly uploadImagesService: UploadImagesService,
+        public socketService: SocketClientService, // private route: ActivatedRoute, // private readonly uploadImagesService: UploadImagesService,
     ) {}
 
     get socketId() {
         return this.socketService.socket.id ? this.socketService.socket.id : '';
     }
 
-    ngOnInit(): void {
-        this.matchId = this.route.snapshot.paramMap.get('id');
-        this.connect();
-        this.socketService.send('joinRoom', this.matchId);
-        this.game = this.uploadImagesService.getGame();
+    get leftCanvasContext() {
+        return this.leftCanvas.nativeElement.getContext('2d');
     }
 
-    async displayImages() {
-        const originalImage = this.game.originalImage;
-        const modifiedImage = this.game.modifiedImage;
-        const imageOriginalElement = new Image();
-        const imageModifiedElement = new Image();
+    get rightCanvasContext() {
+        return this.rightCanvas.nativeElement.getContext('2d');
+    }
 
-        imageOriginalElement.src = `data:image/bmp;base64,${Buffer.from(originalImage).toString('base64')}`;
-        imageModifiedElement.src = `data:image/bmp;base64,${Buffer.from(modifiedImage).toString('base64')}`;
-        imageOriginalElement.style.width = '680px';
-        imageOriginalElement.style.height = '420px';
-        document.body.appendChild(imageOriginalElement);
+    imageOnLoad(srcImg: string, context: CanvasRenderingContext2D) {
+        const img = new Image();
+        img.src = srcImg;
+        img.onload = () => {
+            context.drawImage(img, 0, 0, 640, 480, 0, 0, 640, 480);
+            console.log('Image loaded sucessfully');
+        };
+        img.onerror = (error) => {
+            console.error('Failed to load image', error);
+        };
+    }
+
+    ngAfterViewInit(): void {
+        const leftCanvasContext = this.leftCanvasContext;
+        const rightCanvasContext = this.rightCanvasContext;
+        if (leftCanvasContext !== null && rightCanvasContext !== null) {
+            // TODO aller get avec le serveur
+            this.imageOnLoad('/assets/img/1.bmp', leftCanvasContext);
+            this.imageOnLoad('/assets/img/2.bmp', rightCanvasContext);
+        }
     }
 
     connect() {
