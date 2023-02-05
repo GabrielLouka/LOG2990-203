@@ -11,9 +11,9 @@
     
     <div class="center-column difference-container">
         <div class="center-row data-container">
-            <app-found-hints-counter></app-found-hints-counter>
+            <app-found-hints-counter [differencesFound]="differencesFound" [differencesNbr]="totalDifferences"></app-found-hints-counter>
             <div class="timer-container">
-                <app-timer></app-timer>
+                <app-timer [timeInSeconds]="timeInSeconds"></app-timer>
             </div>
         </div>
 
@@ -25,6 +25,5 @@
         </div>
 
         <app-chat></app-chat>
-        <p># {{ debugDisplayMessage.getValue() }}</p>
     </div>
 </body>

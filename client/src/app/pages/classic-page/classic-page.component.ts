@@ -2,12 +2,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Coordinate } from '@app/interfaces/coordinate';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
 import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
+import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
 
@@ -21,13 +21,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     title = 'JEUX CLASSIQUE';
-    timeInSeconds = 3000;
+    timeInSeconds = 0;
     matchId: string | null;
     currentGameId: string | null;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     originalImage: File | null;
     modifiedImage: File | null;
-
+    foundDifferences: boolean[];
+    differencesFound : number = 0;
+    totalDifferences : number = 0;
+    
     constructor(
         public socketService: SocketClientService,
         public mouseService: MouseHandlerService,
@@ -51,8 +54,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.connect();
-        console.log({ gameId: this.currentGameId, username: this.auth.registerUserName() });
-        this.socketService.send('launchGame', { gameId: this.currentGameId, username: this.auth.registerUserName() });
     }
 
     loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
@@ -105,11 +106,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             this.loadCanvasImages(imgSource1, leftCanvasContext);
             this.loadCanvasImages(imgSource2, rightCanvasContext);
         }
+        console.log({ gameId: this.currentGameId, username: this.auth.registerUserName() });
+        this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
+        this.totalDifferences = this.game.gameData.nbrDifferences;
+        console.log('Size of foundDifferences array: ' + this.foundDifferences.length);
+        this.socketService.send('launchGame', { gameData: this.game.gameData, username: this.auth.registerUserName() });
     }
 
     onMouseDown(event: MouseEvent) {
-        const coordinateClick: Coordinate = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
+        const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
         this.mouseService.onMouseDown(coordinateClick);
+        this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick });
     }
 
     connect() {
@@ -130,5 +137,32 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.socketService.on('matchJoined', (message: string) => {
             console.log(message);
         });
+        this.socketService.on('validationReturned', (data: {foundDifferences : boolean[], isValidated: boolean}) => {
+            if (data.isValidated)
+            {
+            console.log('Well done king.');
+            for (const difference of data.foundDifferences) {
+                console.log(difference);
+            }
+            this.foundDifferences = data.foundDifferences;
+            
+            if (this.differencesFound + 1 >= this.totalDifferences)
+            {
+                console.log('Damn, you are goated');
+                this.socketService.send('gameFinished', { minutesElapsed: Math.floor(this.timeInSeconds / 60), secondsElapsed: Math.floor(this.timeInSeconds % 60) });
+ 
+            }
+            else {
+                this.differencesFound++;
+                console.log('You have found the following number of differences: ' + this.differencesFound);
+            }
+            
+        }
+        else {
+            console.log('Nope.');
+        }
+
+        });
+
     }
 }
