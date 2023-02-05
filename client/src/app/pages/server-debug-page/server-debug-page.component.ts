@@ -32,6 +32,7 @@ export class ServerDebugPageComponent {
                     const serverResult = JSON.parse(response.body);
                     this.debugDisplayMessage.next(responseString);
                     this.games = [serverResult];
+                    this.showImagesForRetrievedGames();
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -41,14 +42,14 @@ export class ServerDebugPageComponent {
             },
         });
     }
-    async giveImages() {
+    async showImagesForRetrievedGames() {
         for (const game of this.games) {
             const originalImage = game.originalImage;
             const imageElement = new Image();
 
             imageElement.src = `data:image/bmp;base64,${Buffer.from(originalImage).toString('base64')}`;
-            imageElement.style.width = '100px';
-            imageElement.style.height = '100px';
+            imageElement.style.width = '320px';
+            imageElement.style.height = '240px';
             document.body.appendChild(imageElement);
         }
     }
@@ -64,6 +65,7 @@ export class ServerDebugPageComponent {
                     const serverResult = JSON.parse(response.body);
                     this.debugDisplayMessage.next(responseString);
                     this.games = serverResult;
+                    this.showImagesForRetrievedGames();
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -161,7 +163,7 @@ export class ServerDebugPageComponent {
 
     async deleteAllGames(): Promise<void> {
         const routeToSend = '/games/deleteAllGames';
-        this.communicationService.post<null>(null, routeToSend).subscribe({
+        this.communicationService.delete(routeToSend).subscribe({
             next: (response) => {
                 const responseString = ` ${response.status} - 
                 ${response.statusText} \n`;

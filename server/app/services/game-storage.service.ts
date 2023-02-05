@@ -80,40 +80,46 @@ export class GameStorageService {
         return this.collection.deleteMany({});
     }
 
-    async getNextGames(pageNbr: number) {
+    async getGamesInPage(pageNbr: number) {
         // checks if the number of games available for one page is under four
         const skipNbr = pageNbr * R_ONLY.gamesLimit;
         const nextGames = await this.collection.find({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
 
-        let folderPath;
-        const theGames = [];
+        const gamesToReturn = [];
         for (const game of nextGames) {
-            console.log(game.id);
-            folderPath = R_ONLY.persistentDataFolderPath + game.id + '/';
-            const firstImage = readFileSync(folderPath + '1.bmp');
-            const secondImage = readFileSync(folderPath + '2.bmp');
+            console.log('getting images from game id = ' + game.id);
+            const images = this.getGameImages(game.id.toString());
+            console.log(`Buffer length first image: ${images.originalImage.length} bytes`);
+            console.log(`Buffer length second image: ${images.modifiedImage.length} bytes`);
 
-            const originalImagePath = folderPath + '1.bmp';
-            console.log(`Original image path: ${originalImagePath}`);
-
-            try {
-                const originalImage = readFileSync(originalImagePath);
-                console.log(`Buffer length: ${originalImage.length} bytes`);
-                // const imageElement = new Image();
-                // imageElement.src = `data:image/bmp;base64,${originalImage.toString('base64')}`;
-                // document.body.appendChild(imageElement);
-            } catch (error) {
-                // eslint-disable-next-line no-console
-                console.error(`Error reading image file: ${error.message}`);
-            }
             game.ranking = defaultRankings;
-            theGames.push({
+            gamesToReturn.push({
                 gameData: game,
-                originalImage: firstImage,
-                modifiedImage: secondImage,
+                originalImage: images.originalImage,
+                modifiedImage: images.modifiedImage,
             });
         }
-        return theGames;
+        return gamesToReturn;
+    }
+
+    getGameImages(id: string) {
+        const folderPath = R_ONLY.persistentDataFolderPath + id + '/';
+        let firstImage = Buffer.from([0]);
+        let secondImage = Buffer.from([0]);
+
+        try {
+            firstImage = readFileSync(folderPath + R_ONLY.originalImageFileName);
+        } catch (error) {
+            console.log('error reading first image');
+        }
+
+        try {
+            secondImage = readFileSync(folderPath + R_ONLY.modifiedImageFileName);
+        } catch (error) {
+            console.log('error reading second image');
+        }
+
+        return { originalImage: firstImage, modifiedImage: secondImage };
     }
 
     async storeDefaultGames() {
@@ -131,13 +137,13 @@ export class GameStorageService {
         // read the next id from the file lastGameId.txt if it exists or create it with 0
         try {
             let lastGameId = 0;
-            const data = readFileSync(R_ONLY.gamesLimit + R_ONLY.lastGameIdFileName);
+            const data = readFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName);
             lastGameId = parseInt(data.toString(), 10);
             const nextGameId = lastGameId + 1;
-            writeFileSync(R_ONLY.gamesLimit + R_ONLY.lastGameIdFileName, nextGameId.toString());
+            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, nextGameId.toString());
             output = nextGameId;
         } catch (err) {
-            writeFileSync(R_ONLY.gamesLimit + R_ONLY.lastGameIdFileName, '0');
+            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, '0');
             output = 0;
         }
 
@@ -157,11 +163,11 @@ export class GameStorageService {
     }
 
     storeGameImages(gameId: number, firstImage: Buffer, secondImage: Buffer): void {
-        const folderPath = R_ONLY.gamesLimit + gameId + '/';
+        const folderPath = R_ONLY.persistentDataFolderPath + gameId + '/';
         // Creates the subfolder for the game if it does not exist
         this.createFolder(folderPath);
 
-        writeFile(folderPath + '1.bmp', firstImage, (err) => {
+        writeFile(folderPath + R_ONLY.originalImageFileName, firstImage, (err) => {
             if (err) {
                 // eslint-disable-next-line no-console
                 console.error(err);
@@ -171,7 +177,7 @@ export class GameStorageService {
             }
         });
 
-        writeFile(folderPath + '2.bmp', secondImage, (err) => {
+        writeFile(folderPath + R_ONLY.modifiedImageFileName, secondImage, (err) => {
             if (err) {
                 // eslint-disable-next-line no-console
                 console.error(err);
@@ -193,9 +199,4 @@ export class GameStorageService {
         };
         return this.collection.insertOne(newGameToAdd);
     }
-
-    // async populateDb() {
-    //     const playlists = JSON.parse(await this.fileSystemManager.readFile(this.JSON_PATH)).playlists;
-    //     await this.databaseService.populateDb(DB_CONST.DB_COLLECTION_GAMES, games);
-    // }
 }

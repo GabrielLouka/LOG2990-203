@@ -11,6 +11,8 @@ const R_ONLY = {
     lastGameIdFileName: 'lastGameId.txt',
     defaultImagesPath: './stored data/default-img.json',
     gamesLimit: 4,
+    originalImageFileName: '1.bmp',
+    modifiedImageFileName: '2.bmp',
 };
 export { DB_CONST };
 export { R_ONLY };
