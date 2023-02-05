@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { Coordinate } from '@app/interfaces/coordinate';
+import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
@@ -18,9 +20,7 @@ export class ClassicPageComponent implements AfterViewInit {
     originalImage: File | null;
     modifiedImage: File | null;
 
-    constructor(
-        public socketService: SocketClientService, // private route: ActivatedRoute, // private readonly uploadImagesService: UploadImagesService,
-    ) {}
+    constructor(public socketService: SocketClientService, public mouseService: MouseHandlerService) {} // private route: ActivatedRoute, // private readonly uploadImagesService: UploadImagesService,
 
     get socketId() {
         return this.socketService.socket.id ? this.socketService.socket.id : '';
@@ -34,7 +34,7 @@ export class ClassicPageComponent implements AfterViewInit {
         return this.rightCanvas.nativeElement.getContext('2d');
     }
 
-    imageOnLoad(srcImg: string, context: CanvasRenderingContext2D) {
+    loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
         const img = new Image();
         img.src = srcImg;
         img.onload = () => {
@@ -51,9 +51,14 @@ export class ClassicPageComponent implements AfterViewInit {
         const rightCanvasContext = this.rightCanvasContext;
         if (leftCanvasContext !== null && rightCanvasContext !== null) {
             // TODO aller get avec le serveur
-            this.imageOnLoad('/assets/img/1.bmp', leftCanvasContext);
-            this.imageOnLoad('/assets/img/2.bmp', rightCanvasContext);
+            this.loadCanvasImages('/assets/img/1.bmp', leftCanvasContext);
+            this.loadCanvasImages('/assets/img/2.bmp', rightCanvasContext);
         }
+    }
+
+    onMouseDown(event: MouseEvent) {
+        const coordinateClick: Coordinate = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
+        this.mouseService.onMouseDown(coordinateClick);
     }
 
     connect() {

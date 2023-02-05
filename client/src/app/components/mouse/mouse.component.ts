@@ -17,17 +17,6 @@ export class MouseComponent {
 
     constructor(private mouseService: MouseHandlerService) {}
 
-    // ngOnInit() {
-    //     const canvas = this.canvas.nativeElement;
-    //     const ctx = canvas.getContext('2d');
-
-    //     const image = new Image();
-    //     image.src = this.src;
-    //     image.onload = () => {
-    //         ctx?.drawImage(image, 0, 0);
-    //     };
-    // }
-
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Coordinate = { x: event.offsetX, y: Math.abs(event.offsetY - this.height) };
         this.mouseService.onMouseDown(coordinateClick);

@@ -20,8 +20,8 @@
         <app-info-card class="info-card"></app-info-card>
 
         <div class="center-row canvas-container">
-            <canvas #originalImage width="640px" height="480px"></canvas>
-            <canvas #modifiedImage width="640px" height="480px"></canvas>
+            <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
+            <canvas #modifiedImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
         </div>
 
         <app-chat></app-chat>
