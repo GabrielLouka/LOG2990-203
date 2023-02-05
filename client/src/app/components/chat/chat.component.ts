@@ -26,4 +26,14 @@ export class ChatComponent {
         });
         this.newMessage = '';
     }
+
+    addMessage(message: string) {
+        this.messages.push({
+            text: message,
+            username: 'System',
+            sentByPlayer1: true,
+            sentByPlayer2: false,
+        });
+        this.newMessage = '';
+    }
 }

@@ -2,6 +2,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
 import { MouseHandlerService } from '@app/services/mouse-handler.service';
@@ -19,6 +20,7 @@ import { BehaviorSubject } from 'rxjs';
 export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('originalImage', { static: true }) leftCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
+    @ViewChild('chat') chat: ChatComponent;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     title = 'JEUX CLASSIQUE';
     timeInSeconds = 0;
@@ -28,9 +30,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     originalImage: File | null;
     modifiedImage: File | null;
     foundDifferences: boolean[];
-    differencesFound : number = 0;
-    totalDifferences : number = 0;
-    
+    differencesFound: number = 0;
+    totalDifferences: number = 0;
+
     constructor(
         public socketService: SocketClientService,
         public mouseService: MouseHandlerService,
@@ -55,15 +57,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.connect();
     }
+    addMessageToChat(message: string) {
+        this.chat.addMessage(message);
+    }
 
     loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
         const img = new Image();
         img.src = srcImg;
         img.onload = () => {
             context.drawImage(img, 0, 0, 640, 480, 0, 0, 640, 480);
-            console.log('Image loaded sucessfully');
+            this.addMessageToChat('Image loaded sucessfully');
         };
         img.onerror = (error) => {
+            this.addMessageToChat('Failed to load image' + error);
             console.error('Failed to load image', error);
         };
     }
@@ -106,10 +112,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             this.loadCanvasImages(imgSource1, leftCanvasContext);
             this.loadCanvasImages(imgSource2, rightCanvasContext);
         }
-        console.log({ gameId: this.currentGameId, username: this.auth.registerUserName() });
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
-        console.log('Size of foundDifferences array: ' + this.foundDifferences.length);
+        this.addMessageToChat('Size of foundDifferences array: ' + this.foundDifferences.length);
         this.socketService.send('launchGame', { gameData: this.game.gameData, username: this.auth.registerUserName() });
     }
 
@@ -121,48 +126,42 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     connect() {
         if (!this.socketService.isSocketAlive()) {
-            console.log('in connect');
             this.socketService.connect();
             this.configureBaseSocketFeatures();
         }
     }
     configureBaseSocketFeatures() {
         this.socketService.on('connect', () => {
-            console.log(`Connexion par WebSocket sur le socket ${this.socketId}`);
+            this.addMessageToChat(`Connexion par WebSocket sur le socket ${this.socketId}`);
         });
         // Afficher le message envoyé lors de la connexion avec le serveur
         this.socketService.on('hello', (message: string) => {
-            console.log(message);
+            this.addMessageToChat(message);
         });
         this.socketService.on('matchJoined', (message: string) => {
-            console.log(message);
+            this.addMessageToChat(message);
         });
-        this.socketService.on('validationReturned', (data: {foundDifferences : boolean[], isValidated: boolean}) => {
-            if (data.isValidated)
-            {
-            console.log('Well done king.');
-            for (const difference of data.foundDifferences) {
-                console.log(difference);
-            }
-            this.foundDifferences = data.foundDifferences;
-            
-            if (this.differencesFound + 1 >= this.totalDifferences)
-            {
-                console.log('Damn, you are goated');
-                this.socketService.send('gameFinished', { minutesElapsed: Math.floor(this.timeInSeconds / 60), secondsElapsed: Math.floor(this.timeInSeconds % 60) });
- 
-            }
-            else {
-                this.differencesFound++;
-                console.log('You have found the following number of differences: ' + this.differencesFound);
-            }
-            
-        }
-        else {
-            console.log('Nope.');
-        }
+        this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean }) => {
+            if (data.isValidated) {
+                this.addMessageToChat('Well done king.');
+                for (const difference of data.foundDifferences) {
+                    this.addMessageToChat(difference.toString());
+                }
+                this.foundDifferences = data.foundDifferences;
 
+                if (this.differencesFound + 1 >= this.totalDifferences) {
+                    this.addMessageToChat('Damn, you are goated');
+                    this.socketService.send('gameFinished', {
+                        minutesElapsed: Math.floor(this.timeInSeconds / 60),
+                        secondsElapsed: Math.floor(this.timeInSeconds % 60),
+                    });
+                } else {
+                    this.differencesFound++;
+                    this.addMessageToChat('You have found the following number of differences: ' + this.differencesFound);
+                }
+            } else {
+                this.addMessageToChat('Nope.');
+            }
         });
-
     }
 }
