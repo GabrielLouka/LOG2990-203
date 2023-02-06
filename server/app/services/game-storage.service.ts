@@ -168,8 +168,6 @@ export class GameStorageService {
         const newGameToAdd: GameData = {
             id: generatedGameId,
             nbrDifferences: _differences.length,
-            nbrHints: 3,
-            penalty: 1,
             differences: _differences,
             name: 'Default game',
             isEasy: _isEasy,

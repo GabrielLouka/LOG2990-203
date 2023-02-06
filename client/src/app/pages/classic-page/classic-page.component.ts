@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
@@ -21,6 +23,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('originalImage', { static: true }) leftCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
+    @ViewChild('errorMessage') errorMessage: ElementRef;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
     matchId: string | null;
@@ -100,7 +103,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             },
             error: (err: HttpErrorResponse) => {
                 const responseString = `Server Error : ${err.message}`;
-                // eslint-disable-next-line no-console
                 console.log(responseString);
             },
         });
@@ -123,6 +125,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
         this.mouseService.onMouseDown(coordinateClick);
         this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick });
+
+        this.errorMessage.nativeElement.style.left = event.clientX + 'px';
+        this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
 
     connect() {
@@ -161,7 +166,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                     this.addMessageToChat('You have found the following number of differences: ' + this.differencesFound);
                 }
             } else {
-                this.addMessageToChat('Nope.');
+                this.errorMessage.nativeElement.style.display = 'block';
+                setTimeout(() => {
+                    this.errorMessage.nativeElement.style.display = 'none';
+                }, 1000);
             }
         });
     }

@@ -8,11 +8,9 @@ import { GameData } from '@common/game-data';
 })
 export class InfoCardComponent implements OnInit {
     @Input() gameData: GameData;
-    title: string;
     difficulty: string;
 
     ngOnInit() {
-        this.title = this.gameData.name;
         this.getDifficulty();
     }
 

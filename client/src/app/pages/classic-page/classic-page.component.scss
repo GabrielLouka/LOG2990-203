@@ -42,41 +42,11 @@ canvas {
     margin-right: 7vw;
 }
 
+.error-message {
+    display: none;
+    position: absolute;
+    color: red;
+    font-weight: 600;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// .left-info {
-//     position: absolute;
-//     left: 0;
-// }
-
-// .right-chat {
-//     position: absolute;
-//     right: 0;
-//     margin: 4vh 2vh;
-// }
-
-// .middle-container {
-//     border: solid saddlebrown;
-// }
+    cursor: default;
+}
