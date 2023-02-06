@@ -1,16 +1,15 @@
 <head>
     <meta charset="UTF-8" />
-    <title>{{ title }}</title>
+    <title>Register Page</title>
 </head>
 <body>
-    <Section class="header">
+    <Section class="flex-row center header">
         <app-back-button></app-back-button>
         <h1 class="button-style titre">Jeu classique</h1>
     </Section>
-    <Section class="registerContainer">
-        <form [formGroup]="registrationForm" class="register-input">
-            <label class="button-style" for="input">Username :</label>
-            <!-- <input class="button-style" id="input" type="text" placeholder="Write here" formControlName="pseudo" required /> -->
+    <Section class="flex-row center registerContainer">
+        <form [formGroup]="registrationForm" class="flex-row register-input">
+            <label class="flex-row center button-style" for="input">Username :</label>
             <input name="userName" class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="username" required />
             <br />
 
@@ -21,7 +20,12 @@
                 [disabled]="registrationForm.invalid"
                 [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
             >
-                <img src=".\assets\img\play-icon.png" id="play-icon" alt="gameLogo" />
+                <img
+                    src=".\assets\img\play-icon.png"
+                    id="play-icon"
+                    [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
+                    alt="gameLogo"
+                />
             </button>
         </form>
     </Section>

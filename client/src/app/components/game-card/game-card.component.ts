@@ -12,8 +12,7 @@ export class GameCardComponent implements OnInit {
     difficulty: string;
     originalImageSrc: string;
     modifiedImageSrc: string;
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-    constructor() {}
+
     ngOnInit() {
         this.difficulty = this.game.gameData ? 'Facile' : 'Difficile';
         this.originalImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;

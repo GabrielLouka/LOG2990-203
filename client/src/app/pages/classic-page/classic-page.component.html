@@ -3,14 +3,14 @@
     <title>Jeu classic</title>
 </head>
 <body>
-    <div class="center-row header">
+    <div class="flex-row center header">
         <app-quit-button></app-quit-button>
         <h1 class="titre">Jeu classique</h1>
         <app-hint></app-hint>
     </div>
-    
-    <div class="center-column difference-container">
-        <div class="center-row data-container">
+
+    <div class="flex-column center difference-container">
+        <div class="flex-row center data-container">
             <app-found-hints-counter [differencesFound]="differencesFound" [differencesNbr]="totalDifferences"></app-found-hints-counter>
             <div class="timer-container">
                 <app-timer [timeInSeconds]="timeInSeconds"></app-timer>
@@ -19,7 +19,7 @@
 
         <app-info-card class="info-card"></app-info-card>
 
-        <div class="center-row canvas-container">
+        <div class="flex-row center canvas-container">
             <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
             <canvas #modifiedImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
         </div>

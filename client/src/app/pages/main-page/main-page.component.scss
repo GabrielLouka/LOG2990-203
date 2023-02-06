@@ -1,11 +1,6 @@
-/* Règles Générales */
-
-body {
-    display: flex;
-    flex-direction: column;
-
-    max-height: 100vh;
-    background-color: lightblue;
+/* regles générales */
+.bigger {
+    font-size: 1.5vh;
 }
 
 .button-style {
@@ -17,11 +12,22 @@ body {
     font-size: 1.7vh;
     letter-spacing: 0.1vw;
 
-    border-radius: 2vw;
-    border: 0.3vh;
+    background-color: white;
 
-    padding: 2vh 4vh;
+    border-radius: 2vw;
+    border: solid;
+
+    padding: 2vh 8vh;
+    margin: 3vw;
+
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(0.9);
+        background-color: lightsalmon;
+    }
 }
+
 
 /* Icon style */
 .logoContainer {
@@ -47,53 +53,21 @@ body {
 }
 
 /* Button style */
-
 .navBarContainer {
-    display: flex;
-    flex-direction: row;
-
-    justify-content: center;
-    align-items: center;
-
     height: 50vh;
-}
-
-.button {
-    margin: 3vw;
-    padding: 2vh 8vh;
-    background-color: white;
-
-    border: solid;
-
-    cursor: pointer;
-
-    &:hover {
-        transform: scale(0.9);
-        background-color: lightsalmon;
-    }
 }
 
 /* Credit style */
 .footer-item {
     display: flex;
     flex-direction: column;
-    text-align: center;
-    // height: 10vh;
-}
 
-.team-number {
-    margin-top: 1.5vh;
-    font-size: 1.5vh;
+    text-align: center;
 }
 
 .dev-team {
-    display: flex;
-    flex-direction: row;
+    justify-content: space-evenly;
 
     margin-left: 15vw;
     margin-right: 15vw;
-
-    justify-content: space-evenly;
-
-    font-size: 1.5vh;
 }

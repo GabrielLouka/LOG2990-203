@@ -1,31 +1,18 @@
+/* règles générales */
 .game-card {
-    display: flex;
-    flex-direction: row;
-
     width: 40vw;
     height: 40vh;
 
-    border: solid;
+    border: solid rgb(230, 230, 11);
     border-radius: 2vh;
-
-    border: solid rgb(228, 228, 0);
 }
 
+/* Content style */
 .description-container {
-    display: flex;
-    flex-direction: column;
-
     position: absolute;
 
     width: 39.5vw;
     height: 39vh;
-}
-
-.title-container {
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
 }
 
 .title {
@@ -34,49 +21,30 @@
     letter-spacing: 0.1vw;
 }
 
-.difficulty {
-    display: flex;
-}
-
 .content-container {
-    display: flex;
-    flex-direction: row;
-
-    justify-content: space-around;
-    align-items: center;
     height: 39vh;
-
-    
 }
 
 .original-picture {
     height: 30vh;
+    scale: 0.85;
     border-radius: 20px;
-    border: solid black;
+    border: solid;
 }
-.classement-container {
-    display: flex;
-    flex-direction: column;
 
+.classement-container {
     justify-content: space-around;
-    align-items: center;
 
     border: solid;
     border-radius: 20px;
+
     height: 30vh;
     width: 20vw;
-
-    border: solid;
+    scale: 0.9;
 }
 
-
 .mode {
-    display: flex; 
-    flex-direction: column;
-    align-items: center;
-
     font-weight: 600;
-
 }
 
 .divider {
@@ -85,36 +53,32 @@
 }
 
 .badge-container{
-    display: flex;
-    flex-direction: column;
+    margin-left: 2vw;
     margin-top: 7vh;
 }
+
 .badge-icon {
     height: 5vh;
     scale: 0.75;
 }
 
-.data-container {
-    display: flex;
-    flex-direction: row;
-}
 .pseudo {
     text-overflow: ellipsis;
     width: 4vw;
     overflow: hidden;
 }
 
-.test {
-    display:flex; 
-    flex-direction: row;
-
-    justify-content: space-around;
-    align-items: center;
-
-    width: 20vw;
-}
-
 .description {
     font-size: larger;
     font-weight: 600;
 }
+
+.text {
+    
+    justify-content: space-around;
+
+    margin-right: 3vw;
+    width: 20vw;
+}
+
+

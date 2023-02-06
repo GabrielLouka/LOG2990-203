@@ -1,21 +1,8 @@
-body {
-    display: flex;
-    flex-direction: column;
-}
-
 .header {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-
     height: 15vh;
 }
 
 .button-style {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
     font-weight: 600;
     font-size: 1.7vh;
     letter-spacing: 0.1vw;
@@ -31,18 +18,10 @@ body {
 }
 
 .registerContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-
     height: 80vh;
 }
 
 .register-input {
-    display: flex;
-    flex-direction: row;
-
     justify-content: space-around;
 
     width: 65vh;
@@ -62,7 +41,6 @@ body {
 }
 
 
-
 input.ng-invalid {
     background-color:rgb(249, 99, 99);
 }
@@ -72,6 +50,7 @@ input.ng-valid {
 
 .not-allowed {
     cursor: not-allowed;
+    opacity: 0.7;
 }
 .allowed {
     cursor: pointer;

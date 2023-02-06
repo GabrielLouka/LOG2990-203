@@ -3,13 +3,13 @@
     <title>Selection page</title>
 </head>
 
-<body>
-    <Section class="header">
+<body class="center">
+    <Section class="center-row header">
         <app-back-button></app-back-button>
         <a routerLink=""><img src=".\assets\img\game-icon.png" id="gameIcon" alt="gameLogo" /></a>
     </Section>
 
-    <div class=" container">
+    <div class="container">
         <mat-grid-list cols="2" rowHeight="42vh">
             <mat-grid-tile *ngFor="let game of games">
                 <app-game-card [game]="game" [isPlayable]="true"></app-game-card>

@@ -9,7 +9,6 @@ import { AuthService } from '@app/services/auth.service';
     styleUrls: ['./registration-page.component.scss'],
 })
 export class RegistrationPageComponent implements OnInit {
-    title = 'Register Page';
     username: string | null | undefined;
     id: string | null;
 
