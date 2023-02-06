@@ -25,15 +25,16 @@
   
 .chat-body {
     height: 32vh;
-    overflow-y: scroll;
+    overflow-y: auto;
     background-color: white;
 }
   
 .message-container {
+    margin: 0.5vh;
     padding: 10px;
     border-radius: 5px;
 
-    border: solid yellow;
+    border: solid 1.5px;
   }
   
   .sent-by-player-1 {
