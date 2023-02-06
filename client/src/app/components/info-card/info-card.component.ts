@@ -1,17 +1,26 @@
-import { Component } from '@angular/core';
-import { Info } from '@app/interfaces/info';
+import { Component, Input, OnInit } from '@angular/core';
+import { GameData } from '@common/game-data';
 
 @Component({
     selector: 'app-info-card',
     templateUrl: './info-card.component.html',
     styleUrls: ['./info-card.component.scss'],
 })
-export class InfoCardComponent {
-    info: Info = {
-        description: 'Glouton ',
-        difficulty: 'Facile',
-        mode: 'Solo classic',
-        nbHints: 3,
-        hintsPenalty: 10,
-    };
+export class InfoCardComponent implements OnInit {
+    @Input() gameData: GameData;
+    title: string;
+    difficulty: string;
+
+    ngOnInit() {
+        this.title = this.gameData.name;
+        this.getDifficulty();
+    }
+
+    getDifficulty() {
+        if (this.gameData.isEasy) {
+            return (this.difficulty = 'Facile');
+        } else {
+            return (this.difficulty = 'Difficile');
+        }
+    }
 }

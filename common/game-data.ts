@@ -5,6 +5,8 @@ export interface GameData {
     name: string;
     isEasy: boolean;
     nbrDifferences: number;
+    nbrHints: number;
+    penalty: number;
     differences: Vector2[][]; // array of all the pixels in a difference
     ranking: Ranking[][];
 }

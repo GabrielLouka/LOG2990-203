@@ -22,7 +22,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    title = 'JEUX CLASSIQUE';
     timeInSeconds = 0;
     matchId: string | null;
     currentGameId: string | null;
@@ -32,6 +31,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     foundDifferences: boolean[];
     differencesFound: number = 0;
     totalDifferences: number = 0;
+    title: string = '';
 
     constructor(
         public socketService: SocketClientService,
@@ -95,6 +95,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                     const img1Source = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;
                     const img2Source = `data:image/bmp;base64,${Buffer.from(this.game.modifiedImage).toString('base64')}`;
                     this.loadImagesToCanvas(img1Source, img2Source);
+                    this.title = this.game.gameData.name;
                 }
             },
             error: (err: HttpErrorResponse) => {

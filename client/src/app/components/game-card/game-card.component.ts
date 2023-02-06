@@ -14,10 +14,11 @@ export class GameCardComponent implements OnInit {
     modifiedImageSrc: string;
 
     ngOnInit() {
-        this.difficulty = this.game.gameData ? 'Facile' : 'Difficile';
+        this.difficulty = this.game.gameData.isEasy ? 'Facile' : 'Difficile';
         this.originalImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;
         this.modifiedImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.modifiedImage).toString('base64')}`;
     }
+
     getDifficultyColor() {
         if (this.game.gameData.isEasy) {
             return 'green';

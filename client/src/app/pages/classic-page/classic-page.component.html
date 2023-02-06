@@ -5,7 +5,7 @@
 <body>
     <div class="flex-row center header">
         <app-quit-button></app-quit-button>
-        <h1 class="titre">Jeu classique</h1>
+        <h1 class="titre">{{ this.title }}</h1>
         <app-hint></app-hint>
     </div>
 
@@ -17,7 +17,7 @@
             </div>
         </div>
 
-        <app-info-card class="info-card"></app-info-card>
+        <app-info-card class="info-card" *ngIf="game" [gameData]="game.gameData"></app-info-card>
 
         <div class="flex-row center canvas-container">
             <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
