@@ -12,7 +12,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class SelectionsPageComponent implements OnInit {
     playable = true;
-    currentIndex = 0;
+    gameNbr = 0;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     generatedGameId = -1;
@@ -30,7 +30,6 @@ export class SelectionsPageComponent implements OnInit {
 
     async getGames(pageId: number): Promise<void> {
         const routeToSend = '/games/' + pageId.toString();
-
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 const responseString = ` ${response.status} - 
@@ -39,7 +38,8 @@ export class SelectionsPageComponent implements OnInit {
                 if (response.body !== null) {
                     const serverResult = JSON.parse(response.body);
                     this.debugDisplayMessage.next(responseString);
-                    this.games = serverResult;
+                    this.games = serverResult.gameContent;
+                    this.gameNbr = serverResult.nbrOfGame;
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -50,14 +50,16 @@ export class SelectionsPageComponent implements OnInit {
         });
     }
 
-    goToNextSlide() {
-        const isLastPage = this.currentIndex === this.games.length - 1;
-        const newIndex = isLastPage ? this.currentIndex : this.currentIndex + 1;
-        this.currentIndex = newIndex;
+    async goToNextSlide() {
+        const isLastPage = this.currentPageNbr === Math.ceil(this.gameNbr / 4);
+        const newIndex = isLastPage ? this.currentPageNbr : this.currentPageNbr + 1;
+        this.currentPageNbr = newIndex;
+        await this.getGames(this.currentPageNbr);
     }
-    goToPreviousSlide() {
-        const isFirstPage = this.currentIndex === 0;
-        const newIndex = isFirstPage ? this.currentIndex : this.currentIndex - 1;
-        this.currentIndex = newIndex;
+    async goToPreviousSlide() {
+        const isFirstPage = this.currentPageNbr === 0;
+        const newIndex = isFirstPage ? this.currentPageNbr : this.currentPageNbr - 1;
+        this.currentPageNbr = newIndex;
+        await this.getGames(this.currentPageNbr);
     }
 }

@@ -8,7 +8,6 @@ import { GameData } from '@common/game-data';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
-import { DeleteResult, UpdateResult } from 'mongodb';
 import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
 @Service()
@@ -39,10 +38,8 @@ export class GameStorageService {
      *
      * @returns the games list
      */
-    async getGamesLength(): Promise<unknown> {
-        const games = await this.collection.find({}).toArray();
-        const gamesCount = games.length;
-        return gamesCount;
+    async getGamesLength(): Promise<number> {
+        return this.collection.count();
     }
 
     /**
