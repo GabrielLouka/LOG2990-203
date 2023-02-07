@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
+import { ImageManipulationService } from '@app/services/image-manipulation.service';
 import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
@@ -44,6 +45,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
         private auth: AuthService,
+        private imageManipulationService: ImageManipulationService,
     ) {}
 
     get socketId() {
@@ -106,8 +108,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                 if (response.body !== null) {
                     const serverResult = JSON.parse(response.body);
                     this.game = serverResult;
-                    const img1Source = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;
-                    const img2Source = `data:image/bmp;base64,${Buffer.from(this.game.modifiedImage).toString('base64')}`;
+                    const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
+                    const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
                     this.loadImagesToCanvas(img1Source, img2Source);
                     this.title = this.game.gameData.name;
                 }
@@ -163,12 +165,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             if (data.isValidated) {
                 this.addMessageToChat('Well done king.');
                 this.foundDifferences = data.foundDifferences;
+                this.onFindDifference(data.foundDifferenceIndex);
 
-                if (this.differencesFound + 1 >= this.totalDifferences) {
-                    this.onWinGame();
-                } else {
-                    this.onFindDifference(data.foundDifferenceIndex);
-                }
+                if (this.differencesFound >= this.totalDifferences) this.onWinGame();
             } else {
                 this.onFindWrongDifference();
             }
@@ -192,6 +191,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.differencesFound++;
         this.addMessageToChat('You found difference #' + differenceIndex + '! (' + this.differencesFound + '/' + this.totalDifferences + ')');
         this.playErrorSound();
+        this.refreshModifiedImage();
+    }
+
+    refreshModifiedImage() {
+        const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
+            this.game.gameData,
+            this.game.originalImage,
+            this.game.modifiedImage,
+            this.foundDifferences,
+        );
+        const newImageSource = this.imageManipulationService.getImageSourceFromBuffer(newImage);
+        if (this.rightCanvasContext !== null) this.loadCanvasImages(newImageSource, this.rightCanvasContext);
     }
 
     // Called when the player wins the game
@@ -201,7 +212,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             minutesElapsed: Math.floor(this.timeInSeconds / 60),
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
         });
-        this.differencesFound++;
         this.showPopUp();
         this.socketService.disconnect();
     }
