@@ -46,7 +46,7 @@ describe('GameController', () => {
         }
     });
 
-    // it("get request with id should return game with matching id from database", async () => {
+    // it("get request with id should return game with matching id from database", async () => {        
     //     const queryId = "1";
     //     // const gameQuery = { id: parseInt(queryId, 10) };
     //     const correctGame = await gameController.gamesService.getGameById(queryId);
@@ -55,6 +55,6 @@ describe('GameController', () => {
     //         .then((response) => {
     //             expect(response.body).to.be.deep.equal(correctGame);
     //         });
-
+        
     // });
 });
