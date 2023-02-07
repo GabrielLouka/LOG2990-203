@@ -1,31 +1,18 @@
+/* règles générales */
 .game-card {
-    display: flex;
-    flex-direction: row;
-
     width: 40vw;
     height: 40vh;
 
-    border: solid;
+    border: solid rgb(230, 230, 11);
     border-radius: 2vh;
-
-    border: solid yellow;
 }
 
+/* Content style */
 .description-container {
-    display: flex;
-    flex-direction: column;
-
     position: absolute;
 
     width: 39.5vw;
     height: 39vh;
-}
-
-.title-container {
-    display: flex;
-    flex-direction: column;
-
-    align-items: center;
 }
 
 .title {
@@ -35,33 +22,63 @@
 }
 
 .content-container {
-    display: flex;
-    flex-direction: row;
-
-    justify-content: space-around;
-    align-items: center;
     height: 39vh;
-
-    //border: solid;
 }
 
 .original-picture {
     height: 30vh;
+    scale: 0.85;
     border-radius: 20px;
-    border: solid black;
+    border: solid;
 }
-.classement {
-    display: flex;
-    flex-direction: row;
 
+.classement-container {
     justify-content: space-around;
-    align-items: center;
 
     border: solid;
+    border-radius: 20px;
+
     height: 30vh;
+    width: 20vw;
+    scale: 0.9;
+}
+
+.mode {
+    font-weight: 600;
+}
+
+.divider {
+    border: solid 1px;
+    height: 20vh;
+}
+
+.badge-container{
+    margin-left: 2vw;
+    margin-top: 7vh;
+}
+
+.badge-icon {
+    height: 5vh;
+    scale: 0.75;
+}
+
+.pseudo {
+    text-overflow: ellipsis;
+    width: 4vw;
+    overflow: hidden;
+}
+
+.description {
+    font-size: larger;
+    font-weight: 600;
+}
+
+.text {
+    
+    justify-content: space-around;
+
+    margin-right: 3vw;
     width: 20vw;
 }
 
-.difficulty {
-    display: flex;
-}
+

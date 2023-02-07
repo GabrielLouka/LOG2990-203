@@ -1,7 +1,7 @@
-import { Pixel } from '@app/classes/pixel';
 import { Queue } from '@app/classes/queue';
-import { Vector2 } from '@app/classes/vector2';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Pixel } from '@common/pixel';
+import { Vector2 } from '@common/vector2';
 import { Service } from 'typedi';
 
 @Service()
@@ -10,8 +10,12 @@ export class ImageProcessingService {
     private static readonly requiredImageWidth = 640;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     private static readonly requiredImageHeight = 480;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    private static readonly minDifferencesForHardMode = 7;
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    private static readonly hardModeImageSurfaceRequiredPercentage = 0.15;
 
-    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): [ImageUploadResult, Vector2[][]] => {
+    getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): ImageUploadResult => {
         const imageOutput: Buffer = Buffer.from(imageBuffer1);
 
         const image1Dimensions: Vector2 = this.getImageDimensions(imageBuffer1);
@@ -53,16 +57,24 @@ export class ImageProcessingService {
         }
         this.paintBlackPixelsAtPositions(sumOfAllDifferences, imageOutput);
 
-        return [
-            {
-                resultImageByteArray: Array.from(new Uint8Array(imageOutput)),
-                numberOfDifferences: allDifferences.length,
-                message: 'Success!',
-                generatedGameId: -1,
-            },
-            allDifferences,
-        ];
-        // return imageOutput;
+        return {
+            resultImageByteArray: Array.from(new Uint8Array(imageOutput)),
+            numberOfDifferences: allDifferences.length,
+            message: 'Success!',
+            generatedGameId: -1,
+            differences: allDifferences,
+            isEasy: !this.isHard(allDifferences.length, sumOfAllDifferences),
+        };
+    };
+
+    private isHard = (numberOfDifferences: number, sumOfAllDifferences: Vector2[]): boolean => {
+        return (
+            numberOfDifferences >= ImageProcessingService.minDifferencesForHardMode &&
+            sumOfAllDifferences.length <=
+                ImageProcessingService.requiredImageHeight *
+                    ImageProcessingService.requiredImageWidth *
+                    ImageProcessingService.hardModeImageSurfaceRequiredPercentage
+        );
     };
 
     private getDifferentPixelPositionsBetweenImages = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[] => {

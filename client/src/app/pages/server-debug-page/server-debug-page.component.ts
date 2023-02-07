@@ -2,10 +2,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
+import { EntireGameUploadForm } from '@common/entire.game.upload.form';
+import { GameData } from '@common/game-data';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Vector2 } from '@common/vector2';
+import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
-
 @Component({
     selector: 'app-server-debug-page',
     templateUrl: './server-debug-page.component.html',
@@ -13,9 +16,69 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class ServerDebugPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[];
+    formToSendAfterServerConfirmation: EntireGameUploadForm;
     constructor(private readonly communicationService: CommunicationService) {}
 
+    async getGame() {
+        let gameId = (document.getElementById('gameId') as HTMLInputElement).value;
+        if (gameId === null || gameId === undefined || gameId === '') gameId = '0';
+        const routeToSend = '/games/fetchGame/' + gameId;
+
+        this.communicationService.get(routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+
+                if (response.body !== null) {
+                    const serverResult = JSON.parse(response.body);
+                    this.debugDisplayMessage.next(responseString);
+                    this.games = [serverResult];
+                    this.showImagesForRetrievedGames();
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
+    }
+    async showImagesForRetrievedGames() {
+        for (const game of this.games) {
+            const originalImage = game.originalImage;
+            const imageElement = new Image();
+
+            imageElement.src = `data:image/bmp;base64,${Buffer.from(originalImage).toString('base64')}`;
+            imageElement.style.width = '320px';
+            imageElement.style.height = '240px';
+            document.body.appendChild(imageElement);
+        }
+    }
+    async getGames(): Promise<void> {
+        const routeToSend = '/games/0';
+
+        this.communicationService.get(routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+
+                if (response.body !== null) {
+                    const serverResult = JSON.parse(response.body);
+                    this.debugDisplayMessage.next(responseString);
+                    this.games = serverResult;
+                    this.showImagesForRetrievedGames();
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
+    }
     async sendImageToServer(): Promise<void> {
         const routeToSend = '/image_processing/send-image';
         const inputValue1 = (document.getElementById('browseButton1') as HTMLInputElement).files?.[0];
@@ -55,6 +118,19 @@ export class ServerDebugPageComponent {
                                 '\n Generated game id = ' +
                                 serverResult.generatedGameId,
                         );
+                        this.formToSendAfterServerConfirmation = {
+                            differences: serverResult.differences,
+                            firstImage,
+                            secondImage,
+                            gameId: serverResult.generatedGameId,
+                            gameName: '',
+                            isEasy: serverResult.isEasy,
+                        };
+                        // this.formToSendAfterServerConfirmation.differences = serverResult.differences;
+                        // this.formToSendAfterServerConfirmation.firstImage = firstImage;
+                        // this.formToSendAfterServerConfirmation.secondImage = secondImage;
+                        // this.formToSendAfterServerConfirmation.gameId = serverResult.generatedGameId;
+                        (document.getElementById('gameNameField') as HTMLInputElement).hidden = false;
                     }
                 },
                 error: (err: HttpErrorResponse) => {
@@ -64,6 +140,66 @@ export class ServerDebugPageComponent {
                 },
             });
         }
+    }
+
+    async sendGameAndNameToServer(): Promise<void> {
+        const routeToSend = '/games/saveGame';
+        const nameValue = (document.getElementById('gameName') as HTMLInputElement).value;
+        this.formToSendAfterServerConfirmation.gameName = nameValue;
+
+        // eslint-disable-next-line no-console
+        console.log('Sending ' + nameValue + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
+
+        this.debugDisplayMessage.next('Sending ' + nameValue + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
+        this.communicationService.post<EntireGameUploadForm>(this.formToSendAfterServerConfirmation, routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+                this.debugDisplayMessage.next(responseString);
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
+    }
+
+    async deleteAllGames(): Promise<void> {
+        const routeToSend = '/games/deleteAllGames';
+        this.communicationService.delete(routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+                this.debugDisplayMessage.next(responseString);
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                this.debugDisplayMessage.next(responseString);
+            },
+        });
+    }
+
+    async getDifferenceIndex(): Promise<void> {
+        const routeToSend = '/match/getDifferenceIndex';
+        const gameId = (document.getElementById('gameId') as HTMLInputElement).value;
+        const pixelToCheckPositionX = (document.getElementById('pixelToCheckPositionX') as HTMLInputElement).value;
+        const pixelToCheckPositionY = (document.getElementById('pixelToCheckPositionY') as HTMLInputElement).value;
+        const pixelToCheckPosition: Vector2 = { x: parseInt(pixelToCheckPositionX, 10), y: parseInt(pixelToCheckPositionY, 10) };
+
+        this.communicationService
+            .post<{ gameId: string; clickPosition: Vector2 }>({ gameId, clickPosition: pixelToCheckPosition }, routeToSend)
+            .subscribe({
+                next: (response) => {
+                    const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+                    this.debugDisplayMessage.next(responseString + ' found ' + response.body);
+                },
+                error: (err: HttpErrorResponse) => {
+                    const responseString = `Server Error : ${err.message}`;
+                    this.debugDisplayMessage.next(responseString);
+                },
+            });
     }
 
     // Convert number[] to ArrayBuffer

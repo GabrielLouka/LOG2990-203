@@ -4,113 +4,73 @@
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-useless-escape */
 /* eslint-disable prettier/prettier */
-import { Location } from '@angular/common';
-import { Component } from '@angular/core';
-import { Classements } from '@app/interfaces/classements';
-import { Game } from '../../interfaces/games';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { CommunicationService } from '@app/services/communication.service';
+import { ImageUploadResult } from '@common/image.upload.result';
+import { BehaviorSubject } from 'rxjs';
+// import { Game } from '../../interfaces/games';
 
 @Component({
     selector: 'app-configuration-page',
     templateUrl: './configuration-page.component.html',
     styleUrls: ['./configuration-page.component.scss'],
 })
+export class ConfigurationPageComponent implements OnInit {
 
-export class ConfigurationPageComponent {
+    debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+    generatedGameId = -1;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    currentPageNbr = 0;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    games: any;
+    
+    btnType = 'Retour';
     title = 'Page de configuration';
-    resetClassement:Classements[] = [ 
-        { name: 'PlayerA', score: 200 },
-        { name: 'PlayerB', score: 200 },
-        { name: 'PlayerC', score: 200 }
-    ];
-    
-    games: Game[] = [
-        {
-            description: 'Jeux 1',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'DIFFICILE',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
-        },
-        {
-            description: 'Jeux 2',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'FACILE',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
-        },
-        {
-            description: 'Jeux 3',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'MOYEN',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
-        },
-        {
-            description: 'Jeux 4',
-            image: '.\\assets\\img\\game-icon.png',
-            difficulty: 'MOYEN',
-            ranking: [[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-            ],[
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 },
-                { name: 'ibrahim', score: 19996 }
-            ]]
-        },
-    ];
-    constructor(private location: Location) {}
-
-
-    over() {
-        const subBox = document.getElementById('sub-box');
-        if (subBox) {
-            subBox.className = 'game-buttons';
-        }
+    playable = false;
+    gameNbr=0;
+    constructor(private readonly communicationService: CommunicationService) {
+       
     }
-    previousPage() {
-        this.location.back();
+    ngOnInit(): void {
+        this.getGames(this.currentPageNbr);
     }
     
-    resetButton(){
-        if(confirm('Are you sure you want to reset all the games')){
-            for(let i=0; i<this.games.length;i++ ){
-                for(let j=0; j<this.games[i].ranking.length;j++){
-                    this.games[i].ranking[j]=this.resetClassement;
+    async getGames(pageId:number): Promise<void> {
+        const routeToSend = '/games/' + pageId.toString();
+        this.communicationService.get(routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+
+                if (response.body !== null) {
+                    const serverResult = JSON.parse(response.body);
+                    this.debugDisplayMessage.next(responseString);
+                    this.games = serverResult.gameContent;
+                    this.gameNbr=serverResult.nbrOfGame;
                 }
-            }
-        }
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
     }
-    deleteButton(){
-        if(confirm('Are you sure you want to delete all the games')){
-            const divContainer:HTMLCollectionOf<Element> = document.getElementsByClassName('sub-container') as HTMLCollectionOf<Element>;
-            for(let i=0; i<divContainer.length;i++){
-                divContainer[i].innerHTML='';
-            }      
-        }
+   
 
-    
+    async goToNextSlide() {
+        const isLastPage = this.currentPageNbr === Math.ceil(this.gameNbr / 4);
+        const newIndex = isLastPage ? this.currentPageNbr : this.currentPageNbr + 1;
+        this.currentPageNbr=newIndex;
+        await this.getGames(this.currentPageNbr);
+    }
+    async goToPreviousSlide() {
+        const isFirstPage = this.currentPageNbr === 0;
+        const newIndex = isFirstPage ? this.currentPageNbr : this.currentPageNbr - 1;
+        this.currentPageNbr=newIndex;
+        await this.getGames(this.currentPageNbr);
+
     }
 }

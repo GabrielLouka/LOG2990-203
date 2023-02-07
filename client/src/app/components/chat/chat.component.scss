@@ -1,0 +1,84 @@
+.chat-container {
+    scale: 0.9;
+
+    position: absolute;
+    bottom: 21vh;
+    left: 80vw;
+
+    width: 20vw;
+    height: 50vh;
+    padding: 20px;
+
+    background-color: whitesmoke;
+    box-sizing: border-box;
+
+    border-radius: 20px;
+    border: solid;
+  }
+  
+  .chat-header {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+.chat-body {
+    height: 32vh;
+    overflow-y: auto;
+    background-color: white;
+}
+  
+.message-container {
+    margin: 0.5vh;
+    padding: 10px;
+    border-radius: 5px;
+
+    border: solid 1.5px;
+  }
+  
+  .sent-by-player-1 {
+    background-color: lightblue;
+  }
+  
+  .sent-by-player-2 {
+    background-color: lightpink;
+  }
+  
+  .message-text {
+    font-size: 16px;
+  }
+  
+.message-username {
+    font-size: 14px;
+    font-style: italic;
+    margin-top: 5px;
+  }
+  
+.chat-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px;
+    background-color: rgb(228, 228, 0);
+    border: none;
+    padding: 2vh 4vh;
+    border-radius: 2vw;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
+}
+
+input {
+  width: 5vw;
+  border-radius: 2vw;
+  padding: 2vh 4vh;
+
+  font-weight: 600;
+  font-size: 1.5vh;
+}

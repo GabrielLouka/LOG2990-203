@@ -19,4 +19,12 @@ describe('BackButtonComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should navigate back in the browser history', () => {
+        const spy = spyOn(window.history, 'back');
+
+        component.goBack();
+
+        expect(spy).toHaveBeenCalled();
+    });
 });

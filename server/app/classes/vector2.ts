@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 export class Vector2 {
     x: number;
     y: number;
