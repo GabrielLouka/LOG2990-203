@@ -159,7 +159,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.socketService.on('matchJoined', (message: string) => {
             this.addMessageToChat(message);
         });
-        this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean }) => {
+        this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number }) => {
             if (data.isValidated) {
                 this.addMessageToChat('Well done king.');
                 this.foundDifferences = data.foundDifferences;
@@ -167,7 +167,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                 if (this.differencesFound + 1 >= this.totalDifferences) {
                     this.onWinGame();
                 } else {
-                    this.onFindDifference();
+                    this.onFindDifference(data.foundDifferenceIndex);
                 }
             } else {
                 this.onFindWrongDifference();
@@ -188,9 +188,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         }, 1000);
     }
 
-    onFindDifference() {
+    onFindDifference(differenceIndex: number) {
         this.differencesFound++;
-        this.addMessageToChat('You have found the following number of differences: ' + this.differencesFound);
+        this.addMessageToChat('You found difference #' + differenceIndex + '! (' + this.differencesFound + '/' + this.totalDifferences + ')');
         this.playErrorSound();
     }
 

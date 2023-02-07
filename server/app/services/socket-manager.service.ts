@@ -45,18 +45,19 @@ export class SocketManager {
             });
 
             socket.on('validateDifference', (data: { foundDifferences: boolean[]; position: Vector2 }) => {
-                const validationResult = this.matchingDifferencesService.getDifferenceIndex(socket.data.gameData as GameData, data.position);
-                if (validationResult === -1 || data.foundDifferences[validationResult]) {
-                    this.sio
-                        .to(socket.data.gameData.id + socket.data.username)
-                        .emit('validationReturned', { foundDifferences: data.foundDifferences, isValidated: false });
-                } else {
-                    data.foundDifferences[validationResult] = true;
-                    this.sio
-                        .to(socket.data.gameData.id + socket.data.username)
-                        .emit('validationReturned', { foundDifferences: data.foundDifferences, isValidated: true });
-                    console.log('Difference found at index #' + validationResult);
+                const foundDifferenceId = this.matchingDifferencesService.getDifferenceIndex(socket.data.gameData as GameData, data.position);
+                const successfullyFoundDifference = foundDifferenceId !== -1 && !data.foundDifferences[foundDifferenceId];
+
+                if (successfullyFoundDifference) {
+                    data.foundDifferences[foundDifferenceId] = true;
+                    console.log('Difference found at index #' + foundDifferenceId);
                 }
+
+                this.sio.to(socket.data.gameData.id + socket.data.username).emit('validationReturned', {
+                    foundDifferences: data.foundDifferences,
+                    isValidated: successfullyFoundDifference,
+                    foundDifferenceIndex: foundDifferenceId,
+                });
             });
             socket.on('broadcastAll', (message: string) => {
                 this.sio.sockets.emit('massMessage', `${socket.id} : ${message}`);
