@@ -10,7 +10,16 @@
     <Section class="flex-row center registerContainer">
         <form [formGroup]="registrationForm" class="flex-row register-input">
             <label class="flex-row center button-style" for="input">Username :</label>
-            <input name="userName" class="button-style" id="input" type="text" placeholder="MismatchMaster" formControlName="username" required />
+            <input
+                name="userName"
+                class="button-style"
+                id="input"
+                type="text"
+                placeholder="MismatchMaster"
+                formControlName="username"
+                required
+                autocomplete="off"
+            />
             <br />
 
             <button

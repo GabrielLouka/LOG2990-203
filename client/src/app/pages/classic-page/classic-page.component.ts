@@ -24,6 +24,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
+    @ViewChild('bgModal') modal!: ElementRef;
+    @ViewChild('failSound', { static: true }) failSound: ElementRef<HTMLAudioElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
     matchId: string | null;
@@ -62,6 +64,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
     addMessageToChat(message: string) {
         this.chat.addMessage(message);
+    }
+
+    showPopUp() {
+        this.modal.nativeElement.style.display = 'flex';
+    }
+
+    async playErrorSound() {
+        this.failSound.nativeElement.currentTime = 0;
+        this.failSound.nativeElement.play();
     }
 
     loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
@@ -161,14 +172,23 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                         minutesElapsed: Math.floor(this.timeInSeconds / 60),
                         secondsElapsed: Math.floor(this.timeInSeconds % 60),
                     });
+                    this.differencesFound++;
+                    this.showPopUp();
+                    this.socketService.disconnect();
                 } else {
                     this.differencesFound++;
                     this.addMessageToChat('You have found the following number of differences: ' + this.differencesFound);
                 }
             } else {
                 this.errorMessage.nativeElement.style.display = 'block';
+                this.leftCanvas.nativeElement.style.pointerEvents = 'none';
+                this.rightCanvas.nativeElement.style.pointerEvents = 'none';
+                this.playErrorSound();
+
                 setTimeout(() => {
                     this.errorMessage.nativeElement.style.display = 'none';
+                    this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
+                    this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
                 }, 1000);
             }
         });
