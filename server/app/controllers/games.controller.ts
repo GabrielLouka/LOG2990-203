@@ -16,7 +16,6 @@ export class GamesController {
 
         this.router.get('/fetchGame/:id', async (req: Request, res: Response) => {
             try {
-                console.log('in fetchGames with id = ' + req.params.id);
                 const game = await this.gameStorageService.getGameById(req.params.id);
                 // res.json(games);
                 res.send(JSON.stringify(game));
