@@ -34,6 +34,16 @@ export class GameStorageService {
     async getAllGames(): Promise<unknown[]> {
         return await this.collection.find({}).toArray();
     }
+    /**
+     * Returns the number of games
+     *
+     * @returns the games list
+     */
+    async getGamesLength(): Promise<unknown> {
+        const games = await this.collection.find({}).toArray();
+        const gamesCount = games.length;
+        return gamesCount;
+    }
 
     /**
      * Gets the game per id

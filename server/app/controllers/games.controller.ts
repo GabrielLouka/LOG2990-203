@@ -28,12 +28,13 @@ export class GamesController {
         this.router.get('/:id', async (req: Request, res: Response) => {
             try {
                 const games = await this.gameStorageService.getGamesInPage(parseInt(req.params.id, 10));
-                res.send(JSON.stringify(games));
+                const gameLength = await this.gameStorageService.getGamesLength();
+                const gameInformation = { gameContent: games, nbrOfGame: gameLength };
+                res.send(JSON.stringify(gameInformation));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }
         });
-
         this.router.post('/updateName', async (req: Request, res: Response) => {
             const receivedArguments: [number, string] = req.body;
             const idIndex = 0;
