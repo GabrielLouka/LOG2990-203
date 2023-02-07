@@ -40,7 +40,7 @@ export class GameStorageService {
      * @returns the games list
      */
     async getGamesLength() {
-        return this.collection.countDocuments();
+        return this.collection.countDocuments({});
     }
 
     /**
