@@ -10,6 +10,7 @@ export class TimerComponent implements AfterViewInit {
     @Input() timeInSeconds: number;
     @ViewChild('minutes', { static: true }) minutes: ElementRef;
     @ViewChild('seconds', { static: true }) seconds: ElementRef;
+    
 
     ngAfterViewInit() {
         setInterval(() => {
