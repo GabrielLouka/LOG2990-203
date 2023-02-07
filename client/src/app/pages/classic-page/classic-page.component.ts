@@ -27,6 +27,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('errorMessage') errorMessage: ElementRef;
     @ViewChild('bgModal') modal!: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
+    @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
     matchId: string | null;
@@ -73,6 +74,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     async playErrorSound() {
+        this.errorSound.nativeElement.currentTime = 0;
+        this.errorSound.nativeElement.play();
+    }
+
+    async playSuccessSound() {
         this.successSound.nativeElement.currentTime = 0;
         this.successSound.nativeElement.play();
     }
@@ -190,7 +196,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     onFindDifference(differenceIndex: number) {
         this.differencesFound++;
         this.addMessageToChat('You found difference #' + differenceIndex + '! (' + this.differencesFound + '/' + this.totalDifferences + ')');
-        this.playErrorSound();
+        this.playSuccessSound();
         this.refreshModifiedImage();
     }
 
