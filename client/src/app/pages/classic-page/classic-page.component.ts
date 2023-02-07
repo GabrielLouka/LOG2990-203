@@ -44,7 +44,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
         private auth: AuthService,
-    ) {} // private route: ActivatedRoute, // private readonly uploadImagesService: UploadImagesService,
+    ) {}
 
     get socketId() {
         return this.socketService.socket.id ? this.socketService.socket.id : '';
@@ -60,7 +60,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
-        this.connect();
+        this.joinServerRoom();
     }
     addMessageToChat(message: string) {
         this.chat.addMessage(message);
@@ -80,7 +80,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         img.src = srcImg;
         img.onload = () => {
             context.drawImage(img, 0, 0, 640, 480, 0, 0, 640, 480);
-            this.addMessageToChat('Image loaded sucessfully');
+            this.addMessageToChat('Image loaded successfully');
         };
         img.onerror = (error) => {
             this.addMessageToChat('Failed to load image' + error);
@@ -141,13 +141,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
 
-    connect() {
-        if (!this.socketService.isSocketAlive()) {
-            this.socketService.connect();
-            this.configureBaseSocketFeatures();
-        }
+    joinServerRoom() {
+        if (this.socketService.isSocketAlive()) this.socketService.disconnect();
+
+        this.socketService.connect();
+        this.addServerSocketMessagesListeners();
     }
-    configureBaseSocketFeatures() {
+
+    addServerSocketMessagesListeners() {
         this.socketService.on('connect', () => {
             this.addMessageToChat(`Connexion par WebSocket sur le socket ${this.socketId}`);
         });
@@ -161,36 +162,47 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean }) => {
             if (data.isValidated) {
                 this.addMessageToChat('Well done king.');
-                for (const difference of data.foundDifferences) {
-                    this.addMessageToChat(difference.toString());
-                }
                 this.foundDifferences = data.foundDifferences;
 
                 if (this.differencesFound + 1 >= this.totalDifferences) {
-                    this.addMessageToChat('Damn, you are goated');
-                    this.socketService.send('gameFinished', {
-                        minutesElapsed: Math.floor(this.timeInSeconds / 60),
-                        secondsElapsed: Math.floor(this.timeInSeconds % 60),
-                    });
-                    this.differencesFound++;
-                    this.showPopUp();
-                    this.socketService.disconnect();
+                    this.onWinGame();
                 } else {
-                    this.differencesFound++;
-                    this.addMessageToChat('You have found the following number of differences: ' + this.differencesFound);
-                    this.playErrorSound();
+                    this.onFindDifference();
                 }
             } else {
-                this.errorMessage.nativeElement.style.display = 'block';
-                this.leftCanvas.nativeElement.style.pointerEvents = 'none';
-                this.rightCanvas.nativeElement.style.pointerEvents = 'none';
-
-                setTimeout(() => {
-                    this.errorMessage.nativeElement.style.display = 'none';
-                    this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
-                    this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
-                }, 1000);
+                this.onFindWrongDifference();
             }
         });
+    }
+
+    onFindWrongDifference() {
+        this.errorMessage.nativeElement.style.display = 'block';
+        this.leftCanvas.nativeElement.style.pointerEvents = 'none';
+        this.rightCanvas.nativeElement.style.pointerEvents = 'none';
+        this.playErrorSound();
+
+        setTimeout(() => {
+            this.errorMessage.nativeElement.style.display = 'none';
+            this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
+            this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
+        }, 1000);
+    }
+
+    onFindDifference() {
+        this.differencesFound++;
+        this.addMessageToChat('You have found the following number of differences: ' + this.differencesFound);
+        this.playErrorSound();
+    }
+
+    // Called when the player wins the game
+    onWinGame() {
+        this.addMessageToChat('Damn, you are goated');
+        this.socketService.send('gameFinished', {
+            minutesElapsed: Math.floor(this.timeInSeconds / 60),
+            secondsElapsed: Math.floor(this.timeInSeconds % 60),
+        });
+        this.differencesFound++;
+        this.showPopUp();
+        this.socketService.disconnect();
     }
 }
