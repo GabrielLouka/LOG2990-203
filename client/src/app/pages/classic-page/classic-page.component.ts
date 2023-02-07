@@ -25,7 +25,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('chat') chat: ChatComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
     @ViewChild('bgModal') modal!: ElementRef;
-    @ViewChild('failSound', { static: true }) failSound: ElementRef<HTMLAudioElement>;
+    @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
     matchId: string | null;
@@ -71,8 +71,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     async playErrorSound() {
-        this.failSound.nativeElement.currentTime = 0;
-        this.failSound.nativeElement.play();
+        this.successSound.nativeElement.currentTime = 0;
+        this.successSound.nativeElement.play();
     }
 
     loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
@@ -178,12 +178,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                 } else {
                     this.differencesFound++;
                     this.addMessageToChat('You have found the following number of differences: ' + this.differencesFound);
+                    this.playErrorSound();
                 }
             } else {
                 this.errorMessage.nativeElement.style.display = 'block';
                 this.leftCanvas.nativeElement.style.pointerEvents = 'none';
                 this.rightCanvas.nativeElement.style.pointerEvents = 'none';
-                this.playErrorSound();
 
                 setTimeout(() => {
                     this.errorMessage.nativeElement.style.display = 'none';
