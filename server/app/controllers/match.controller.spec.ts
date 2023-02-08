@@ -1,9 +1,8 @@
-import { StatusCodes } from 'http-status-codes';
+// import { StatusCodes } from 'http-status-codes';
 
-const HTTP_STATUS_OK = StatusCodes.OK;
-const HTTP_STATUS_CREATED = StatusCodes.CREATED;
+// const HTTP_STATUS_OK = StatusCodes.OK;
+// const HTTP_STATUS_CREATED = StatusCodes.CREATED;
 
-describe("MathController", () => {
-    
+// describe("MathController", () => {
 
-});
+// });
