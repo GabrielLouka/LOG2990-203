@@ -45,13 +45,10 @@ export class GameCreationPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
     titleRegistration = new FormGroup({
-        title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
+        title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9 ]{3,15}$')])),
     });
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
-    private readonly characterMax: number = 20;
-    // private readonly minDifferences: number = 3;
-    // private readonly maxDifferences: number = 9;
 
     constructor(private readonly communicationService: CommunicationService) {}
 
@@ -217,15 +214,6 @@ export class GameCreationPageComponent {
                     this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
-        }
-    }
-
-    updateName(name: string) {
-        // TODO utiliser un regex ? '^[a-zA-Z0-9]{3,20}$' (même que celui de registration min : 3 char/ max : 20 char)
-        if (name.length === 0 || name.length > this.characterMax || name.trim().length === 0) {
-            alert("Nom invalide. Veuillez entrer une chaine non vide d'une taille de 20 caracteres maximum");
-        } else {
-            this.gameName = name;
         }
     }
 
