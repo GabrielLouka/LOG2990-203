@@ -5,6 +5,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { TimerComponent } from '@app/components/timer/timer.component';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
@@ -24,6 +25,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('originalImage', { static: true }) leftCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
+    @ViewChild('timerElement') timerElement: TimerComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
     @ViewChild('bgModal') modal!: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
@@ -213,6 +215,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
         });
         this.showPopUp();
+        this.timerElement.stopTimer();
         this.socketService.disconnect();
     }
 }

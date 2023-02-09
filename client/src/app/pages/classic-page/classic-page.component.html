@@ -13,7 +13,7 @@
         <div class="flex-row center data-container">
             <app-found-hints-counter [differencesFound]="differencesFound" [differencesNbr]="totalDifferences"></app-found-hints-counter>
             <div class="timer-container">
-                <app-timer [timeInSeconds]="timeInSeconds"></app-timer>
+                <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
             </div>
         </div>
 

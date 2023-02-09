@@ -10,7 +10,8 @@ export class TimerComponent implements AfterViewInit {
     @Input() timeInSeconds: number;
     @ViewChild('minutes', { static: true }) minutes: ElementRef;
     @ViewChild('seconds', { static: true }) seconds: ElementRef;
-    
+
+    private shouldStop = false;
 
     ngAfterViewInit() {
         setInterval(() => {
@@ -21,7 +22,7 @@ export class TimerComponent implements AfterViewInit {
     }
 
     tickTock() {
-        this.timeInSeconds++;
+        if (!this.shouldStop) this.timeInSeconds++;
         this.minutes.nativeElement.innerText = this.getMinutes() < 10 ? '0' + this.getMinutes() : this.getMinutes();
         this.seconds.nativeElement.innerText = this.getSeconds() < 10 ? '0' + this.getSeconds() : this.getSeconds();
     }
@@ -32,5 +33,9 @@ export class TimerComponent implements AfterViewInit {
 
     getSeconds() {
         return Math.floor(this.timeInSeconds % 60);
+    }
+
+    stopTimer() {
+        this.shouldStop = true;
     }
 }
