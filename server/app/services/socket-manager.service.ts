@@ -50,6 +50,7 @@ export class SocketManager {
                 const successfullyFoundDifference = foundDifferenceId !== -1 && !data.foundDifferences[foundDifferenceId];
 
                 if (successfullyFoundDifference) {
+                    console.log('SUCCESSFULLY FOUND');
                     data.foundDifferences[foundDifferenceId] = true;
                     console.log('Difference found at index #' + foundDifferenceId);
                 }

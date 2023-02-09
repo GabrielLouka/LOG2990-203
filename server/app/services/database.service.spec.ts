@@ -17,7 +17,7 @@ describe("Database service", () => {
       if (databaseService["client"]) {
         await databaseService["client"].close();
       }
-    });
+    }); 
   
     it("should connect to the database when start is called", async () => {
       const mongoUri = mongoServer.getUri();

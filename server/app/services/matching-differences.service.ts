@@ -16,6 +16,6 @@ export class MatchingDifferencesService {
                 }
             }
         }
-        return GAME_CONST.notFound;
+        return GAME_CONST.NOT_FOUND;
     }
 }
