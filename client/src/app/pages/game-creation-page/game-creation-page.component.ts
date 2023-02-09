@@ -46,7 +46,7 @@ export class GameCreationPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
     titleRegistration = new FormGroup({
-        title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9 ]{3,15}$')])),
+        title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[-a-zA-Z0-9-()]{3,15}(\\s+[-a-zA-Z0-9-()]+)*$')])),
     });
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
