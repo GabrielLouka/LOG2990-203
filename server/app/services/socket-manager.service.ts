@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import * as http from 'http';
@@ -83,6 +84,11 @@ export class SocketManager {
         setInterval(() => {
             this.emitTime();
         }, 1000);
+    }
+
+    disconnect(): void {
+        this.sio.disconnectSockets();
+        this.sio.close();
     }
 
     private emitTime() {

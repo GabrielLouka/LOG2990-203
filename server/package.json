@@ -63,6 +63,7 @@
         "reflect-metadata": "0.1.13",
         "serve-favicon": "2.5.0",
         "socket.io": "^4.5.4",
+        "socket.io-client": "^4.6.0",
         "swagger-jsdoc": "6.2.5",
         "swagger-ui-express": "4.5.0",
         "typedi": "0.10.0"
