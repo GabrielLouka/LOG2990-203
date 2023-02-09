@@ -16,7 +16,7 @@ const R_ONLY = {
 };
 
 const GAME_CONST = {
-    notFound: -1,
+    NOT_FOUND: -1,
 };
 export { DB };
 export { R_ONLY };

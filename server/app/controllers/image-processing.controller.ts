@@ -30,7 +30,7 @@ export class ImageProcessingController {
                 resultImageByteArray: Array.from(new Uint8Array(buffer1)),
                 numberOfDifferences: 0,
                 message: '',
-                generatedGameId: GAME_CONST.notFound,
+                generatedGameId: GAME_CONST.NOT_FOUND,
                 differences: [],
                 isEasy: true,
             };

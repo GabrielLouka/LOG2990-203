@@ -46,6 +46,6 @@ describe('MatchingDifferences service', () => {
     it('getDIfference should return -1 if none have been found', () => {
         click = { x: 0, y: 0 };
         const result = differenceService.getDifferenceIndex(gameData, click);
-        expect(result).to.deep.equal(GAME_CONST.notFound);
+        expect(result).to.deep.equal(GAME_CONST.NOT_FOUND);
     });
 });
