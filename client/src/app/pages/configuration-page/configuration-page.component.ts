@@ -1,16 +1,10 @@
-/* eslint-disable @typescript-eslint/quotes */
-/* eslint-disable @typescript-eslint/prefer-for-of */
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-restricted-imports */
-/* eslint-disable no-useless-escape */
-/* eslint-disable prettier/prettier */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
 import { GameData } from '@common/game-data';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
-// import { Game } from '../../interfaces/games';
 
 @Component({
     selector: 'app-configuration-page',
