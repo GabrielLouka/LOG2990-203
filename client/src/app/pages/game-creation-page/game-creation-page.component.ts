@@ -118,13 +118,9 @@ export class GameCreationPageComponent {
         context?.clearRect(0, 0, canvas.width, canvas.height);
 
         if (rightImage) {
-            this.rightCanvas.nativeElement.src = '';
-            this.modifiedImage = null;
             this.input2.nativeElement.value = '';
             this.modifiedContainsImage = false;
         } else {
-            this.leftCanvas.nativeElement.src = '';
-            this.originalImage = null;
             this.input1.nativeElement.value = '';
             this.originalContainsImage = false;
         }
