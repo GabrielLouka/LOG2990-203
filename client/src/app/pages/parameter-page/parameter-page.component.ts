@@ -3,70 +3,66 @@
 import { Component } from '@angular/core';
 import { History } from '@app/interfaces/history';
 @Component({
-  selector: 'app-parameter-page',
-  templateUrl: './parameter-page.component.html',
-  styleUrls: ['./parameter-page.component.scss'],
+    selector: 'app-parameter-page',
+    templateUrl: './parameter-page.component.html',
+    styleUrls: ['./parameter-page.component.scss'],
 })
 export class ParameterPageComponent {
-  title = 'Page de paramètres';
-  constants = [
-    {
-      fetchData: 'temps-init',
-      label: 'Temps intial du compte à rebours',
-      time: 35
-    },
-    {
-      fetchData: 'temps-penal',
-      label: 'Temps de pénalité par indice utilisé',
-      time: 15
-    },
-    {
-      fetchData: 'temps-bonus',
-      label: 'Temps bonus par différence trouvée',
-      time: 10
-    }];
-  defaultConstants = [30, 5, 5];
-  gamesHistory: History[] = [
-    {
-      startingTime: new Date(Date.parse('23 Janvier, 2023 11:13:10')),
-      endingTime: new Date(Date.parse('23 Janvier, 2023 11:23:00')),
-      gameMode: 'Solo',
-      player1: 'Jean',
-      player2: 'Marc',
-    },
-    {
-      startingTime: new Date('23 Janvier, 2023 11:13:00'),
-      endingTime: new Date('23 Janvier, 2023 11:23:00'),
-      gameMode: '1v1',
-      player1: 'Marcus',
-      player2: 'Katie',
-    },
-    {
-      startingTime: new Date('23 Janvier, 2023 11:13:00'),
-      endingTime: new Date('23 Janvier, 2023 11:23:00'),
-      gameMode: 'Solo',
-      player1: 'Heisenberg',
-      player2: 'Jessy',
-    },
-  ];
+    title = 'Page de paramètres';
+    constants = [
+        {
+            fetchData: 'temps-init',
+            label: 'Temps intial du compte à rebours',
+            time: 35,
+        },
+        {
+            fetchData: 'temps-penal',
+            label: 'Temps de pénalité par indice utilisé',
+            time: 15,
+        },
+        {
+            fetchData: 'temps-bonus',
+            label: 'Temps bonus par différence trouvée',
+            time: 10,
+        },
+    ];
+    defaultConstants = [30, 5, 5];
+    gamesHistory: History[] = [
+        {
+            startingTime: new Date(Date.parse('23 Janvier, 2023 11:13:10')),
+            endingTime: new Date(Date.parse('23 Janvier, 2023 11:23:00')),
+            gameMode: 'Solo',
+            player1: 'Jean',
+            player2: 'Marc',
+        },
+        {
+            startingTime: new Date('23 Janvier, 2023 11:13:00'),
+            endingTime: new Date('23 Janvier, 2023 11:23:00'),
+            gameMode: '1v1',
+            player1: 'Marcus',
+            player2: 'Katie',
+        },
+        {
+            startingTime: new Date('23 Janvier, 2023 11:13:00'),
+            endingTime: new Date('23 Janvier, 2023 11:23:00'),
+            gameMode: 'Solo',
+            player1: 'Heisenberg',
+            player2: 'Jessy',
+        },
+    ];
 
-
-  clearHistory() {
-    if (this.gamesHistory.length !== 0) {
-      if (confirm("Êtes-vous certain de vouloir réinitialiser l'historique des parties jouées?"))
-        this.gamesHistory = [];
+    clearHistory() {
+        if (this.gamesHistory.length !== 0) {
+            if (confirm("Êtes-vous certain de vouloir réinitialiser l'historique des parties jouées?")) this.gamesHistory = [];
+        } else {
+            window.alert("L'historique est déjà vide");
+        }
     }
-    else {
-      window.alert("L'historique est déjà vide");
+
+    resetConstants() {
+        if (confirm('Êtes-vous certain de vouloir réinitiliser les constantes de temps à défault?'))
+            for (let i = 0; i < this.constants.length; i++) {
+                this.constants[i].time = this.defaultConstants[i];
+            }
     }
-  }
-
-  resetConstants() {
-    if (confirm('Êtes-vous certain de vouloir réinitiliser les constantes de temps à défault?'))
-      for (let i = 0; i < this.constants.length; i++) {
-        this.constants[i].time = this.defaultConstants[i];
-      }
-  }
-
-
 }

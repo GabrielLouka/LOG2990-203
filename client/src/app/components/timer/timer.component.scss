@@ -1,18 +1,23 @@
 .count-down-timer {
-    box-shadow: 2px 6px 9px 2px rgb(0 0 0 / 20%);
-    text-align: center;
-    background-color: rgb(228, 228, 0);
-    max-width: 500px;
-    margin: 20px auto;
-    color: orange;
-    border-radius: 6px;
-    padding: 10px;
-    font-family: sans-serif;
+  display: flex;
+  text-align: center;
+  font-family: sans-serif;
+  color: black;
 
-    position: absolute;
-    top: 12;
-    right:0;
-    margin: 0 4vh;
+  box-shadow: 2px 6px 9px 2px rgb(0 0 0 / 20%);
+  border: solid;
+  border-radius: 6px;
+  background-color: whitesmoke;
+    
+  //position: relative;
+  //left: 60vw;
+  //bottom: 5vh;
+
+  width: 8vw;
+  height: 6vh;
+  padding: 10px;
+
+  
 }
   
     .wrapper {

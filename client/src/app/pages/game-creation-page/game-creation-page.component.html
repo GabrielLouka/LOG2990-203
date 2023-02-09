@@ -4,16 +4,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 </head>
 <body class="center">
-    <section class="header">
+    <section class="flex-column center">
         <h1>Création de jeux</h1>
         <app-back-button></app-back-button>
     </section>
-    <div class="main-container center">
-        <div class="canvas-container center">
+    <div class="flex-row center main-container">
+        <div class="flex-column center">
             <div class="canvas">
                 <canvas #originalImage width="640px" height="480px">IMAGE ORIGINALE</canvas>
             </div>
-            <div class="picture-option">
+            <div class="flex-row picture-option">
                 <button class="button-style center" (click)="input1.click()">
                     <span class="material-symbols-outlined optionIcon"> upload_file </span>
                     Ajouter une image
@@ -29,8 +29,8 @@
             </div>
         </div>
 
-        <div class="middle-container center">
-            <div class="main-options">
+        <div class="flex-column center">
+            <div class="flex-column">
                 <button class="button-style center"><span class="material-symbols-outlined optionIcon"> edit </span></button>
                 <button class="button-style center"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
                 <button class="button-style center"><input type="color" ng-model="test" id="" /></button>
@@ -63,11 +63,11 @@
             </div>
         </div>
 
-        <div class="canvas-container center">
+        <div class="flex-column center">
             <div class="canvas">
                 <canvas #modifiedImage width="640px" height="480px">IMAGE MODIFIÉE</canvas>
             </div>
-            <div class="picture-option">
+            <div class="flex-row picture-option">
                 <button class="button-style center">
                     <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
                 </button>
@@ -84,7 +84,7 @@
         </div>
     </div>
 
-    <div class="game-container center">
+    <div class="flex-row center game-container">
         <div>
             <div class="button-style center no-hover bigger">
                 RAYON POUR LES DIFFÉRENCES
@@ -102,13 +102,13 @@
         </button>
     </div>
 
-    <div #bgModal class="bgModal">
-        <div class="modal-contents">
+    <div #bgModal class="bgModal center">
+        <div class="flex-column center modal-contents">
             <div #close class="close" (click)="closePopUp()">+</div>
             <h2>Différences entre les deux images</h2>
             <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
             <p>Il y a {{ totalDifferences }} differences ( easy: {{ isEasy }})</p>
-            <form [formGroup]="titleRegistration" class="form-container">
+            <form #gameNameForm [formGroup]="titleRegistration" class="flex-column center">
                 <p>Ajouter un titre le jeu :</p>
                 <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />
                 <button
@@ -120,6 +120,7 @@
                     <span class="material-symbols-outlined optionIcon"> fact_check </span>Sauvegarder le jeu
                 </button>
             </form>
+            <p #errorPopupText>ERREUR : Le nombre de differences doi etre compris entre 3 et 9!</p>
         </div>
     </div>
 </body>

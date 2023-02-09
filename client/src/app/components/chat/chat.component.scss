@@ -1,9 +1,19 @@
 .chat-container {
-    width: 500px;
-    height: 500px;
-    background-color: #f5f5f5;
+    scale: 0.9;
+
+    position: absolute;
+    bottom: 21vh;
+    left: 80vw;
+
+    width: 20vw;
+    height: 50vh;
     padding: 20px;
+
+    background-color: whitesmoke;
     box-sizing: border-box;
+
+    border-radius: 20px;
+    border: solid;
   }
   
   .chat-header {
@@ -14,14 +24,17 @@
   }
   
 .chat-body {
-    height: 300px;
-    overflow-y: scroll;
+    height: 32vh;
+    overflow-y: auto;
+    background-color: white;
 }
   
 .message-container {
-    background-color: #fff;
+    margin: 0.5vh;
     padding: 10px;
     border-radius: 5px;
+
+    border: solid 1.5px;
   }
   
   .sent-by-player-1 {
@@ -49,7 +62,6 @@
     margin-top: 20px;
 }
 
-
 button {
     padding: 10px;
     background-color: rgb(228, 228, 0);
@@ -63,8 +75,10 @@ button {
 }
 
 input {
-  width: 60%;
-  height:3vh;
+  width: 5vw;
   border-radius: 2vw;
   padding: 2vh 4vh;
+
+  font-weight: 600;
+  font-size: 1.5vh;
 }

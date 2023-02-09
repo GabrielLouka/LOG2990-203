@@ -5,6 +5,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
@@ -17,11 +18,20 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
+
+// TODO faire de ce component un service
 export class GameCreationPageComponent {
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
     @ViewChild('bgModal') modal!: ElementRef;
+    @ViewChild('gameNameForm') gameNameForm!: ElementRef;
+    @ViewChild('errorPopupText') errorPopupText!: ElementRef;
     @ViewChild('imagePreview') imagePreview!: ElementRef;
+
+    // eslint-disable-next-line @typescript-eslint/member-ordering
+    static readonly maxNumberOfDifferences: number = 9;
+    // eslint-disable-next-line @typescript-eslint/member-ordering
+    static readonly minNumberOfDifferences: number = 3;
 
     gameName: string = '';
     totalDifferences = 0;
@@ -36,22 +46,25 @@ export class GameCreationPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
     titleRegistration = new FormGroup({
-        title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
+        title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9 ]{3,15}$')])),
     });
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
-    private readonly characterMax: number = 20;
-    // private readonly minDifferences: number = 3;
-    // private readonly maxDifferences: number = 9;
 
-    constructor(private readonly communicationService: CommunicationService) {}
+    constructor(private readonly communicationService: CommunicationService, private readonly router: Router) {}
 
     showPopUp() {
+        this.toggleElementVisibility(this.gameNameForm, false);
+        this.toggleElementVisibility(this.errorPopupText, false);
         this.modal.nativeElement.style.display = 'flex';
     }
 
     closePopUp() {
         this.modal.nativeElement.style.display = 'none';
+    }
+
+    toggleElementVisibility(element: ElementRef<any>, isVisible: boolean) {
+        element.nativeElement.style.display = isVisible ? 'flex' : 'none';
     }
 
     sendConsoleLog() {
@@ -188,6 +201,12 @@ export class GameCreationPageComponent {
                         };
                         this.totalDifferences = serverResult.numberOfDifferences;
                         this.isEasy = serverResult.isEasy;
+                        if (this.isNumberOfDifferencesValid()) {
+                            this.toggleElementVisibility(this.gameNameForm, true);
+                        } else {
+                            this.toggleElementVisibility(this.gameNameForm, false);
+                            this.toggleElementVisibility(this.errorPopupText, true);
+                        }
                     }
                 },
                 error: (err: HttpErrorResponse) => {
@@ -196,15 +215,6 @@ export class GameCreationPageComponent {
                     this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
-        }
-    }
-
-    updateName(name: string) {
-        // TODO utiliser un regex ? '^[a-zA-Z0-9]{3,20}$' (même que celui de registration min : 3 char/ max : 20 char)
-        if (name.length === 0 || name.length > this.characterMax || name.trim().length === 0) {
-            alert("Nom invalide. Veuillez entrer une chaine non vide d'une taille de 20 caracteres maximum");
-        } else {
-            this.gameName = name;
         }
     }
 
@@ -225,6 +235,7 @@ export class GameCreationPageComponent {
                 ${response.statusText} \n`;
                 this.debugDisplayMessage.next(responseString);
                 this.closePopUp();
+                this.router.navigate(['/config']);
             },
             error: (err: HttpErrorResponse) => {
                 const responseString = `Server Error : ${err.message}`;
@@ -232,6 +243,13 @@ export class GameCreationPageComponent {
                 this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
             },
         });
+    }
+
+    isNumberOfDifferencesValid(): boolean {
+        return (
+            this.totalDifferences > GameCreationPageComponent.minNumberOfDifferences &&
+            this.totalDifferences < GameCreationPageComponent.maxNumberOfDifferences
+        );
     }
 
     // Convert number[] to ArrayBuffer

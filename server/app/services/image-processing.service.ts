@@ -1,6 +1,6 @@
-import { Pixel } from '@app/classes/pixel';
 import { Queue } from '@app/classes/queue';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Pixel } from '@common/pixel';
 import { Vector2 } from '@common/vector2';
 import { Service } from 'typedi';
 

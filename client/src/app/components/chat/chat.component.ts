@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AuthService } from '@app/services/auth.service';
 @Component({
     selector: 'app-chat',
@@ -7,6 +7,7 @@ import { AuthService } from '@app/services/auth.service';
     styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent {
+    @ViewChild('chat') chat: ElementRef;
     messages: any[] = [];
     newMessage = '';
     text: any;
@@ -24,6 +25,24 @@ export class ChatComponent {
             sentByPlayer1: playerNumber === 1,
             sentByPlayer2: playerNumber === 2,
         });
+        this.scrollToBottom();
         this.newMessage = '';
+    }
+
+    addMessage(message: string) {
+        this.messages.push({
+            text: message,
+            username: 'System',
+            sentByPlayer1: true,
+            sentByPlayer2: false,
+        });
+        this.scrollToBottom();
+        this.newMessage = '';
+    }
+
+    scrollToBottom() {
+        setTimeout(() => {
+            this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
+        });
     }
 }

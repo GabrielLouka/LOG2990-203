@@ -3,8 +3,10 @@ import { Component } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
+import { GameData } from '@common/game-data';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
 @Component({
@@ -16,18 +18,42 @@ export class ServerDebugPageComponent {
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    games: any;
+    games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[];
     formToSendAfterServerConfirmation: EntireGameUploadForm;
     constructor(private readonly communicationService: CommunicationService) {}
 
-    async giveImages() {
+    async getGame() {
+        let gameId = (document.getElementById('gameId') as HTMLInputElement).value;
+        if (gameId === null || gameId === undefined || gameId === '') gameId = '0';
+        const routeToSend = '/games/fetchGame/' + gameId;
+
+        this.communicationService.get(routeToSend).subscribe({
+            next: (response) => {
+                const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+
+                if (response.body !== null) {
+                    const serverResult = JSON.parse(response.body);
+                    this.debugDisplayMessage.next(responseString);
+                    this.games = [serverResult];
+                    this.showImagesForRetrievedGames();
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult: ImageUploadResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
+    }
+    async showImagesForRetrievedGames() {
         for (const game of this.games) {
             const originalImage = game.originalImage;
             const imageElement = new Image();
 
             imageElement.src = `data:image/bmp;base64,${Buffer.from(originalImage).toString('base64')}`;
-            imageElement.style.width = '100px';
-            imageElement.style.height = '100px';
+            imageElement.style.width = '320px';
+            imageElement.style.height = '240px';
             document.body.appendChild(imageElement);
         }
     }
@@ -43,6 +69,7 @@ export class ServerDebugPageComponent {
                     const serverResult = JSON.parse(response.body);
                     this.debugDisplayMessage.next(responseString);
                     this.games = serverResult;
+                    this.showImagesForRetrievedGames();
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -140,7 +167,7 @@ export class ServerDebugPageComponent {
 
     async deleteAllGames(): Promise<void> {
         const routeToSend = '/games/deleteAllGames';
-        this.communicationService.post<null>(null, routeToSend).subscribe({
+        this.communicationService.delete(routeToSend).subscribe({
             next: (response) => {
                 const responseString = ` ${response.status} - 
                 ${response.statusText} \n`;
@@ -151,6 +178,28 @@ export class ServerDebugPageComponent {
                 this.debugDisplayMessage.next(responseString);
             },
         });
+    }
+
+    async getDifferenceIndex(): Promise<void> {
+        const routeToSend = '/match/getDifferenceIndex';
+        const gameId = (document.getElementById('gameId') as HTMLInputElement).value;
+        const pixelToCheckPositionX = (document.getElementById('pixelToCheckPositionX') as HTMLInputElement).value;
+        const pixelToCheckPositionY = (document.getElementById('pixelToCheckPositionY') as HTMLInputElement).value;
+        const pixelToCheckPosition: Vector2 = { x: parseInt(pixelToCheckPositionX, 10), y: parseInt(pixelToCheckPositionY, 10) };
+
+        this.communicationService
+            .post<{ gameId: string; clickPosition: Vector2 }>({ gameId, clickPosition: pixelToCheckPosition }, routeToSend)
+            .subscribe({
+                next: (response) => {
+                    const responseString = ` ${response.status} - 
+                ${response.statusText} \n`;
+                    this.debugDisplayMessage.next(responseString + ' found ' + response.body);
+                },
+                error: (err: HttpErrorResponse) => {
+                    const responseString = `Server Error : ${err.message}`;
+                    this.debugDisplayMessage.next(responseString);
+                },
+            });
     }
 
     // Convert number[] to ArrayBuffer

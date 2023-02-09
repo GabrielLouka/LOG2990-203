@@ -14,34 +14,34 @@ export class GamesController {
     private configureRouter(): void {
         this.router = Router();
 
-        // this.router.get('/', async (req: Request, res: Response) => {
-        //     // Can also use the async/await syntax
-        //     try {
-        //         // const games = await this.gamesService.getAllGames();
-        //         const games = await this.gamesService.getNextGames();
-        //         // res.json(games);
-        //         res.send(JSON.stringify(games));
-        //     } catch (error) {
-        //         res.status(StatusCodes.NOT_FOUND).send(error.message);
-        //     }
-        // });
-
-        this.router.get('/:id', async (req: Request, res: Response) => {
+        this.router.get('/fetchGame/:id', async (req: Request, res: Response) => {
             try {
-                const games = await this.gameStorageService.getNextGames(parseInt(req.params.id, 10));
+                const game = await this.gameStorageService.getGameById(req.params.id);
                 // res.json(games);
-                res.send(JSON.stringify(games));
+                res.send(JSON.stringify(game));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }
         });
 
+        this.router.get('/:id', async (req: Request, res: Response) => {
+            try {
+                const games = await this.gameStorageService.getGamesInPage(parseInt(req.params.id, 10));
+                const gameLength = await this.gameStorageService.getGamesLength();
+                const gameInformation = { gameContent: games, nbrOfGame: gameLength };
+                res.send(JSON.stringify(gameInformation));
+            } catch (error) {
+                res.status(StatusCodes.NOT_FOUND).send(error.message);
+            }
+        });
         this.router.post('/updateName', async (req: Request, res: Response) => {
             const receivedArguments: [number, string] = req.body;
+            const idIndex = 0;
+            const nameIndex = 1;
             // eslint-disable-next-line no-console
-            console.log('updating name, id= ' + receivedArguments[0] + ' name=' + receivedArguments[1]);
+            console.log('updating name, id= ' + receivedArguments[idIndex] + ' name=' + receivedArguments[nameIndex]);
             this.gameStorageService
-                .updateGameName(receivedArguments[0], receivedArguments[1])
+                .updateGameName(receivedArguments[idIndex], receivedArguments[nameIndex])
                 .then(() => {
                     res.status(StatusCodes.OK).send();
                 })
@@ -78,7 +78,7 @@ export class GamesController {
                 });
         });
 
-        this.router.post('/deleteAllGames', async (req: Request, res: Response) => {
+        this.router.delete('/deleteAllGames', async (req: Request, res: Response) => {
             this.gameStorageService
                 .deleteAllGames()
                 .then(() => {

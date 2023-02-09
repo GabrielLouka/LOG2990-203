@@ -3,50 +3,45 @@ import { BackButtonComponent } from '@app/components/back-button/back-button.com
 import { GameCardComponent } from '@app/components/game-card/game-card.component';
 import { NextPageButtonComponent } from '@app/components/next-page-button/next-page-button.component';
 import { PreviousPageButtonComponent } from '@app/components/previous-page-button/previous-page-button.component';
-import { Game } from '@app/interfaces/games';
-import { SelectionsPageComponent } from './selections-page.component';
+import { GamesDisplayComponent } from './games-display.component';
 
-describe('SelectionsPageComponent', () => {
-    let component: SelectionsPageComponent;
-    let fixture: ComponentFixture<SelectionsPageComponent>;
+describe('GamesDisplayComponent', () => {
+    let component: GamesDisplayComponent;
+    let fixture: ComponentFixture<GamesDisplayComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            declarations: [SelectionsPageComponent, BackButtonComponent, GameCardComponent, NextPageButtonComponent, PreviousPageButtonComponent],
+            declarations: [GamesDisplayComponent, BackButtonComponent, GameCardComponent, NextPageButtonComponent, PreviousPageButtonComponent],
         }).compileComponents();
 
-        fixture = TestBed.createComponent(SelectionsPageComponent);
+        fixture = TestBed.createComponent(GamesDisplayComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-        const game1: Game[] = [];
-        const game2: Game[] = [];
-        const game3: Game[] = [];
-        component.games = [game1, game2, game3];
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
     it('clicking on next button should increment page number', () => {
-        component.currentIndex = 0;
+        component.currentPageNbr = 0;
         component.goToNextSlide();
-        expect(component.currentIndex).toEqual(1);
+        expect(component.currentPageNbr).toEqual(1);
     });
 
     it('clicking on previous button should decrement page number', () => {
-        component.currentIndex = 2;
+        component.currentPageNbr = 2;
         component.goToPreviousSlide();
-        expect(component.currentIndex).toEqual(1);
+        expect(component.currentPageNbr).toEqual(1);
     });
 
     it("current page should stay the same if it's the last page", () => {
-        component.currentIndex = 2;
+        component.currentPageNbr = 2;
         component.goToNextSlide();
-        expect(component.currentIndex).toEqual(component.currentIndex);
+        expect(component.currentPageNbr).toEqual(component.currentPageNbr);
     });
     it("current page should stay the same if it's the last page", () => {
-        component.currentIndex = 0;
+        component.currentPageNbr = 0;
         component.goToPreviousSlide();
-        expect(component.currentIndex).toEqual(component.currentIndex);
+        expect(component.currentPageNbr).toEqual(component.currentPageNbr);
     });
 });

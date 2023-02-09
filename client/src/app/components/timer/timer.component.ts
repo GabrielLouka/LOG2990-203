@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
 
 @Component({
@@ -8,29 +7,35 @@ import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements AfterViewInit {
-    @Input() init: number;
+    @Input() timeInSeconds: number;
     @ViewChild('minutes', { static: true }) minutes: ElementRef;
     @ViewChild('seconds', { static: true }) seconds: ElementRef;
 
-    timeInSecond: number = 5;
+    private shouldStop = false;
 
     ngAfterViewInit() {
         setInterval(() => {
-            if (this.timeInSecond > 0) this.tickTock();
+            if (this.timeInSeconds >= 0) {
+                this.tickTock();
+            }
         }, 1000);
     }
 
     tickTock() {
-        this.timeInSecond--;
-        this.minutes.nativeElement.innerText = this.getMinutes();
-        this.seconds.nativeElement.innerText = this.getSeconds();
+        if (!this.shouldStop) this.timeInSeconds++;
+        this.minutes.nativeElement.innerText = this.getMinutes() < 10 ? '0' + this.getMinutes() : this.getMinutes();
+        this.seconds.nativeElement.innerText = this.getSeconds() < 10 ? '0' + this.getSeconds() : this.getSeconds();
     }
 
     getMinutes() {
-        return Math.floor(this.timeInSecond / 60);
+        return Math.floor(this.timeInSeconds / 60);
     }
 
     getSeconds() {
-        return Math.floor(this.timeInSecond % 60);
+        return Math.floor(this.timeInSeconds % 60);
+    }
+
+    stopTimer() {
+        this.shouldStop = true;
     }
 }

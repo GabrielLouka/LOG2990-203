@@ -11,3 +11,19 @@ body {
     height: 1080;
     width: 1920;
 }
+
+.center{
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-row{
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-column{
+    display: flex;
+    flex-direction: column;
+}
+

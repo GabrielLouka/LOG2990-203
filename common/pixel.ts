@@ -1,5 +1,4 @@
 export class Pixel {
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     static readonly white = new Pixel(255, 255, 255);
     static readonly black = new Pixel(0, 0, 0);
     r: number;

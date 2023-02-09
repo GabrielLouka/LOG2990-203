@@ -1,7 +1,6 @@
-<div class="overlay">
-    <button *ngIf="isPlayable" class="button-style" routerLink="/registration" (click)="setSoloMode">Jouer</button>
-    <button *ngIf="isPlayable" class="button-style" routerLink="/registration" (click)="set1vs1Mode">Rejoindre</button>
-    
+<div class="flex-row center overlay">
+    <button *ngIf="isPlayable" class="button-style" [routerLink]="['/registration', id]" (click)="(setSoloMode)">Jouer</button>
+    <button *ngIf="isPlayable" class="button-style" [routerLink]="['/registration', id]" (click)="(set1vs1Mode)">Rejoindre</button>
     <button *ngIf="!isPlayable" class="button-style">Supprimer</button>
     <button *ngIf="!isPlayable" class="button-style">Réinitialiser</button>
 </div>

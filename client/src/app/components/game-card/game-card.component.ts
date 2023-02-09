@@ -7,18 +7,16 @@ import { Buffer } from 'buffer';
     styleUrls: ['./game-card.component.scss'],
 })
 export class GameCardComponent implements OnInit {
-    @Input() game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
+    @Input() game: { gameData: GameData; originalImage: Buffer };
     @Input() isPlayable: boolean;
     difficulty: string;
     originalImageSrc: string;
-    modifiedImageSrc: string;
-    // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-    constructor() {}
+
     ngOnInit() {
-        this.difficulty = this.game.gameData ? 'Facile' : 'Difficile';
+        this.difficulty = this.game.gameData.isEasy ? 'Facile' : 'Difficile';
         this.originalImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;
-        this.modifiedImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.modifiedImage).toString('base64')}`;
     }
+
     getDifficultyColor() {
         if (this.game.gameData.isEasy) {
             return 'green';

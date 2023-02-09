@@ -12,7 +12,3 @@ const HTTP_STATUS = {
 };
 
 export { HTTP_STATUS };
-
-// module.exports = {
-//     HTTP_STATUS,
-// };
