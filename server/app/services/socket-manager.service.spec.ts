@@ -21,6 +21,7 @@ describe('SocketManager service tests,', () => {
     let clientSocket: Socket;
 
     let matchingDifferenceService: SinonStubbedInstance<MatchingDifferencesService>;
+    let foundDifferences: boolean[];
 
     const urlString = 'http://localhost:3000';
     beforeEach(async () => {
@@ -141,7 +142,7 @@ describe('SocketManager service tests,', () => {
 
     it('should validate if when difference found with console message', (done) => {
         const spy = sinon.spy(console, 'log');
-        const foundDifferences = [true, false];
+        foundDifferences = [true, false];
         const position: Vector2 = { x: 100, y: 200 };
         clientSocket.emit('launchGame', data);
         clientSocket.emit('validateDifference', { foundDifferences, position });
@@ -154,7 +155,7 @@ describe('SocketManager service tests,', () => {
 
     it('should not print console message when no difference found', (done) => {
         const spy = sinon.spy(console, 'log');
-        const foundDifferences: boolean[] = [true, false];
+        foundDifferences = [true, false];
         const position: Vector2 = { x: 400, y: 400 };
         clientSocket.emit('launchGame', data);
         clientSocket.emit('validateDifference', { foundDifferences, position });

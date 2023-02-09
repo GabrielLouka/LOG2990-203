@@ -8,7 +8,7 @@ import { FileSystemManager } from './file-system-manager';
 describe('FileSysteManager', ()=>{
     it('should read the file and return the correct content',async ()=>{
         const fileSystemManager = new FileSystemManager();
-    const path = 'C:\Users\ibrah\OneDrive\Bureau\LOG2990-203\server\app\services\file-system/test-file.txt';
+    const path = 'path/to/test-file.txt';
     const expectedContents = 'This is a test file.';
 
     fs.writeFileSync(path, expectedContents);

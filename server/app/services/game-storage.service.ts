@@ -60,7 +60,6 @@ export class GameStorageService {
         return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
     }
 
-    // TODO À tester !!
     /**
      * @param id game identifier
      * @returns true if deleted, false if not
@@ -163,7 +162,6 @@ export class GameStorageService {
      *
      * @param err
      */
-    // TODO je ne vois pas de confirmations lorsque je crée un jeu
     writeFileErrorManagement = (err: NodeJS.ErrnoException) => {
         if (err) {
             console.error(err);

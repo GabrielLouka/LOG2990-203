@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable @typescript-eslint/prefer-for-of */
 /* eslint-disable no-unused-vars */
