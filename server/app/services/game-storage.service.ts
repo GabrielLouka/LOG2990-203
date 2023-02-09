@@ -90,7 +90,7 @@ export class GameStorageService {
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
-                modifiedImage: images.modifiedImage,
+                // modifiedImage: images.modifiedImage,
             });
         }
         return gamesToReturn;

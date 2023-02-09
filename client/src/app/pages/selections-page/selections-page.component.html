@@ -10,6 +10,7 @@
     </Section>
 
     <div class="container">
+        <p>{{ debugDisplayMessage.getValue() }}</p>
         <mat-grid-list cols="2" rowHeight="42vh">
             <mat-grid-tile *ngFor="let game of games">
                 <app-game-card [game]="game" [isPlayable]="true"></app-game-card>
@@ -17,6 +18,6 @@
         </mat-grid-list>
     </div>
 
-    <app-next-page-button (click)="goToNextSlide()"></app-next-page-button>
-    <app-previous-page-button (click)="goToPreviousSlide()"></app-previous-page-button>
+    <app-next-page-button *ngIf="showNextButton" (click)="goToNextSlide()"></app-next-page-button>
+    <app-previous-page-button *ngIf="showPreviousButton" (click)="goToPreviousSlide()"></app-previous-page-button>
 </body>
