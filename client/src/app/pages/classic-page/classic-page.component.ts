@@ -1,6 +1,3 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -9,7 +6,6 @@ import { TimerComponent } from '@app/components/timer/timer.component';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
-import { MouseHandlerService } from '@app/services/mouse-handler.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
@@ -45,7 +41,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     constructor(
         public socketService: SocketClientService,
-        public mouseService: MouseHandlerService,
+        // public mouseService: MouseHandlerService,
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
         private auth: AuthService,
@@ -131,7 +127,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
-        this.mouseService.onMouseDown(coordinateClick);
+        // this.mouseService.onMouseDown(coordinateClick);
         this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick });
 
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';

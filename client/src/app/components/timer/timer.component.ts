@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
-
+import { INTERVAL_VALUE, MINUTE, MINUTE_LIMIT } from '@common/pixel';
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
@@ -18,21 +17,21 @@ export class TimerComponent implements AfterViewInit {
             if (this.timeInSeconds >= 0) {
                 this.tickTock();
             }
-        }, 1000);
+        }, INTERVAL_VALUE);
     }
 
     tickTock() {
         if (!this.shouldStop) this.timeInSeconds++;
-        this.minutes.nativeElement.innerText = this.getMinutes() < 10 ? '0' + this.getMinutes() : this.getMinutes();
-        this.seconds.nativeElement.innerText = this.getSeconds() < 10 ? '0' + this.getSeconds() : this.getSeconds();
+        this.minutes.nativeElement.innerText = this.getMinutes() < MINUTE_LIMIT ? '0' + this.getMinutes() : this.getMinutes();
+        this.seconds.nativeElement.innerText = this.getSeconds() < MINUTE_LIMIT ? '0' + this.getSeconds() : this.getSeconds();
     }
 
     getMinutes() {
-        return Math.floor(this.timeInSeconds / 60);
+        return Math.floor(this.timeInSeconds / MINUTE);
     }
 
     getSeconds() {
-        return Math.floor(this.timeInSeconds % 60);
+        return Math.floor(this.timeInSeconds % MINUTE);
     }
 
     stopTimer() {

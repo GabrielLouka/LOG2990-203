@@ -20,7 +20,6 @@ export class GamesDisplayComponent implements OnInit {
         originalImage: Buffer;
     }[];
     title: string;
-    btnType = 'Retour';
     playable = false;
     gamesNbr: number = 0;
     justifyContent: string;

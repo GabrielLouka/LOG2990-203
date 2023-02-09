@@ -8,3 +8,6 @@ export interface GameData {
     differences: Vector2[][]; // array of all the pixels in a difference
     ranking: Ranking[][];
 }
+
+export const MIN_NBR_OF_DIFFERENCES = 3;
+export const MAX_NBR_OF_DIFFERENCES = 9;

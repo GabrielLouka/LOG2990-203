@@ -13,6 +13,8 @@ const R_ONLY = {
     gamesLimit: 4,
     originalImageFileName: '1.bmp',
     modifiedImageFileName: '2.bmp',
+    REQUIRED_WIDTH: '640',
+    REQUIRED_HEIGHT: '480',
 };
 
 const GAME_CONST = {

@@ -15,3 +15,9 @@ export class Pixel {
         return this.r === pixel.r && this.g === pixel.g && this.b === pixel.b;
     };
 }
+
+export const REQUIRED_WIDTH = 640;
+export const REQUIRED_HEIGHT = 480;
+export const INTERVAL_VALUE = 1000;
+export const MINUTE = 60;
+export const MINUTE_LIMIT = 10;

@@ -3,10 +3,11 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file-system-manager';
-import { DB, R_ONLY } from '@app/utils/env';
+import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
+import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult, UpdateResult } from 'mongodb';
 import { Service } from 'typedi';
@@ -23,7 +24,8 @@ export class GameStorageService {
         this.fileSystemManager = new FileSystemManager();
     }
     get collection() {
-        return this.databaseService.database.collection(DB.COLLECTION_GAMES);
+        // eslint-disable-next-line no-undef
+        return this.databaseService.database.collection(process.env.DATABASE_COLLECTION_GAMES!);
     }
 
     /**
