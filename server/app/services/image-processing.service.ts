@@ -83,12 +83,6 @@ export class ImageProcessingService {
             // const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
 
             const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
-            const imageDimensions2: Vector2 = this.getImageDimensions(imageBuffer2);
-
-            // eslint-disable-next-line no-console
-            console.log('Image dimensions 1: ' + imageDimensions.x + 'x' + imageDimensions.y);
-            // eslint-disable-next-line no-console
-            console.log('Image dimensions 2: ' + imageDimensions2.x + 'x' + imageDimensions2.y);
 
             const differences: Vector2[] = [];
 
