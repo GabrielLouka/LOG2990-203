@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-console */
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
