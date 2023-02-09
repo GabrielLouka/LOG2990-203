@@ -19,18 +19,18 @@ export class SocketManager {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             // message initial
             socket.emit('hello', 'Hello World!');
+            let roomName = '';
 
             socket.on('message', (message: string) => {
                 console.log(message);
             });
 
             socket.on('launchGame', (data: { gameData: GameData; username: string }) => {
-                console.log('launchGame called with ' + data.gameData.id + data.username);
-                socket.join(data.gameData.id + data.username);
-                if (socket.rooms.has(data.gameData.id + data.username)) {
-                    this.sio
-                        .to(data.gameData.id + data.username)
-                        .emit('matchJoined', 'User:' + data.username + 'has joined the game with id #' + data.gameData.id);
+                roomName = data.gameData.id + data.username + socket.id;
+                console.log('launchGame called with ' + roomName);
+                socket.join(roomName);
+                if (socket.rooms.has(roomName)) {
+                    this.sio.to(roomName).emit('matchJoined', 'User:' + data.username + 'has joined the game with id #' + data.gameData.id);
                     socket.data = data;
                     for (const room of socket.rooms) {
                         console.log('gameData saved for room: ' + room);
@@ -53,8 +53,7 @@ export class SocketManager {
                     data.foundDifferences[foundDifferenceId] = true;
                     console.log('Difference found at index #' + foundDifferenceId);
                 }
-
-                this.sio.to(socket.data.gameData.id + socket.data.username).emit('validationReturned', {
+                this.sio.to(roomName).emit('validationReturned', {
                     foundDifferences: data.foundDifferences,
                     isValidated: successfullyFoundDifference,
                     foundDifferenceIndex: foundDifferenceId,

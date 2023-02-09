@@ -66,7 +66,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
-        this.joinServerRoom();
+        this.connectSocket();
     }
     addMessageToChat(message: string) {
         this.chat.addMessage(message);
@@ -107,6 +107,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                     const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
                     const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
                     this.loadImagesToCanvas(img1Source, img2Source);
+                    this.requestStartGame();
                     this.title = this.game.gameData.name;
                 }
             },
@@ -126,8 +127,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         }
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
-        this.addMessageToChat('Size of foundDifferences array: ' + this.foundDifferences.length);
-        this.socketService.send('launchGame', { gameData: this.game.gameData, username: this.auth.registerUserName() });
     }
 
     onMouseDown(event: MouseEvent) {
@@ -139,11 +138,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
 
-    joinServerRoom() {
+    connectSocket() {
         if (this.socketService.isSocketAlive()) this.socketService.disconnect();
 
         this.socketService.connect();
         this.addServerSocketMessagesListeners();
+    }
+
+    requestStartGame() {
+        this.socketService.send('launchGame', { gameData: this.game.gameData, username: this.auth.registerUserName() });
     }
 
     addServerSocketMessagesListeners() {
