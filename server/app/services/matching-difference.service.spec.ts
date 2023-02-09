@@ -30,7 +30,7 @@ describe("MatchingDifferences service", () => {
 
     it("getDifference should be called with a game and a vector of clicks", () => {
         const methodSpy = Sinon.spy(differenceService, "getDifferenceIndex");
-        assert(methodSpy.calledWith(gameData, click));
+        assert(methodSpy.calledWith(gameData, click));        
     });
 
     it("should return the index of the difference that matches the click position", () => {
