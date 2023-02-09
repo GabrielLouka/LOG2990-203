@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Injectable } from '@angular/core';
 import { GameData } from '@common/game-data';
 import { Pixel } from '@common/pixel';
@@ -35,6 +36,33 @@ export class ImageManipulationService {
         }
 
         return output;
+    }
+
+    async blinkDifference(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
+        const numberOfBlinks = 3;
+        const blinkTime = 100;
+
+        this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+        for (let i = 0; i < numberOfBlinks; i++) {
+            await this.sleep(blinkTime);
+            this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
+            await this.sleep(blinkTime);
+            this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+        }
+    }
+
+    async sleep(time: number) {
+        return new Promise((resolve) => {
+            setTimeout(resolve, time);
+        });
+    }
+
+    loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
+        const img = new Image();
+        img.src = srcImg;
+        img.onload = () => {
+            context.drawImage(img, 0, 0, 640, 480, 0, 0, 640, 480);
+        };
     }
 
     private getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {

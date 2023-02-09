@@ -39,6 +39,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     differencesFound: number = 0;
     totalDifferences: number = 0;
     title: string = '';
+    currentModifiedImage: Buffer;
 
     constructor(
         public socketService: SocketClientService,
@@ -83,19 +84,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.successSound.nativeElement.play();
     }
 
-    loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
-        const img = new Image();
-        img.src = srcImg;
-        img.onload = () => {
-            context.drawImage(img, 0, 0, 640, 480, 0, 0, 640, 480);
-            this.addMessageToChat('Image loaded successfully');
-        };
-        img.onerror = (error) => {
-            this.addMessageToChat('Failed to load image' + error);
-            console.error('Failed to load image', error);
-        };
-    }
-
     ngAfterViewInit(): void {
         const leftCanvasContext = this.leftCanvasContext;
         const rightCanvasContext = this.rightCanvasContext;
@@ -131,8 +119,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         const leftCanvasContext = this.leftCanvasContext;
         const rightCanvasContext = this.rightCanvasContext;
         if (leftCanvasContext !== null && rightCanvasContext !== null) {
-            this.loadCanvasImages(imgSource1, leftCanvasContext);
-            this.loadCanvasImages(imgSource2, rightCanvasContext);
+            this.imageManipulationService.loadCanvasImages(imgSource1, leftCanvasContext);
+            this.imageManipulationService.loadCanvasImages(imgSource2, rightCanvasContext);
         }
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
@@ -200,15 +188,21 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.refreshModifiedImage();
     }
 
-    refreshModifiedImage() {
+    async refreshModifiedImage() {
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
             this.game.gameData,
             this.game.originalImage,
             this.game.modifiedImage,
             this.foundDifferences,
         );
-        const newImageSource = this.imageManipulationService.getImageSourceFromBuffer(newImage);
-        if (this.rightCanvasContext !== null) this.loadCanvasImages(newImageSource, this.rightCanvasContext);
+        if (this.rightCanvasContext !== null) {
+            await this.imageManipulationService.blinkDifference(
+                this.currentModifiedImage != null ? this.currentModifiedImage : this.game.modifiedImage,
+                newImage,
+                this.rightCanvasContext,
+            );
+            this.currentModifiedImage = newImage;
+        }
     }
 
     // Called when the player wins the game
