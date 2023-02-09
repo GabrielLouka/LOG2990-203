@@ -5,6 +5,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
@@ -50,7 +51,7 @@ export class GameCreationPageComponent {
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
 
-    constructor(private readonly communicationService: CommunicationService) {}
+    constructor(private readonly communicationService: CommunicationService, private readonly router: Router) {}
 
     showPopUp() {
         this.toggleElementVisibility(this.gameNameForm, false);
@@ -234,6 +235,7 @@ export class GameCreationPageComponent {
                 ${response.statusText} \n`;
                 this.debugDisplayMessage.next(responseString);
                 this.closePopUp();
+                this.router.navigate(['/config']);
             },
             error: (err: HttpErrorResponse) => {
                 const responseString = `Server Error : ${err.message}`;
