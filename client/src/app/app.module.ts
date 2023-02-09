@@ -14,6 +14,7 @@ import { BackButtonComponent } from './components/back-button/back-button.compon
 import { ChatComponent } from './components/chat/chat.component';
 import { FoundHintsCounterComponent } from './components/found-hints-counter/found-hints-counter.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
+import { GamesDisplayComponent } from './components/games-display/games-display.component';
 import { HintComponent } from './components/hint/hint.component';
 import { ImagesAreaComponent } from './components/images-area/images-area.component';
 import { InfoCardComponent } from './components/info-card/info-card.component';
@@ -60,6 +61,7 @@ import { AuthService } from './services/auth.service';
         ChatComponent,
         MouseComponent,
         GameCreationPageComponent,
+        GamesDisplayComponent,
     ],
     imports: [
         AppMaterialModule,
