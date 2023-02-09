@@ -12,7 +12,7 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./selections-page.component.scss'],
 })
 export class SelectionsPageComponent implements OnInit {
-    title = 'Page de configuration';
+    title = 'Page de selection';
     playable = true;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     currentPageNbr: number = 0;
@@ -37,11 +37,7 @@ export class SelectionsPageComponent implements OnInit {
                     const serverResult = JSON.parse(response.body);
                     this.games = serverResult.gameContent;
                     this.gamesNbr = serverResult.nbrOfGame;
-                    if (this.gamesNbr - (this.currentPageNbr + 1) * 4 <= 0) {
-                        this.showNextButton = false;
-                    } else {
-                        this.showNextButton = true;
-                    }
+                    this.showNextButton = this.gamesNbr - (this.currentPageNbr + 1) * 4 > 0;
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -62,6 +58,9 @@ export class SelectionsPageComponent implements OnInit {
 
     async goToPreviousSlide() {
         this.currentPageNbr--;
+        if (this.currentPageNbr <= 0) {
+            this.showPreviousButton = false;
+        }
         await this.getGames(this.currentPageNbr);
     }
 }

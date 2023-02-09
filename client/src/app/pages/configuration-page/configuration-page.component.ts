@@ -7,6 +7,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
+import { GameData } from '@common/game-data';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { BehaviorSubject } from 'rxjs';
 // import { Game } from '../../interfaces/games';
@@ -17,38 +18,34 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./configuration-page.component.scss'],
 })
 export class ConfigurationPageComponent implements OnInit {
-
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    generatedGameId = -1;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    currentPageNbr = 0;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    games: any;
-    
+    currentPageNbr: number = 0;
+    games: {
+        gameData: GameData;
+        originalImage: Buffer;
+    }[];
+
     btnType = 'Retour';
     title = 'Page de configuration';
     playable = false;
-    gameNbr=0;
-    constructor(private readonly communicationService: CommunicationService) {
-       
-    }
-    ngOnInit(): void {
+    gamesNbr: number = 0;
+
+    showNextButton = true;
+    showPreviousButton = false;
+    constructor(private readonly communicationService: CommunicationService) {}
+    ngOnInit() {
         this.getGames(this.currentPageNbr);
     }
-    
-    async getGames(pageId:number): Promise<void> {
+
+    async getGames(pageId: number): Promise<void> {
         const routeToSend = '/games/' + pageId.toString();
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
-                const responseString = ` ${response.status} - 
-                ${response.statusText} \n`;
-
                 if (response.body !== null) {
                     const serverResult = JSON.parse(response.body);
-                    this.debugDisplayMessage.next(responseString);
                     this.games = serverResult.gameContent;
-                    this.gameNbr=serverResult.nbrOfGame;
+                    this.gamesNbr = serverResult.nbrOfGame;
+                    this.showNextButton = this.gamesNbr - (this.currentPageNbr + 1) * 4 > 0;
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -58,19 +55,20 @@ export class ConfigurationPageComponent implements OnInit {
             },
         });
     }
-   
 
     async goToNextSlide() {
-        const isLastPage = this.currentPageNbr === Math.ceil(this.gameNbr / 4);
-        const newIndex = isLastPage ? this.currentPageNbr : this.currentPageNbr + 1;
-        this.currentPageNbr=newIndex;
+        this.currentPageNbr++;
+        if (this.currentPageNbr > 0) {
+            this.showPreviousButton = true;
+        }
         await this.getGames(this.currentPageNbr);
     }
-    async goToPreviousSlide() {
-        const isFirstPage = this.currentPageNbr === 0;
-        const newIndex = isFirstPage ? this.currentPageNbr : this.currentPageNbr - 1;
-        this.currentPageNbr=newIndex;
-        await this.getGames(this.currentPageNbr);
 
+    async goToPreviousSlide() {
+        this.currentPageNbr--;
+        if (this.currentPageNbr <= 0) {
+            this.showPreviousButton = false;
+        }
+        await this.getGames(this.currentPageNbr);
     }
 }
