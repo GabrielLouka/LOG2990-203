@@ -21,17 +21,17 @@ import { BehaviorSubject } from 'rxjs';
 
 // TODO faire de ce component un service
 export class GameCreationPageComponent {
+    static readonly maxNumberOfDifferences: number = 9;
+    static readonly minNumberOfDifferences: number = 3;
+
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
     @ViewChild('bgModal') modal!: ElementRef;
     @ViewChild('gameNameForm') gameNameForm!: ElementRef;
     @ViewChild('errorPopupText') errorPopupText!: ElementRef;
     @ViewChild('imagePreview') imagePreview!: ElementRef;
-
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    static readonly maxNumberOfDifferences: number = 9;
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    static readonly minNumberOfDifferences: number = 3;
+    @ViewChild('input1') input1!: ElementRef;
+    @ViewChild('input2') input2!: ElementRef;
 
     gameName: string = '';
     totalDifferences = 0;
@@ -112,19 +112,20 @@ export class GameCreationPageComponent {
         return dataView.getUint16(BITMAP_TYPE_OFFSET, true) === BIT_COUNT_24;
     };
 
-    resetCanvas(isModified: boolean) {
+    resetCanvas(rightImage: boolean) {
         const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
-        const context = this.getCanvas(isModified);
+        const context = this.getCanvas(rightImage);
         context?.clearRect(0, 0, canvas.width, canvas.height);
 
-        this.leftCanvas.nativeElement.src = '';
-        this.rightCanvas.nativeElement.src = '';
-        this.modifiedImage = null;
-        this.originalImage = null;
-
-        if (isModified) {
+        if (rightImage) {
+            this.rightCanvas.nativeElement.src = '';
+            this.modifiedImage = null;
+            this.input2.nativeElement.value = '';
             this.modifiedContainsImage = false;
         } else {
+            this.leftCanvas.nativeElement.src = '';
+            this.originalImage = null;
+            this.input1.nativeElement.value = '';
             this.originalContainsImage = false;
         }
     }
@@ -247,8 +248,8 @@ export class GameCreationPageComponent {
 
     isNumberOfDifferencesValid(): boolean {
         return (
-            this.totalDifferences > GameCreationPageComponent.minNumberOfDifferences &&
-            this.totalDifferences < GameCreationPageComponent.maxNumberOfDifferences
+            this.totalDifferences >= GameCreationPageComponent.minNumberOfDifferences &&
+            this.totalDifferences <= GameCreationPageComponent.maxNumberOfDifferences
         );
     }
 
