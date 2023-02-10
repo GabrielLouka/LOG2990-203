@@ -7,11 +7,10 @@ import * as supertest from 'supertest';
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage.service';
 import { GameData } from '@common/game-data';
-import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
 
-const HTTP_STATUS_OK = StatusCodes.OK;
+// const HTTP_STATUS_OK = StatusCodes.OK;
 // const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
 // const API_URL = '/api/games';
 
