@@ -31,11 +31,13 @@
 
         <div class="flex-column center">
             <div class="flex-column">
-                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> edit </span></button>
-                <button class="button-style center"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
-                <button class="button-style center"><input type="color" ng-model="test" id="" /></button>
-                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> crop_7_5 </span></button>
-                <button class="button-style center">
+                <button class="button-style center" title="Crayon"><span class="material-symbols-outlined optionIcon"> edit </span></button>
+                <button class="button-style center" title="Efface"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
+                <input #input3 type="color" class="button-style bigger color" title="Couleurs" />
+                <button class="button-style center" title="Outil rectangle">
+                    <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
+                </button>
+                <button class="button-style center" title="drawing swapper">
                     <span class="material-symbols-outlined optionIcon"> swap_horiz </span>
                 </button>
             </div>
