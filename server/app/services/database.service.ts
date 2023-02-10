@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import 'dotenv/config';
 import { Db, MongoClient, OptionalId } from 'mongodb';
 import { Service } from 'typedi';
