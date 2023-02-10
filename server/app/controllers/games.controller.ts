@@ -17,7 +17,6 @@ export class GamesController {
         this.router.get('/fetchGame/:id', async (req: Request, res: Response) => {
             try {
                 const game = await this.gameStorageService.getGameById(req.params.id);
-                // res.json(games);
                 res.send(JSON.stringify(game));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
