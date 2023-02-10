@@ -64,6 +64,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.connectSocket();
     }
+
     addMessageToChat(message: string) {
         this.chat.addMessage(message);
     }
@@ -74,6 +75,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     async playErrorSound() {
         this.errorSound.nativeElement.currentTime = 0;
+        this.errorSound.nativeElement.volume = 0.3;
         this.errorSound.nativeElement.play();
     }
 
@@ -146,21 +148,21 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     addServerSocketMessagesListeners() {
-        this.socketService.on('connect', () => {
-            this.addMessageToChat(`Connexion par WebSocket sur le socket ${this.socketId}`);
-        });
+        // this.socketService.on('connect', () => {
+        //     this.addMessageToChat(`Connexion par WebSocket sur le socket ${this.socketId}`);
+        // });
         // Afficher le message envoyé lors de la connexion avec le serveur
-        this.socketService.on('hello', (message: string) => {
-            this.addMessageToChat(message);
-        });
-        this.socketService.on('matchJoined', (message: string) => {
-            this.addMessageToChat(message);
-        });
+        // this.socketService.on('hello', (message: string) => {
+        //     this.addMessageToChat(message);
+        // });
+        // this.socketService.on('matchJoined', (message: string) => {
+        //     this.addMessageToChat(message);
+        // });
         this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number }) => {
             if (data.isValidated) {
-                this.addMessageToChat('Well done king.');
+                // this.addMessageToChat('Well done king.');
                 this.foundDifferences = data.foundDifferences;
-                this.onFindDifference(data.foundDifferenceIndex);
+                this.onFindDifference();
 
                 if (this.differencesFound >= this.totalDifferences) this.onWinGame();
             } else {
@@ -182,9 +184,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         }, 1000);
     }
 
-    onFindDifference(differenceIndex: number) {
+    onFindDifference() {
         this.differencesFound++;
-        this.addMessageToChat('You found difference #' + differenceIndex + '! (' + this.differencesFound + '/' + this.totalDifferences + ')');
+        // this.addMessageToChat('You found difference #' + differenceIndex + '! (' + this.differencesFound + '/' + this.totalDifferences + ')');
         this.playSuccessSound();
         this.refreshModifiedImage();
     }

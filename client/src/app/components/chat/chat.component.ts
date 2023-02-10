@@ -19,6 +19,8 @@ export class ChatComponent {
     constructor(private auth: AuthService) {}
 
     sendMessage(playerNumber: number) {
+        if (!this.isTextValid(this.newMessage)) return;
+
         this.messages.push({
             text: this.newMessage,
             username: `${this.username}`,
@@ -27,6 +29,15 @@ export class ChatComponent {
         });
         this.scrollToBottom();
         this.newMessage = '';
+    }
+
+    isTextValid(newMessage: string) {
+        newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
+        if (newMessage === '' || newMessage === ' ' || newMessage === null) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     addMessage(message: string) {

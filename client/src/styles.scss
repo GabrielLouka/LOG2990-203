@@ -10,6 +10,12 @@ body {
     background-color: lightblue;
     height: 1080;
     width: 1920;
+
+    // Disable user selection
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Standard */
 }
 
 .center{
@@ -26,4 +32,14 @@ body {
     display: flex;
     flex-direction: column;
 }
+
+.font-size {
+    font-size: 1.5vh;
+}
+
+.not-implement {
+    cursor: not-allowed;
+}
+
+
 

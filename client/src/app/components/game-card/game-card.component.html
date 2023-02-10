@@ -2,8 +2,8 @@
     <div class="flex-column description-container">
         <div class="flex-column center">
             <div class="title">{{ game.gameData.name }}</div>
-            <div class="flex-row">
-                <div>Difficulté :</div>
+            <div class="flex-row font-size">
+                <div><strong> Difficulté :</strong></div>
                 <div [ngStyle]="{ color: getDifficultyColor() }">{{ '&nbsp;' + difficulty }}</div>
             </div>
         </div>
@@ -18,20 +18,20 @@
                         <img src=".\assets\img\bronze-badge.png" class="badge-icon" alt="gameLogo" />
                     </div>
                     <div class="flex-column center mode">
-                        <p>Solo</p>
+                        <p class="font-size">Solo</p>
                         <br />
                         <div class="flex-row" *ngFor="let player of game.gameData.ranking[0]">
-                            <p class="pseudo" *ngIf="player.name && player.score">{{ player.name }}</p>
-                            <p>: {{ player.score }}</p>
+                            <p class="font-size pseudo" *ngIf="player.name && player.score">{{ player.name }}</p>
+                            <p class="font-size">: {{ player.score }}</p>
                         </div>
                     </div>
                     <div class="divider"></div>
                     <div class="flex-column center mode">
-                        <p class="title-mode">1 VS 1</p>
+                        <p class="title-mode font-size">1 VS 1</p>
                         <br />
                         <div class="flex-row" *ngFor="let player of game.gameData.ranking[1]">
-                            <p class="pseudo" *ngIf="player.name && player.score">{{ player.name }}</p>
-                            <p>: {{ player.score }}</p>
+                            <p class="pseudo font-size" *ngIf="player.name && player.score">{{ player.name }}</p>
+                            <p class="font-size">: {{ player.score }}</p>
                         </div>
                     </div>
                 </div>

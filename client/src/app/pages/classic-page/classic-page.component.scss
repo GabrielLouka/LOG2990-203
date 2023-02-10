@@ -16,22 +16,14 @@ h1 {
 
 // Canvas CSS
 .canvas-container {
-    margin-right: 7vw;
+    margin-right: 6vw;
 }
 
 canvas {
+    width: 640px;
+    height: 480px; 
     background-color: whitesmoke;
-    //scale: 0.8;
-    border: solid;
-
-}
-
-// InfoCard CSS
-
-.info-card {
-    position: absolute;
-    bottom: 30vh;
-    left: 1vw;
+    border: solid; 
 }
 
 .data-container {
@@ -49,6 +41,12 @@ canvas {
     font-weight: 600;
 
     cursor: default;
+}
+
+.chat-container {
+    position: absolute;
+    bottom: 21vh;
+    right: 0vw;
 }
 
 
