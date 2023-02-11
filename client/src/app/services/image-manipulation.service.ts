@@ -13,11 +13,15 @@ export class ImageManipulationService {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
     }
 
-    getModifiedImageWithoutDifferences(gameData: GameData, originalImage: Buffer, modifiedImage: Buffer, foundDifferences: boolean[]): Buffer {
-        const output = Buffer.from(modifiedImage);
+    getModifiedImageWithoutDifferences(
+        gameData: GameData,
+        images: { originalImage: Buffer; modifiedImage: Buffer },
+        foundDifferences: boolean[],
+    ): Buffer {
+        const output = Buffer.from(images.modifiedImage);
 
         // for some reason I need to use Buffer.from to make it work (cant use the originalImage directly)
-        const ogImage = Buffer.from(originalImage);
+        const ogImage = Buffer.from(images.originalImage);
 
         for (let i = 0; i < foundDifferences.length; i++) {
             if (foundDifferences[i]) {
