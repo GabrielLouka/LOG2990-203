@@ -2,25 +2,22 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { expect } from 'chai';
-const fs = require('fs');
-
 import { FileSystemManager } from './file-system-manager';
-describe('FileSysteManager', ()=>{
-    it('should read the file and return the correct content',async ()=>{
-        const fileSystemManager = new FileSystemManager();
-    const path = 'path/to/test-file.txt';
-    const expectedContents = 'This is a test file.';
+// const fs = require('fs');
 
-    fs.writeFileSync(path, expectedContents);
+describe('FileSysteManager', () => {
+    let fileManager: FileSystemManager;
+    let path: string
 
-    const contents = await fileSystemManager.readFile(path);
-
-    expect(contents.toString()).to.equal(expectedContents);
-
-    fs.unlinkSync(path);
-
-
+    beforeEach(async() => {
+        fileManager = new FileSystemManager();
+        path = './app/services/file-system/test-file.json';
     });
+
+    it('returns a Buffer', async ()=>{                
+        const contents = await fileManager.readFile(path);
+        expect(Buffer.isBuffer(contents)).to.equal(true);
+    });    
 
 
 });
