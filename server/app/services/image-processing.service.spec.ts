@@ -347,6 +347,7 @@ describe('Image-Processing Service', () => {
         const turnImageToWhiteStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'turnImageToWhite');
         turnImageToWhiteStub.returns(whiteBuffer);
         const result = imageProcessingService.getDifferencesBlackAndWhiteImage(imageBuffer1, imageBuffer2, radius);
+        // eslint-disable-next-line no-console
         console.log(result);
         const paintBlackPixelsAtPositionsStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'paintBlackPixelsAtPositions');
         paintBlackPixelsAtPositionsStub.returns(blackAndWhiteBuffer);
