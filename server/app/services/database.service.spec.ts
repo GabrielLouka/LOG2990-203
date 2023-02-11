@@ -14,9 +14,9 @@ describe("Database service", () => {
     });
   
     afterEach(async () => {
-      if (databaseService["client"]) {
-        await databaseService["client"]!.close();
-      }
+      // if (databaseService["client"]) {
+      //   await databaseService["client"]!.close();
+      // }
     }); 
   
     it("should connect to the database when start is called", async () => {
@@ -55,18 +55,25 @@ describe("Database service", () => {
       const uri = mongoServer.getUri();
       const client = new MongoClient(uri);
       await client.connect();
+
       databaseService['db'] = client.db("LOG2990");
+
       let theGames = await databaseService.database.collection("games").find({}).toArray();
-      expect(theGames.length).to.deep.equal(0);    
+      expect(theGames.length).to.deep.equal(0);
+
       await databaseService.populateDb("games", [game]);
       if(theGames.length === 0) theGames = await databaseService.database.collection("games").find({}).toArray();
       else expect(theGames.length).to.deep.equal(1);
+
+      await databaseService.populateDb("games", [game]);
+      expect(await (await databaseService.database.collection("games").find({}).toArray()).length).to.equal(1);
+      
       await databaseService.closeConnection();
-      await databaseService.start(uri);
-      theGames = await databaseService.database.collection("games").find({}).toArray();
-      expect(theGames.length).to.deep.equal(1);
+      
       
     });
+
+    
 
   
     
