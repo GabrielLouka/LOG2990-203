@@ -4,13 +4,13 @@
 </head>
 
 <body>
-    <Section class="header" [ngStyle]="{ 'justify-content': justifyContent }">
+    <Section class="flex-row center header">
         <app-back-button></app-back-button>
-        <a id="projectLogo"><img src=".\assets\img\game-icon.png" alt="Logo Projet" width="180" height="180" /></a>
-        <div *ngIf="!isSelection" class="btn">
-            <button class="game-btn" routerLink="/creation">Créer un jeu</button>
-            <button class="game-btn">Supprimer les jeux</button>
-            <button class="game-btn">Réinitialiser les jeux</button>
+        <a class="projectLogo"><img src=".\assets\img\game-icon.png" alt="Logo Projet" width="180" height="180" /></a>
+        <div *ngIf="!isSelection" class="btn-container">
+            <button class="button-style game-btn" routerLink="/creation">Créer un jeu</button>
+            <button class="button-style game-btn">Supprimer les jeux</button>
+            <button class="button-style game-btn">Réinitialiser les jeux</button>
         </div>
     </Section>
     <p>{{ debugDisplayMessage.getValue() }}</p>

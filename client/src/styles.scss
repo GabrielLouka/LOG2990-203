@@ -18,6 +18,7 @@ body {
     user-select: none; /* Standard */
 }
 
+/* Box styles: */
 .center{
     justify-content: center;
     align-items: center;
@@ -33,12 +34,39 @@ body {
     flex-direction: column;
 }
 
+/* Text styles: */
 .font-size {
     font-size: 1.5vh;
 }
 
-.not-implement {
+/* Cursor styles: */
+.not-allowed {
     cursor: not-allowed;
+}
+
+.allowed {
+    cursor: pointer;
+}
+
+/* Button styles: */
+.button-style {
+    font-weight: 600;
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
+
+    background-color: white;
+
+    border-radius: 2vw;
+    border: solid;
+
+    padding: 2vh 4vh;
+
+    cursor: pointer;
+
+    &:hover {
+        transform: scale(0.9);
+        background-color: lightsalmon;
+    }
 }
 
 

@@ -1,31 +1,7 @@
-/* regles générales */
-.bigger {
-    font-size: 1.5vh;
-}
 
 .button-style {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-weight: 600;
-    font-size: 1.7vh;
-    letter-spacing: 0.1vw;
-
-    background-color: white;
-
-    border-radius: 2vw;
-    border: solid;
-
     padding: 2vh 8vh;
     margin: 3vw;
-
-    cursor: pointer;
-
-    &:hover {
-        transform: scale(0.9);
-        background-color: lightsalmon;
-    }
 }
 
 
@@ -52,7 +28,6 @@
     }
 }
 
-/* Button style */
 .navBarContainer {
     height: 50vh;
 }
@@ -70,4 +45,8 @@
 
     margin-left: 15vw;
     margin-right: 15vw;
+}
+
+.not-allowed {
+    cursor: not-allowed;
 }

@@ -1,136 +1,84 @@
-.button-style {
-    font-weight: 600;
-    font-size: 1.7vh;
-    letter-spacing: 0.1vw;
 
-    border-radius: 2vw;
-    border: solid 0.3vh;
-
-    padding: 2vh 4vh;
-
-    background-color: white;
-
-    cursor: pointer;
-
-    &:hover {
-        transform: scale(0.9);
-        background-color: lightsalmon;
-    }
+header {
+    height: 15vh;
 }
 
-.title-params {
-    text-align: center;
-    font-family: monospace;
-    font-size: xx-large;
-
+.config-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 2vw;
 }
 
-.buttons-section {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-}
+.main-container{
+    height: 80vh;
 
-.reset-btn {
-    width: 50%;
-    left: 50%;
-    right: 50%;
-}
-
-.two-btn {
-    display: flex;
-    flex-direction: row;
     justify-content: space-around;
-}
-
-.parameters {
-    border: 2px solid black;
-    border-radius: 20px;
-    height: 50%;
-    width: 35%;
-    margin-top: 8%;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
-
-.constants-option {
-    padding: 20px;
-    height: 40%;
-    margin: auto;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-}
-
-.label-input {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-}
-
-.middle-section {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    height: 80%;
-    padding: 20px;
-}
-
-.sub-section-history {
-    display: flex;
-    flex-direction: column;
-    border: 2px solid black;
-    padding: 20px;
-    margin-top: 70px;
-    border-radius: 20px;
-    height: 70%;
-    width: 50%;
-}
-
-.body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-evenly;
-    height: 100%;
-
 }
 
 .title {
     text-align: center;
-    margin-top: 10px;
+    font-size: x-large; 
+
+    margin-bottom: 5vh;
+}
+
+.option-icon {
+    scale: 1.8;
+}
+
+/* Constants */
+.const-container {
+    height: 40vh;
+    width: 35vw;
+
+    border: solid; 
+    border-radius: 3vh;
+}
+
+.label-input {
+    width: 30vw;
+    height: 2vh;
+    margin: 1vh;
+
+    justify-content: space-around;
+}
+
+.const-btn {
+    margin-top: 3vh;
+    scale: 0.8;
 }
 
 
-body {
-    background-color: lightblue;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-}
-
-.history-section {
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    height: 90%;
-    overflow-y: auto
-}
-
-.history-line {
-    text-align: center;
-}
-
+/* History */
 .history-container {
+    height: 60vh;
+    width: 35vw;
+
+    padding: 2vw;
+
+    border: solid; 
+    border-radius: 3vh;
+}
+
+.delete-btn {
+    position: absolute;
+    right: 18vh;
+    top: 25vh;
+    scale: 0.7;
+}
+
+.history-board {
+    height: 50vh;
+    overflow-y: scroll;
+}
+
+.history-card {
     border: 2px solid black;
     background-color: white;
     border-radius: 10px;
-    padding: 10px;
+
+    margin: 1vh;
 
     &:hover {
         transform: scale(0.97);

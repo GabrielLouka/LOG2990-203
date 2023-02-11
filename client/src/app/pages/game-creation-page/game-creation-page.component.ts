@@ -56,6 +56,7 @@ export class GameCreationPageComponent {
     showPopUp() {
         this.toggleElementVisibility(this.gameNameForm, false);
         this.toggleElementVisibility(this.errorPopupText, false);
+        this.errorPopupText.nativeElement.style.color = 'red';
         this.modal.nativeElement.style.display = 'flex';
     }
 
@@ -270,16 +271,4 @@ export class GameCreationPageComponent {
             };
         }
     }
-    // ADAPTER POUR L'AVANT PLAN
-    // switchCanvas(isModified: boolean) {
-    //     const leftCanvas: HTMLCanvasElement = this.leftCanvas.nativeElement;
-    //     const rightCanvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
-    //     if (isModified) {
-    //         leftCanvas.getContext('2d')?.drawImage(rightCanvas, 0, 0);
-    //         this.resetCanvas(isModified);
-    //     } else {
-    //         rightCanvas.getContext('2d')?.drawImage(leftCanvas, 0, 0);
-    //         this.resetCanvas(isModified);
-    //     }
-    // }
 }

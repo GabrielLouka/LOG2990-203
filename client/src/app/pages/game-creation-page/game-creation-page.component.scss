@@ -1,25 +1,8 @@
 .button-style {
   display: flex;
 
-  font-weight: 600;
-  font-size: 1.7vh;
-  letter-spacing: 0.1vw;
-
-  border-radius: 2vw;
-  border: solid 0.3vh;
-
   padding: 1vh 2vh;
-
-  background-color: white;
-
-  cursor: pointer;
-
   scale: 0.7;
-
-  &:hover {
-      transform: scale(0.9);
-      background-color: lightsalmon;
-  }
 }
 
 .display{
@@ -31,6 +14,10 @@
     transform: scale(1);
     background-color: white;
   }
+}
+
+.not-allowed {
+  cursor: not-allowed;
 }
 
 .bigger {
@@ -68,12 +55,12 @@ h1 {
 .color {
   height: 5vh;
   width: 4vw;
+  border: solid 2px;
 }
 
-.reverse-controle {
+.reverse-control {
   display: flex;
 }
-
 
 .game-container {
   height: 15vh;
@@ -83,7 +70,7 @@ h1 {
 }
 
 
-// ---------------------
+// Modal Window Style
 
 .bgModal {
 	background-color: rgba(0, 0, 0, 0.8);
@@ -95,8 +82,8 @@ h1 {
 }
 
 .modal-contents {
-	height: 800px;
-	width: 1200px;
+	height: 80vh;
+	width: 60vw;
 	background-color: white;
 	text-align: center;
 	padding: 20px;
@@ -107,9 +94,10 @@ h1 {
 input {
 	margin: 15px auto;
 	display: block;
-	width: 50%;
+	width: 75%;
 	padding: 8px;
 	border: 1px solid gray;
+  border-radius: 1vh;
 }
 
 .close {
@@ -125,7 +113,6 @@ input {
 	}
 }
 
-
 input.ng-invalid {
   background-color:rgb(249, 99, 99);
 }
@@ -133,9 +120,3 @@ input.ng-valid {
   background-color:lightgreen;
 }
 
-.not-allowed {
-  cursor: not-allowed;
-}
-.allowed {
-  cursor: pointer;
-}

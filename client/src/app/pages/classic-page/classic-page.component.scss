@@ -71,24 +71,3 @@ canvas {
 	position: relative;
 	border-radius: 15px;
 }
-
-.button-style {
-    font-weight: 600;
-    font-size: 1.7vh;
-    letter-spacing: 0.1vw;
-
-    background-color: white;
-
-    border-radius: 2vw;
-    border: solid;
-
-    padding: 2vh 4vh;
-    scale: 0.8;
-
-    cursor: pointer;
-
-    &:hover {
-        transform: scale(0.9);
-        background-color: lightsalmon;
-    }
-}
