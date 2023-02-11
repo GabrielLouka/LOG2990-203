@@ -1,8 +1,8 @@
-import { fail } from "assert";
 import { expect } from "chai";
-import { MongoClient } from "mongodb";
+import { MongoClient, OptionalId } from "mongodb";
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { DatabaseService } from "./database.service";
+import Sinon = require("sinon");
 
 describe("Database service", () => {
     let databaseService: DatabaseService;
@@ -15,7 +15,7 @@ describe("Database service", () => {
   
     afterEach(async () => {
       if (databaseService["client"]) {
-        await databaseService["client"].close();
+        await databaseService["client"]!.close();
       }
     }); 
   
@@ -27,42 +27,48 @@ describe("Database service", () => {
     });
   
     it("should not connect to the database when start is called with wrong URL", async () => {
-      try {
-        await databaseService.start("WRONG URL");
-        fail();
-      } catch {
-        expect(databaseService["client"]).to.be.undefined;
-      }
+      // try{
+      //   await databaseService.start("wrong uri");;
+      //   fail();
+      // }  
+      // catch {
+      //   expect(databaseService['client']).to.equal(undefined);
+      // }
+      const startSpy = Sinon.spy(databaseService, "start");
+      expect(startSpy).to.throw('Database connection error');
+      
     });
-  
-    it("should populate the database with a helper function", async () => {
-      const mongoUri = mongoServer.getUri();
-      const client = new MongoClient(mongoUri);
+
+    it("populateDb should add data to database", async() => {
+      const game = {
+        id: 1,
+        name: "name",
+        isEasy: true,
+        nbrDifferences: 1,
+        differences: [[{x:0, y:0}]],
+        ranking: [[{
+          name: "name",
+          score: "score"
+        }]]
+      } as unknown as OptionalId<Document>;
+
+      const uri = mongoServer.getUri();
+      const client = new MongoClient(uri);
       await client.connect();
-      databaseService["db"] = client.db("database");
-      await databaseService['populateDb'];
-      let courses = await databaseService.database
-        .collection("courses")
-        .find({})
-        .toArray();
-      expect(courses.length).to.equal(0);
-    });
-  
-    it("should not populate the database with start function if it is already populated", async () => {
-      const mongoUri = mongoServer.getUri();
-      await databaseService.start(mongoUri);
-      let courses = await databaseService.database
-        .collection("courses")
-        .find({})
-        .toArray();
-      expect(courses.length).to.equal(0);
+      databaseService['db'] = client.db("LOG2990");
+      let theGames = await databaseService.database.collection("games").find({}).toArray();
+      expect(theGames.length).to.deep.equal(0);    
+      await databaseService.populateDb("games", [game]);
+      if(theGames.length === 0) theGames = await databaseService.database.collection("games").find({}).toArray();
+      else expect(theGames.length).to.deep.equal(1);
       await databaseService.closeConnection();
-      await databaseService.start(mongoUri);
-      courses = await databaseService.database
-        .collection("courses")
-        .find({})
-        .toArray();
-      expect(courses.length).to.equal(0);
+      await databaseService.start(uri);
+      theGames = await databaseService.database.collection("games").find({}).toArray();
+      expect(theGames.length).to.deep.equal(1);
+      
     });
+
+  
+    
   });
   
