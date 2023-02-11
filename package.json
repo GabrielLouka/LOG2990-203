@@ -2,7 +2,9 @@
   "dependencies": {
     "@ng-bootstrap/ng-bootstrap": "^14.0.1",
     "ng-carousel": "^0.2.0",
-    "ts-mockito": "^2.6.1"
+    "reflect-metadata": "^0.1.13",
+    "ts-mockito": "^2.6.1",
+    "typedi": "^0.10.0"
   },
   "devDependencies": {
     "@types/chai": "^4.3.4",
