@@ -66,12 +66,12 @@
         "mongodb": "4.5.0",
         "mongodb-memory-server": "^8.11.4",
         "prettier": "2.7.1",
-        "reflect-metadata": "0.1.13",
+        "reflect-metadata": "^0.1.13",
         "serve-favicon": "2.5.0",
         "socket.io": "^4.6.0",
         "swagger-jsdoc": "6.2.5",
         "swagger-ui-express": "4.5.0",
-        "typedi": "0.10.0"
+        "typedi": "^0.10.0"
     },
     "devDependencies": {
         "@types/body-parser": "1.19.1",

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
@@ -9,6 +10,7 @@ import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult, UpdateResult } from 'mongodb';
+import 'reflect-metadata';
 import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
 @Service()
@@ -64,9 +66,9 @@ export class GameStorageService {
      * @param id game identifier
      * @returns true if deleted, false if not
      */
-    async deleteGame(id: string): Promise<boolean> {
-        const res = await this.collection.findOneAndDelete({ id });
-        return res.value !== null;
+    async deleteGame(id: string) {
+        const query = { id: parseInt(id, 10) };
+        await this.collection.findOneAndDelete(query);
     }
 
     async deleteAllGames(): Promise<DeleteResult> {
@@ -81,10 +83,6 @@ export class GameStorageService {
         const gamesToReturn = [];
         for (const game of nextGames) {
             const images = this.getGameImages(game.id.toString());
-            console.log('getting images from game id = ' + game.id);
-            console.log(`Buffer length first image: ${images.originalImage.length} bytes`);
-            console.log(`Buffer length second image: ${images.modifiedImage.length} bytes`);
-
             game.ranking = defaultRankings;
             gamesToReturn.push({
                 gameData: game,

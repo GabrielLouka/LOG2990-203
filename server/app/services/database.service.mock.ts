@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/member-ordering */
-import { Db, MongoClient } from 'mongodb';
+import { Db, MongoClient, OptionalId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-const DATABASE_NAME = 'database';
+const DATABASE_NAME = 'testDatabase';
 
 export class DatabaseServiceMock {
     private db: Db;
@@ -33,5 +33,10 @@ export class DatabaseServiceMock {
 
     get database(): Db {
         return this.db;
+    }
+    async populateDb(collectionName: string, data: OptionalId<Document>[]) {
+        if ((await this.db.collection(collectionName).find({}).toArray()).length === 0) {
+            await this.db.collection(collectionName).insertMany(data);
+        }
     }
 }
