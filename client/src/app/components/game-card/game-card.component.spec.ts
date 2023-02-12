@@ -1,56 +1,53 @@
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { Game } from '@app/interfaces/games';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { GameData } from '@common/game-data';
+import { Buffer } from 'buffer';
 
-// import { OverlayComponent } from '@app/components/overlay/overlay.component';
-// import { GameCardComponent } from './game-card.component';
+import { OverlayComponent } from '@app/components/overlay/overlay.component';
+import { GameCardComponent } from './game-card.component';
 
-// describe('GameCardComponent', () => {
-//     let component: GameCardComponent;
-//     let fixture: ComponentFixture<GameCardComponent>;
-//     const game: Game = {
-//         description: 'Glouton',
-//         image: '.\\assets\\img\\game-icon.png',
-//         difficulty: 'DIFFICILE',
-//         ranking: [
-//             [
-//                 { name: 'gabriel', score: '05:30' },
-//                 { name: 'gabriel', score: '05:30' },
-//                 { name: 'gabriel', score: '05:30' },
-//             ],
-//             [
-//                 { name: 'gabriel', score: '05:30' },
-//                 { name: 'gabriel', score: '05:30' },
-//                 { name: 'gabriel', score: '05:30' },
-//             ],
-//         ],
-//     };
+describe('GameCardComponent', () => {
+    let component: GameCardComponent;
+    let fixture: ComponentFixture<GameCardComponent>;
+    let gameTest: GameData = {
+        id: 0,
+        name: "gametest",
+        isEasy: true,
+        nbrDifferences: 1,
+        differences: [[{x:0, y:0}]],
+        ranking: [[{name: "name", score: "1"}]]
+    };
+    let imageBuffer: Buffer = Buffer.alloc(3);
+    
+    
+    beforeEach(waitForAsync(() => {
+        TestBed.configureTestingModule({
+          declarations: [GameCardComponent, OverlayComponent]
+        })
+          .compileComponents();
+      }));
 
-//     beforeEach(async () => {
-//         await TestBed.configureTestingModule({
-//             declarations: [GameCardComponent, OverlayComponent],
-//         }).compileComponents();
+    beforeEach(() => {
+    fixture = TestBed.createComponent(GameCardComponent);
+    component = fixture.componentInstance;
+    fixture.componentInstance.game = {gameData: gameTest, originalImage: imageBuffer}
+    fixture.detectChanges();
+    });
 
-//         fixture = TestBed.createComponent(GameCardComponent);
-//         component = fixture.componentInstance;
-//         fixture.detectChanges();
-//     });
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
 
-//     it('should create', () => {
-//         expect(component).toBeTruthy();
-//     });
+    it("getDifficulty should return green if easy", () => { 
+        component.game.gameData.isEasy = true;
+        const colour = component.getDifficultyColor();
+        expect(colour).toEqual("green");
+    });
 
-//     it('should return green when difficulty is FACILE', () => {
-//         game.difficulty = 'FACILE';
-//         expect(component.getDifficultyColor(game)).toBe('green');
-//     });
+    it("getDifficulty should return red if difficult", () => {
+        component.game.gameData.isEasy = false;
+        const colour = component.getDifficultyColor();
+        expect(colour).toEqual("red");
+    });
 
-//     it('should return red when difficulty is DIFFICILE', () => {
-//         game.difficulty = 'DIFFICILE';
-//         expect(component.getDifficultyColor(game)).toBe('red');
-//     });
-
-//     it('should return black when difficulty is unknown', () => {
-//         game.difficulty = 'MEDIUM';
-//         expect(component.getDifficultyColor(game)).toBe('black');
-//     });
-// });
+    
+});

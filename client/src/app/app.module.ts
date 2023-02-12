@@ -9,7 +9,6 @@ import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { FoundHintsCounterComponent } from './components/found-hints-counter/found-hints-counter.component';
@@ -50,8 +49,7 @@ import { AuthService } from './services/auth.service';
         ClassicPageComponent,
         SelectionsPageComponent,
         HintComponent,
-        InfoCardComponent,
-        ServerDebugPageComponent,
+        InfoCardComponent,        
         RegistrationPageComponent,
         ParameterPageComponent,
         FoundHintsCounterComponent,
