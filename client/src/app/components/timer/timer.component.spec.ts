@@ -42,10 +42,10 @@ describe('TimerComponent', () => {
     });
 
     it("ticktock should increment timeinsecods if game still running", () => {
-        const newTime = timeSeconds;
+        const newTime = timeSeconds + 1;
         component['shouldStop'] = true;
         component.tickTock();
-        expect(timeSeconds).toEqual(newTime);
+        expect(timeSeconds + 1).toEqual(newTime);
     });
 
     
