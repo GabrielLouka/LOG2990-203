@@ -1,30 +1,3 @@
-<<<<<<< HEAD
-// import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-// import { BackButtonComponent } from '@app/components/back-button/back-button.component';
-// import { HintComponent } from '@app/components/hint/hint.component';
-// import { InfoCardComponent } from '@app/components/info-card/info-card.component';
-// import { ClassicPageComponent } from './classic-page.component';
-
-// describe('ClassicPageComponent', () => {
-//     let component: ClassicPageComponent;
-//     let fixture: ComponentFixture<ClassicPageComponent>;
-
-//     beforeEach(async () => {
-//         await TestBed.configureTestingModule({
-//             declarations: [ClassicPageComponent, HintComponent, BackButtonComponent, InfoCardComponent],
-//         }).compileComponents();
-
-//         fixture = TestBed.createComponent(ClassicPageComponent);
-//         component = fixture.componentInstance;
-//         fixture.detectChanges();
-//     });
-
-//     it('should create', () => {
-//         expect(component).toBeTruthy();
-//     });
-// });
-=======
 import { HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -55,19 +28,23 @@ describe('ClassicPageComponent', () => {
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',
-      });      
+    });
     const mockObservable = of(mockResponse);
 
     beforeEach(() => {
-        socketService = jasmine.createSpyObj("SocketClientService", ['isSocketAlive', 'connect', 'disconnect', 'on', 'send']);
-        commService = jasmine.createSpyObj("CommunicationService", ['basicGet', 'basicPost', 'get', 'post', 'delete']);
-        authService = jasmine.createSpyObj("AuthService", ['registerUser', 'registerUserName']);
-        imageService = jasmine.createSpyObj("ImageManipulationService", ['getModifiedImageWithoutDifferences', 'blinkDifference',
-         'sleep', 'loadCanvasImages']);
+        socketService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'disconnect', 'on', 'send']);
+        commService = jasmine.createSpyObj('CommunicationService', ['basicGet', 'basicPost', 'get', 'post', 'delete']);
+        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
+        imageService = jasmine.createSpyObj('ImageManipulationService', [
+            'getModifiedImageWithoutDifferences',
+            'blinkDifference',
+            'sleep',
+            'loadCanvasImages',
+        ]);
 
-        leftCanvas = jasmine.createSpyObj("nativeElement", ['getContext']);
-        rightCanvas = jasmine.createSpyObj("nativeElement", ['getContext']);
-        chat = jasmine.createSpyObj("ChatComponent", ['sendMessage', 'addMessage']);
+        leftCanvas = jasmine.createSpyObj('nativeElement', ['getContext']);
+        rightCanvas = jasmine.createSpyObj('nativeElement', ['getContext']);
+        chat = jasmine.createSpyObj('ChatComponent', ['sendMessage', 'addMessage']);
 
         commService.get.and.returnValue(mockObservable);
     });
@@ -75,17 +52,21 @@ describe('ClassicPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [ClassicPageComponent, HintComponent, BackButtonComponent, InfoCardComponent],
-            providers: [{provide: AuthService, useValue: authService}, 
-                        {provide: SocketClientService, useValue: socketService},
-                        {provide: CommunicationService, useValue: commService},
-                        {provide: ImageManipulationService, useValue: imageService},
-                        {provide: ActivatedRoute, useValue: {
-                            snapshot: { paramMap: convertToParamMap({id: '123'}) }
-                        }}, 
-                        {provide: ChatComponent, useValue: chat},
-                        {provide:  ElementRef, useValue: leftCanvas},
-                        {provide: ElementRef, useValue: rightCanvas}
-                    ]
+            providers: [
+                { provide: AuthService, useValue: authService },
+                { provide: SocketClientService, useValue: socketService },
+                { provide: CommunicationService, useValue: commService },
+                { provide: ImageManipulationService, useValue: imageService },
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        snapshot: { paramMap: convertToParamMap({ id: '123' }) },
+                    },
+                },
+                { provide: ChatComponent, useValue: chat },
+                { provide: ElementRef, useValue: leftCanvas },
+                { provide: ElementRef, useValue: rightCanvas },
+            ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ClassicPageComponent);
@@ -101,29 +82,25 @@ describe('ClassicPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it("socketId should return id if valid, otherwise empty string", () => {
-        if(socketService.socket.id) expect(component.socketId).toEqual(socketService.socket.id);
+    it('socketId should return id if valid, otherwise empty string', () => {
+        if (socketService.socket.id) expect(component.socketId).toEqual(socketService.socket.id);
         else expect(component.socketId).toEqual('');
     });
 
-    it("addMessageToChat should add message to chat", () => {
+    it('addMessageToChat should add message to chat', () => {
         const message = 'hello';
         component.chat.addMessage(message);
         expect(component.chat).toContain(message);
     });
 
-
-    it("onWinGame should add message to chat", () => {
-        const messageSpy = spyOn(component, "addMessageToChat");
+    it('onWinGame should add message to chat', () => {
+        const messageSpy = spyOn(component, 'addMessageToChat');
         component.onWinGame();
         expect(messageSpy).toHaveBeenCalledWith('Damn, you are goated');
+    });
 
-    });    
-
-    it("onWinGame should disconnect", () => {
+    it('onWinGame should disconnect', () => {
         component.onWinGame();
         expect(socketService.disconnect).toHaveBeenCalled();
     });
-
 });
->>>>>>> 5d22934ef17f5069b7ee848a9a0de533f583bb6c
