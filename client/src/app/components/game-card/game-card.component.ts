@@ -1,23 +1,27 @@
-import { Component, Input } from '@angular/core';
-import { Game } from '@app/interfaces/games';
-
+import { Component, Input, OnInit } from '@angular/core';
+import { GameData } from '@common/game-data';
+import { Buffer } from 'buffer';
 @Component({
     selector: 'app-game-card',
     templateUrl: './game-card.component.html',
     styleUrls: ['./game-card.component.scss'],
 })
-export class GameCardComponent {
-    @Input() game: Game;
-    @Input() playable: boolean;
+export class GameCardComponent implements OnInit {
+    @Input() game: { gameData: GameData; originalImage: Buffer };
+    @Input() isPlayable: boolean;
+    difficulty: string;
+    originalImageSrc: string;
 
-    getDifficultyColor(game: { difficulty: unknown }) {
-        switch (game.difficulty) {
-            case 'FACILE':
-                return 'green';
-            case 'DIFFICILE':
-                return 'red';
-            default:
-                return 'black';
+    ngOnInit() {
+        this.difficulty = this.game.gameData.isEasy ? 'Facile' : 'Difficile';
+        this.originalImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;
+    }
+
+    getDifficultyColor() {
+        if (this.game.gameData.isEasy) {
+            return 'green';
+        } else {
+            return 'red';
         }
     }
 }

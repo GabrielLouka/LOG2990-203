@@ -19,18 +19,12 @@ export class MouseHandlerService {
     }
 
     onMouseUp(coordinate: Coordinate) {
-        this.endCoordinate = coordinate;
-        console.log(`Mouse Up on x: ${this.endCoordinate.x} y: ${this.endCoordinate.y}`);
-
-        this.printToConsole(this.calculateDistance(this.startCoordinate, this.endCoordinate));
-
-        // Can call one or the other
-        // this.calculateDistanceWrapper();
+        this.startCoordinate = coordinate;
+        console.log(`Mouse Up on x: ${this.startCoordinate.x} y: ${this.startCoordinate.y}`);
     }
 
     calculateDistanceWrapper() {
         const distance = this.calculateDistance(this.startCoordinate, this.endCoordinate);
-        this.printToConsole(distance);
         return distance;
     }
 
@@ -41,9 +35,5 @@ export class MouseHandlerService {
         const totalDistance = Math.sqrt(Math.pow(distanceX, 2) + Math.pow(distanceY, 2));
 
         return totalDistance;
-    }
-
-    private printToConsole(x: number): void {
-        console.log(`Total distance is ${x}`);
     }
 }

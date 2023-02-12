@@ -3,9 +3,9 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { Pixel } from '@common/pixel';
 import { expect } from 'chai';
 import { describe } from 'mocha';
-import { Pixel } from './pixel';
 
 describe('Pixel', () => {
     it('should have r equal to 255', () => {
@@ -38,15 +38,15 @@ describe('Pixel', () => {
         const pixel = new Pixel(1, 2, 3);
         expect(pixel.b).to.equal(3);
     });
-     it('should return true for equal pixels', () => {
-            const pixel1 = new Pixel(1, 2, 3);
-            const pixel2 = new Pixel(1, 2, 3);
-            expect(pixel1.equals(pixel2)).to.be.true;
-        });
+    it('should return true for equal pixels', () => {
+        const pixel1 = new Pixel(1, 2, 3);
+        const pixel2 = new Pixel(1, 2, 3);
+        expect(pixel1.equals(pixel2)).to.be.true;
+    });
     it('should return false for non-equal pixels', () => {
-            const pixel1 = new Pixel(1, 2, 3);
-            const pixel2 = new Pixel(3, 2, 1);
-            expect(pixel1.equals(pixel2)).to.be.false;
+        const pixel1 = new Pixel(1, 2, 3);
+        const pixel2 = new Pixel(3, 2, 1);
+        expect(pixel1.equals(pixel2)).to.be.false;
     });
     it('should return false for non-equal pixels', () => {
         const pixel1 = new Pixel(1, 5, 3);
@@ -63,5 +63,4 @@ describe('Pixel', () => {
         const pixel2 = new Pixel(9, 8, 3);
         expect(pixel1.equals(pixel2)).to.be.false;
     });
-    
 });

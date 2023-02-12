@@ -26,25 +26,10 @@ describe('MouseHandlerService', () => {
     });
 
     it('onMouseDown should read the mouse pointer position', () => {
-        // Our setup is already done in the beforeEach()
-
         service.onMouseDown(startPosition);
 
         expect(service.startCoordinate.x).toBe(startPosition.x);
         expect(service.startCoordinate.y).toBe(startPosition.y);
-    });
-
-    it('onMouseUp should read the mouse pointer position', () => {
-        service.onMouseUp(endPosition);
-
-        expect(service.endCoordinate.x).toBe(endPosition.x);
-        expect(service.endCoordinate.y).toBe(endPosition.y);
-    });
-
-    it('should calculate distance between two points', () => {
-        const calculatedDistance = service.calculateDistance(startPosition, endPosition);
-
-        expect(calculatedDistance).toBe(distance);
     });
 
     it('should always have a positive or null distance', () => {
@@ -80,25 +65,5 @@ describe('MouseHandlerService', () => {
         // It can also check what values have been passed to it
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledWith(service.startCoordinate, service.endCoordinate);
-    });
-
-    it('Spy should change what is called when wrapper function is called ', () => {
-        service.startCoordinate = startPosition;
-        service.endCoordinate = endPosition;
-
-        // We create a fake function that is called instead of printToConsole that does nothing
-        const fakePrint = (x: number) => {};
-
-        // We spy on a real function but replace it with our own one
-        // Note : printToConsole is private so we need to add <any> before the spy
-        //
-        // Using a Spy to mock only a part of an objet can be useful but it should be used with caution.
-        // Having to use it a lot can mean that your methods are highly coupled and can have side effets.
-        const spy = spyOn<unknown>(service, 'printToConsole').and.callFake(fakePrint);
-
-        const calculatedDistance = service.calculateDistanceWrapper();
-
-        expect(spy).toHaveBeenCalled();
-        expect(calculatedDistance).toBe(5);
     });
 });

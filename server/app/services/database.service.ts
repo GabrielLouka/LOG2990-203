@@ -11,6 +11,7 @@ export class DatabaseService {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     async start(url: string = process.env.DATABASE_URL!): Promise<void> {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             this.client = new MongoClient(process.env.DATABASE_URL!);
             await this.client.connect();
             this.db = this.client.db(process.env.DATABASE_NAME);

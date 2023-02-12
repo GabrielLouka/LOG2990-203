@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 export interface History {
     startingTime: Date;
     endingTime: Date;

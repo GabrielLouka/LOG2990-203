@@ -1,5 +1,6 @@
 import { GameStorageService } from '@app/services/game-storage.service';
 import { ImageProcessingService } from '@app/services/image-processing.service';
+import { GAME_CONST } from '@app/utils/env';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Request, Response, Router } from 'express';
@@ -24,20 +25,19 @@ export class ImageProcessingController {
             const buffer1 = Buffer.from(receivedDifferenceImages.firstImage.background);
             const buffer2 = Buffer.from(receivedDifferenceImages.secondImage.background);
 
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
             let status = HTTP_STATUS_CREATED;
             let outputResultToSendToClient: ImageUploadResult = {
                 resultImageByteArray: Array.from(new Uint8Array(buffer1)),
                 numberOfDifferences: 0,
                 message: '',
-                generatedGameId: -1,
+                generatedGameId: GAME_CONST.notFound,
+                differences: [],
+                isEasy: true,
             };
             try {
                 const out = this.imageProcessingService.getDifferencesBlackAndWhiteImage(buffer1, buffer2, receivedDifferenceImages.radius);
-                outputResultToSendToClient = out[0];
+                outputResultToSendToClient = out;
                 outputResultToSendToClient.generatedGameId = this.gameStorageService.getNextAvailableGameId();
-                this.gameStorageService.storeGameImages(outputResultToSendToClient.generatedGameId, buffer1, buffer2);
-                this.gameStorageService.storeGameResult(outputResultToSendToClient.generatedGameId, out[1]);
             } catch (e) {
                 // eslint-disable-next-line no-console
                 console.error(e);

@@ -1,29 +1,44 @@
 <head>
     <meta charset="UTF-8" />
-    <title>{{ title }}</title>
+    <title>Jeu classic</title>
 </head>
 <body>
-    <section class="header">
+    <div class="flex-row center header">
         <app-quit-button></app-quit-button>
+        <h1 class="titre">{{ this.title }}</h1>
         <app-hint></app-hint>
-        <h1 class="button-style titre">Jeu classique</h1>
-    </section>
+    </div>
 
-    <div class="difference-container">
-        <div class="left-info">
-            <app-info-card></app-info-card>
+    <div class="flex-column center difference-container">
+        <div class="flex-row center data-container">
+            <app-found-hints-counter [differencesFound]="differencesFound" [differencesNbr]="totalDifferences"></app-found-hints-counter>
+            <div class="timer-container">
+                <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
+            </div>
         </div>
-        <app-found-hints-counter></app-found-hints-counter>
-        <div class="timer-container">
-            <app-timer [init]="timeInSeconds"></app-timer>
+
+        <app-info-card class="info-card" *ngIf="game" [gameData]="game.gameData"></app-info-card>
+
+        <div class="flex-row center canvas-container">
+            <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
+            <canvas #modifiedImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
+        </div>
+
+        <app-chat #chat></app-chat>
+    </div>
+
+    <div #errorMessage class="error-message">ERREUR</div>
+
+    <div #bgModal class="bgModal center">
+        <div class="flex-column center modal-contents">
+            <h2>Félicitations !</h2>
+            <p><strong>Tu as trouvé toutes les différences. GG WP.</strong></p>
+            <div class="flex-row center">
+                <button class="button-style" routerLink="/home">Menu Principal</button>
+                <button class="button-style">Reprise Vidéo</button>
+            </div>
         </div>
     </div>
-    <div class="middle-container">
-        <div class= "center-container">
-            <app-images-area></app-images-area>
-        </div>
-        <div class= "right-chat">
-            <app-chat></app-chat>
-        </div>
-    </div>
+    <audio #successSound src="../../../assets/sound/success2.mp3"></audio>
+    <audio #errorSound src="../../../assets/sound/fail2.mp3"></audio>
 </body>

@@ -4,6 +4,7 @@ import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { DatabaseService } from './services/database.service';
 import { GameStorageService } from './services/game-storage.service';
+import { SocketManager } from './services/socket-manager.service';
 
 @Service()
 export class Server {
@@ -11,7 +12,7 @@ export class Server {
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     private static readonly baseDix: number = 10;
     private server: http.Server;
-
+    private socketManager: SocketManager;
     constructor(private application: Application, private databaseService: DatabaseService) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -29,6 +30,9 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
+        this.socketManager = new SocketManager(this.server);
+        this.socketManager.handleSockets();
+
         this.server.listen(Server.appPort);
 
         this.server.on('error', (error: NodeJS.ErrnoException) => this.onError(error));
@@ -36,7 +40,7 @@ export class Server {
 
         try {
             await this.databaseService.start();
-            this.application.gamesController.gamesService = new GameStorageService(this.databaseService);
+            this.application.gamesController.gameStorageService = new GameStorageService(this.databaseService);
             console.log('Database connection successful !');
         } catch {
             console.error('Database connection failed !');
