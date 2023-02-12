@@ -20,7 +20,6 @@ describe('SocketTestHelper', () => {
     it('should register a callback for a specific event', () => {
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('event1', callback);
-        socketTestHelper.on('event1', callback);
         expect(socketTestHelper['callbacks'].has('event1')).toBeTruthy();
         expect(socketTestHelper['callbacks'].get('event1')).toContain(callback);
     });
@@ -46,6 +45,15 @@ describe('SocketTestHelper', () => {
         expect(result).toEqual(undefined);   
         
     });
+    // it('should handle undefined callbacks correctly', () => {
+    //     const callback = ((params: any) => {}) as any;
+    //     const getStub=jasmine.createSpyObj(socketTestHelper['callbacks'],['get']);
+    //     getStub.get.and.callFake(()=>{
+    //         return undefined;
+    //     });
+    //     socketTestHelper.on('event1', callback);
+    //     socketTestHelper.on('event2', callback);
+    //   });
     
    
 });

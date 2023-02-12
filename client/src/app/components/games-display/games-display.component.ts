@@ -24,6 +24,7 @@ export class GamesDisplayComponent implements OnInit {
     gamesNbr: number = 0;
     justifyContent: string;
     showNextButton = true;
+
     showPreviousButton = false;
     constructor(private readonly communicationService: CommunicationService) {}
     ngOnInit() {
