@@ -9,8 +9,8 @@
         <a class="projectLogo"><img src=".\assets\img\game-icon.png" alt="Logo Projet" width="180" height="180" /></a>
         <div *ngIf="!isSelection" class="btn-container">
             <button class="button-style game-btn" routerLink="/creation">Créer un jeu</button>
-            <button class="button-style game-btn">Supprimer les jeux</button>
-            <button class="button-style game-btn">Réinitialiser les jeux</button>
+            <button class="button-style game-btn not-allowed">Supprimer les jeux</button>
+            <button class="button-style game-btn not-allowed">Réinitialiser les jeux</button>
         </div>
     </Section>
     <p>{{ debugDisplayMessage.getValue() }}</p>

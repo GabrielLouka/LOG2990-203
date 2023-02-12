@@ -2,6 +2,10 @@
     height: 11vh;
 }
 
+.projectLogo {
+    margin-top: 4vh;
+}
+
 .btn-container{
     position: absolute;
 
@@ -16,5 +20,9 @@
     width: fit-content; 
     float: right;
     margin: 0.5vh
+}
+
+.not-allowed {
+    cursor: not-allowed;
 }
 

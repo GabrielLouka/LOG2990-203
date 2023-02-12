@@ -233,7 +233,7 @@ export class GameCreationPageComponent {
                 ${response.statusText} \n`;
                 this.debugDisplayMessage.next(responseString);
                 this.closePopUp();
-                this.router.navigate(['/config']);
+                this.router.navigate(['/home']);
             },
             error: (err: HttpErrorResponse) => {
                 const responseString = `Server Error : ${err.message}`;
