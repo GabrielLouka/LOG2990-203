@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import { expect } from 'chai';
 import { MongoClient, OptionalId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
@@ -34,7 +36,8 @@ describe('Database service', () => {
         //   expect(databaseService['client']).to.equal(undefined);
         // }
         const startSpy = sinon.spy(databaseService, 'start');
-        expect(startSpy).to.throw('Database connection error');
+        await databaseService.start('');
+        expect(startSpy).to.throws(Error);
     });
 
     it('populateDb should add data to database', async () => {

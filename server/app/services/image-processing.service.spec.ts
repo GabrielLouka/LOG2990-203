@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
@@ -80,7 +81,7 @@ describe('Image-Processing Service', () => {
         expect(spy.callCount).to.equal(2);
         expect(spy.getCall(0).args[0]).to.be.an('error');
         expect(spy.getCall(1).args[0]).to.equal("OOPS! Can't write pixel at position " + invalidPosition.x + ', ' + invalidPosition.y + '!');
-        spy.restore();
+        sinon.restore();
     });
     it('should return a null and throw an error', () => {
         const spy = sinon.spy(console, 'error');
@@ -94,7 +95,7 @@ describe('Image-Processing Service', () => {
             "OOPS! Couldn't get the RGB values for the pixel at position " + invalidPosition.x + ', ' + invalidPosition.y + '!',
         );
         expect(pixelEmpty).to.be.null;
-        spy.restore();
+        sinon.restore();
     });
 
     it('should return the RGB values of a pixel in the image buffer', () => {
@@ -112,6 +113,7 @@ describe('Image-Processing Service', () => {
         expect(result?.b).to.deep.equal(pixelTest.b);
         expect(result?.g).to.deep.equal(pixelTest.g);
         expect(result?.r).to.deep.equal(pixelTest.r);
+        sinon.restore();
     });
 
     it('should turn the image to white', () => {
@@ -127,6 +129,7 @@ describe('Image-Processing Service', () => {
         }
         imageProcessingService['turnImageToWhite'](imageBuffer);
         expect(imageBuffer).to.deep.equal(expectedImageBuffer);
+        sinon.restore();
     });
     it('should write an error on the console if the image is invalid or not found', () => {
         const spy = sinon.spy(console, 'error');
@@ -161,6 +164,7 @@ describe('Image-Processing Service', () => {
         }
         imageProcessingService['paintBlackPixelsAtPositions'](position, imageBuffer);
         expect(imageBuffer).to.deep.equal(expectedImageBuffer);
+        sinon.restore();
     });
 
     it('should get the different pixel position between two Images', () => {
@@ -183,6 +187,7 @@ describe('Image-Processing Service', () => {
         }
         const result = imageProcessingService['getDifferentPixelPositionsBetweenImages'](imageBuffer1, imageBuffer2);
         expect(result).to.deep.equal(expected);
+        sinon.restore();
     });
     it('should return no difference if both pixels are identical', () => {
         const getImageDimensionsStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'getImageDimensions');
@@ -196,6 +201,7 @@ describe('Image-Processing Service', () => {
         }
         const result = imageProcessingService['getDifferentPixelPositionsBetweenImages'](imageBuffer1, imageBuffer1);
         expect(result).to.deep.equal(expected);
+        sinon.restore();
     });
 
     it('should return the positions differences in an array', () => {
@@ -231,6 +237,7 @@ describe('Image-Processing Service', () => {
         getImageDimensionsStub.returns(new Vector2(5, 1));
         const result = imageProcessingService['getDifferencesPositionsList'](imageBuffer1, imageBuffer2, radius);
         expect(result).to.deep.equal(expected);
+        sinon.restore();
     });
     it('should return the positions differences in an array', () => {
         const radius = 0;
@@ -265,6 +272,7 @@ describe('Image-Processing Service', () => {
         getImageDimensionsStub.returns(new Vector2(5, 1));
         const result = imageProcessingService['getDifferencesPositionsList'](imageBuffer1, imageBuffer2, radius);
         expect(result).to.deep.equal(expected);
+        sinon.restore();
     });
     it('should throw an error if the dimensions of the images are not the right one ', () => {
         const imageBuffer1 = Buffer.alloc(3);
@@ -294,6 +302,7 @@ describe('Image-Processing Service', () => {
                     ')',
             ),
         );
+        sinon.restore();
     });
     it('should throw an error if format is not the good one ', () => {
         const imageBuffer1 = Buffer.alloc(3);
@@ -312,6 +321,7 @@ describe('Image-Processing Service', () => {
         getImageDimensionsStub.withArgs(imageBuffer2).returns(image2Dimensions);
         const result = imageProcessingService.getDifferencesBlackAndWhiteImage(imageBuffer1, imageBuffer2, radius);
         expect(result).to.throws(new Error('Images must be 24 bit depth BMPs!'));
+        sinon.restore();
     });
     it('should return an image with all differences in black and white', () => {
         const imageBuffer1 = Buffer.alloc(3);
@@ -367,5 +377,6 @@ describe('Image-Processing Service', () => {
             ],
             isEasy: true,
         });
+        sinon.restore();
     });
 });
