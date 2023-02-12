@@ -1,10 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import * as chai from 'chai';
 import { expect } from 'chai';
-import { OptionalId } from 'mongodb';
+import * as chaiAsPromised from 'chai-as-promised';
+import { MongoClient, OptionalId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import * as sinon from 'sinon';
 import { DatabaseService } from './database.service';
+
+chai.use(chaiAsPromised);
+
 describe('Database service', () => {
     let databaseService: DatabaseService;
     let mongoServer: MongoMemoryServer;
@@ -14,34 +20,50 @@ describe('Database service', () => {
         mongoServer = await MongoMemoryServer.create();
     });
 
-    afterEach(async () => {
-        await databaseService.closeConnection();
-    });
-
     it('should connect to the database when start is called', async () => {
         const mongoUri = mongoServer.getUri();
+
         await databaseService.start(mongoUri);
         expect(databaseService['client']).to.not.be.undefined;
         expect(databaseService['db'].databaseName).to.equal('LOG2990');
+        await databaseService.closeConnection();
     });
 
-    it('should not create a new client', async () => {
+    it('should not connect to the database when start is called with wrong URL', async () => {
+        // Try to reconnect to local server
+        const startSpy = sinon.spy(databaseService, 'start');
+        await databaseService.start('');
+        expect(startSpy).to.throws(Error);
+    });
+
+    it('should insert data into the collection if the collection is empty', async () => {
         const mongoUri = mongoServer.getUri();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await databaseService.start(mongoUri);
-        await databaseService.start(mongoUri);
-        expect(databaseService['client']).to.not.be.undefined;
+        const client = new MongoClient(mongoUri);
+        const objectData: OptionalId<Document>[] = [
+            {
+                name: 'Object Oriented Programming',
+                credits: 3,
+                subjectCode: 'INF1010',
+                teacher: 'Samuel Kadoury',
+            },
+        ] as any;
+
+        await client.connect();
+        databaseService['db'] = client.db('database');
+        await databaseService.populateDb('LOG2990', objectData);
+        const dataFromMdb = await databaseService.database.collection('LOG2990').find({}).toArray();
+        expect(dataFromMdb.length).to.equal(1);
     });
 
-    it('populateDb should add data to database', async () => {
-        const DATABASE_NAME = 'testDatabase';
+    it('should not add data to database', async () => {
+        const DATABASE_NAME = 'LOG2990';
         const mongoUri = mongoServer.getUri();
         await databaseService.start(mongoUri);
         await databaseService.database.collection(DATABASE_NAME).insertOne({ id: 5 });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const database: OptionalId<Document> = (await databaseService.database.collection(DATABASE_NAME).find({})) as any;
         const insertManySpy: sinon.SinonSpy = sinon.spy(databaseService.database.collection(DATABASE_NAME), 'insertMany');
-        await databaseService.populateDb(DATABASE_NAME, [database]);
+        await databaseService.populateDb(DATABASE_NAME, [database, database]);
         sinon.assert.notCalled(insertManySpy);
+        await databaseService.closeConnection();
     });
 });
