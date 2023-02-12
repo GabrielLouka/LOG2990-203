@@ -11,6 +11,7 @@ describe('CommunicationService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
+            providers: [CommunicationService]
         });
         service = TestBed.inject(CommunicationService);
         httpMock = TestBed.inject(HttpTestingController);
@@ -70,4 +71,7 @@ describe('CommunicationService', () => {
         expect(req.request.method).toBe('GET');
         req.error(new ProgressEvent('Random error occurred'));
     });
+
+    
+    
 });

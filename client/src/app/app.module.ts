@@ -49,7 +49,11 @@ import { AuthService } from './services/auth.service';
         ClassicPageComponent,
         SelectionsPageComponent,
         HintComponent,
+<<<<<<< HEAD
         InfoCardComponent,
+=======
+        InfoCardComponent,        
+>>>>>>> 5d22934ef17f5069b7ee848a9a0de533f583bb6c
         RegistrationPageComponent,
         ParameterPageComponent,
         FoundHintsCounterComponent,
