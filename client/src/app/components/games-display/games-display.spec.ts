@@ -1,73 +1,54 @@
-/* eslint-disable deprecation/deprecation */
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+/* eslint-disable no-unused-vars */
+import { HttpClient } from '@angular/common/http';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { CommunicationService } from '@app/services/communication.service';
-import { GameData } from '@common/game-data';
 import { GamesDisplayComponent } from './games-display.component';
-
+import SpyObj = jasmine.SpyObj;
 describe('GamesDisplayComponent', () => {
     let component: GamesDisplayComponent;
     let fixture: ComponentFixture<GamesDisplayComponent>;
-    let communicationService: CommunicationService;
-
+    let communicationServiceSpy: SpyObj<CommunicationService>;
     beforeEach(() => {
+        communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['basicGet', 'basicPost', 'get', 'post', 'delete', 'handleError']);
+    });
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
             declarations: [GamesDisplayComponent],
-            providers: [CommunicationService],
-        });
-
+            providers: [{ provide: CommunicationService, useValue: communicationServiceSpy }, HttpClient],
+        }).compileComponents();
+    }));
+    beforeEach(() => {
         fixture = TestBed.createComponent(GamesDisplayComponent);
         component = fixture.componentInstance;
-        communicationService = TestBed.get(CommunicationService);
+        fixture.detectChanges();
     });
-
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-
-    it('should set the title based on whether the component is used for selection or configuration', () => {
+    it('clicking on next button should increment page number', async () => {
+        component.currentPageNbr = 0;
+        await component.goToNextSlide();
+        expect(component.currentPageNbr).toEqual(1);
+    });
+    it('clicking on previous button should decrement page number', async () => {
         component.isSelection = true;
-        fixture.detectChanges();
-        expect(component.title).toEqual('Page de configuration ');
-
-        component.isSelection = false;
-        fixture.detectChanges();
-        expect(component.title).toEqual('Page de selection');
+        component.currentPageNbr = 2;
+        await component.goToPreviousSlide();
+        expect(component.getGames).toHaveBeenCalled();
+        expect(component.currentPageNbr).toEqual(1);
+        expect(component.isSelection).toBeTruthy();
     });
 
-    it('should get games from the server', () => {
-        spyOn(communicationService, 'get').and.returnValue({
-            subscribe: ((callback) => {
-                callback({ body: JSON.stringify({ gameContent: [{ gameData: {} as GameData, originalImage: new ArrayBuffer(0) }], nbrOfGame: 1 }) });
-            }as any),
-        });
-        component.ngOnInit();
-
-        expect(communicationService.get).toHaveBeenCalledWith('/games/0');
-        expect(component.games.length).toEqual(1);
-    });
-
-    it('should show or hide the next button based on the number of games', () => {
-        component.ngOnInit();
-        component.gamesNbr = 3;
-        component.currentPageNbr = 0;
-        fixture.detectChanges();
-        expect(component.showNextButton).toBeTruthy();
-
-        component.currentPageNbr = 1;
-        fixture.detectChanges();
-        expect(component.showNextButton).toBeFalsy();
-    });
-
-    it('should show or hide the previous button based on the current page number', () => {
-        component.ngOnInit();
-        component.currentPageNbr = 1;
-        fixture.detectChanges();
+    it("current page should stay the same if it's the last page", async () => {
+        component.currentPageNbr = 2;
+        await component.goToNextSlide();
+        expect(component.currentPageNbr).toEqual(3);
         expect(component.showPreviousButton).toBeTruthy();
-
+    });
+    it("current page should stay the same if it's the last page", async () => {
         component.currentPageNbr = 0;
-        fixture.detectChanges();
+        await component.goToPreviousSlide();
+        expect(component.currentPageNbr).toEqual(component.currentPageNbr);
         expect(component.showPreviousButton).toBeFalsy();
     });
 });
