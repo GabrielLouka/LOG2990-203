@@ -5,7 +5,7 @@
 </head>
 <body class="center">
     <section class="flex-column center">
-        <h1>Création de jeux</h1>
+        <h1>Création de jeu</h1>
         <app-back-button></app-back-button>
     </section>
     <div class="flex-row center main-container">
@@ -24,18 +24,22 @@
                     <p>Réinitialiser image</p>
                 </button>
                 <button class="button-style center">
-                    <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
+                    <span class="material-symbols-outlined optionIcon center not-allowed"> drive_file_move_outline </span>
                 </button>
             </div>
         </div>
 
         <div class="flex-column center">
             <div class="flex-column">
-                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> edit </span></button>
-                <button class="button-style center"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
-                <button class="button-style center"><input type="color" ng-model="test" id="" /></button>
-                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> crop_7_5 </span></button>
-                <button class="button-style center">
+                <button class="button-style center not-allowed" title="Crayon">
+                    <span class="material-symbols-outlined optionIcon"> edit </span>
+                </button>
+                <button class="button-style center not-allowed" title="Efface"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
+                <input type="color" class="button-style bigger color not-allowed" title="Couleurs" />
+                <button class="button-style center not-allowed" title="Outil rectangle">
+                    <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
+                </button>
+                <button class="button-style center not-allowed" title="drawing swapper">
                     <span class="material-symbols-outlined optionIcon"> swap_horiz </span>
                 </button>
             </div>
@@ -43,9 +47,9 @@
             <br />
             <br />
             <br />
-            <div class="reverse-controle center">
-                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> undo </span></button>
-                <button class="button-style center"><span class="material-symbols-outlined optionIcon"> redo </span></button>
+            <div class="reverse-control center">
+                <button class="button-style center not-allowed" title="Undo"><span class="material-symbols-outlined optionIcon"> undo </span></button>
+                <button class="button-style center not-allowed" title="Redo"><span class="material-symbols-outlined optionIcon"> redo </span></button>
             </div>
             <div class="image-option">
                 <button class="button-style center" (click)="bothImagesButton.click()">
@@ -69,7 +73,7 @@
             </div>
             <div class="flex-row picture-option">
                 <button class="button-style center">
-                    <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
+                    <span class="material-symbols-outlined optionIcon not-allowed"> drive_file_move_rtl </span>
                 </button>
                 <button class="button-style center" (click)="input2.click()">
                     <span class="material-symbols-outlined optionIcon"> upload_file </span>
@@ -97,7 +101,7 @@
             </div>
         </div>
 
-        <button mat-raised-button class="button-style bigger" (click)="sendImageToServer()">
+        <button class="button-style bigger center" (click)="sendImageToServer()">
             <span class="material-symbols-outlined optionIcon"> search </span>RECHERCHE DE DIFFERENCES
         </button>
     </div>
@@ -107,12 +111,12 @@
             <div #close class="close" (click)="closePopUp()">+</div>
             <h2>Différences entre les deux images</h2>
             <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
-            <p>Il y a {{ totalDifferences }} differences ( easy: {{ isEasy }})</p>
+            <p>Il y a {{ totalDifferences }} differences ---- difficulté automatique : {{ isEasy ? 'Facile' : 'Difficile' }}</p>
             <form #gameNameForm [formGroup]="titleRegistration" class="flex-column center">
                 <p>Ajouter un titre le jeu :</p>
                 <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />
                 <button
-                    class="button-style bigger no-hover center"
+                    class="button-style no-hover center"
                     [disabled]="titleRegistration.invalid"
                     [ngClass]="{ 'not-allowed': titleRegistration.invalid, allowed: titleRegistration.valid }"
                     (click)="sendGameNameToServer()"
@@ -120,7 +124,7 @@
                     <span class="material-symbols-outlined optionIcon"> fact_check </span>Sauvegarder le jeu
                 </button>
             </form>
-            <p #errorPopupText>ERREUR : Le nombre de differences doi etre compris entre 3 et 9!</p>
+            <p #errorPopupText>ERREUR : Le nombre de differences doi être compris entre 3 et 9 !</p>
         </div>
     </div>
 </body>

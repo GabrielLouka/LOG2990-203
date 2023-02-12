@@ -1,34 +1,8 @@
-.button-style {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    font-weight: 600;
-    font-size: 1.7vh;
-    letter-spacing: 0.1vw;
-
-    border-radius: 2vw;
-    border: 0.3vh;
-
-    padding: 2vh 4vh;
-}
-
-.return-button {
+.abs-position {
     position: absolute;
     top: 0;
     left: 0;
     margin: 2vw;
-
-    background-color: white;
-
-    border: solid;
-
-    cursor: pointer;
-
-    &:hover {
-        transform: scale(0.9);
-        background-color: lightsalmon;
-    }
 }
 
 .previous-icon {

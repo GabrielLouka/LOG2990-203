@@ -1,83 +1,77 @@
 .chat-container {
-    scale: 0.9;
+  width: 16vw;
+  height: 50vh;
 
-    position: absolute;
-    bottom: 21vh;
-    left: 80vw;
+  margin-right: 0.5vw;
 
-    width: 20vw;
-    height: 50vh;
-    padding: 20px;
+  background-color: whitesmoke;
 
-    background-color: whitesmoke;
-    box-sizing: border-box;
-
-    border-radius: 20px;
-    border: solid;
-  }
+  border-radius: 2vh;
+  border: solid;
+}
   
-  .chat-header {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
+.chat-header {
+  font-size: 2.5vh;
+  font-weight: bold;
+  margin-bottom: 2vh;
+}
   
 .chat-body {
-    height: 32vh;
-    overflow-y: auto;
-    background-color: white;
+  height: 32vh;
+  width: 15vw;
+
+  overflow-y: auto;
+
+  background-color: white;
 }
   
 .message-container {
-    margin: 0.5vh;
-    padding: 10px;
-    border-radius: 5px;
+  width: 12.5vw;
 
-    border: solid 1.5px;
-  }
+  margin: 0.5vh;
+  padding: 1vh;
+
+  border-radius: 1vh;
+  border: solid 0.2vh;
+
+  overflow-x: hidden;
+  word-wrap: break-word;
+}
+
+.sent-by-player-1 {
+  background-color: lightblue;
+}
   
-  .sent-by-player-1 {
-    background-color: lightblue;
-  }
-  
-  .sent-by-player-2 {
-    background-color: lightpink;
-  }
-  
-  .message-text {
-    font-size: 16px;
-  }
+.sent-by-player-2 {
+  background-color: lightpink;
+}
   
 .message-username {
-    font-size: 14px;
-    font-style: italic;
-    margin-top: 5px;
-  }
-  
+  font-style: italic;
+}
+
 .chat-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
+  margin-top: 1vh;
+  justify-content: space-between;
 }
 
 button {
-    padding: 10px;
-    background-color: rgb(228, 228, 0);
-    border: none;
-    padding: 2vh 4vh;
-    border-radius: 2vw;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 1.7vh;
-    letter-spacing: 0.1vw;
+  background-color: rgb(228, 228, 0);
+  padding: 1vh 3vh;
+    
+  border-radius: 2vw;
+  border: none;
+  cursor: pointer;
+
+  font-weight: 600;
+  font-size: 1.7vh;
+  letter-spacing: 0.1vw;
 }
 
 input {
-  width: 5vw;
+  width: 6vw;
   border-radius: 2vw;
-  padding: 2vh 4vh;
+  padding: 1.5vh 4vh;
 
   font-weight: 600;
   font-size: 1.5vh;

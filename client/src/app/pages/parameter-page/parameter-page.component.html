@@ -1,47 +1,59 @@
 <head>
     <meta charset="UTF-8" />
-    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <title>Page de Configurations</title>
 </head>
 
 <body>
-    <div class="header">
-        <app-back-button></app-back-button>
-    </div>
+    <app-back-button></app-back-button>
+    <header class="flex-row center">
+        <h1>Paramètres généraux</h1>
+        <div class="config-btn">
+            <button class="button-style" routerLink="/creation">Créer un jeu</button>
+            <button class="button-style" routerLink="/config">Configurations des jeux</button>
+        </div>
+    </header>
 
-    <div class="body">
-        <div class="buttons-section">
-            <button class="button-style edit-button" routerLink="/config">Éditer un jeu</button>
-            <button class="button-style change-times-button" id="clearHistory" (click)="clearHistory()">Réinitialiser l'historique</button>
+    <div class="flex-row center main-container">
+        <div class="flex-column center const-container">
+            <p class="title"><b> Constantes de jeu</b></p>
+
+            <div class="flex-row label-input" *ngFor="let constant of constants; let index = index">
+                <label for="{{ constant.fetchData }}">{{ constant.label }}</label>
+                <input type="number" id="{{ constant.fetchData }}" name="{{ constant.fetchData }}" step="1" value="{{ constant.time }}" />
+            </div>
+
+            <div class="flex-row">
+                <button class="button-style flex-row center const-btn" (click)="resetConstants()">
+                    <span class="material-symbols-outlined option-icon"> device_reset </span>
+                    Mettre à défault les constantes
+                </button>
+                <button class="button-style flex-row center const-btn">
+                    <span class="material-symbols-outlined option-icon"> save </span>
+                    Sauvegarder les constantes
+                </button>
+            </div>
         </div>
 
-        <div class="middle-section">
-            <div class="parameters">
-                <p class="title"><b> Paramètres de temps globaux</b></p>
-                <div class="constants-option">
-                    <div class="label-input" *ngFor="let constant of constants; let index = index">
-                        <label for="{{ constant.fetchData }}">{{ constant.label }}</label>
-                        <input type="number" id="{{ constant.fetchData }}" name="{{ constant.fetchData }}" step="1" value="{{ constant.time }}" />
-                    </div>
-                </div>
-                <div class="two-btn">
-                    <button class="button-style reset-btn" (click)="resetConstants()">Mettre à défault les constantes</button>
-                    <button class="button-style">Sauvegarder les constantes</button>
-                </div>
+        <div class="history-container">
+            <div class="flex-row center">
+                <p class="title"><b> Historique des parties jouées </b></p>
+                <button class="button-style delete-btn center" (click)="clearHistory()">
+                    <span class="material-symbols-outlined option-icon"> delete </span>
+                </button>
             </div>
-            <div class="sub-section-history">
-                <p class="title"><b> Historique des parties jouées</b></p>
-                <div class="history-section">
-                    <div class="history-container" *ngFor="let history of gamesHistory">
-                        <p class="history-line" *ngIf="history"><strong>Début du jeu :</strong> {{ history.startingTime.toLocaleString() }}</p>
-                        <p class="history-line" *ngIf="history"><strong>Fin du jeu :</strong> {{ history.endingTime.toLocaleString() }}</p>
-                        <p class="history-line" *ngIf="history"><strong>Mode :</strong> {{ history.gameMode }}</p>
-                        <p class="history-line" *ngIf="history && history.gameMode === 'Solo'">
-                            <strong>Partie jouée par :</strong> {{ history.player1 }}
-                        </p>
-                        <p class="history-line" *ngIf="history && history.gameMode === '1v1'">
-                            <strong>Partie jouée par :</strong> {{ history.player1 }} <strong>et</strong> {{ history.player2 }}
-                        </p>
-                    </div>
+
+            <div class="history-board">
+                <div class="history-card flex-column center" *ngFor="let history of gamesHistory">
+                    <p class="history-line" *ngIf="history"><strong>Début du jeu :</strong> {{ history.startingTime.toLocaleString() }}</p>
+                    <p class="history-line" *ngIf="history"><strong>Fin du jeu :</strong> {{ history.endingTime.toLocaleString() }}</p>
+                    <p class="history-line" *ngIf="history"><strong>Mode :</strong> {{ history.gameMode }}</p>
+                    <p class="history-line" *ngIf="history && history.gameMode === 'Solo'">
+                        <strong>Partie jouée par :</strong> {{ history.player1 }}
+                    </p>
+                    <p class="history-line" *ngIf="history && history.gameMode === '1v1'">
+                        <strong>Partie jouée par :</strong> {{ history.player1 }} <strong>et</strong> {{ history.player2 }}
+                    </p>
                 </div>
             </div>
         </div>
