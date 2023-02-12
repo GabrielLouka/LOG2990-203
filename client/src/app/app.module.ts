@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ActivatedRoute } from '@angular/router';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
@@ -72,7 +73,7 @@ import { AuthService } from './services/auth.service';
         ReactiveFormsModule,
         CommonModule,
     ],
-    providers: [AuthService],
+    providers: [AuthService, ActivatedRoute],
     bootstrap: [AppComponent],
 })
 export class AppModule {}
