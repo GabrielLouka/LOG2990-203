@@ -72,9 +72,7 @@ export class SocketManager {
 
             socket.on('roomMessage', (message: string) => {
                 // Seulement un membre de la salle peut envoyer un message aux autres
-                if (socket.rooms.has(this.room)) {
-                    this.sio.to(this.room).emit('roomMessage', `${socket.id} : ${message}`);
-                }
+                this.sio.to(this.room).emit('roomMessage', `${socket.id} : ${message}`);
             });
 
             socket.on('disconnect', (reason) => {
