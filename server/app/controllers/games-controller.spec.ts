@@ -2,22 +2,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 // eslint-disable-next-line @typescript-eslint/quotes
-import { Vector2 } from '@common/vector2';
-import { assert, expect } from 'chai';
-import * as sinon from 'sinon';
 import * as supertest from 'supertest';
 // import * as http from 'http';
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage.service';
 import { GameData } from '@common/game-data';
-import { Buffer } from 'buffer';
+import { Vector2 } from '@common/vector2';
+import { assert } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import { createStubInstance, SinonStubbedInstance } from 'sinon';
 import { Container } from 'typedi';
-import { GamesController } from './games.controller';
+import sinon = require('sinon');
 
 const HTTP_STATUS_OK = StatusCodes.OK;
+const HTTP_STATUS_CREATED = StatusCodes.CREATED;
 const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
+const HTTP_STATUS_BAD_REQUEST = StatusCodes.BAD_REQUEST;
 const API_URL = '/api/games';
 
 describe('GameController', () => {
@@ -59,17 +59,14 @@ describe('GameController', () => {
         },
     ];
 
-    // const stubGameValues = {
-    //     id: faker.random.numeric(),
-    //     name: faker.word.noun(),
-    //     isEasy: true,
-    //     nbrDifferences: faker.random.numeric(),
-    //     differences: [[new Vector2(1, 2), new Vector2(5, 6)], [new Vector2(4, 3)]],
-    //     ranking: [[]],
-    // };
     const images = { originalImage: Buffer.from(''), modifiedImage: Buffer.from('') };
     const gameInfo = {
         gameData: games[0],
+        originalImage: images.originalImage,
+        modifiedImage: images.modifiedImage,
+    };
+    const gameInfo2 = {
+        gameData: games[1],
         originalImage: images.originalImage,
         modifiedImage: images.modifiedImage,
     };
@@ -78,52 +75,43 @@ describe('GameController', () => {
 
     beforeEach(async () => {
         gameStorageService = createStubInstance(GameStorageService);
-        gameStorageService.getGameImages.resolves(images);
-        gameStorageService.getAllGames.resolves(games);
-        gameStorageService.getGamesLength.resolves(1);
         const app = Container.get(Application);
         // eslint-disable-next-line dot-notation
+        Object.defineProperty(app['gamesController'], 'gameStorageService', { value: gameStorageService });
         expressApp = app.app;
     });
 
-    it('should be defined', async () => {
-        const gameController: GamesController = new GamesController(gameStorageService);
-        assert(gameController);
-        assert(gameController.router);
-    });
-
     it('should return all games', async () => {
+        await gameStorageService.deleteAllGames();
+        gameStorageService.getGamesInPage.resolves([gameInfo, gameInfo2]);
+        gameStorageService.getGamesLength.resolves(2);
+
         supertest(expressApp)
             .get(`${API_URL}/0`)
             .expect(HTTP_STATUS_OK)
             .then((response) => {
-                assert(response.body);
-                expect(response.body).to.deep.equal({});
+                const gameContentExpected = [gameInfo, gameInfo2];
+                const gameLengthExpected = 2;
+                const gameInformation = { gameContent: gameContentExpected, nbrOfGames: gameLengthExpected };
+                assert.deepEqual(response.text, JSON.stringify(gameInformation));
+                assert.deepEqual(response.status, HTTP_STATUS_OK);
             });
+        sinon.reset();
     });
 
     it('GET should return game by id', async () => {
-        gameStorageService.getGameById.resolves({
-            gameData: games[0],
-            originalImage: images.originalImage,
-            modifiedImage: images.modifiedImage,
-        });
-        supertest(expressApp)
+        gameStorageService.getGameById.returns(Promise.resolve(gameInfo));
+        return supertest(expressApp)
             .get(`${API_URL}/fetchGame/0`)
             .expect(HTTP_STATUS_OK)
-            .expect({})
             .then((response) => {
-                assert(response.body);
-                expect(response.text).to.deep.equal(JSON.stringify(gameInfo));
-                expect(response.body).to.contain('originalImage').to.equal('');
-                expect(response.body).to.contain('name').to.equal('Glutton');
-                expect(response.body).to.contain('id').to.equal(0);
+                assert.deepEqual(response.text, JSON.stringify(gameInfo));
             });
     });
 
     it('GET should not return game if gameLength not been correctly saved', async () => {
         gameStorageService.getGamesLength.throwsException();
-        supertest(expressApp)
+        return supertest(expressApp)
             .get(`${API_URL}/fetchGame/0`)
             .expect(HTTP_STATUS_NOT_FOUND)
             .catch((err) => {
@@ -133,7 +121,7 @@ describe('GameController', () => {
 
     it('GET not should return game by id when ERROR catch', async () => {
         gameStorageService.getGameById.throwsException();
-        supertest(expressApp)
+        return supertest(expressApp)
             .get(`${API_URL}/fetchGame/0`)
             .expect(HTTP_STATUS_NOT_FOUND)
             .catch((err) => {
@@ -141,15 +129,14 @@ describe('GameController', () => {
             });
     });
 
-    it('GET should return games per pageId', async () => {
+    it('GET should not return games per pageId when no game on pageId', async () => {
         gameStorageService.getGamesInPage.resolves([]);
         const queryId = '89';
-        supertest(expressApp)
+        return supertest(expressApp)
             .get(`${API_URL}/${queryId}`)
-            .expect(HTTP_STATUS_NOT_FOUND)
+            .expect(HTTP_STATUS_BAD_REQUEST)
             .then((response) => {
-                assert(response.body);
-                assert(response.clientError);
+                assert(response.error);
             });
     });
 
@@ -162,42 +149,51 @@ describe('GameController', () => {
             .catch((err) => {
                 assert(err.message);
             });
+        sinon.restore();
     });
 
     it('POST /saveGame should save a new game ', async () => {
+        const storeImagesSpy = sinon.spy(GameStorageService.prototype, 'storeGameImages');
+        const storeGameResultSpy = sinon.spy(GameStorageService.prototype, 'storeGameResult');
+        const updateNameSpy = sinon.spy(GameStorageService.prototype, 'updateGameName');
         supertest(expressApp)
             .post(`${API_URL}/saveGame`)
             .send(games[0])
             .expect(HTTP_STATUS_OK)
-            .end((_err, res) => {
-                expect(res.status).to.equal(HTTP_STATUS_OK);
-                expect(res.body).to.contain('id').to.equal(0);
+            .then((res) => {
+                assert(storeImagesSpy.calledOnce);
+                assert(storeGameResultSpy.calledOnce);
+                assert(updateNameSpy.calledOnce);
+                assert.deepEqual(res.status, HTTP_STATUS_CREATED);
             });
+        sinon.restore();
+    });
+
+    it('POST /saveGame should not save new game when ERROR ', async () => {
+        gameStorageService.storeGameImages.throwsException();
+        supertest(expressApp)
+            .post(`${API_URL}/saveGame`)
+            .send(games[0])
+            .expect(HTTP_STATUS_NOT_FOUND)
+            .catch((error) => {
+                assert(error.message);
+            });
+        sinon.restore();
     });
 
     it('POST should update game name ', async () => {
+        const spy = sinon.spy(GameStorageService.prototype, 'updateGameName');
         const updatedName = games[3].name;
-        const spy = sinon.spy(gameStorageService, 'updateGameName');
-        await gameStorageService.updateGameName(games[0].id, updatedName);
         supertest(expressApp)
             .post(`${API_URL}/updateName`)
             .send([games[0].id, updatedName])
-            .expect(HTTP_STATUS_OK)
+            .expect(HTTP_STATUS_CREATED)
             .then((res) => {
+                assert(spy.called);
                 assert(res.status);
-                expect(res.body).to.deep.equal({});
+                assert.deepEqual(res.body, updatedName);
             });
-        expect(spy.called);
-        supertest(expressApp)
-            .get(`${API_URL}/fetchGame/0`)
-            .expect(HTTP_STATUS_OK)
-            .then((res) => {
-                console.log(res);
-                assert(res.body);
-                assert(res.text);
-                assert(res.status);
-                expect(res.body).to.deep.equal({});
-            });
+        sinon.restore();
     });
 
     it('POST should not update game name when ERROR catch ', async () => {
@@ -208,8 +204,9 @@ describe('GameController', () => {
             .expect(HTTP_STATUS_OK)
             .catch((response) => {
                 assert(response.message);
-                assert(response.status === HTTP_STATUS_NOT_FOUND);
+                assert.deepEqual(response.status, HTTP_STATUS_NOT_FOUND);
             });
+        sinon.restore();
     });
 
     it('DELETE request should delete all games from database', async () => {
@@ -217,8 +214,8 @@ describe('GameController', () => {
             .delete(`${API_URL}/deleteAllGames`)
             .expect(HTTP_STATUS_OK)
             .then((response) => {
-                assert(response.statusCode === HTTP_STATUS_OK);
-                assert(response.accepted);
+                assert.deepEqual(response.status, HTTP_STATUS_OK);
+                assert.deepEqual(response.body, 0);
             });
     });
 
@@ -228,7 +225,7 @@ describe('GameController', () => {
             .delete(`${API_URL}/deleteAllGames`)
             .expect(HTTP_STATUS_NOT_FOUND)
             .catch((err) => {
-                assert(err.message === true);
+                assert(err.message);
             });
     });
 });
