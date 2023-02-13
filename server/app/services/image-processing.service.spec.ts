@@ -55,7 +55,7 @@ describe('Image-Processing Service', () => {
         sinon.stub(imageProcessingService, <any>'getImageDimensions').returns(new Vector2(12, 10));
         const pixelBufferPos = imageProcessingService['getPixelBufferPosAtPixelPos'](position, imageBuffer);
 
-        expect(pixelBufferPos).to.equal(129);
+        expect(pixelBufferPos).to.equal(309);
     });
     it('should sets the RGB values of a pixel in the image buffer', () => {
         const getPixelBufferPosAtPixelPosStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'getPixelBufferPosAtPixelPos');

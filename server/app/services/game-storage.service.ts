@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
-import { DB, R_ONLY } from '@app/utils/env';
+import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
