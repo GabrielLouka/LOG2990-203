@@ -80,7 +80,7 @@ export class GameStorageService {
     async getGamesInPage(pageNbr: number) {
         // checks if the number of games available for one page is under four
         const skipNbr = pageNbr * R_ONLY.gamesLimit;
-        const nextGames = await this.collection.find<GameData>({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
+        const nextGames = await this.collection.find({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
 
         const gamesToReturn = [];
         for (const game of nextGames) {
@@ -89,7 +89,6 @@ export class GameStorageService {
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
-                // modifiedImage: images.modifiedImage,
             });
         }
         return gamesToReturn;
