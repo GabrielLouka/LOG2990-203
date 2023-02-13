@@ -27,7 +27,7 @@ export class GamesDisplayComponent implements OnInit {
     showPreviousButton = false;
     constructor(private readonly communicationService: CommunicationService) {}
     ngOnInit() {
-        this.title = this.isSelection ? 'Page de configuration ' : 'Page de selection';
+        this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
         this.justifyContent = this.isSelection ? 'center' : 'right';
         this.fetchGameDataFromServer(this.currentPageNbr);
     }
