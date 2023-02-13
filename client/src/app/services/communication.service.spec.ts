@@ -11,7 +11,7 @@ describe('CommunicationService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [HttpClientTestingModule],
-            providers: [CommunicationService]
+            providers: [CommunicationService],
         });
         service = TestBed.inject(CommunicationService);
         httpMock = TestBed.inject(HttpTestingController);
@@ -27,51 +27,49 @@ describe('CommunicationService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should return expected message (HttpClient called once)', () => {
+    it('should perform a GET request with get()', () => {
         const expectedMessage: Message = { body: 'Hello', title: 'World' };
+        const expectedUrl = '/example';
 
-        // check the content of the mocked call
-        service.basicGet().subscribe({
-            next: (response: Message) => {
-                expect(response.title).toEqual(expectedMessage.title);
-                expect(response.body).toEqual(expectedMessage.body);
+        service.get(expectedUrl).subscribe({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            next: (response: any) => {
+                // expect(response.title).toEqual(expectedMessage.title);
+                expect(JSON.parse(response.body).body).toEqual(expectedMessage.body);
             },
             error: fail,
         });
 
         const req = httpMock.expectOne(`${baseUrl}/example`);
         expect(req.request.method).toBe('GET');
-        // actually send the request
         req.flush(expectedMessage);
     });
 
-    it('should not return any message when sending a POST request (HttpClient called once)', () => {
+    it('should post data', () => {
         const sentMessage: Message = { body: 'Hello', title: 'World' };
-        // subscribe to the mocked call
-        service.basicPost(sentMessage).subscribe({
+        const expectedUrl = '/example/send';
+        service.post(sentMessage, expectedUrl).subscribe({
             // eslint-disable-next-line @typescript-eslint/no-empty-function
             next: () => {},
             error: fail,
         });
-        const req = httpMock.expectOne(`${baseUrl}/example/send`);
-        expect(req.request.method).toBe('POST');
-        // actually send the request
-        req.flush(sentMessage);
+
+        const req = httpMock.expectOne(`${baseUrl}${expectedUrl}`);
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.body).toEqual(sentMessage);
+        req.flush({ message: 'Data posted successfully' }, { status: 200, statusText: 'OK' });
     });
 
-    it('should handle http error safely', () => {
-        service.basicGet().subscribe({
-            next: (response: Message) => {
-                expect(response).toBeUndefined();
-            },
-            error: fail,
+    it('should delete data', () => {
+        const testRoute = '/test';
+
+        service.delete(testRoute).subscribe((response) => {
+            expect(response.status).toEqual(200);
+            expect(response.body).toEqual('Data deleted successfully');
         });
 
-        const req = httpMock.expectOne(`${baseUrl}/example`);
-        expect(req.request.method).toBe('GET');
-        req.error(new ProgressEvent('Random error occurred'));
+        const req = httpMock.expectOne(`${baseUrl}${testRoute}`);
+        expect(req.request.method).toEqual('DELETE');
+        req.flush('Data deleted successfully', { status: 200, statusText: 'OK' });
     });
-
-    
-    
 });

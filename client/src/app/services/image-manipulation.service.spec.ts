@@ -34,15 +34,19 @@ describe('ImageManipulationService', () => {
     });
 
     it('should get the modified image without the specified differences', () => {
-        const originalImage: Buffer = Buffer.alloc(100, 1);
-        const modifiedImage: Buffer = Buffer.alloc(100, 0);
+        const originalBuffer: Buffer = Buffer.alloc(100, 1);
+        const modifiedBuffer: Buffer = Buffer.alloc(100, 0);
 
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
-        const output = service.getModifiedImageWithoutDifferences(gameData as GameData, originalImage, modifiedImage, foundDifferences);
+        const output = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: originalBuffer, modifiedImage: modifiedBuffer },
+            foundDifferences,
+        );
 
-        expect(output).not.toBe(modifiedImage);
+        expect(output).not.toBe(modifiedBuffer);
     });
 
     it('should handle corrupted images', () => {
@@ -54,8 +58,16 @@ describe('ImageManipulationService', () => {
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
-        const output1 = service.getModifiedImageWithoutDifferences(gameData as GameData, corruptedOgImage, goodModifiedImage, foundDifferences);
-        const output2 = service.getModifiedImageWithoutDifferences(gameData as GameData, goodOgImage, corruptedModifiedImage, foundDifferences);
+        const output1 = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: corruptedOgImage, modifiedImage: goodModifiedImage },
+            foundDifferences,
+        );
+        const output2 = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: goodOgImage, modifiedImage: corruptedModifiedImage },
+            foundDifferences,
+        );
 
         expect(output1).toEqual(goodModifiedImage);
         expect(output2).toEqual(corruptedModifiedImage);

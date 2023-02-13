@@ -15,12 +15,12 @@ export class MouseHandlerService {
 
     onMouseDown(coordinate: Coordinate) {
         this.startCoordinate = coordinate;
-        console.log(`Mouse Down on x: ${this.startCoordinate.x} y: ${this.startCoordinate.y}`);
+        // console.log(`Mouse Down on x: ${this.startCoordinate.x} y: ${this.startCoordinate.y}`);
     }
 
     onMouseUp(coordinate: Coordinate) {
         this.startCoordinate = coordinate;
-        console.log(`Mouse Up on x: ${this.startCoordinate.x} y: ${this.startCoordinate.y}`);
+        // console.log(`Mouse Up on x: ${this.startCoordinate.x} y: ${this.startCoordinate.y}`);
     }
 
     calculateDistanceWrapper() {
