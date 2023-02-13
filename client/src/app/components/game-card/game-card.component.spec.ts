@@ -8,46 +8,48 @@ import { GameCardComponent } from './game-card.component';
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
-    let gameTest: GameData = {
+    const gameTest: GameData = {
         id: 0,
-        name: "gametest",
+        name: 'gametest',
         isEasy: true,
         nbrDifferences: 1,
-        differences: [[{x:0, y:0}]],
-        ranking: [[{name: "name", score: "1"}]]
+        differences: [[{ x: 0, y: 0 }]],
+        ranking: [[{ name: 'name', score: '1' }]],
     };
-    let imageBuffer: Buffer = Buffer.alloc(3);
-    
-    
+    const imageBuffer: Buffer = Buffer.alloc(3);
+
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-          declarations: [GameCardComponent, OverlayComponent]
-        })
-          .compileComponents();
-      }));
+            declarations: [GameCardComponent, OverlayComponent],
+        }).compileComponents();
+    }));
 
     beforeEach(() => {
-    fixture = TestBed.createComponent(GameCardComponent);
-    component = fixture.componentInstance;
-    fixture.componentInstance.game = {gameData: gameTest, originalImage: imageBuffer}
-    fixture.detectChanges();
+        fixture = TestBed.createComponent(GameCardComponent);
+        component = fixture.componentInstance;
+        fixture.componentInstance.game = { gameData: gameTest, originalImage: imageBuffer };
+        fixture.detectChanges();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it("getDifficulty should return green if easy", () => { 
+    it('getDifficulty should return green if easy', () => {
         component.game.gameData.isEasy = true;
         const colour = component.getDifficultyColor();
-        expect(colour).toEqual("green");
+        expect(colour).toEqual('green');
     });
 
-    it("getDifficulty should return red if difficult", () => {
+    it('getDifficulty should return red if difficult', () => {
         component.game.gameData.isEasy = false;
         const colour = component.getDifficultyColor();
-        expect(colour).toEqual("red");
+        expect(colour).toEqual('red');
     });
 
-    
+    it('this.difficulty should be Difficile if easy is false', () => {
+        component.game.gameData.isEasy = false;
+        const difficulty = component.difficulty;
+        expect(difficulty).toEqual('Difficile');
+    });
 });
