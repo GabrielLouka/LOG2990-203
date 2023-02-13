@@ -4,7 +4,6 @@ import { TestBed } from '@angular/core/testing';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
-
 import { ImageManipulationService } from './image-manipulation.service';
 
 describe('ImageManipulationService', () => {
@@ -22,7 +21,6 @@ describe('ImageManipulationService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-
     it('should change the canvas source when loading an image', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
