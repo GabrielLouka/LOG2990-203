@@ -28,11 +28,7 @@ export class GamesController {
                 const games = await this.gameStorageService.getGamesInPage(parseInt(req.params.id, 10));
                 const gameLength = await this.gameStorageService.getGamesLength();
                 const gameInformation = { gameContent: games, nbrOfGame: gameLength };
-                if (gameInformation.nbrOfGame > 0) {
-                    res.send(JSON.stringify(gameInformation));
-                } else {
-                    res.status(StatusCodes.BAD_REQUEST).send();
-                }
+                res.send(JSON.stringify(gameInformation));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }
