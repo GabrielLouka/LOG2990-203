@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { GameData } from '@common/game-data';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -8,8 +9,7 @@ import { CommunicationService } from './communication.service';
     providedIn: 'root',
 })
 export class UploadImagesService {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    game: any;
+    game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     imageElement: HTMLImageElement;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
@@ -27,7 +27,7 @@ export class UploadImagesService {
                 if (response.body !== null) {
                     const serverResult = JSON.parse(response.body);
                     this.debugDisplayMessage.next(responseString);
-                    this.game = [serverResult];
+                    this.game = serverResult;
                 }
             },
             error: (err: HttpErrorResponse) => {
