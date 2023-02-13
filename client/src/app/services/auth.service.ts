@@ -4,9 +4,9 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class AuthService {
-    userName: unknown = '';
+    userName: string = '';
 
-    registerUser(pseudo: unknown) {
+    registerUser(pseudo: string) {
         this.userName = pseudo;
     }
 
