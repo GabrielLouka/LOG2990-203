@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AuthService } from '@app/services/auth.service';
 @Component({
@@ -8,9 +7,10 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class ChatComponent {
     @ViewChild('chat') chat: ElementRef;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     messages: any[] = [];
     newMessage = '';
-    text: any;
+    text: unknown;
     sentByplayer1: boolean;
     sentByPlayer2: boolean;
 

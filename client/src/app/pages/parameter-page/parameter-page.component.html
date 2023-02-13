@@ -18,13 +18,13 @@
         <div class="flex-column center const-container">
             <p class="title"><b> Constantes de jeu</b></p>
 
-            <div class="flex-row label-input" *ngFor="let constant of constants; let index = index">
+            <!-- <div class="flex-row label-input" *ngFor="let constant of constants; let index = index">
                 <label for="{{ constant.fetchData }}">{{ constant.label }}</label>
                 <input type="number" id="{{ constant.fetchData }}" name="{{ constant.fetchData }}" step="1" value="{{ constant.time }}" />
-            </div>
+            </div> -->
 
             <div class="flex-row">
-                <button class="button-style flex-row center const-btn" (click)="resetConstants()">
+                <button class="button-style flex-row center const-btn">
                     <span class="material-symbols-outlined option-icon"> device_reset </span>
                     Mettre à défault les constantes
                 </button>
@@ -38,13 +38,13 @@
         <div class="history-container">
             <div class="flex-row center">
                 <p class="title"><b> Historique des parties jouées </b></p>
-                <button class="button-style delete-btn center" (click)="clearHistory()">
+                <button class="button-style delete-btn center">
                     <span class="material-symbols-outlined option-icon"> delete </span>
                 </button>
             </div>
 
             <div class="history-board">
-                <div class="history-card flex-column center" *ngFor="let history of gamesHistory">
+                <!-- <div class="history-card flex-column center" *ngFor="let history of gamesHistory">
                     <p class="history-line" *ngIf="history"><strong>Début du jeu :</strong> {{ history.startingTime.toLocaleString() }}</p>
                     <p class="history-line" *ngIf="history"><strong>Fin du jeu :</strong> {{ history.endingTime.toLocaleString() }}</p>
                     <p class="history-line" *ngIf="history"><strong>Mode :</strong> {{ history.gameMode }}</p>
@@ -54,7 +54,7 @@
                     <p class="history-line" *ngIf="history && history.gameMode === '1v1'">
                         <strong>Partie jouée par :</strong> {{ history.player1 }} <strong>et</strong> {{ history.player2 }}
                     </p>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

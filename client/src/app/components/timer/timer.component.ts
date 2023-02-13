@@ -1,23 +1,29 @@
-import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { INTERVAL_VALUE, MINUTE, MINUTE_LIMIT } from '@common/pixel';
+
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
-export class TimerComponent implements AfterViewInit {
+export class TimerComponent implements AfterViewInit, OnDestroy {
     @Input() timeInSeconds: number;
     @ViewChild('minutes', { static: true }) minutes: ElementRef;
     @ViewChild('seconds', { static: true }) seconds: ElementRef;
 
-    private shouldStop = false;
+    shouldStop = false;
+    intervalId: number;
 
     ngAfterViewInit() {
-        setInterval(() => {
+        this.intervalId = window.setInterval(() => {
             if (this.timeInSeconds >= 0) {
                 this.tickTock();
             }
         }, INTERVAL_VALUE);
+    }
+
+    ngOnDestroy() {
+        window.clearInterval(this.intervalId);
     }
 
     tickTock() {

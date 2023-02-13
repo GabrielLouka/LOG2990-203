@@ -17,7 +17,7 @@
             </div>
         </div>
 
-        <app-info-card class="info-card" *ngIf="game" [gameData]="game.gameData"></app-info-card>
+        <app-info-card class="info-card" *ngIf="game" [isEasy]="game.gameData.isEasy"></app-info-card>
 
         <div class="flex-row center canvas-container">
             <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
