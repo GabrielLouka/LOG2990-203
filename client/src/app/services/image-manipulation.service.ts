@@ -120,9 +120,7 @@ export class ImageManipulationService {
         const imageWidth = imageBuffer.readInt32LE(imageWidthOffset);
         let imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
 
-        if (imageHeight < 0) {
-            imageHeight = -imageHeight;
-        }
+        imageHeight = imageHeight < 0 ? -imageHeight : imageHeight;
 
         return new Vector2(imageWidth, imageHeight);
     };
