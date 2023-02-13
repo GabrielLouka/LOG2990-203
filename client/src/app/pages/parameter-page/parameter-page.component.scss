@@ -86,6 +86,10 @@ header {
 
     &:hover {
         transform: scale(0.97);
-        cursor: pointer;
+        //cursor: pointer;
     }
 }
+
+.not-allowed {
+    cursor: not-allowed;
+  }

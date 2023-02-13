@@ -68,7 +68,6 @@ export class GameCreationPageComponent {
         element.nativeElement.style.display = isVisible ? 'flex' : 'none';
     }
     async processImage(event: any, isModified: boolean) {
-        console.log('Hello');
         if (event.target.files.length === 0) return;
         const image: HTMLImageElement = new Image();
         const imageBuffer: ArrayBuffer = await event.target.files[0].arrayBuffer();
@@ -88,8 +87,6 @@ export class GameCreationPageComponent {
 
             const context = this.getCanvas(isModified);
             context?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
-
-            console.log(event.target.files[0]);
 
             if (isModified) {
                 this.modifiedImage = event.target.files[0];
