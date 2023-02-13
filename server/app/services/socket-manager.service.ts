@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-console */
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
@@ -50,6 +51,7 @@ export class SocketManager {
                 const successfullyFoundDifference = foundDifferenceId !== -1 && !data.foundDifferences[foundDifferenceId];
 
                 if (successfullyFoundDifference) {
+                    console.log('SUCCESSFULLY FOUND');
                     data.foundDifferences[foundDifferenceId] = true;
                     console.log('Difference found at index #' + foundDifferenceId);
                 }
@@ -69,9 +71,7 @@ export class SocketManager {
 
             socket.on('roomMessage', (message: string) => {
                 // Seulement un membre de la salle peut envoyer un message aux autres
-                if (socket.rooms.has(this.room)) {
-                    this.sio.to(this.room).emit('roomMessage', `${socket.id} : ${message}`);
-                }
+                this.sio.to(this.room).emit('roomMessage', `${socket.id} : ${message}`);
             });
 
             socket.on('disconnect', (reason) => {

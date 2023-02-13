@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DatabaseService } from '@app/services/database.service';
-import { FileSystemManager } from '@app/services/file-system-manager';
-import { R_ONLY } from '@app/utils/env';
+import { FileSystemManager } from '@app/services/file-system/file-system-manager';
+import { DB, R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult, UpdateResult } from 'mongodb';
+import 'reflect-metadata';
 import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
 @Service()
@@ -42,7 +44,7 @@ export class GameStorageService {
      * @returns the games list
      */
     async getGamesLength() {
-        return this.collection.countDocuments();
+        return this.collection.countDocuments({});
     }
 
     /**
@@ -62,14 +64,13 @@ export class GameStorageService {
         return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
     }
 
-    // TODO À tester !!
     /**
      * @param id game identifier
      * @returns true if deleted, false if not
      */
-    async deleteGame(id: string): Promise<boolean> {
-        const res = await this.collection.findOneAndDelete({ id });
-        return res.value !== null;
+    async deleteGame(id: string) {
+        const query = { id: parseInt(id, 10) };
+        await this.collection.findOneAndDelete(query);
     }
 
     async deleteAllGames(): Promise<DeleteResult> {
@@ -79,15 +80,11 @@ export class GameStorageService {
     async getGamesInPage(pageNbr: number) {
         // checks if the number of games available for one page is under four
         const skipNbr = pageNbr * R_ONLY.gamesLimit;
-        const nextGames = await this.collection.find({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
+        const nextGames = await this.collection.find<GameData>({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
 
         const gamesToReturn = [];
         for (const game of nextGames) {
             const images = this.getGameImages(game.id.toString());
-            console.log('getting images from game id = ' + game.id);
-            console.log(`Buffer length first image: ${images.originalImage.length} bytes`);
-            console.log(`Buffer length second image: ${images.modifiedImage.length} bytes`);
-
             game.ranking = defaultRankings;
             gamesToReturn.push({
                 gameData: game,
@@ -144,7 +141,7 @@ export class GameStorageService {
     createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
-                console.error(err);
+                console.error('Folder was not created');
             } else {
                 console.log('Folder successfully created.');
             }
@@ -165,10 +162,9 @@ export class GameStorageService {
      *
      * @param err
      */
-    // TODO je ne vois pas de confirmations lorsque je crée un jeu
     writeFileErrorManagement = (err: NodeJS.ErrnoException) => {
         if (err) {
-            console.error(err);
+            console.error('File was not successfully written');
         } else {
             console.log('File successfully written.');
         }

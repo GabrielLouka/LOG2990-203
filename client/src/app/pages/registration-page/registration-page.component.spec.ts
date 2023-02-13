@@ -14,6 +14,10 @@ describe('RegistrationPageComponent', () => {
         authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
     });
 
+    beforeEach(() => {
+        authService = jasmine.createSpyObj("AuthService", ['registerUser', 'getUser']);
+    });
+    
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [RegistrationPageComponent],
@@ -31,7 +35,8 @@ describe('RegistrationPageComponent', () => {
         fixture = TestBed.createComponent(RegistrationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-    });
+    });    
+
 
     it('should create', () => {
         expect(component).toBeTruthy();

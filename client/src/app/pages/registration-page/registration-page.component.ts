@@ -7,6 +7,7 @@ import { AuthService } from '@app/services/auth.service';
     selector: 'app-registration-page',
     templateUrl: './registration-page.component.html',
     styleUrls: ['./registration-page.component.scss'],
+    providers: [AuthService]
 })
 export class RegistrationPageComponent implements OnInit {
     username: string | null | undefined;

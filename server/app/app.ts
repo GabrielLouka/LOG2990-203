@@ -1,6 +1,4 @@
 import { HttpException } from '@app/classes/http.exception';
-import { DateController } from '@app/controllers/date.controller';
-import { ExampleController } from '@app/controllers/example.controller';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
 import * as express from 'express';
@@ -10,7 +8,6 @@ import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
 import { GamesController } from './controllers/games.controller';
 import { ImageProcessingController } from './controllers/image-processing.controller';
-import { MatchController } from './controllers/match.controller';
 
 @Service()
 export class Application {
@@ -19,13 +16,7 @@ export class Application {
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
     // eslint-disable-next-line max-params
-    constructor(
-        private readonly exampleController: ExampleController,
-        private readonly dateController: DateController,
-        private readonly imageProcessingController: ImageProcessingController,
-        readonly gamesController: GamesController,
-        readonly matchController: MatchController,
-    ) {
+    constructor(private readonly imageProcessingController: ImageProcessingController, readonly gamesController: GamesController) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -46,11 +37,8 @@ export class Application {
 
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
-        this.app.use('/api/example', this.exampleController.router);
         this.app.use('/api/image_processing', this.imageProcessingController.router);
-        this.app.use('/api/date', this.dateController.router);
         this.app.use('/api/games', this.gamesController.router);
-        this.app.use('/api/match', this.matchController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });

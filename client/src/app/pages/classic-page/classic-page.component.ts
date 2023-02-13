@@ -194,8 +194,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     async refreshModifiedImage() {
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
             this.game.gameData,
-            this.game.originalImage,
-            this.game.modifiedImage,
+            { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
         if (this.rightCanvasContext !== null) {
