@@ -32,13 +32,12 @@ describe('MouseHandlerService', () => {
         expect(service.startCoordinate.y).toBe(startPosition.y);
     });
 
-    // it('onMouseUp should read the mouse pointer position', () => {
-    //     service.onMouseUp(endPosition);
-    
-    //     expect(service.endCoordinate.x).toBe(endPosition.x);
-    //     expect(service.endCoordinate.y).toBe(endPosition.y);
-    // });
-    
+    it('onMouseUp should read the mouse pointer position', () => {
+        service.onMouseUp(endPosition);
+
+        expect(service.endCoordinate.x).toBe(endPosition.x);
+        expect(service.endCoordinate.y).toBe(endPosition.y);
+    });
 
     it('should always have a positive or null distance', () => {
         // We can redefine our variables if we need a specific value for the test
