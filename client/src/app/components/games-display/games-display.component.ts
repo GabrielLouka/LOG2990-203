@@ -20,7 +20,6 @@ export class GamesDisplayComponent implements OnInit {
         originalImage: Buffer;
     }[];
     title: string;
-    playable = false;
     gamesNbr: number = 0;
     justifyContent: string;
     showNextButton = true;
@@ -30,9 +29,10 @@ export class GamesDisplayComponent implements OnInit {
     ngOnInit() {
         this.title = this.isSelection ? 'Page de configuration ' : 'Page de selection';
         this.justifyContent = this.isSelection ? 'center' : 'right';
-        this.getGames(this.currentPageNbr);
+        this.fetchGameDataFromServer(this.currentPageNbr);
     }
-    async getGames(pageId: number): Promise<void> {
+
+    async fetchGameDataFromServer(pageId: number): Promise<void> {
         const routeToSend = '/games/' + pageId.toString();
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
@@ -56,7 +56,7 @@ export class GamesDisplayComponent implements OnInit {
         if (this.currentPageNbr > 0) {
             this.showPreviousButton = true;
         }
-        await this.getGames(this.currentPageNbr);
+        await this.fetchGameDataFromServer(this.currentPageNbr);
     }
 
     async goToPreviousSlide() {
@@ -64,6 +64,6 @@ export class GamesDisplayComponent implements OnInit {
         if (this.currentPageNbr <= 0) {
             this.showPreviousButton = false;
         }
-        await this.getGames(this.currentPageNbr);
+        await this.fetchGameDataFromServer(this.currentPageNbr);
     }
 }
