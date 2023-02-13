@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-console */
 import { GameData } from '@common/game-data';
@@ -9,7 +10,7 @@ import { MatchingDifferencesService } from './matching-differences.service';
 export class SocketManager {
     matchingDifferencesService: MatchingDifferencesService;
     private sio: io.Server;
-    private room: string = 'serverRoom';
+    private readonly room: 'serverRoom';
     constructor(server: http.Server) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
         this.matchingDifferencesService = new MatchingDifferencesService();
@@ -20,34 +21,34 @@ export class SocketManager {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
             // message initial
             socket.emit('hello', 'Hello World!');
-            let roomName = '';
+            let joinedRoomName = '';
 
             socket.on('message', (message: string) => {
                 console.log(message);
             });
 
             socket.on('launchGame', (data: { gameData: GameData; username: string }) => {
-                roomName = data.gameData.id + data.username + socket.id;
-                console.log('launchGame called with ' + roomName);
-                socket.join(roomName);
-                if (socket.rooms.has(roomName)) {
-                    this.sio.to(roomName).emit('matchJoined', 'User:' + data.username + 'has joined the game with id #' + data.gameData.id);
+                joinedRoomName = data.gameData.id + data.username + socket.id;
+                console.log('launchGame called with ' + joinedRoomName);
+                socket.join(joinedRoomName);
+                if (socket.rooms.has(joinedRoomName)) {
+                    this.sio.to(joinedRoomName).emit('matchJoined', 'User:' + data.username + 'has joined the game with id #' + data.gameData.id);
                     socket.data = data;
                     for (const room of socket.rooms) {
                         console.log('gameData saved for room: ' + room);
                     }
 
                     for (const key in socket.data) {
-                        // eslint-disable-next-line no-prototype-builtins
-                        if (socket.data.hasOwnProperty(key)) {
-                            console.log(`${key}: ${socket.data[key]}`);
-                        }
+                        console.log(`${key}: ${socket.data[key]}`);
                     }
                 }
             });
 
             socket.on('validateDifference', (data: { foundDifferences: boolean[]; position: Vector2 }) => {
-                const foundDifferenceId = this.matchingDifferencesService.getDifferenceIndex(socket.data.gameData as GameData, data.position);
+                const foundDifferenceId = this.matchingDifferencesService.getDifferenceIndex(
+                    socket.data.gameData as GameData,
+                    data.position as Vector2,
+                );
                 const successfullyFoundDifference = foundDifferenceId !== -1 && !data.foundDifferences[foundDifferenceId];
 
                 if (successfullyFoundDifference) {
@@ -55,7 +56,7 @@ export class SocketManager {
                     data.foundDifferences[foundDifferenceId] = true;
                     console.log('Difference found at index #' + foundDifferenceId);
                 }
-                this.sio.to(roomName).emit('validationReturned', {
+                this.sio.to(joinedRoomName).emit('validationReturned', {
                     foundDifferences: data.foundDifferences,
                     isValidated: successfullyFoundDifference,
                     foundDifferenceIndex: foundDifferenceId,
@@ -71,7 +72,9 @@ export class SocketManager {
 
             socket.on('roomMessage', (message: string) => {
                 // Seulement un membre de la salle peut envoyer un message aux autres
-                this.sio.to(this.room).emit('roomMessage', `${socket.id} : ${message}`);
+                if (socket.rooms.has(this.room)) {
+                    this.sio.to(this.room).emit('roomMessage', `${socket.id} : ${message}`);
+                }
             });
 
             socket.on('disconnect', (reason) => {

@@ -5,7 +5,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ActivatedRoute } from '@angular/router';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppMaterialModule } from '@app/modules/material.module';
 import { AppComponent } from '@app/pages/app/app.component';
@@ -17,7 +16,6 @@ import { GameCardComponent } from './components/game-card/game-card.component';
 import { GamesDisplayComponent } from './components/games-display/games-display.component';
 import { HintComponent } from './components/hint/hint.component';
 import { InfoCardComponent } from './components/info-card/info-card.component';
-import { MouseComponent } from './components/mouse/mouse.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
@@ -56,7 +54,6 @@ import { AuthService } from './services/auth.service';
         TimerComponent,
         QuitButtonComponent,
         ChatComponent,
-        MouseComponent,
         GameCreationPageComponent,
         GamesDisplayComponent,
     ],
@@ -71,7 +68,8 @@ import { AuthService } from './services/auth.service';
         ReactiveFormsModule,
         CommonModule,
     ],
-    providers: [AuthService, ActivatedRoute],
+    // providers: [AuthService, ActivatedRoute],
+    providers: [AuthService],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

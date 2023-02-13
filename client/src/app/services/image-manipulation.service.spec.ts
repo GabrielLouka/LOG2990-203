@@ -6,7 +6,6 @@ import { TestBed } from '@angular/core/testing';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
-
 import { ImageManipulationService } from './image-manipulation.service';
 
 describe('ImageManipulationService', () => {
@@ -24,7 +23,6 @@ describe('ImageManipulationService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-
     it('should change the canvas source when loading an image', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
@@ -36,15 +34,19 @@ describe('ImageManipulationService', () => {
     });
 
     it('should get the modified image without the specified differences', () => {
-        const originalImage1: Buffer = Buffer.alloc(100, 1);
-        const modifiedImage1: Buffer = Buffer.alloc(100, 0);
-        const image = { originalImage: originalImage1, modifiedImage: modifiedImage1 };
+        const originalBuffer: Buffer = Buffer.alloc(100, 1);
+        const modifiedBuffer: Buffer = Buffer.alloc(100, 0);
+
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
-        const output = service.getModifiedImageWithoutDifferences(gameData as GameData, image, foundDifferences);
+        const output = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: originalBuffer, modifiedImage: modifiedBuffer },
+            foundDifferences,
+        );
 
-        expect(output).not.toBe(modifiedImage1);
+        expect(output).not.toBe(modifiedBuffer);
     });
 
     it('should handle corrupted images', () => {
@@ -52,29 +54,36 @@ describe('ImageManipulationService', () => {
         const corruptedModifiedImage: Buffer = Buffer.alloc(0);
         const goodModifiedImage: Buffer = Buffer.alloc(100, 0);
         const goodOgImage: Buffer = Buffer.alloc(100, 1);
-        const image1 = { originalImage: corruptedOgImage, modifiedImage: goodModifiedImage };
-        const image2 = { originalImage: goodOgImage, modifiedImage: corruptedModifiedImage };
-
+        
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
-        const output1 = service.getModifiedImageWithoutDifferences(gameData as GameData, image1, foundDifferences);
-        const output2 = service.getModifiedImageWithoutDifferences(gameData as GameData, image2, foundDifferences);
+        const output1 = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: corruptedOgImage, modifiedImage: goodModifiedImage },
+            foundDifferences,
+        );
+        const output2 = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: goodOgImage, modifiedImage: corruptedModifiedImage },
+            foundDifferences,
+        );
 
         expect(output1).toEqual(goodModifiedImage);
         expect(output2).toEqual(corruptedModifiedImage);
     });
 
-    it('should blink the difference between two images', () => {
+    it('should blink the difference between two images during specified time', () => {
         const imageOld: Buffer = Buffer.alloc(100, 1);
         const imageNew: Buffer = Buffer.alloc(100, 0);
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
+        const blinkTime = 100;
 
         spyOn(service, 'sleep').and.resolveTo();
         service.blinkDifference(imageOld, imageNew, ctx).then(() => {
-            expect(service.sleep).toHaveBeenCalled();
+            expect(service.sleep(blinkTime)).toHaveBeenCalled();
         });
     });
     

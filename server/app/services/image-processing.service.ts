@@ -230,11 +230,11 @@ export class ImageProcessingService {
         const imageWidth = dimensions.x;
 
         let yPosition: number;
-        if (this.isImageUsingTopDownFormat(imageBuffer)) {
-            // Top-down BMP
+        if (!this.isImageUsingTopDownFormat(imageBuffer)) {
+            // Bottom Up BMP
             yPosition = position.y;
         } else {
-            // Bottom-up BMP
+            // Top Down BMP
             yPosition = dimensions.y - position.y - 1;
         }
 

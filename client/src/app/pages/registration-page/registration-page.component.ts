@@ -22,7 +22,7 @@ export class RegistrationPageComponent implements OnInit {
         this.id = this.route.snapshot.paramMap.get('id');
     }
     registerUser() {
-        this.auth.registerUser(this.registrationForm.value.username);
+        this.auth.registerUser(this.registrationForm.value.username as string);
         this.username = this.registrationForm.value.username;
     }
 

@@ -111,10 +111,28 @@ export class ImageManipulationService {
         // Each pixel is 3 bytes (BGR)
         const pixelLength = 3;
 
-        const imageWidth = this.getImageDimensions(imageBuffer).x;
+        const dimensions = this.getImageDimensions(imageBuffer);
+        const imageWidth = dimensions.x;
+
+        let yPosition: number;
+        if (!this.isImageUsingTopDownFormat(imageBuffer)) {
+            // Bottom Up BMP
+            yPosition = position.y;
+        } else {
+            // Top Down BMP
+            yPosition = dimensions.y - position.y - 1;
+        }
 
         // Calculate the starting position of the pixel
-        return (position.x + position.y * imageWidth) * pixelLength + pixelStart;
+        // return (position.x + position.y * imageBuffer.readUInt32LE(imageWidthOffset)) * pixelLength + pixelStart;
+        return (position.x + yPosition * imageWidth) * pixelLength + pixelStart;
+    };
+
+    private isImageUsingTopDownFormat = (imageBuffer: Buffer): boolean => {
+        const imageHeightOffset = 22;
+        const imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
+
+        return imageHeight < 0;
     };
 
     private getImageDimensions = (imageBuffer: Buffer): Vector2 => {

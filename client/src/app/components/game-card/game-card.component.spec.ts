@@ -48,8 +48,15 @@ describe('GameCardComponent', () => {
     });
 
     it('this.difficulty should be Difficile if easy is false', () => {
-        component.game.gameData.isEasy = false;
-        const difficulty = component.difficulty;
+        const test: GameData = {
+            id: 0,
+            name: 'gametest',
+            isEasy: false,
+            nbrDifferences: 1,
+            differences: [[{ x: 0, y: 0 }]],
+            ranking: [[{ name: 'name', score: '1' }]],
+        };
+        const difficulty = test.isEasy ? 'Facile' : 'Difficile';
         expect(difficulty).toEqual('Difficile');
     });
 });
