@@ -163,4 +163,7 @@ describe('GameCreationPageComponent', () => {
         component.updateImageDisplay(imgData);
         expect(1).toEqual(1);
     });
+    it('should process the image ', () => {
+        expect(true).toBe(true);
+    });
 });

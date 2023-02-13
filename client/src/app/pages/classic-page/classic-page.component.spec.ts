@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { BackButtonComponent } from '@app/components/back-button/back-button.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
@@ -264,18 +264,14 @@ describe('ClassicPageComponent', () => {
         expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('none');
     });
 
-    // it('should hide the error message and re-enable pointer events on the canvases after 1 second', () => {
-    //     const canvas = document.createElement('canvas');
-    //     component.leftCanvas = { nativeElement: canvas };
-    //     component.rightCanvas = { nativeElement: canvas };
-    //     component.onFindWrongDifference();
-
-    //     expect(component.errorMessage.nativeElement.style.display).toBe('block');
-    //     expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('none');
-    //     expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('none');
-
-    //     expect(component.errorMessage.nativeElement.style.display).toBe('none');
-    //     expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('auto');
-    //     expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('auto');
-    // });
+    it('setTimout should be called onFindWrongDifferences', fakeAsync(() => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.onFindWrongDifference();
+        tick(1000);
+        expect(component.errorMessage.nativeElement.style.display).toBe('none');
+        expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('auto');
+        expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('auto');
+    }));
 });
