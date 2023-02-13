@@ -28,7 +28,11 @@ export class GamesController {
                 const games = await this.gameStorageService.getGamesInPage(parseInt(req.params.id, 10));
                 const gameLength = await this.gameStorageService.getGamesLength();
                 const gameInformation = { gameContent: games, nbrOfGame: gameLength };
-                res.send(JSON.stringify(gameInformation));
+                if (gameInformation.nbrOfGame > 0) {
+                    res.send(JSON.stringify(gameInformation));
+                } else {
+                    res.status(StatusCodes.BAD_REQUEST).send();
+                }
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }
@@ -42,7 +46,7 @@ export class GamesController {
             this.gameStorageService
                 .updateGameName(receivedArguments[idIndex], receivedArguments[nameIndex])
                 .then(() => {
-                    res.status(StatusCodes.OK).send();
+                    res.status(StatusCodes.CREATED).send();
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
@@ -70,7 +74,7 @@ export class GamesController {
             this.gameStorageService
                 .updateGameName(receivedNameForm.gameId, receivedNameForm.gameName)
                 .then(() => {
-                    res.status(StatusCodes.CREATED).send();
+                    res.status(StatusCodes.CREATED).send({ body: receivedNameForm.gameName });
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
@@ -81,7 +85,7 @@ export class GamesController {
             this.gameStorageService
                 .deleteAllGames()
                 .then(() => {
-                    res.status(StatusCodes.OK).send();
+                    res.status(StatusCodes.OK).send({ body: this.gameStorageService.getGamesLength() });
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
