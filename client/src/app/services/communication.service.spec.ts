@@ -27,24 +27,6 @@ describe('CommunicationService', () => {
         expect(service).toBeTruthy();
     });
 
-    it('should return expected message (HttpClient called once)', () => {
-        const expectedMessage: Message = { body: 'Hello', title: 'World' };
-
-        // check the content of the mocked call
-        service.basicGet().subscribe({
-            next: (response: Message) => {
-                expect(response.title).toEqual(expectedMessage.title);
-                expect(response.body).toEqual(expectedMessage.body);
-            },
-            error: fail,
-        });
-
-        const req = httpMock.expectOne(`${baseUrl}/example`);
-        expect(req.request.method).toBe('GET');
-        // actually send the request
-        req.flush(expectedMessage);
-    });
-
     it('should perform a GET request with get()', () => {
         const expectedMessage: Message = { body: 'Hello', title: 'World' };
         const expectedUrl = '/example';
@@ -62,18 +44,6 @@ describe('CommunicationService', () => {
         expect(req.request.method).toBe('GET');
         req.flush(expectedMessage);
     });
-    it('should handle http error safely', () => {
-        service.basicGet().subscribe({
-            next: (response: Message) => {
-                expect(response).toBeUndefined();
-            },
-            error: fail,
-        });
-
-        const req = httpMock.expectOne(`${baseUrl}/example`);
-        expect(req.request.method).toBe('GET');
-        req.error(new ProgressEvent('Random error occurred'));
-    });
 
     it('should post data', () => {
         const sentMessage: Message = { body: 'Hello', title: 'World' };
@@ -90,19 +60,6 @@ describe('CommunicationService', () => {
         req.flush({ message: 'Data posted successfully' }, { status: 200, statusText: 'OK' });
     });
 
-    it('should not return any message when sending a POST request (HttpClient called once)', () => {
-        const sentMessage: Message = { body: 'Hello', title: 'World' };
-        // subscribe to the mocked call
-        service.basicPost(sentMessage).subscribe({
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            next: () => {},
-            error: fail,
-        });
-        const req = httpMock.expectOne(`${baseUrl}/example/send`);
-        expect(req.request.method).toBe('POST');
-        // actually send the request
-        req.flush(sentMessage);
-    });
     it('should delete data', () => {
         const testRoute = '/test';
 
