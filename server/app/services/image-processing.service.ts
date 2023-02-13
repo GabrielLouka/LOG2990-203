@@ -79,9 +79,6 @@ export class ImageProcessingService {
 
     private getDifferentPixelPositionsBetweenImages = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[] => {
         try {
-            // const imageWidth = imageBuffer1.readUInt32LE(ImageProcessingService.imageWidthOffset);
-            // const imageHeight = imageBuffer1.readUInt32LE(ImageProcessingService.imageHeightOffset);
-
             const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
 
             const differences: Vector2[] = [];
@@ -146,11 +143,6 @@ export class ImageProcessingService {
 
             while (nextPixelsToVisit.length > 0) {
                 const currentPixel = nextPixelsToVisit.dequeue() as { pos: Vector2; radius: number };
-
-                // eslint-disable-next-line no-console
-                // console.log(
-                //     'Visiting ' + currentPixel.pos.x + ', ' + (imageHeight - (currentPixel.pos.y + 1)) + ' with radius ' + currentPixel.radius,
-                // );
 
                 // if this pixel hasn't been visited, add it to the list of differences
                 if (!alreadyVisited.has(currentPixel.pos.x + ' ' + currentPixel.pos.y)) {
@@ -238,7 +230,6 @@ export class ImageProcessingService {
         const imageWidth = dimensions.x;
 
         let yPosition: number;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         if (this.isImageUsingTopDownFormat(imageBuffer)) {
             // Top-down BMP
             yPosition = position.y;

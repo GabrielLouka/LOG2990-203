@@ -393,4 +393,37 @@ describe('Image-Processing Service', () => {
         });
         sinon.restore();
     });
+
+    it('should write an error on the console if cannot get different pixel position between images', () => {
+        const spy = sinon.spy(console, 'error');
+        const imageBuffer = Buffer.from([15]);
+        const imageBuffer2 = Buffer.from([15]);
+
+        try {
+            imageProcessingService['getDifferentPixelPositionsBetweenImages'](imageBuffer, imageBuffer2);
+        } catch (e) {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.getCall(0).args[0]).to.equal('Could not get different pixel positions between images');
+        }
+        spy.restore();
+    });
+
+    it('should write an error on the console if cannot paint black pixels at given positions', () => {
+        const spy = sinon.spy(console, 'error');
+        const imageBuffer = Buffer.from([15]);
+        const positions: Vector2[] = [
+            { x: 10, y: 10 },
+            { x: 4, y: 0 },
+            { x: 3, y: 0 },
+            { x: 2, y: 0 },
+        ];
+
+        try {
+            imageProcessingService['paintBlackPixelsAtPositions'](positions, imageBuffer);
+        } catch (e) {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.getCall(0).args[0]).to.equal('Cannot paint black pixels at theses given positions');
+        }
+        spy.restore();
+    });
 });
