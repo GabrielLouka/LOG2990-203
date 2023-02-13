@@ -1,10 +1,11 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed } from '@angular/core/testing';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
-
 import { ImageManipulationService } from './image-manipulation.service';
 
 describe('ImageManipulationService', () => {
@@ -22,7 +23,6 @@ describe('ImageManipulationService', () => {
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-
     it('should change the canvas source when loading an image', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
@@ -54,7 +54,7 @@ describe('ImageManipulationService', () => {
         const corruptedModifiedImage: Buffer = Buffer.alloc(0);
         const goodModifiedImage: Buffer = Buffer.alloc(100, 0);
         const goodOgImage: Buffer = Buffer.alloc(100, 1);
-
+        
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
@@ -86,4 +86,5 @@ describe('ImageManipulationService', () => {
             expect(service.sleep(blinkTime)).toHaveBeenCalled();
         });
     });
+    
 });

@@ -67,11 +67,6 @@ export class GameCreationPageComponent {
     toggleElementVisibility(element: ElementRef<any>, isVisible: boolean) {
         element.nativeElement.style.display = isVisible ? 'flex' : 'none';
     }
-
-    sendConsoleLog() {
-        console.log('Hello world!');
-    }
-
     async processImage(event: any, isModified: boolean) {
         console.log('Hello');
         if (event.target.files.length === 0) return;

@@ -7,7 +7,6 @@ import { AuthService } from '@app/services/auth.service';
     selector: 'app-registration-page',
     templateUrl: './registration-page.component.html',
     styleUrls: ['./registration-page.component.scss'],
-    providers: [AuthService]
 })
 export class RegistrationPageComponent implements OnInit {
     username: string | null | undefined;
@@ -23,7 +22,7 @@ export class RegistrationPageComponent implements OnInit {
         this.id = this.route.snapshot.paramMap.get('id');
     }
     registerUser() {
-        this.auth.registerUser(this.registrationForm.value.username);
+        this.auth.registerUser(this.registrationForm.value.username as string);
         this.username = this.registrationForm.value.username;
     }
 
