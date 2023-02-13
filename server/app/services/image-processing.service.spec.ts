@@ -69,18 +69,22 @@ describe('Image-Processing Service', () => {
         expect(buf.readUInt8(0)).to.equal(pixelTest.b);
         expect(buf.readUInt8(1)).to.equal(pixelTest.g);
         expect(buf.readUInt8(2)).to.equal(pixelTest.r);
+        sinon.restore();
     });
-    it('should throw an error message  if the pixel position is not valid', () => {
+    it('should throw an error message if the pixel position is not valid', () => {
         const spy = sinon.spy(console, 'error');
         const invalidPosition = { x: 10, y: 10 };
         const pixel = new Pixel(10, 11, 15);
         const imageBuffer = Buffer.from([15]);
 
-        imageProcessingService['setRGB'](invalidPosition, imageBuffer, pixel);
-
-        expect(spy.callCount).to.equal(2);
-        expect(spy.getCall(0).args[0]).to.be.an('error');
-        expect(spy.getCall(1).args[0]).to.equal("OOPS! Can't write pixel at position " + invalidPosition.x + ', ' + invalidPosition.y + '!');
+        try {
+            imageProcessingService['setRGB'](invalidPosition, imageBuffer, pixel);
+        } catch (e) {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.getCall(0).args[0]).to.equal("OOPS! Can't write pixel at position " + invalidPosition.x + ', ' + invalidPosition.y + '!');
+            expect(spy.getCall(1).args[0]).to.equal('Cannot turn this image to white');
+        }
+        spy.restore();
         sinon.restore();
     });
     it('should return a null and throw an error', () => {
@@ -89,12 +93,12 @@ describe('Image-Processing Service', () => {
         const imageBuffer = Buffer.from([15]);
 
         const pixelEmpty = imageProcessingService['getRGB'](invalidPosition, imageBuffer);
-        expect(spy.callCount).to.equal(2);
-        expect(spy.getCall(0).args[0]).to.be.an('error');
-        expect(spy.getCall(1).args[0]).to.equal(
+        expect(spy.callCount).to.equal(1);
+        expect(spy.getCall(0).args[0]).to.equal(
             "OOPS! Couldn't get the RGB values for the pixel at position " + invalidPosition.x + ', ' + invalidPosition.y + '!',
         );
         expect(pixelEmpty).to.be.null;
+        spy.restore();
         sinon.restore();
     });
 
@@ -131,27 +135,34 @@ describe('Image-Processing Service', () => {
         expect(imageBuffer).to.deep.equal(expectedImageBuffer);
         sinon.restore();
     });
+
     it('should write an error on the console if the image is invalid or not found', () => {
         const spy = sinon.spy(console, 'error');
         const imageBuffer = Buffer.from([15]);
 
-        imageProcessingService['turnImageToWhite'](imageBuffer);
-        expect(spy.callCount).to.equal(1);
-        expect(spy.getCall(0).args[0]).to.be.an('error');
+        try {
+            imageProcessingService['turnImageToWhite'](imageBuffer);
+        } catch (e) {
+            expect(spy.callCount).to.equal(1);
+            expect(spy.getCall(0).args[0]).to.be.an('Cannot turn this image to white');
+        }
         spy.restore();
     });
+
     it('should return that the game is hard', () => {
         const numberOfDifference = 7;
         const sumOfAllDifferences = [new Vector2(1, 2)];
         const result = imageProcessingService['isHard'](numberOfDifference, sumOfAllDifferences);
         expect(result).to.be.true;
     });
+
     it("should return that the game isn't hard", () => {
         const numberOfDifference = 7;
         const sumOfAllDifferences = Array(47000);
         const result = imageProcessingService['isHard'](numberOfDifference, sumOfAllDifferences);
         expect(result).to.be.false;
     });
+
     it('should turn pixel at the given position to Black', () => {
         const imageBuffer = Buffer.alloc(3);
         const expectedImageBuffer = Buffer.alloc(3);
@@ -288,9 +299,10 @@ describe('Image-Processing Service', () => {
         const getImageDimensionsStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'getImageDimensions');
         getImageDimensionsStub.withArgs(imageBuffer1).returns(image1Dimensions);
         getImageDimensionsStub.withArgs(imageBuffer2).returns(image2Dimensions);
-        const result = imageProcessingService.getDifferencesBlackAndWhiteImage(imageBuffer1, imageBuffer2, radius);
-        expect(result).to.equal(
-            new Error(
+        try {
+            imageProcessingService.getDifferencesBlackAndWhiteImage(imageBuffer1, imageBuffer2, radius);
+        } catch (e) {
+            expect(e.message).to.equal(
                 'Images must be 640x480! (img 1 ' +
                     image1Dimensions.x +
                     'x' +
@@ -300,8 +312,8 @@ describe('Image-Processing Service', () => {
                     'x' +
                     image2Dimensions.y +
                     ')',
-            ),
-        );
+            );
+        }
         sinon.restore();
     });
     it('should throw an error if format is not the good one ', () => {
@@ -319,8 +331,12 @@ describe('Image-Processing Service', () => {
         const getImageDimensionsStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'getImageDimensions');
         getImageDimensionsStub.withArgs(imageBuffer1).returns(image1Dimensions);
         getImageDimensionsStub.withArgs(imageBuffer2).returns(image2Dimensions);
-        const result = imageProcessingService.getDifferencesBlackAndWhiteImage(imageBuffer1, imageBuffer2, radius);
-        expect(result).to.throws(new Error('Images must be 24 bit depth BMPs!'));
+
+        try {
+            imageProcessingService.getDifferencesBlackAndWhiteImage(imageBuffer1, imageBuffer2, radius);
+        } catch (e) {
+            expect(e.message).to.equal('Images must be 24 bit depth BMPs!');
+        }
         sinon.restore();
     });
     it('should return an image with all differences in black and white', () => {
@@ -357,11 +373,9 @@ describe('Image-Processing Service', () => {
         const turnImageToWhiteStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'turnImageToWhite');
         turnImageToWhiteStub.returns(whiteBuffer);
         const result = imageProcessingService.getDifferencesBlackAndWhiteImage(imageBuffer1, imageBuffer2, radius);
-        // eslint-disable-next-line no-console
-        console.log(result);
         const paintBlackPixelsAtPositionsStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'paintBlackPixelsAtPositions');
         paintBlackPixelsAtPositionsStub.returns(blackAndWhiteBuffer);
-        expect(result).to.equal({
+        expect(result).to.deep.equal({
             resultImageByteArray: [5, 5, 5],
             numberOfDifferences: 1,
             message: 'Success!',

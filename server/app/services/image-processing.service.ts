@@ -99,7 +99,7 @@ export class ImageProcessingService {
             return differences;
         } catch (e) {
             // eslint-disable-next-line no-console
-            console.error(e);
+            console.error('Could not get different pixel positions between images');
             return [];
         }
     };
@@ -111,7 +111,7 @@ export class ImageProcessingService {
             });
         } catch (e) {
             // eslint-disable-next-line no-console
-            console.error(e);
+            console.error('Cannot paint black pixels at theses given positions');
         }
     };
 
@@ -208,8 +208,6 @@ export class ImageProcessingService {
             return new Pixel(r, g, b);
         } catch (e) {
             // eslint-disable-next-line no-console
-            console.error(e);
-            // eslint-disable-next-line no-console
             console.error("OOPS! Couldn't get the RGB values for the pixel at position " + position.x + ', ' + position.y + '!');
             return null;
         }
@@ -224,8 +222,6 @@ export class ImageProcessingService {
             imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
             imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
             // eslint-disable-next-line no-console
             console.error("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
         }
@@ -276,7 +272,7 @@ export class ImageProcessingService {
             }
         } catch (e) {
             // eslint-disable-next-line no-console
-            console.error(e);
+            console.error('Cannot turn this image to white');
         }
     };
 }

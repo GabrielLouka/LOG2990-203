@@ -139,7 +139,7 @@ export class GameStorageService {
     createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
-                console.error(err);
+                console.error('Folder was not created');
             } else {
                 console.log('Folder successfully created.');
             }
@@ -162,7 +162,7 @@ export class GameStorageService {
      */
     writeFileErrorManagement = (err: NodeJS.ErrnoException) => {
         if (err) {
-            console.error(err);
+            console.error('File was not successfully written');
         } else {
             console.log('File successfully written.');
         }

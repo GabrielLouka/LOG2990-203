@@ -90,7 +90,7 @@ describe('ImageProcessingController', () => {
         expressApp = app.app;
     });
 
-    it('POST should send Created status', async () => {
+    it('POST should send a created status', async () => {
         assert(controller.router);
         supertest(expressApp)
             .post(`${API_URL}/send-image`)
