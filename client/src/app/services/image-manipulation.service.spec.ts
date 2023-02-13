@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { TestBed } from '@angular/core/testing';
@@ -34,15 +36,15 @@ describe('ImageManipulationService', () => {
     });
 
     it('should get the modified image without the specified differences', () => {
-        const originalImage: Buffer = Buffer.alloc(100, 1);
-        const modifiedImage: Buffer = Buffer.alloc(100, 0);
-
+        const originalImage1: Buffer = Buffer.alloc(100, 1);
+        const modifiedImage1: Buffer = Buffer.alloc(100, 0);
+        const image = { originalImage: originalImage1, modifiedImage: modifiedImage1 };
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
-        const output = service.getModifiedImageWithoutDifferences(gameData as GameData, originalImage, modifiedImage, foundDifferences);
+        const output = service.getModifiedImageWithoutDifferences(gameData as GameData, image, foundDifferences);
 
-        expect(output).not.toBe(modifiedImage);
+        expect(output).not.toBe(modifiedImage1);
     });
 
     it('should handle corrupted images', () => {
@@ -50,12 +52,14 @@ describe('ImageManipulationService', () => {
         const corruptedModifiedImage: Buffer = Buffer.alloc(0);
         const goodModifiedImage: Buffer = Buffer.alloc(100, 0);
         const goodOgImage: Buffer = Buffer.alloc(100, 1);
+        const image1 = { originalImage: corruptedOgImage, modifiedImage: goodModifiedImage };
+        const image2 = { originalImage: goodOgImage, modifiedImage: corruptedModifiedImage };
 
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
-        const output1 = service.getModifiedImageWithoutDifferences(gameData as GameData, corruptedOgImage, goodModifiedImage, foundDifferences);
-        const output2 = service.getModifiedImageWithoutDifferences(gameData as GameData, goodOgImage, corruptedModifiedImage, foundDifferences);
+        const output1 = service.getModifiedImageWithoutDifferences(gameData as GameData, image1, foundDifferences);
+        const output2 = service.getModifiedImageWithoutDifferences(gameData as GameData, image2, foundDifferences);
 
         expect(output1).toEqual(goodModifiedImage);
         expect(output2).toEqual(corruptedModifiedImage);
@@ -73,4 +77,5 @@ describe('ImageManipulationService', () => {
             expect(service.sleep).toHaveBeenCalled();
         });
     });
+    
 });

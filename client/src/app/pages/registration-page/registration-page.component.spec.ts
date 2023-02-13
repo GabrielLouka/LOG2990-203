@@ -14,10 +14,6 @@ describe('RegistrationPageComponent', () => {
         authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
     });
 
-    beforeEach(() => {
-        authService = jasmine.createSpyObj("AuthService", ['registerUser', 'getUser']);
-    });
-    
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [RegistrationPageComponent],
@@ -35,8 +31,7 @@ describe('RegistrationPageComponent', () => {
         fixture = TestBed.createComponent(RegistrationPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
-    });    
-
+    });
 
     it('should create', () => {
         expect(component).toBeTruthy();
@@ -46,13 +41,16 @@ describe('RegistrationPageComponent', () => {
         expect(component.registrationForm).toBeInstanceOf(FormGroup);
     });
 
-    it('registerUser should call registerUser method', () => {
+    it('should register a user with the auth service', () => {
+        authService.registerUser.and.callThrough();
+        component.registrationForm.setValue({ username: 'testuser' });
         component.registerUser();
-        expect(authService.registerUser).toHaveBeenCalled();
+        expect(component.username).toBe('testuser');
     });
 
-    it('getUser should call registerUserName from service', () => {
-        component.getUser();
-        expect(authService.registerUserName).toHaveBeenCalled();
+    it('should get the registered user name from the auth service', () => {
+        authService.registerUserName.and.returnValue('testuser');
+        const result = component.getUser();
+        expect(result).toBe('testuser');
     });
 });
