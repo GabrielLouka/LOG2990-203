@@ -73,16 +73,17 @@ describe('ImageManipulationService', () => {
         expect(output2).toEqual(corruptedModifiedImage);
     });
 
-    it('should blink the difference between two images', () => {
+    it('should blink the difference between two images during specified time', () => {
         const imageOld: Buffer = Buffer.alloc(100, 1);
         const imageNew: Buffer = Buffer.alloc(100, 0);
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
+        const blinkTime = 100;
 
         spyOn(service, 'sleep').and.resolveTo();
         service.blinkDifference(imageOld, imageNew, ctx).then(() => {
-            expect(service.sleep).toHaveBeenCalled();
+            expect(service.sleep(blinkTime)).toHaveBeenCalled();
         });
     });
 });

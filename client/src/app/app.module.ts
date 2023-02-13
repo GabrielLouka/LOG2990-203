@@ -16,7 +16,6 @@ import { GameCardComponent } from './components/game-card/game-card.component';
 import { GamesDisplayComponent } from './components/games-display/games-display.component';
 import { HintComponent } from './components/hint/hint.component';
 import { InfoCardComponent } from './components/info-card/info-card.component';
-import { MouseComponent } from './components/mouse/mouse.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
@@ -55,7 +54,6 @@ import { AuthService } from './services/auth.service';
         TimerComponent,
         QuitButtonComponent,
         ChatComponent,
-        MouseComponent,
         GameCreationPageComponent,
         GamesDisplayComponent,
     ],
