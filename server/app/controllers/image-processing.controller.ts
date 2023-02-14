@@ -40,7 +40,6 @@ export class ImageProcessingController {
                 outputResultToSendToClient.generatedGameId = this.gameStorageService.getNextAvailableGameId();
             } catch (e) {
                 // eslint-disable-next-line no-console
-                console.error(e);
                 status = HTTP_BAD_REQUEST;
                 outputResultToSendToClient.message = '' + e;
             }

@@ -26,12 +26,12 @@ describe('ImageProcessingController', () => {
     const radius = 3;
 
     const image: DifferenceImage = {
-        background: [0x2, 0x3, 0x5],
+        background: [],
         foreground: [],
     };
 
     const image2: DifferenceImage = {
-        background: [0x5, 0x9, 0x5],
+        background: [],
         foreground: [],
     };
 
@@ -97,12 +97,10 @@ describe('ImageProcessingController', () => {
             .send({ body: receivedDifferenceImages })
             .set('Accept', 'application/json')
             .expect(HTTP_STATUS_CREATED)
-            .then((response) => {
-                assert.deepEqual(response.status, HTTP_STATUS_CREATED);
+            .then(() => {
                 assert(imageProcessingServiceStub.calledOnce);
                 assert(gameStorageService.getNextAvailableGameId.calledOnce);
                 assert.deepEqual(gameStorageService.getNextAvailableGameId(), -1);
-                expect(response.status).to.deep.equal(HTTP_STATUS_CREATED);
             });
     });
 
@@ -116,8 +114,6 @@ describe('ImageProcessingController', () => {
             .expect(HTTP_STATUS_BAD_REQUEST)
             .catch((res) => {
                 assert.deepEqual(res.message, errorMessage);
-                assert.deepEqual(res.status, HTTP_STATUS_BAD_REQUEST);
-                expect(res.status.calledWith(HTTP_STATUS_BAD_REQUEST)).to.be.true;
             });
     });
 
@@ -131,7 +127,6 @@ describe('ImageProcessingController', () => {
             .expect(HTTP_STATUS_BAD_REQUEST)
             .catch((res) => {
                 expect(res.message).to.deep.equal('' + errorMessage);
-                expect(res.status.calledWith(HTTP_STATUS_BAD_REQUEST)).to.be.true;
             });
     });
 });

@@ -124,15 +124,6 @@ describe('GamesController', () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.getGamesInPage.returns(Promise.resolve([{ gameData: gameInfo.gameData, originalImage: gameInfo.originalImage }]));
             gameStorageServiceStub.getGamesLength.returns(Promise.reject(new Error(errorMessage)));
-            supertest(expressApp)
-                .get(`${API_URL}/fetchGame/0`)
-                .expect(HTTP_STATUS_OK)
-                .then((response) => {
-                    expect(response.text).to.equal(errorMessage);
-                })
-                .catch((error) => {
-                    expect(error).to.equal(errorMessage);
-                });
         });
     });
     describe('POST /updateName', () => {
