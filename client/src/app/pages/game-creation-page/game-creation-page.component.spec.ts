@@ -21,6 +21,17 @@ describe('GameCreationPageComponent', () => {
     let communicationService: jasmine.SpyObj<CommunicationService>;
     let leftCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
     let rightCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
+    let onloadRef: Function | undefined;
+    // eslint-disable-next-line no-unused-vars
+    Object.defineProperty(Image.prototype, 'onload', {
+        get() {
+            return this._onload;
+        },
+        set(onload: Function) {
+            onloadRef = onload;
+            this._onload = onload;
+        },
+    });
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',
@@ -172,6 +183,8 @@ describe('GameCreationPageComponent', () => {
         const img = new Image();
         img.src = URL.createObjectURL(new Blob([imgData]));
         component.updateImageDisplay(imgData);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
         expect(component.imagePreview).toEqual({ nativeElement: canvas });
     });
 
@@ -329,17 +342,6 @@ describe('GameCreationPageComponent', () => {
         const byteArray = [1, 2, 3, 4];
         const buffer = component.convertToBuffer(byteArray);
         const imgData = new Uint8Array(buffer);
-        let onloadRef: Function | undefined;
-        // eslint-disable-next-line no-unused-vars
-        Object.defineProperty(Image.prototype, 'onload', {
-            get() {
-                return this._onload;
-            },
-            set(onload: Function) {
-                onloadRef = onload;
-                this._onload = onload;
-            },
-        });
 
         const myBlob = new Blob([imgData]);
         const canvas = document.createElement('canvas');
