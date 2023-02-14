@@ -125,7 +125,8 @@ describe('ClassicPageComponent', () => {
     it('playSuccess should play', async () => {
         const newTime = 0;
         await component.playSuccessSound();
-        expect(component.successSound.nativeElement.currentTime).toEqual(newTime);
+        const currentTime = await component.successSound.nativeElement.currentTime;
+        expect(currentTime).toEqual(newTime);
     });
 
     it('refreshModifiedImage should refresh', async () => {
@@ -163,8 +164,11 @@ describe('ClassicPageComponent', () => {
 
     it('onMouseDown should check mouse event', () => {
         const event = new MouseEvent('mousedown');
+        const socketServiceSpy = jasmine.createSpyObj('SocketService', ['send']);
+        component.socketService = socketServiceSpy;
+
         component.onMouseDown(event);
-        expect(socketService.send).toHaveBeenCalled();
+        expect(socketServiceSpy.send).toHaveBeenCalled();
     });
 
     it('addServerSocketMessagesListeners should send message', () => {
@@ -178,9 +182,14 @@ describe('ClassicPageComponent', () => {
         if (res) expect(socketService.disconnect).toHaveBeenCalled();
     });
 
-    it('get socket id should return id', () => {
-        const id = component.socketId;
-        expect(id).toEqual(socketService.socket.id);
+    // it('get socket id should return id', () => {
+    //     const id = component.socketId;
+    //     expect(id).toEqual(socketService.socket.id);
+    // });
+    it('get socket id should return id', async () => {
+        const id = await component.socketId;
+        const expectedId = await socketService.socket.id;
+        expect(id).toEqual(expectedId);
     });
 
     it('get socket id should return id', () => {
@@ -188,9 +197,9 @@ describe('ClassicPageComponent', () => {
         expect(component.socketId).toEqual('');
     });
 
-    it('onWinGame should call showPopUp', () => {
+    it('onWinGame should call showPopUp', async () => {
         const popUpSpy = spyOn(component, 'showPopUp');
-        component.onWinGame();
+        await component.onWinGame();
         expect(popUpSpy).toHaveBeenCalled();
     });
 

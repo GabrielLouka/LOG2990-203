@@ -98,6 +98,7 @@ describe('GamesDisplayComponent', () => {
         expect(component.gamesNbr).toEqual(4);
         expect(component.showNextButton).toBeFalse();
     });
+
     it('should handle error response from the server', async () => {
         const error = new HttpErrorResponse({
             error: JSON.stringify('Test error'),
@@ -107,7 +108,7 @@ describe('GamesDisplayComponent', () => {
         spyOn(component.debugDisplayMessage, 'next');
         communicationServiceSpy.get.and.returnValue(throwError(() => error));
 
-        component.fetchGameDataFromServer(1);
+        await component.fetchGameDataFromServer(1);
         expect(component.debugDisplayMessage.next).toHaveBeenCalled();
     });
 
