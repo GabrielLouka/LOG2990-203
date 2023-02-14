@@ -173,8 +173,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.errorMessage.nativeElement.style.display = 'block';
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
+        this.showErrorText();
         this.playErrorSound();
+    }
 
+    showErrorText() {
         setTimeout(() => {
             this.errorMessage.nativeElement.style.display = 'none';
             this.leftCanvas.nativeElement.style.pointerEvents = 'auto';

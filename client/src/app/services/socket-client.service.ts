@@ -6,13 +6,14 @@ import { io, Socket } from 'socket.io-client';
 })
 export class SocketClientService {
     socket: Socket;
+    serverAddress: string = 'http://localhost:3000';
 
     isSocketAlive() {
         return this.socket && this.socket.connected;
     }
 
     connect() {
-        this.socket = io('http://localhost:3000', { transports: ['websocket'], upgrade: false });
+        this.socket = io(this.serverAddress, { transports: ['websocket'], upgrade: false });
     }
 
     disconnect() {

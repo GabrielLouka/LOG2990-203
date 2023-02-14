@@ -119,8 +119,6 @@ export class ImageManipulationService {
             yPosition = dimensions.y - position.y - 1;
         }
 
-        // Calculate the starting position of the pixel
-        // return (position.x + position.y * imageBuffer.readUInt32LE(imageWidthOffset)) * pixelLength + pixelStart;
         return (position.x + yPosition * imageWidth) * pixelLength + pixelStart;
     };
 
