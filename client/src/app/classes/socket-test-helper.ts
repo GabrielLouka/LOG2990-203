@@ -15,6 +15,9 @@ export class SocketTestHelper {
     }
 
     emit(event: string, ...params: any): void {
+        // We need to use the params variable, otherwise the linter will complain
+        // eslint-disable-next-line no-console
+        console.log('emit', event, params);
         return;
     }
 
