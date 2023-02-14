@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
@@ -14,7 +14,7 @@ import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Buffer } from 'buffer';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { ClassicPageComponent } from './classic-page.component';
 
 describe('ClassicPageComponent', () => {
@@ -138,6 +138,12 @@ describe('ClassicPageComponent', () => {
         if (!component.rightCanvasContext) expect(imageService.blinkDifference).toHaveBeenCalled();
     });
 
+    // it("if rightCanvas has image, should call using currentModifiedImage", async() => {
+    //     component.currentModifiedImage = Buffer.from([2]);
+    //     await component.refreshModifiedImage();
+    //     expect(component.currentModifiedImage).toBeTruthy();
+    // });
+
     it('onFindDifference should send message about difference found', () => {
         const refresSpy = spyOn(component, 'refreshModifiedImage');
         const successSpy = spyOn(component, 'playSuccessSound');
@@ -172,10 +178,10 @@ describe('ClassicPageComponent', () => {
         expect(socketService.on).toHaveBeenCalled();
     });
 
-    it('connectToSocket should not disconnect if not alive', () => {
-        const res = socketService.isSocketAlive();
+    it('socket should disonnect if already active', () => {
+        socketService.isSocketAlive.and.returnValue(true);
         component.connectSocket();
-        if (res) expect(socketService.disconnect).toHaveBeenCalled();
+        expect(socketService.disconnect).toHaveBeenCalled();
     });
 
     it('get socket id should return id', () => {
@@ -202,8 +208,8 @@ describe('ClassicPageComponent', () => {
         };
         component.totalDifferences = 3;
         component.foundDifferences = fakeData.foundDifferences;
-        component.onWinGame = jasmine.createSpy('onWinGame');
-        component.onFindDifference = jasmine.createSpy('onFindDifference');
+        const winSpy = spyOn(component, 'onWinGame');
+        const diffSpy = spyOn(component, 'onFindDifference');
 
         socketService.on.and.callFake((eventName: string, callback) => {
             if (eventName === 'validationReturned') {
@@ -212,13 +218,14 @@ describe('ClassicPageComponent', () => {
         });
 
         component.addServerSocketMessagesListeners();
-        expect(component.onFindDifference).toHaveBeenCalled();
-        expect(component.onWinGame).not.toHaveBeenCalled();
+        expect(diffSpy).toHaveBeenCalled();
+        component.totalDifferences = 0;
+        component.addServerSocketMessagesListeners();
+        expect(winSpy).toHaveBeenCalled();
     });
 
     it('should call onFindWrongDifference when data is not validated', () => {
         const fakeData = {};
-
         component.onFindWrongDifference = jasmine.createSpy('onFindWrongDifference');
 
         socketService.on.and.callFake((eventName: string, callback) => {
@@ -251,8 +258,16 @@ describe('ClassicPageComponent', () => {
         expect(imageService.getImageSourceFromBuffer).toHaveBeenCalledTimes(2);
         expect(loadSpy).toHaveBeenCalled();
         expect(restartSpy).toHaveBeenCalled();
-        // expect(component.title).toEqual('test');
     });
+
+    it('getInitialImagesFromServer should throw error', () => {
+        const logSpy = spyOn(console, 'log');
+        const errorResponse = new HttpErrorResponse({});
+        commService.get = jasmine.createSpy().and.returnValue(throwError(() => errorResponse));
+        component.getInitialImagesFromServer();
+        expect(logSpy).toHaveBeenCalled();
+    });
+
     it('should display the error message and disable pointer events on the canvases', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
