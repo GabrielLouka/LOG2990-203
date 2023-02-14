@@ -135,7 +135,10 @@ export class GameCreationPageComponent {
     }
 
     async sendImageToServer(): Promise<void> {
-        if (!this.canSendToServer()) return;
+        if (!this.canSendToServer()) {
+            alert('Veuillez ajouter deux images');
+            return;
+        }
 
         this.showPopUp();
 
