@@ -17,6 +17,20 @@
     <div class="flex-row center main-container">
         <div class="flex-column center const-container">
             <p class="title"><b> Constantes de jeu</b></p>
+            <div class="input-container">
+                <div class="flex-row center">
+                    <p class="label-input">Temps initial du compte à rebours (minute)</p>
+                    <input type="number" step="1" value="5" min="0" max="60" />
+                </div>
+                <div class="flex-row center">
+                    <p class="label-input">Temps de pénalité par indice utilisé (seconde)</p>
+                    <input type="number" step="1" value="3" min="0" max="10" />
+                </div>
+                <div class="flex-row center">
+                    <p class="label-input">Temps bonus par différence trouvée (seconde)</p>
+                    <input type="number" step="1" value="2" min="0" max="10" />
+                </div>
+            </div>
             <div class="flex-row">
                 <button class="button-style flex-row center const-btn not-allowed">
                     <span class="material-symbols-outlined option-icon"> device_reset </span>

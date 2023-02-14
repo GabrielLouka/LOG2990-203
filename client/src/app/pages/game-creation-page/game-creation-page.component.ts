@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, ElementRef, ViewChild } from '@angular/core';
 
@@ -63,9 +62,10 @@ export class GameCreationPageComponent {
         this.modal.nativeElement.style.display = 'none';
     }
 
-    toggleElementVisibility(element: ElementRef<any>, isVisible: boolean) {
+    toggleElementVisibility(element: ElementRef, isVisible: boolean) {
         element.nativeElement.style.display = isVisible ? 'flex' : 'none';
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async processImage(event: any, isModified: boolean) {
         if (event.target.files.length === 0) return;
         const image: HTMLImageElement = new Image();

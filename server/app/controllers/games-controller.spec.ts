@@ -9,7 +9,7 @@ import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
-import Container from 'typedi';
+import { Container } from 'typedi';
 // import { GamesController } from './games.controller';
 
 const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;

@@ -49,12 +49,30 @@ describe('ImageManipulationService', () => {
         expect(output).not.toBe(modifiedBuffer);
     });
 
+    it('should get the modified image without the specified differences with a top down image', () => {
+        const originalBuffer: Buffer = Buffer.alloc(100, 1);
+        const modifiedBuffer: Buffer = Buffer.alloc(100, 0);
+
+        spyOn(service, 'isImageUsingTopDownFormat' as any).and.returnValue(true);
+
+        const foundDifferences: boolean[] = [true];
+        const gameData = { differences: [[new Vector2(0, 0)]] };
+
+        const output = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: originalBuffer, modifiedImage: modifiedBuffer },
+            foundDifferences,
+        );
+
+        expect(output).not.toBe(modifiedBuffer);
+    });
+
     it('should handle corrupted images', () => {
         const corruptedOgImage: Buffer = Buffer.alloc(1, 1);
         const corruptedModifiedImage: Buffer = Buffer.alloc(0);
         const goodModifiedImage: Buffer = Buffer.alloc(100, 0);
         const goodOgImage: Buffer = Buffer.alloc(100, 1);
-        
+
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
@@ -86,5 +104,4 @@ describe('ImageManipulationService', () => {
             expect(service.sleep(blinkTime)).toHaveBeenCalled();
         });
     });
-    
 });

@@ -40,6 +40,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     title: string = '';
     currentModifiedImage: Buffer;
 
+    // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,

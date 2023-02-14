@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+/* (Code fourni dans le projet de base donc on retire (disable) l'erreur de lint)
 /**
  * Les codes HTTP utilisés
  */
