@@ -123,11 +123,7 @@ describe('SocketManager', () => {
         });
 
         it('should launchGame', (done) => {
-<<<<<<< HEAD
             const dataTest: GameData = {
-=======
-            const gameData: GameData = {
->>>>>>> dba39ef9d0665f76255f2ba933d099199c1f1a9f
                 id: 0,
                 name: 'Jeu1',
                 isEasy: true,
@@ -160,11 +156,7 @@ describe('SocketManager', () => {
                     cb(testMessage);
                 }
                 if (event === 'launchGame') {
-<<<<<<< HEAD
                     cb({ dataTest, username });
-=======
-                    cb({ gameData, username });
->>>>>>> dba39ef9d0665f76255f2ba933d099199c1f1a9f
                 }
             });
             setTimeout(() => {
