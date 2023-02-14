@@ -367,13 +367,48 @@ describe('GameCreationPageComponent', () => {
         onloadRef!();
         expect(window.alert).toHaveBeenCalledWith("L'image doit être en 24-bits");
     });
-    it('should not process the image', () => {
+    it('should not process the image', async () => {
         const event = {
             target: {
                 files: [] as any,
             },
         };
-        component.processImage(event, false);
-        expect(component.processImage(event, false)).toEqual('' as any);
+        const testValue = await component.processImage(event, false);
+        expect(testValue).toEqual(undefined);
     });
+    it('should process the image to the server', async () => {
+        const byteArray = [1, 2, 3, 4];
+        const buffer = component.convertToBuffer(byteArray);
+        const imgData = new Uint8Array(buffer);
+
+        const myBlob = new Blob([imgData]);
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        const image = new Image();
+        spyOn(Image, 'height' as never).and.returnValue(480 as never);
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
+        spyOn(window, 'alert');
+        const event: any = {
+            target: {
+                files: [
+                    {
+                        arrayBuffer: () => {
+                            return myBlob;
+                        },
+                    },
+                ],
+                length: 10,
+            },
+        };
+        spyOn(URL, 'createObjectURL').and.returnValue('./invalidUrl');
+        const testValue = await component.processImage(event, false);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
+        expect(window.alert).toHaveBeenCalledWith(
+            'Taille invalide (' + image.width + 'x' + image.height + '), la taille doit être de : 640x480 pixels',
+        );
+        expect(testValue).toEqual(undefined);
+    });
+    it('should tell if the image is  ');
 });
