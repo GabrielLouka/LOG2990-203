@@ -81,8 +81,6 @@ export class ImageManipulationService {
             return new Pixel(r, g, b);
         } catch (e) {
             // eslint-disable-next-line no-console
-            console.error(e);
-            // eslint-disable-next-line no-console
             console.error("OOPS! Couldn't get the RGB values for the pixel at position " + position.x + ', ' + position.y + '!');
             return null;
         }
@@ -97,8 +95,6 @@ export class ImageManipulationService {
             imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
             imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
             // eslint-disable-next-line no-console
             console.error("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
         }

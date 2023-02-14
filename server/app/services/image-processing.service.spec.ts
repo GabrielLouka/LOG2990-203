@@ -55,7 +55,7 @@ describe('Image-Processing Service', () => {
         sinon.stub(imageProcessingService, <any>'getImageDimensions').returns(new Vector2(12, 10));
         const pixelBufferPos = imageProcessingService['getPixelBufferPosAtPixelPos'](position, imageBuffer);
 
-        expect(pixelBufferPos).to.equal(309);
+        expect(pixelBufferPos).to.equal(129);
     });
     it('should sets the RGB values of a pixel in the image buffer', () => {
         const getPixelBufferPosAtPixelPosStub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'getPixelBufferPosAtPixelPos');
@@ -69,6 +69,15 @@ describe('Image-Processing Service', () => {
         expect(buf.readUInt8(0)).to.equal(pixelTest.b);
         expect(buf.readUInt8(1)).to.equal(pixelTest.g);
         expect(buf.readUInt8(2)).to.equal(pixelTest.r);
+        sinon.restore();
+    });
+    it('should return right position if image is using top down format', () => {
+        const position: Vector2 = { x: 10, y: 10 };
+        const buf = Buffer.allocUnsafe(5);
+        sinon.stub(imageProcessingService, <any>'isImageUsingTopDownFormat').returns(true);
+        sinon.stub(imageProcessingService, <any>'getImageDimensions').returns({ x: 100, y: 100 });
+        const getPixelBufferPosAtPixelPos = imageProcessingService['getPixelBufferPosAtPixelPos'](position, buf);
+        expect(getPixelBufferPosAtPixelPos).to.equal(26784);
         sinon.restore();
     });
     it('should throw an error message if the pixel position is not valid', () => {
@@ -421,8 +430,19 @@ describe('Image-Processing Service', () => {
         try {
             imageProcessingService['paintBlackPixelsAtPositions'](positions, imageBuffer);
         } catch (e) {
-            expect(spy.callCount).to.equal(1);
             expect(spy.getCall(0).args[0]).to.equal('Cannot paint black pixels at theses given positions');
+            expect(spy.callCount).to.equal(1);
+        }
+        spy.restore();
+    });
+    it('should write an error on the console if cannot paint black pixels at given positions', () => {
+        const spy = sinon.spy(console, 'error');
+        const stub: sinon.SinonStub = sinon.stub(imageProcessingService, <any>'paintBlackPixelsAtPositions');
+        try {
+            stub.throws(new Error());
+        } catch (e) {
+            expect(spy.getCall(0).args[0]).to.equal('Cannot paint black pixels at theses given positions');
+            expect(spy.callCount).to.equal(1);
         }
         spy.restore();
     });
