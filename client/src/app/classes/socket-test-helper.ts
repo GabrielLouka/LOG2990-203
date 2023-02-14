@@ -14,7 +14,11 @@ export class SocketTestHelper {
         this.callbacks.get(event)?.push(callback);
     }
 
+    // eslint-disable-next-line no-unused-vars
     emit(event: string, ...params: any): void {
+        // We need to use the params variable, otherwise the linter will complain
+        // eslint-disable-next-line no-console
+        console.log('emit', event, params);
         return;
     }
 

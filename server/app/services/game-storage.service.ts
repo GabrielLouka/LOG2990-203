@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
@@ -14,18 +10,16 @@ import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
 @Service()
 export class GameStorageService {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    JSON_PATH: string;
+    jsonPath: string;
     fileSystemManager: FileSystemManager;
     socketManager: SocketManager;
 
     constructor(private databaseService: DatabaseService) {
-        this.JSON_PATH = './app/data/default-games.json';
+        this.jsonPath = './app/data/default-games.json';
         this.fileSystemManager = new FileSystemManager();
     }
     get collection() {
-        // eslint-disable-next-line no-undef
-        return this.databaseService.database.collection(process.env.DATABASE_COLLECTION_GAMES!);
+        return this.databaseService.database.collection(process.env.DATABASE_COLLECTION_GAMES as string);
     }
 
     /**
@@ -109,7 +103,7 @@ export class GameStorageService {
     }
 
     async storeDefaultGames() {
-        const games = JSON.parse(await this.fileSystemManager.readFile(this.JSON_PATH)).games;
+        const games = JSON.parse(await this.fileSystemManager.readFile(this.jsonPath)).games;
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
     }
 
@@ -164,14 +158,6 @@ export class GameStorageService {
     };
 
     async storeGameResult(newGameToAdd: GameData) {
-        // const newGameToAdd: GameData = {
-        //     id: generatedGameId,
-        //     nbrDifferences: _differences.length,
-        //     differences: _differences,
-        //     name: gameName,
-        //     isEasy: _isEasy,
-        //     ranking: defaultRankings,
-        // };
         return this.collection.insertOne(newGameToAdd);
     }
 }
