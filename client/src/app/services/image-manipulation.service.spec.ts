@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
@@ -9,6 +11,8 @@ import { Buffer } from 'buffer';
 import { ImageManipulationService } from './image-manipulation.service';
 
 describe('ImageManipulationService', () => {
+    // let onloadRef: Function | undefined;
+    // eslint-disable-next-line no-unused-vars
     let service: ImageManipulationService;
 
     // We have no dependencies to other classes or Angular Components
@@ -27,9 +31,22 @@ describe('ImageManipulationService', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         const src = 'assets/img/image_empty.png';
+        // Object.defineProperties(Image.prototype, {
+        //     onload: {
+        //         get() {
+        //             return this._onload;
+        //         },
+        //         set(onload) {
+        //             this._onload = onload;
+        //         },
+        //         configurable: true,
+        //         enumerable: true,
+        //     },
+        // });
 
         service.loadCanvasImages(src, ctx);
-
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // onloadRef!();
         expect(canvas.toDataURL()).not.toBe('');
     });
 
