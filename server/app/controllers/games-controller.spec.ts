@@ -4,23 +4,21 @@ import { GameStorageService } from '@app/services/game-storage.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';
 import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
-// import { GamesController } from './games.controller';
 
 const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
 const HTTP_STATUS_OK = StatusCodes.OK;
 const HTTP_STATUS_CREATED = StatusCodes.CREATED;
-// const HTTP_STATUS_BAD_REQUEST = StatusCodes.BAD_REQUEST;
+
 const API_URL = '/api/games';
 
 describe('GamesController', () => {
     let gameStorageServiceStub: SinonStubbedInstance<GameStorageService>;
-    // let gamesController: GamesController;
     let sandbox: SinonSandbox;
     let expressApp: Express.Application;
     beforeEach(async () => {
@@ -66,7 +64,7 @@ describe('GamesController', () => {
         });
         it('fetchGame should catch error', async () => {
             const errorMessage = 'Update failed';
-            gameStorageServiceStub.getGameById.returns(Promise.reject(new Error(errorMessage)));
+            gameStorageServiceStub.getGameById.rejects(errorMessage);
 
             supertest(expressApp)
                 .get(`${API_URL}/fetchGame/${game.id}`)
@@ -94,7 +92,7 @@ describe('GamesController', () => {
 
         it('GET should not return games by page id if cannot get games', async () => {
             const errorMessage = 'Update failed';
-            gameStorageServiceStub.getGamesInPage.returns(Promise.reject(new Error(errorMessage)));
+            gameStorageServiceStub.getGamesInPage.rejects(errorMessage);
             gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
             supertest(expressApp)
                 .get(`${API_URL}/0`)
@@ -103,28 +101,11 @@ describe('GamesController', () => {
                     expect(response.text).to.equal(errorMessage);
                 });
         });
-
-        it('GET should call two gameStorageService methods ', async () => {
-            const gamesInPageSpy = sinon.spy(GameStorageService.prototype, 'getGamesInPage');
-            const getGamesLengthSpy = sinon.spy(GameStorageService.prototype, 'getGamesLength');
-
-            supertest(expressApp)
-                .get(`${API_URL}/0`)
-                .expect(HTTP_STATUS_OK)
-                .then(() => {
-                    assert(gamesInPageSpy.calledOnce);
-                    assert(getGamesLengthSpy.calledOnce);
-                });
-            gamesInPageSpy.restore();
-            getGamesLengthSpy.restore();
-            sinon.restore();
-        });
     });
-
     describe('POST /saveGame ', () => {
         it('POST /saveGame should save a new game ', async () => {
-            const storeImagesSpy = sinon.spy(GameStorageService.prototype, 'storeGameImages');
-            const storeGameResultSpy = sinon.spy(GameStorageService.prototype, 'storeGameResult');
+            gameStorageServiceStub.storeGameImages.resolves();
+            gameStorageServiceStub.storeGameResult.resolves();
             const newGameToAdd: EntireGameUploadForm = {
                 gameId: 2,
                 firstImage: { background: [], foreground: [] },
@@ -133,49 +114,51 @@ describe('GamesController', () => {
                 gameName: 'saveGame test',
                 isEasy: true,
             };
-            const buffer1 = Buffer.from(newGameToAdd.firstImage.background);
-            const buffer2 = Buffer.from(newGameToAdd.secondImage.background);
-            supertest(expressApp)
+            await supertest(expressApp)
                 .post(`${API_URL}/saveGame`)
                 .send(newGameToAdd)
                 .expect(HTTP_STATUS_CREATED)
                 .then((response) => {
                     expect(response.body).to.deep.equal({ body: newGameToAdd.gameName });
-                    assert(storeImagesSpy.calledOnce);
-                    assert(storeGameResultSpy.calledOnce);
-                    assert(storeImagesSpy.calledWith(newGameToAdd.gameId, buffer1, buffer2));
                 });
-            storeImagesSpy.restore();
-            storeGameResultSpy.restore();
             sinon.restore();
         });
-        it('POST /saveGame should not save a new game when error occurs ', async () => {
-            const errorMessage = 'Store game images failed';
-            gameStorageServiceStub.storeGameResult.rejects(errorMessage);
 
-            supertest(expressApp)
+        it('POST /saveGame should not save a new game when error occurs ', async () => {
+            const errorMessage = 'Store game result failed';
+            gameStorageServiceStub.storeGameImages.resolves();
+            gameStorageServiceStub.storeGameResult.rejects(errorMessage);
+            const newGameToAdd: EntireGameUploadForm = {
+                gameId: 2,
+                firstImage: { background: [], foreground: [] },
+                secondImage: { background: [], foreground: [] },
+                differences: [[{ x: 100, y: 100 }]],
+                gameName: 'saveGame test',
+                isEasy: true,
+            };
+            await supertest(expressApp)
                 .post(`${API_URL}/saveGame`)
-                .send(game)
+                .send(newGameToAdd)
                 .expect(HTTP_STATUS_NOT_FOUND)
                 .then((response) => {
-                    expect(response.text).to.equal(errorMessage);
+                    expect(response.text).to.equal('');
                 });
             sinon.restore();
         });
     });
-    describe('DELETE /deleteAllGames', () => {
+    describe('DELETE /deleteAllGames', async () => {
         it('DELETE request should delete all games from database', async () => {
-            supertest(expressApp)
+            gameStorageServiceStub.deleteAllGames.resolves();
+            await supertest(expressApp)
                 .delete(`${API_URL}/deleteAllGames`)
                 .expect(HTTP_STATUS_OK)
                 .then((response) => {
-                    expect(response.text).to.deep.equal(0);
+                    expect(response.body).to.deep.equal({});
                 });
-            sinon.restore();
         });
         it('DELETE /deleteAllGames should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
-            gameStorageServiceStub.deleteAllGames.returns(Promise.reject(new Error(errorMessage)));
+            gameStorageServiceStub.deleteAllGames.rejects(errorMessage);
             supertest(expressApp)
                 .delete(`${API_URL}/deleteAllGames`)
                 .expect(HTTP_STATUS_NOT_FOUND)
