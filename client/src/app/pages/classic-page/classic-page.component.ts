@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -41,7 +42,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     constructor(
         public socketService: SocketClientService,
-        // public mouseService: MouseHandlerService,
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
         private auth: AuthService,
@@ -111,7 +111,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             },
             error: (err: HttpErrorResponse) => {
                 const responseString = `Server Error : ${err.message}`;
-                console.log(responseString);
+                alert(responseString);
             },
         });
     }
@@ -129,7 +129,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
-        // this.mouseService.onMouseDown(coordinateClick);
         this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick });
 
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';
@@ -160,7 +159,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         // });
         this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number }) => {
             if (data.isValidated) {
-                // this.addMessageToChat('Well done king.');
                 this.foundDifferences = data.foundDifferences;
                 this.onFindDifference();
 
@@ -186,7 +184,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     onFindDifference() {
         this.differencesFound++;
-        // this.addMessageToChat('You found difference #' + differenceIndex + '! (' + this.differencesFound + '/' + this.totalDifferences + ')');
         this.playSuccessSound();
         this.refreshModifiedImage();
     }

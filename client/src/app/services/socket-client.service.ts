@@ -13,7 +13,6 @@ export class SocketClientService {
 
     connect() {
         this.socket = io('http://localhost:3000', { transports: ['websocket'], upgrade: false });
-        // this.socket = io(environment.serverUrl, { transports: ['websocket'] });
     }
 
     disconnect() {

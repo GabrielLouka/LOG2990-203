@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Injectable } from '@angular/core';
 import { Coordinate } from '@app/interfaces/coordinate';
 
@@ -20,8 +21,6 @@ export class DrawService {
         return this.canvasSize.y;
     }
 
-    // TODO : pas de valeurs magiques!! Faudrait avoir une meilleure manière de le faire
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
     drawGrid() {
         this.context.beginPath();
         this.context.strokeStyle = 'black';
