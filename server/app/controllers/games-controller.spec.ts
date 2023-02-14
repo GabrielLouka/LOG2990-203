@@ -26,9 +26,9 @@ describe('GamesController', () => {
     beforeEach(async () => {
         sandbox = createSandbox();
         gameStorageServiceStub = createStubInstance(GameStorageService);
-        // gamesController = new GamesController(gameStorageServiceStub);
 
         const app = Container.get(Application);
+        Object.defineProperty(app['gamesController'], 'gameStorageService', { value: gameStorageServiceStub });
         expressApp = app.app;
     });
 
@@ -57,7 +57,6 @@ describe('GamesController', () => {
             gameStorageServiceStub.getGameById.returns(
                 Promise.resolve({ gameData: game, originalImage: images.originalImage, modifiedImage: images.modifiedImage }),
             );
-
             supertest(expressApp)
                 .get(`${API_URL}/fetchGame/0`)
                 .expect(HTTP_STATUS_OK)
@@ -83,12 +82,13 @@ describe('GamesController', () => {
             gameStorageServiceStub.getGamesInPage.returns(Promise.resolve([{ gameData: gameInfo.gameData, originalImage: gameInfo.originalImage }]));
             gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
             supertest(expressApp)
-                .get(`${API_URL}/fetchGame/0`)
+                .get(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)
                 .then((response) => {
-                    assert(response.body);
-                    assert.deepEqual(response.status, HTTP_STATUS_OK);
-                    expect(response.body).to.deep.equal(game);
+                    expect(response.body).to.deep.equal({
+                        gameContent: [{ gameData: gameInfo.gameData, originalImage: gameInfo.originalImage }],
+                        nbrOfGames: 1,
+                    });
                 });
         });
 
@@ -97,7 +97,7 @@ describe('GamesController', () => {
             gameStorageServiceStub.getGamesInPage.returns(Promise.reject(new Error(errorMessage)));
             gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
             supertest(expressApp)
-                .get(`${API_URL}/fetchGame/0`)
+                .get(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)
                 .then((response) => {
                     expect(response.text).to.equal(errorMessage);
@@ -109,7 +109,7 @@ describe('GamesController', () => {
             const getGamesLengthSpy = sinon.spy(GameStorageService.prototype, 'getGamesLength');
 
             supertest(expressApp)
-                .get(`${API_URL}/fetchGame/0`)
+                .get(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)
                 .then(() => {
                     assert(gamesInPageSpy.calledOnce);
@@ -118,12 +118,6 @@ describe('GamesController', () => {
             gamesInPageSpy.restore();
             getGamesLengthSpy.restore();
             sinon.restore();
-        });
-
-        it('GET should not return games by page id if cannot get games length', async () => {
-            const errorMessage = 'Update failed';
-            gameStorageServiceStub.getGamesInPage.returns(Promise.resolve([{ gameData: gameInfo.gameData, originalImage: gameInfo.originalImage }]));
-            gameStorageServiceStub.getGamesLength.returns(Promise.reject(new Error(errorMessage)));
         });
     });
 
@@ -156,10 +150,8 @@ describe('GamesController', () => {
             sinon.restore();
         });
         it('POST /saveGame should not save a new game when error occurs ', async () => {
-            const storeImagesSpy = sinon.spy(GameStorageService.prototype, 'storeGameImages');
-            const storeGameResultSpy = sinon.spy(GameStorageService.prototype, 'storeGameResult');
             const errorMessage = 'Store game images failed';
-            gameStorageServiceStub.storeGameResult.returns(Promise.reject(new Error(errorMessage)));
+            gameStorageServiceStub.storeGameResult.rejects(errorMessage);
 
             supertest(expressApp)
                 .post(`${API_URL}/saveGame`)
@@ -168,8 +160,6 @@ describe('GamesController', () => {
                 .then((response) => {
                     expect(response.text).to.equal(errorMessage);
                 });
-            storeImagesSpy.restore();
-            storeGameResultSpy.restore();
             sinon.restore();
         });
     });
@@ -179,9 +169,9 @@ describe('GamesController', () => {
                 .delete(`${API_URL}/deleteAllGames`)
                 .expect(HTTP_STATUS_OK)
                 .then((response) => {
-                    expect(response.text).to.equal(0);
-                    expect(response.status).to.equal(HTTP_STATUS_OK);
+                    expect(response.text).to.deep.equal(0);
                 });
+            sinon.restore();
         });
         it('DELETE /deleteAllGames should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
