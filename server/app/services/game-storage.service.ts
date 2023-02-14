@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
@@ -106,7 +105,7 @@ export class GameStorageService {
 
     async storeDefaultGames() {
         const games = JSON.parse(await this.fileSystemManager.readFile(this.jsonPath)).games;
-        await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES!, games);
+        await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES as string, games);
     }
 
     getNextAvailableGameId(): number {
