@@ -79,7 +79,6 @@ export class GameStorageService {
         const gamesToReturn = [];
         for (const game of nextGames) {
             const images = this.getGameImages(game.id.toString());
-            // game.ranking = defaultRankings;
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
@@ -164,14 +163,6 @@ export class GameStorageService {
     };
 
     async storeGameResult(newGameToAdd: GameData) {
-        // const newGameToAdd: GameData = {
-        //     id: generatedGameId,
-        //     nbrDifferences: _differences.length,
-        //     differences: _differences,
-        //     name: gameName,
-        //     isEasy: _isEasy,
-        //     ranking: defaultRankings,
-        // };
         return this.collection.insertOne(newGameToAdd);
     }
 }

@@ -334,12 +334,11 @@ describe('GameCreationPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         spyOn(component, 'is24BitDepthBMP').and.returnValue(false);
         spyOn(window, 'alert');
-
-        const event = {
+        const event: any = {
             target: {
                 files: [
                     {
-                        arrayBuffer: async () => {
+                        arrayBuffer: () => {
                             return myBlob;
                         },
                     },
@@ -347,9 +346,19 @@ describe('GameCreationPageComponent', () => {
                 length: 10,
             },
         };
+        spyOn(URL, 'createObjectURL').and.returnValue('./invalidUrl');
 
         await component.processImage(event, false);
 
         expect(window.alert).toHaveBeenCalledWith("L'image doit être en 24-bits");
+    });
+    it('should not process the image', () => {
+        const event = {
+            target: {
+                files: [] as any,
+            },
+        };
+        component.processImage(event, false);
+        expect(component.processImage(event, false)).toEqual('' as any);
     });
 });

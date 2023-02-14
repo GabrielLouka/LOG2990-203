@@ -138,13 +138,6 @@ describe('ClassicPageComponent', () => {
         await component.refreshModifiedImage();
         if (!component.rightCanvasContext) expect(imageService.blinkDifference).toHaveBeenCalled();
     });
-
-    // it("if rightCanvas has image, should call using currentModifiedImage", async() => {
-    //     component.currentModifiedImage = Buffer.from([2]);
-    //     await component.refreshModifiedImage();
-    //     expect(component.currentModifiedImage).toBeTruthy();
-    // });
-
     it('onFindDifference should send message about difference found', () => {
         const refresSpy = spyOn(component, 'refreshModifiedImage');
         const successSpy = spyOn(component, 'playSuccessSound');
@@ -188,10 +181,6 @@ describe('ClassicPageComponent', () => {
         expect(socketService.disconnect).toHaveBeenCalled();
     });
 
-    // it('get socket id should return id', () => {
-    //     const id = component.socketId;
-    //     expect(id).toEqual(socketService.socket.id);
-    // });
     it('get socket id should return id', async () => {
         const id = await component.socketId;
         const expectedId = await socketService.socket.id;
@@ -270,7 +259,7 @@ describe('ClassicPageComponent', () => {
     });
 
     it('getInitialImagesFromServer should throw error', () => {
-        const logSpy = spyOn(console, 'log');
+        const logSpy = spyOn(window, 'alert');
         const errorResponse = new HttpErrorResponse({});
         commService.get = jasmine.createSpy().and.returnValue(throwError(() => errorResponse));
         component.getInitialImagesFromServer();
