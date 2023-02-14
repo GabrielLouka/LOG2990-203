@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
@@ -9,6 +11,8 @@ import { Buffer } from 'buffer';
 import { ImageManipulationService } from './image-manipulation.service';
 
 describe('ImageManipulationService', () => {
+    // let onloadRef: Function | undefined;
+    // eslint-disable-next-line no-unused-vars
     let service: ImageManipulationService;
 
     // We have no dependencies to other classes or Angular Components
@@ -27,9 +31,22 @@ describe('ImageManipulationService', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         const src = 'assets/img/image_empty.png';
+        // Object.defineProperties(Image.prototype, {
+        //     onload: {
+        //         get() {
+        //             return this._onload;
+        //         },
+        //         set(onload) {
+        //             this._onload = onload;
+        //         },
+        //         configurable: true,
+        //         enumerable: true,
+        //     },
+        // });
 
         service.loadCanvasImages(src, ctx);
-
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // onloadRef!();
         expect(canvas.toDataURL()).not.toBe('');
     });
 
@@ -49,12 +66,30 @@ describe('ImageManipulationService', () => {
         expect(output).not.toBe(modifiedBuffer);
     });
 
+    it('should get the modified image without the specified differences with a top down image', () => {
+        const originalBuffer: Buffer = Buffer.alloc(100, 1);
+        const modifiedBuffer: Buffer = Buffer.alloc(100, 0);
+
+        spyOn(service, 'isImageUsingTopDownFormat' as any).and.returnValue(true);
+
+        const foundDifferences: boolean[] = [true];
+        const gameData = { differences: [[new Vector2(0, 0)]] };
+
+        const output = service.getModifiedImageWithoutDifferences(
+            gameData as GameData,
+            { originalImage: originalBuffer, modifiedImage: modifiedBuffer },
+            foundDifferences,
+        );
+
+        expect(output).not.toBe(modifiedBuffer);
+    });
+
     it('should handle corrupted images', () => {
         const corruptedOgImage: Buffer = Buffer.alloc(1, 1);
         const corruptedModifiedImage: Buffer = Buffer.alloc(0);
         const goodModifiedImage: Buffer = Buffer.alloc(100, 0);
         const goodOgImage: Buffer = Buffer.alloc(100, 1);
-        
+
         const foundDifferences: boolean[] = [true];
         const gameData = { differences: [[new Vector2(0, 0)]] };
 
@@ -86,5 +121,4 @@ describe('ImageManipulationService', () => {
             expect(service.sleep(blinkTime)).toHaveBeenCalled();
         });
     });
-    
 });

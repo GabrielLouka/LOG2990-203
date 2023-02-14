@@ -74,7 +74,6 @@ export class GameStorageService {
         const gamesToReturn = [];
         for (const game of nextGames) {
             const images = this.getGameImages(game.id.toString());
-            // game.ranking = defaultRankings;
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,

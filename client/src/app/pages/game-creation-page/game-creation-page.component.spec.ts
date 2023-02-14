@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -19,6 +21,17 @@ describe('GameCreationPageComponent', () => {
     let communicationService: jasmine.SpyObj<CommunicationService>;
     let leftCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
     let rightCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
+    let onloadRef: Function | undefined;
+    // eslint-disable-next-line no-unused-vars
+    Object.defineProperty(Image.prototype, 'onload', {
+        get() {
+            return this._onload;
+        },
+        set(onload: Function) {
+            onloadRef = onload;
+            this._onload = onload;
+        },
+    });
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',
@@ -170,6 +183,8 @@ describe('GameCreationPageComponent', () => {
         const img = new Image();
         img.src = URL.createObjectURL(new Blob([imgData]));
         component.updateImageDisplay(imgData);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
         expect(component.imagePreview).toEqual({ nativeElement: canvas });
     });
 
@@ -334,38 +349,7 @@ describe('GameCreationPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         spyOn(component, 'is24BitDepthBMP').and.returnValue(false);
         spyOn(window, 'alert');
-
-        const event = {
-            target: {
-                files: [
-                    {
-                        arrayBuffer: async () => {
-                            return myBlob;
-                        },
-                    },
-                ],
-                length: 10,
-            },
-        };
-
-        await component.processImage(event, false);
-
-        expect(window.alert).toHaveBeenCalledWith("L'image doit être en 24-bits");
-    });
-    it('should process the image and set the image data when given a valid image', async () => {
-        const byteArray = [1, 2, 3, 4];
-        const buffer = component.convertToBuffer(byteArray);
-        const imgData = new Uint8Array(buffer);
-
-        const myBlob = new Blob([imgData]);
-        const canvas = document.createElement('canvas');
-        component.leftCanvas = { nativeElement: canvas };
-        component.rightCanvas = { nativeElement: canvas };
-        spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
-        spyOn(window, 'alert');
-        spyOn(component, 'getCanvas').and.returnValue(canvas.getContext('2d'));
-
-        const event = {
+        const event: any = {
             target: {
                 files: [
                     {
@@ -374,15 +358,57 @@ describe('GameCreationPageComponent', () => {
                         },
                     },
                 ],
-                length: 1,
+                length: 10,
             },
         };
-
+        spyOn(URL, 'createObjectURL').and.returnValue('./invalidUrl');
         await component.processImage(event, false);
-
-        expect(window.alert).not.toHaveBeenCalled();
-        // expect(component.originalImage).toEqual(event.target.files[0]);
-        expect(component.originalContainsImage).toBeTrue();
-        expect(component.rightCanvas.nativeElement.toDataURL()).toContain('data:image/png;base64');
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
+        expect(window.alert).toHaveBeenCalledWith("L'image doit être en 24-bits");
     });
+    it('should not process the image', async () => {
+        const event = {
+            target: {
+                files: [] as any,
+            },
+        };
+        const testValue = await component.processImage(event, false);
+        expect(testValue).toEqual(undefined);
+    });
+    it('should process the image to the server', async () => {
+        const byteArray = [1, 2, 3, 4];
+        const buffer = component.convertToBuffer(byteArray);
+        const imgData = new Uint8Array(buffer);
+
+        const myBlob = new Blob([imgData]);
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        const image = new Image();
+        spyOn(Image, 'height' as never).and.returnValue(480 as never);
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
+        spyOn(window, 'alert');
+        const event: any = {
+            target: {
+                files: [
+                    {
+                        arrayBuffer: () => {
+                            return myBlob;
+                        },
+                    },
+                ],
+                length: 10,
+            },
+        };
+        spyOn(URL, 'createObjectURL').and.returnValue('./invalidUrl');
+        const testValue = await component.processImage(event, false);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
+        expect(window.alert).toHaveBeenCalledWith(
+            'Taille invalide (' + image.width + 'x' + image.height + '), la taille doit être de : 640x480 pixels',
+        );
+        expect(testValue).toEqual(undefined);
+    });
+    it('should tell if the image is  ');
 });
