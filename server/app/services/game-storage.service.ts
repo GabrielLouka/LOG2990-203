@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
