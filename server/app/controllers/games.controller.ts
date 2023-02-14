@@ -1,5 +1,7 @@
 import { GameStorageService } from '@app/services/game-storage.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
+import { GameData } from '@common/game-data';
+import { defaultRankings } from '@common/ranking';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -33,21 +35,6 @@ export class GamesController {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }
         });
-        this.router.post('/updateName', async (req: Request, res: Response) => {
-            const receivedArguments: [number, string] = req.body;
-            const idIndex = 0;
-            const nameIndex = 1;
-            // eslint-disable-next-line no-console
-            console.log('updating name, id= ' + receivedArguments[idIndex] + ' name=' + receivedArguments[nameIndex]);
-            this.gameStorageService
-                .updateGameName(receivedArguments[idIndex], receivedArguments[nameIndex])
-                .then(() => {
-                    res.status(StatusCodes.CREATED).send();
-                })
-                .catch((error: Error) => {
-                    res.status(StatusCodes.NOT_FOUND).send(error.message);
-                });
-        });
 
         this.router.post('/saveGame', async (req: Request, res: Response) => {
             const receivedNameForm: EntireGameUploadForm = req.body;
@@ -66,9 +53,16 @@ export class GamesController {
             const buffer2 = Buffer.from(receivedNameForm.secondImage.background);
 
             this.gameStorageService.storeGameImages(receivedNameForm.gameId, buffer1, buffer2);
-            await this.gameStorageService.storeGameResult(receivedNameForm.gameId, receivedNameForm.differences, receivedNameForm.isEasy);
+            const newGameToAdd: GameData = {
+                id: receivedNameForm.gameId,
+                nbrDifferences: receivedNameForm.differences.length,
+                differences: receivedNameForm.differences,
+                name: receivedNameForm.gameName,
+                isEasy: receivedNameForm.isEasy,
+                ranking: defaultRankings,
+            };
             this.gameStorageService
-                .updateGameName(receivedNameForm.gameId, receivedNameForm.gameName)
+                .storeGameResult(newGameToAdd)
                 .then(() => {
                     res.status(StatusCodes.CREATED).send({ body: receivedNameForm.gameName });
                 })

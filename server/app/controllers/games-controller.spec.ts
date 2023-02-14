@@ -126,42 +126,11 @@ describe('GamesController', () => {
             gameStorageServiceStub.getGamesLength.returns(Promise.reject(new Error(errorMessage)));
         });
     });
-    describe('POST /updateName', () => {
-        it('POST should update game name ', async () => {
-            const spy = sinon.spy(GameStorageService.prototype, 'updateGameName');
-            const updatedName = 'Apple and Bananas';
-            supertest(expressApp)
-                .post(`${API_URL}/updateName`)
-                .send([game.id, updatedName])
-                .expect(HTTP_STATUS_CREATED)
-                .then((res) => {
-                    assert(spy.called);
-                    assert(res.status);
-                    assert.deepEqual(res.body, updatedName);
-                });
-            spy.restore();
-            sinon.restore();
-        });
-        it('should not update name game when error occurs', async () => {
-            const errorMessage = 'Update failed';
-            const id = 0;
-            const name = 'new name';
-            gameStorageServiceStub.updateGameName.returns(Promise.reject(new Error(errorMessage)));
 
-            return supertest(expressApp)
-                .post(`${API_URL}/updateName`)
-                .send([id, name])
-                .expect(HTTP_STATUS_NOT_FOUND)
-                .then((response) => {
-                    expect(response.text).to.equal("Cannot read properties of undefined (reading 'collection')");
-                });
-        });
-    });
     describe('POST /saveGame ', () => {
         it('POST /saveGame should save a new game ', async () => {
             const storeImagesSpy = sinon.spy(GameStorageService.prototype, 'storeGameImages');
             const storeGameResultSpy = sinon.spy(GameStorageService.prototype, 'storeGameResult');
-            const updateNameSpy = sinon.spy(GameStorageService.prototype, 'updateGameName');
             const newGameToAdd: EntireGameUploadForm = {
                 gameId: 2,
                 firstImage: { background: [], foreground: [] },
@@ -180,20 +149,15 @@ describe('GamesController', () => {
                     expect(response.body).to.deep.equal({ body: newGameToAdd.gameName });
                     assert(storeImagesSpy.calledOnce);
                     assert(storeGameResultSpy.calledOnce);
-                    assert(updateNameSpy.calledOnce);
                     assert(storeImagesSpy.calledWith(newGameToAdd.gameId, buffer1, buffer2));
-                    assert(storeGameResultSpy.calledWith(newGameToAdd.gameId, newGameToAdd.differences, newGameToAdd.isEasy));
-                    assert(updateNameSpy.calledWith(newGameToAdd.gameId, newGameToAdd.gameName));
                 });
             storeImagesSpy.restore();
             storeGameResultSpy.restore();
-            updateNameSpy.restore();
             sinon.restore();
         });
         it('POST /saveGame should not save a new game when error occurs ', async () => {
             const storeImagesSpy = sinon.spy(GameStorageService.prototype, 'storeGameImages');
             const storeGameResultSpy = sinon.spy(GameStorageService.prototype, 'storeGameResult');
-            const updateNameSpy = sinon.spy(GameStorageService.prototype, 'updateGameName');
             const errorMessage = 'Store game images failed';
             gameStorageServiceStub.storeGameResult.returns(Promise.reject(new Error(errorMessage)));
 
@@ -206,7 +170,6 @@ describe('GamesController', () => {
                 });
             storeImagesSpy.restore();
             storeGameResultSpy.restore();
-            updateNameSpy.restore();
             sinon.restore();
         });
     });

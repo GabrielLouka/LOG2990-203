@@ -6,11 +6,9 @@ import { DatabaseService } from '@app/services/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
-import { defaultRankings } from '@common/ranking';
-import { Vector2 } from '@common/vector2';
 import 'dotenv/config';
 import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
-import { DeleteResult, UpdateResult } from 'mongodb';
+import { DeleteResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
@@ -60,10 +58,6 @@ export class GameStorageService {
         return { gameData: game, originalImage: images.originalImage, modifiedImage: images.modifiedImage };
     }
 
-    async updateGameName(gameId: number, newName: string): Promise<UpdateResult> {
-        return this.collection.updateOne({ id: gameId }, { $set: { name: newName } });
-    }
-
     /**
      * @param id game identifier
      * @returns true if deleted, false if not
@@ -85,7 +79,7 @@ export class GameStorageService {
         const gamesToReturn = [];
         for (const game of nextGames) {
             const images = this.getGameImages(game.id.toString());
-            game.ranking = defaultRankings;
+            // game.ranking = defaultRankings;
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
@@ -169,15 +163,15 @@ export class GameStorageService {
         }
     };
 
-    async storeGameResult(generatedGameId: number, _differences: Vector2[][], _isEasy: boolean) {
-        const newGameToAdd: GameData = {
-            id: generatedGameId,
-            nbrDifferences: _differences.length,
-            differences: _differences,
-            name: 'Default game',
-            isEasy: _isEasy,
-            ranking: defaultRankings,
-        };
+    async storeGameResult(newGameToAdd: GameData) {
+        // const newGameToAdd: GameData = {
+        //     id: generatedGameId,
+        //     nbrDifferences: _differences.length,
+        //     differences: _differences,
+        //     name: gameName,
+        //     isEasy: _isEasy,
+        //     ranking: defaultRankings,
+        // };
         return this.collection.insertOne(newGameToAdd);
     }
 }

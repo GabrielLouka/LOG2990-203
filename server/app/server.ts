@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Application } from '@app/app';
 import * as http from 'http';
 import { AddressInfo } from 'net';
@@ -54,12 +55,10 @@ export class Server {
         const bind: string = typeof Server.appPort === 'string' ? 'Pipe ' + Server.appPort : 'Port ' + Server.appPort;
         switch (error.code) {
             case 'EACCES':
-                // eslint-disable-next-line no-console
                 console.error(`${bind} requires elevated privileges`);
                 process.exit(1);
                 break;
             case 'EADDRINUSE':
-                // eslint-disable-next-line no-console
                 console.error(`${bind} is already in use`);
                 process.exit(1);
                 break;
@@ -68,9 +67,6 @@ export class Server {
         }
     }
 
-    /**
-     * Se produit lorsque le serveur se met à écouter sur le port.
-     */
     private onListening(): void {
         const addr = this.server.address() as AddressInfo;
         const bind: string = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
