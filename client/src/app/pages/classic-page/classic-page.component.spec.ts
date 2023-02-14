@@ -139,12 +139,6 @@ describe('ClassicPageComponent', () => {
         if (!component.rightCanvasContext) expect(imageService.blinkDifference).toHaveBeenCalled();
     });
 
-    // it("if rightCanvas has image, should call using currentModifiedImage", async() => {
-    //     component.currentModifiedImage = Buffer.from([2]);
-    //     await component.refreshModifiedImage();
-    //     expect(component.currentModifiedImage).toBeTruthy();
-    // });
-
     it('onFindDifference should send message about difference found', () => {
         const refresSpy = spyOn(component, 'refreshModifiedImage');
         const successSpy = spyOn(component, 'playSuccessSound');
@@ -187,11 +181,7 @@ describe('ClassicPageComponent', () => {
         component.connectSocket();
         expect(socketService.disconnect).toHaveBeenCalled();
     });
-
-    // it('get socket id should return id', () => {
-    //     const id = component.socketId;
-    //     expect(id).toEqual(socketService.socket.id);
-    // });
+    
     it('get socket id should return id', async () => {
         const id = await component.socketId;
         const expectedId = await socketService.socket.id;
@@ -267,14 +257,14 @@ describe('ClassicPageComponent', () => {
         expect(imageService.getImageSourceFromBuffer).toHaveBeenCalledTimes(2);
         expect(loadSpy).toHaveBeenCalled();
         expect(restartSpy).toHaveBeenCalled();
-    });
+    });    
 
     it('getInitialImagesFromServer should throw error', () => {
-        const logSpy = spyOn(console, 'log');
+        const alertSpy = spyOn(window, 'alert');
         const errorResponse = new HttpErrorResponse({});
         commService.get = jasmine.createSpy().and.returnValue(throwError(() => errorResponse));
         component.getInitialImagesFromServer();
-        expect(logSpy).toHaveBeenCalled();
+        expect(alertSpy).toHaveBeenCalled();
     });
 
     it('should display the error message and disable pointer events on the canvases', () => {
@@ -298,4 +288,17 @@ describe('ClassicPageComponent', () => {
         expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('auto');
         expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('auto');
     }));
+
+    it("refreshModifiedImage should use currentModifiedImage if valid when blinking difference", async() => {
+        const bytes = [0x68, 0x65, 0x6c, 0x6c, 0x6f];
+        const buffer = Buffer.from(bytes);
+        component.currentModifiedImage = buffer;    
+        await component.refreshModifiedImage();
+        expect(imageService.blinkDifference).toHaveBeenCalledWith(
+            buffer, undefined as any, undefined as any);
+
+    });
+
+    
+    
 });
