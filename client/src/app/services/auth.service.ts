@@ -6,8 +6,8 @@ import { Injectable } from '@angular/core';
 export class AuthService {
     userName: string = '';
 
-    registerUser(pseudo: string) {
-        this.userName = pseudo;
+    registerUser(username: string) {
+        this.userName = username;
     }
 
     registerUserName() {
