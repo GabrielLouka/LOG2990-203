@@ -24,8 +24,10 @@ describe('Queue', () => {
         expect(val).to.equal(true);
     });
 
-    it('dequeue should throw error if queue is already empy', () => {                
-        expect(() => {q.dequeue()}).to.throw('Queue is empty.');
+    it('dequeue should throw error if queue is already empy', () => {
+        expect(() => {
+            q.dequeue();
+        }).to.throw('Queue is empty.');
     });
 
     it('dequeue should return element', () => {

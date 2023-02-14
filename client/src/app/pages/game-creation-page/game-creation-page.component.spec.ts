@@ -352,4 +352,37 @@ describe('GameCreationPageComponent', () => {
 
         expect(window.alert).toHaveBeenCalledWith("L'image doit être en 24-bits");
     });
+    it('should process the image and set the image data when given a valid image', async () => {
+        const byteArray = [1, 2, 3, 4];
+        const buffer = component.convertToBuffer(byteArray);
+        const imgData = new Uint8Array(buffer);
+
+        const myBlob = new Blob([imgData]);
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
+        spyOn(window, 'alert');
+        spyOn(component, 'getCanvas').and.returnValue(canvas.getContext('2d'));
+
+        const event = {
+            target: {
+                files: [
+                    {
+                        arrayBuffer: () => {
+                            return myBlob;
+                        },
+                    },
+                ],
+                length: 1,
+            },
+        };
+
+        await component.processImage(event, false);
+
+        expect(window.alert).not.toHaveBeenCalled();
+        // expect(component.originalImage).toEqual(event.target.files[0]);
+        expect(component.originalContainsImage).toBeTrue();
+        expect(component.rightCanvas.nativeElement.toDataURL()).toContain('data:image/png;base64');
+    });
 });
