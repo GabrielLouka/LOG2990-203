@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/member-ordering */
-// eslint-disable-next-line @typescript-eslint/ban-types
 type CallbackSignature = (params: any) => {};
 
 export class SocketTestHelper {
+    private callbacks = new Map<string, CallbackSignature[]>();
+
     on(event: string, callback: CallbackSignature): void {
         if (!this.callbacks.has(event)) {
             this.callbacks.set(event, []);
@@ -30,6 +31,4 @@ export class SocketTestHelper {
             callback(params);
         }
     }
-
-    private callbacks = new Map<string, CallbackSignature[]>();
 }

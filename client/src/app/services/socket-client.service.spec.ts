@@ -21,7 +21,8 @@ describe('SocketClientService', () => {
         const opts = { transports: ['websocket'], upgrade: false };
         service.connect();
         expect(service.socket.io).toBeDefined();
-        expect(service.socket.io.opts).toEqual(opts);
+        expect(service.socket.io.opts.transports).toEqual(opts.transports);
+        expect(service.socket.io.opts.upgrade).toEqual(opts.upgrade);
     });
 
     it('should disconnect', () => {

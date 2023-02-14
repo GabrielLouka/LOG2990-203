@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable prettier/prettier */
 import { Component } from '@angular/core';
 @Component({
     selector: 'app-parameter-page',

@@ -111,9 +111,9 @@
             <div #close class="close" (click)="closePopUp()">+</div>
             <h2>Différences entre les deux images</h2>
             <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
-            <p>Il y a {{ totalDifferences }} differences ---- difficulté automatique : {{ isEasy ? 'Facile' : 'Difficile' }}</p>
+            <p>Il y a {{ totalDifferences }} différences (Difficulté : {{ isEasy ? 'facile' : 'difficile' }})</p>
             <form #gameNameForm [formGroup]="titleRegistration" class="flex-column center">
-                <p>Ajouter un titre le jeu :</p>
+                <p>Veuillez choisir un nom pour le jeu :</p>
                 <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />
                 <button
                     class="button-style no-hover center"
@@ -124,7 +124,7 @@
                     <span class="material-symbols-outlined optionIcon"> fact_check </span>Sauvegarder le jeu
                 </button>
             </form>
-            <p #errorPopupText>ERREUR : Le nombre de differences doi être compris entre 3 et 9 !</p>
+            <p #errorPopupText>ERREUR : Le nombre de differences doit être compris entre 3 et 9 !</p>
         </div>
     </div>
 </body>

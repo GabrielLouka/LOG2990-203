@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Component, ElementRef, ViewChild } from '@angular/core';
@@ -136,7 +135,10 @@ export class GameCreationPageComponent {
     }
 
     async sendImageToServer(): Promise<void> {
-        if (!this.canSendToServer()) return;
+        if (!this.canSendToServer()) {
+            alert('Veuillez ajouter deux images');
+            return;
+        }
 
         this.showPopUp();
 
@@ -216,7 +218,7 @@ export class GameCreationPageComponent {
         const routeToSend = '/games/saveGame';
         this.formToSendAfterServerConfirmation.gameName = this.gameName;
 
-        console.log('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
+        // console.log('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
 
         this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
         this.communicationService.post<EntireGameUploadForm>(this.formToSendAfterServerConfirmation, routeToSend).subscribe({
