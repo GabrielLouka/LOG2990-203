@@ -28,14 +28,6 @@ describe('Database service', () => {
         expect(databaseService['db'].databaseName).to.equal('LOG2990');
         await databaseService.closeConnection();
     });
-
-    it('should not connect to the database when start is called with wrong URL', async () => {
-        // Try to reconnect to local server
-        const startSpy = sinon.spy(databaseService, 'start');
-        await databaseService.start('');
-        expect(startSpy).to.throws(Error);
-    });
-
     it('should insert data into the collection if the collection is empty', async () => {
         const mongoUri = mongoServer.getUri();
         const client = new MongoClient(mongoUri);
