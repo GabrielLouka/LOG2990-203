@@ -61,7 +61,7 @@
                     id="both-images"
                     accept="image/bmp"
                     #bothImagesButton
-                    (change)="processImage($event, false); processImage($event, true)"
+                    (input)="processImage($event, false); processImage($event, true)"
                     style="display: none"
                 />
             </div>
@@ -79,7 +79,7 @@
                     <span class="material-symbols-outlined optionIcon"> upload_file </span>
                     Ajouter une image
                 </button>
-                <input #input2 type="file" class="display" accept="image/bmp" (change)="processImage($event, true)" />
+                <input #input2 type="file" class="display" accept="image/bmp" (input)="processImage($event, true)" />
                 <button class="button-style center" (click)="resetCanvas(true)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>

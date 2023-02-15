@@ -34,13 +34,14 @@ export class GamesDisplayComponent implements OnInit {
 
     async fetchGameDataFromServer(pageId: number): Promise<void> {
         const routeToSend = '/games/' + pageId.toString();
+        const numberOfGamesInAPage = 4;
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 if (response.body !== null) {
                     const serverResult = JSON.parse(response.body);
                     this.games = serverResult.gameContent;
                     this.gamesNbr = serverResult.nbrOfGame;
-                    this.showNextButton = this.gamesNbr - (this.currentPageNbr + 1) * 4 > 0;
+                    this.showNextButton = this.gamesNbr - (this.currentPageNbr + 1) * numberOfGamesInAPage > 0;
                 }
             },
             error: (err: HttpErrorResponse) => {

@@ -96,10 +96,7 @@ describe('ImageProcessingController', () => {
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
             .set('Accept', 'application/json')
-            .expect(HTTP_STATUS_CREATED)
-            .then((response) => {
-                console.log(response);
-            });
+            .expect(HTTP_STATUS_CREATED);
     });
 
     it('should return a response with status code 400 when getDifferencesBlackAndWhiteImage throws an error', async () => {
