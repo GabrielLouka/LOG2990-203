@@ -14,7 +14,7 @@ export class ChatComponent {
         sentByPlayer2: boolean;
     }[] = [];
     newMessage = '';
-    text: unknown;
+    text: string;
     sentByplayer1: boolean;
     sentByPlayer2: boolean;
 
