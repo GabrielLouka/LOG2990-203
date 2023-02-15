@@ -31,7 +31,7 @@ describe('GamesController', () => {
     });
 
     afterEach(() => {
-        sinon.reset();
+        sinon.restore();
         sandbox.restore();
     });
 
