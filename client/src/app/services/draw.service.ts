@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Injectable } from '@angular/core';
-import { Vec2 } from '@app/interfaces/vec2';
+import { Coordinate } from '@app/interfaces/coordinate';
 
-// TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
 export const DEFAULT_WIDTH = 500;
 export const DEFAULT_HEIGHT = 500;
 
@@ -10,7 +10,7 @@ export const DEFAULT_HEIGHT = 500;
 })
 export class DrawService {
     context: CanvasRenderingContext2D;
-    private canvasSize: Vec2 = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
+    private canvasSize: Coordinate = { x: DEFAULT_WIDTH, y: DEFAULT_HEIGHT };
 
     get width(): number {
         return this.canvasSize.x;
@@ -20,8 +20,6 @@ export class DrawService {
         return this.canvasSize.y;
     }
 
-    // TODO : pas de valeurs magiques!! Faudrait avoir une meilleure manière de le faire
-    /* eslint-disable @typescript-eslint/no-magic-numbers */
     drawGrid() {
         this.context.beginPath();
         this.context.strokeStyle = 'black';
@@ -43,7 +41,7 @@ export class DrawService {
     }
 
     drawWord(word: string) {
-        const startPosition: Vec2 = { x: 175, y: 100 };
+        const startPosition: Coordinate = { x: 175, y: 100 };
         const step = 20;
         this.context.font = '20px system-ui';
         for (let i = 0; i < word.length; i++) {

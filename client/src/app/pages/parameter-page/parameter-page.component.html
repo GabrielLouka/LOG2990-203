@@ -1,0 +1,59 @@
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <title>Page de Configurations</title>
+</head>
+
+<body>
+    <app-back-button></app-back-button>
+    <header class="flex-row center">
+        <h1>Paramètres généraux</h1>
+        <div class="flex-row config-btn">
+            <button class="button-style" routerLink="/creation">Créer un jeu</button>
+            <button class="button-style" routerLink="/config">Configurations des jeux</button>
+        </div>
+    </header>
+
+    <div class="flex-row center main-container">
+        <div class="flex-column center const-container">
+            <p class="title"><b> Constantes de jeu</b></p>
+            <div class="input-container">
+                <div class="flex-row center">
+                    <p class="label-input">Temps initial du compte à rebours (minute)</p>
+                    <input type="number" step="1" value="5" min="0" max="60" />
+                </div>
+                <div class="flex-row center">
+                    <p class="label-input">Temps de pénalité par indice utilisé (seconde)</p>
+                    <input type="number" step="1" value="3" min="0" max="10" />
+                </div>
+                <div class="flex-row center">
+                    <p class="label-input">Temps bonus par différence trouvée (seconde)</p>
+                    <input type="number" step="1" value="2" min="0" max="10" />
+                </div>
+            </div>
+            <div class="flex-row">
+                <button class="button-style flex-row center const-btn not-allowed">
+                    <span class="material-symbols-outlined option-icon"> device_reset </span>
+                    Mettre à défault les constantes
+                </button>
+                <button class="button-style flex-row center const-btn not-allowed">
+                    <span class="material-symbols-outlined option-icon"> save </span>
+                    Sauvegarder les constantes
+                </button>
+            </div>
+        </div>
+
+        <div class="history-container">
+            <div class="flex-row center">
+                <p class="title"><b> Historique des parties jouées </b></p>
+                <button class="button-style delete-btn center not-allowed">
+                    <span class="material-symbols-outlined option-icon"> delete </span>
+                </button>
+            </div>
+
+            <div class="history-board flex-column center">
+                <p>Leaderboards will be here !</p>
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,40 @@
+<head>
+    <meta charset="UTF-8" />
+    <title>Register Page</title>
+</head>
+<body>
+    <Section class="flex-row center header">
+        <app-back-button></app-back-button>
+        <h1 class="title">Jeu classique</h1>
+    </Section>
+    <Section class="flex-row center registerContainer">
+        <form [formGroup]="registrationForm" class="flex-row register-input">
+            <label class="flex-row center user-title" for="input"><b>Username :</b></label>
+            <input
+                name="userName"
+                class="button-style no-hover"
+                id="input"
+                type="text"
+                placeholder="MismatchMaster"
+                formControlName="username"
+                required
+                autocomplete="off"
+                title="Only letters and numbers are allowed"
+            />
+            <button
+                class="button-style play-button no-hover"
+                (click)="registerUser()"
+                [routerLink]="['/classic', id!]"
+                [disabled]="registrationForm.invalid"
+                [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
+            >
+                <img
+                    src=".\assets\img\play-icon.png"
+                    id="play-icon"
+                    [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
+                    alt="gameLogo"
+                />
+            </button>
+        </form>
+    </Section>
+</body>

@@ -1,8 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Message } from '@common/message';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -13,15 +11,15 @@ export class CommunicationService {
 
     constructor(private readonly http: HttpClient) {}
 
-    basicGet(): Observable<Message> {
-        return this.http.get<Message>(`${this.baseUrl}/example`).pipe(catchError(this.handleError<Message>('basicGet')));
+    get(route?: string): Observable<HttpResponse<string>> {
+        return this.http.get(`${this.baseUrl}${route}`, { observe: 'response', responseType: 'text' });
     }
 
-    basicPost(message: Message): Observable<HttpResponse<string>> {
-        return this.http.post(`${this.baseUrl}/example/send`, message, { observe: 'response', responseType: 'text' });
+    post<Type>(message: Type, route: string): Observable<HttpResponse<string>> {
+        return this.http.post(`${this.baseUrl}${route}`, message, { observe: 'response', responseType: 'text' });
     }
 
-    private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return () => of(result as T);
+    delete(route: string): Observable<HttpResponse<string>> {
+        return this.http.delete(`${this.baseUrl}${route}`, { observe: 'response', responseType: 'text' });
     }
 }

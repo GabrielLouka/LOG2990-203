@@ -1,0 +1,28 @@
+.header {
+    height: 11vh;
+}
+
+.projectLogo {
+    margin-top: 4vh;
+}
+
+.btn-container{
+    position: absolute;
+
+    width: 43vw;
+
+    top: 0;
+    right: 0;
+    margin: 2vw 5vw 0vw 0vw;
+}
+
+.game-btn {
+    width: fit-content; 
+    float: right;
+    margin: 0.5vh
+}
+
+.not-allowed {
+    cursor: not-allowed;
+}
+

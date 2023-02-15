@@ -1,6 +1,4 @@
 import { HttpException } from '@app/classes/http.exception';
-import { DateController } from '@app/controllers/date.controller';
-import { ExampleController } from '@app/controllers/example.controller';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
 import * as express from 'express';
@@ -8,6 +6,8 @@ import { StatusCodes } from 'http-status-codes';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { GamesController } from './controllers/games.controller';
+import { ImageProcessingController } from './controllers/image-processing.controller';
 
 @Service()
 export class Application {
@@ -15,7 +15,8 @@ export class Application {
     private readonly internalError: number = StatusCodes.INTERNAL_SERVER_ERROR;
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
-    constructor(private readonly exampleController: ExampleController, private readonly dateController: DateController) {
+    // eslint-disable-next-line max-params
+    constructor(private readonly imageProcessingController: ImageProcessingController, readonly gamesController: GamesController) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -36,8 +37,8 @@ export class Application {
 
     bindRoutes(): void {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
-        this.app.use('/api/example', this.exampleController.router);
-        this.app.use('/api/date', this.dateController.router);
+        this.app.use('/api/image_processing', this.imageProcessingController.router);
+        this.app.use('/api/games', this.gamesController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });
@@ -46,10 +47,11 @@ export class Application {
 
     private config(): void {
         // Middlewares configuration
-        this.app.use(express.json());
+        this.app.use(express.json({ limit: '50mb' }));
         this.app.use(express.urlencoded({ extended: true }));
         this.app.use(cookieParser());
-        this.app.use(cors());
+        // this.app.use(cors());
+        this.app.use(cors({ origin: '*' }));
     }
 
     private errorHandling(): void {

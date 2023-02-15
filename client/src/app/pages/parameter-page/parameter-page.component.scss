@@ -1,0 +1,99 @@
+header {
+    height: 15vh;
+}
+
+.config-btn { 
+    position: absolute;
+    justify-content: space-around;
+    
+    width: 30vw;
+    height: 7vh;
+
+    top: 0;
+    right: 0;
+    margin: 2vw;
+}
+
+.main-container{
+    height: 80vh;
+
+    justify-content: space-around;
+}
+
+.title {
+    text-align: center;
+    font-size: x-large; 
+
+    margin-bottom: 5vh;
+}
+
+.option-icon {
+    scale: 1.8;
+}
+
+/* Constants */
+.const-container {
+    height: 40vh;
+    width: 35vw;
+
+    border: solid; 
+    border-radius: 3vh;
+}
+
+.input-container {
+    width: 25vw;
+}
+
+.label-input {
+    width: 18vw;
+    height: 2vh;
+    margin: 1vh;
+
+    justify-content: space-around;
+}
+
+.const-btn {
+    margin-top: 3vh;
+    scale: 0.8;
+}
+
+
+/* History */
+.history-container {
+    height: 60vh;
+    width: 35vw;
+
+    padding: 2vw;
+
+    border: solid; 
+    border-radius: 3vh;
+}
+
+.delete-btn {
+    position: absolute;
+    right: 18vh;
+    top: 25vh;
+    scale: 0.7;
+}
+
+.history-board {
+    height: 50vh;
+    overflow-y: scroll;
+}
+
+.history-card {
+    border: 2px solid black;
+    background-color: white;
+    border-radius: 10px;
+
+    margin: 1vh;
+
+    &:hover {
+        transform: scale(0.97);
+        //cursor: pointer;
+    }
+}
+
+.not-allowed {
+    cursor: not-allowed;
+  }

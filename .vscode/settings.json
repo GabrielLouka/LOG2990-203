@@ -1,5 +1,5 @@
 {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.defaultFormatter": null,
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
         "source.organizeImports": true,
@@ -9,5 +9,20 @@
     "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
     "eslint.workingDirectories": ["./client", "./server"],
     "eslint.probe": ["javascript", "typescript", "html", "vue", "markdown"],
-    "eslint.validate": ["javascript", "typescript", "html", "vue", "markdown"]
+    "eslint.validate": [
+        "javascript",
+        "typescript",
+        "html",
+        "vue",
+        "markdown"
+    ],
+    "cSpell.words": [
+        "ngfor"
+    ],
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

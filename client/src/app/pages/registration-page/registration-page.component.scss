@@ -1,0 +1,54 @@
+.header {
+    height: 15vh;
+}
+
+.no-hover {
+    &:hover {
+      transform: scale(1);
+    }
+  }
+
+.title {
+    font-size: 5vh;
+}
+
+.registerContainer {
+    height: 80vh;
+}
+
+.register-input {
+    justify-content: space-around;
+
+    width: 65vh;
+}
+
+.user-title{
+    font-size: 2vh;
+}
+
+#input {
+    border: solid;
+    cursor: text;
+}
+
+.play-button {
+    border:solid; 
+}
+
+.button-style #play-icon {
+    width: 3vh;
+    height: 3vh;
+}
+
+
+input.ng-invalid {
+    background-color:rgb(249, 99, 99);
+}
+input.ng-valid {
+    background-color:lightgreen;
+}
+
+.not-allowed {
+    cursor: not-allowed;
+    opacity: 0.7;
+}

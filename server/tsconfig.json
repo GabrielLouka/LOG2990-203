@@ -2,7 +2,11 @@
     "compilerOptions": {
         "baseUrl": "./",
         "target": "es6",
-        "types": ["reflect-metadata", "@types/mocha", "mocha"],
+        "types": [
+            "reflect-metadata",
+            "@types/mocha",
+            "mocha"
+        ],
         "module": "commonjs",
         "moduleResolution": "node",
         "sourceMap": true,
@@ -18,8 +22,12 @@
         "strictNullChecks": true,
         "resolveJsonModule": false, // DO NOT CHANGE
         "paths": {
-            "@app/*": ["./app/*"],
-            "@common/*": ["../common/*"],
+            "@app/*": [
+                "./app/*"
+            ],
+            "@common/*": [
+                "../common/*"
+            ],
         }
     }
 }
