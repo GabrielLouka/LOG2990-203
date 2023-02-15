@@ -17,8 +17,6 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-
-// TODO faire de ce component un service
 export class GameCreationPageComponent {
     static readonly maxNumberOfDifferences: number = 9;
     static readonly minNumberOfDifferences: number = 3;
