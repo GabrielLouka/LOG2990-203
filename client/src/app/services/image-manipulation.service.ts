@@ -13,7 +13,17 @@ export class ImageManipulationService {
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
     }
+    getImageDimensions = (imageBuffer: Buffer): Vector2 => {
+        const imageWidthOffset = 18;
+        const imageHeightOffset = 22;
 
+        const imageWidth = imageBuffer.readInt32LE(imageWidthOffset);
+        let imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
+
+        imageHeight = imageHeight < 0 ? -imageHeight : imageHeight;
+
+        return new Vector2(imageWidth, imageHeight);
+    };
     getModifiedImageWithoutDifferences(
         gameData: GameData,
         images: { originalImage: Buffer; modifiedImage: Buffer },
@@ -127,17 +137,5 @@ export class ImageManipulationService {
         const imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
 
         return imageHeight < 0;
-    };
-
-    private getImageDimensions = (imageBuffer: Buffer): Vector2 => {
-        const imageWidthOffset = 18;
-        const imageHeightOffset = 22;
-
-        const imageWidth = imageBuffer.readInt32LE(imageWidthOffset);
-        let imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
-
-        imageHeight = imageHeight < 0 ? -imageHeight : imageHeight;
-
-        return new Vector2(imageWidth, imageHeight);
     };
 }

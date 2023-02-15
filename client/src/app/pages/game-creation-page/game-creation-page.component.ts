@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { Component, ElementRef, ViewChild } from '@angular/core';
-
 import { HttpErrorResponse } from '@angular/common/http';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
+import { ImageManipulationService } from '@app/services/image-manipulation.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Vector2 } from '@common/vector2';
+import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
-
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
@@ -49,7 +50,11 @@ export class GameCreationPageComponent {
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
 
-    constructor(private readonly communicationService: CommunicationService, private readonly router: Router) {}
+    constructor(
+        private readonly communicationService: CommunicationService,
+        private readonly router: Router,
+        private readonly imageManipulationService: ImageManipulationService,
+    ) {}
 
     showPopUp() {
         this.toggleElementVisibility(this.gameNameForm, false);
@@ -72,6 +77,7 @@ export class GameCreationPageComponent {
         const imageBuffer: ArrayBuffer = await event.target.files[0].arrayBuffer();
         image.src = URL.createObjectURL(event.target.files[0]);
         const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
+        const imageDimensions: Vector2 = this.imageManipulationService.getImageDimensions(Buffer.from(imageBuffer));
 
         image.onload = () => {
             if (!this.is24BitDepthBMP(imageBuffer)) {
@@ -79,14 +85,13 @@ export class GameCreationPageComponent {
                 return;
             }
 
-            if (image.height !== 480 || image.width !== 640) {
+            if (imageDimensions.y !== 480 || imageDimensions.x !== 640) {
                 alert('Taille invalide (' + image.width + 'x' + image.height + '), la taille doit être de : 640x480 pixels');
                 return;
             }
 
             const context = this.getCanvas(isModified);
             context?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
-
             if (isModified) {
                 this.modifiedImage = event.target.files[0];
                 this.modifiedContainsImage = true;
@@ -217,8 +222,6 @@ export class GameCreationPageComponent {
     async sendGameNameToServer(): Promise<void> {
         const routeToSend = '/games/saveGame';
         this.formToSendAfterServerConfirmation.gameName = this.gameName;
-
-        // console.log('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
 
         this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
         this.communicationService.post<EntireGameUploadForm>(this.formToSendAfterServerConfirmation, routeToSend).subscribe({

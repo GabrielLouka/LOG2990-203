@@ -9,9 +9,7 @@ import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { ImageManipulationService } from './image-manipulation.service';
-
 describe('ImageManipulationService', () => {
-    // let onloadRef: Function | undefined;
     // eslint-disable-next-line no-unused-vars
     let service: ImageManipulationService;
 
@@ -22,6 +20,7 @@ describe('ImageManipulationService', () => {
     // This runs before each test so we put variables we reuse here
     beforeEach(() => {
         service = TestBed.inject(ImageManipulationService);
+
     });
 
     it('should be created', () => {
@@ -31,22 +30,10 @@ describe('ImageManipulationService', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         const src = 'assets/img/image_empty.png';
-        // Object.defineProperties(Image.prototype, {
-        //     onload: {
-        //         get() {
-        //             return this._onload;
-        //         },
-        //         set(onload) {
-        //             this._onload = onload;
-        //         },
-        //         configurable: true,
-        //         enumerable: true,
-        //     },
-        // });
+        
 
         service.loadCanvasImages(src, ctx);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        // onloadRef!();
         expect(canvas.toDataURL()).not.toBe('');
     });
 
@@ -121,4 +108,5 @@ describe('ImageManipulationService', () => {
             expect(service.sleep(blinkTime)).toHaveBeenCalled();
         });
     });
+    
 });

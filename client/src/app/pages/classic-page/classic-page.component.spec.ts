@@ -21,6 +21,7 @@ describe('ClassicPageComponent', () => {
     let component: ClassicPageComponent;
     let fixture: ComponentFixture<ClassicPageComponent>;
     let socketService: jasmine.SpyObj<SocketClientService>;
+
     let commService: jasmine.SpyObj<CommunicationService>;
     let authService: jasmine.SpyObj<AuthService>;
     let imageService: jasmine.SpyObj<ImageManipulationService>;
@@ -138,6 +139,7 @@ describe('ClassicPageComponent', () => {
         await component.refreshModifiedImage();
         if (!component.rightCanvasContext) expect(imageService.blinkDifference).toHaveBeenCalled();
     });
+
     it('onFindDifference should send message about difference found', () => {
         const refresSpy = spyOn(component, 'refreshModifiedImage');
         const successSpy = spyOn(component, 'playSuccessSound');
@@ -259,11 +261,11 @@ describe('ClassicPageComponent', () => {
     });
 
     it('getInitialImagesFromServer should throw error', () => {
-        const logSpy = spyOn(window, 'alert');
+        const alertSpy = spyOn(window, 'alert');
         const errorResponse = new HttpErrorResponse({});
         commService.get = jasmine.createSpy().and.returnValue(throwError(() => errorResponse));
         component.getInitialImagesFromServer();
-        expect(logSpy).toHaveBeenCalled();
+        expect(alertSpy).toHaveBeenCalled();
     });
 
     it('should display the error message and disable pointer events on the canvases', () => {
@@ -287,4 +289,12 @@ describe('ClassicPageComponent', () => {
         expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('auto');
         expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('auto');
     }));
+
+    it('refreshModifiedImage should use currentModifiedImage if valid when blinking difference', async () => {
+        const bytes = [0x68, 0x65, 0x6c, 0x6c, 0x6f];
+        const buffer = Buffer.from(bytes);
+        component.currentModifiedImage = buffer;
+        await component.refreshModifiedImage();
+        expect(imageService.blinkDifference).toHaveBeenCalledWith(buffer, undefined as any, undefined as any);
+    });
 });

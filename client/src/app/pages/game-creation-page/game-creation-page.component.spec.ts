@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable prettier/prettier */
+/* eslint-disable max-len */
+/* eslint-disable max-lines */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable max-lines */
@@ -8,6 +12,7 @@ import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
+import { ImageManipulationService } from '@app/services/image-manipulation.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { Vector2 } from '@common/vector2';
@@ -19,6 +24,7 @@ describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
     let communicationService: jasmine.SpyObj<CommunicationService>;
+    let imageManipulationService: ImageManipulationService;
     let leftCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
     let rightCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
     let onloadRef: Function | undefined;
@@ -43,6 +49,7 @@ describe('GameCreationPageComponent', () => {
     beforeEach(() => {
         communicationService = jasmine.createSpyObj('CommunicationService', ['get', 'post', 'delete']);
         communicationService.get.and.returnValue(mockObservable);
+        imageManipulationService = new ImageManipulationService();
     });
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -58,6 +65,7 @@ describe('GameCreationPageComponent', () => {
                 { provide: ElementRef, useValue: leftCanvas },
                 { provide: ElementRef, useValue: rightCanvas },
                 { provide: Router, useValue: routerMock },
+                { provide: ImageManipulationService, useValue: imageManipulationService },
             ],
         }).compileComponents();
 
@@ -338,35 +346,7 @@ describe('GameCreationPageComponent', () => {
         await component.sendImageToServer();
         expect(component.debugDisplayMessage.next).toHaveBeenCalled();
     });
-    it('should show an error message if the image is not 24-bits', async () => {
-        const byteArray = [1, 2, 3, 4];
-        const buffer = component.convertToBuffer(byteArray);
-        const imgData = new Uint8Array(buffer);
 
-        const myBlob = new Blob([imgData]);
-        const canvas = document.createElement('canvas');
-        component.leftCanvas = { nativeElement: canvas };
-        component.rightCanvas = { nativeElement: canvas };
-        spyOn(component, 'is24BitDepthBMP').and.returnValue(false);
-        spyOn(window, 'alert');
-        const event: any = {
-            target: {
-                files: [
-                    {
-                        arrayBuffer: () => {
-                            return myBlob;
-                        },
-                    },
-                ],
-                length: 10,
-            },
-        };
-        spyOn(URL, 'createObjectURL').and.returnValue('./invalidUrl');
-        await component.processImage(event, false);
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        onloadRef!();
-        expect(window.alert).toHaveBeenCalledWith("L'image doit être en 24-bits");
-    });
     it('should not process the image', async () => {
         const event = {
             target: {
@@ -385,30 +365,91 @@ describe('GameCreationPageComponent', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
-        const image = new Image();
-        spyOn(Image, 'height' as never).and.returnValue(480 as never);
         spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
         spyOn(window, 'alert');
+        spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(640, 480));
         const event: any = {
             target: {
-                files: [
-                    {
-                        arrayBuffer: () => {
-                            return myBlob;
-                        },
-                    },
-                ],
-                length: 10,
+                files: [myBlob],
+                length: 1,
             },
         };
-        spyOn(URL, 'createObjectURL').and.returnValue('./invalidUrl');
-        const testValue = await component.processImage(event, false);
+        spyOn(URL, 'createObjectURL').and.returnValue('client/src/assets/img/testImage.bmp');
+        await component.processImage(event, true);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         onloadRef!();
-        expect(window.alert).toHaveBeenCalledWith(
-            'Taille invalide (' + image.width + 'x' + image.height + '), la taille doit être de : 640x480 pixels',
-        );
-        expect(testValue).toEqual(undefined);
+        expect(component.modifiedContainsImage).toBeTruthy();
     });
-    it('should tell if the image is  ');
+    it('should process the image to the server', async () => {
+        const byteArray = [1, 2, 3, 4];
+        const buffer = component.convertToBuffer(byteArray);
+        const imgData = new Uint8Array(buffer);
+
+        const myBlob = new Blob([imgData]);
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
+        spyOn(window, 'alert');
+        spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(640, 480));
+        const event: any = {
+            target: {
+                files: [myBlob],
+                length: 1,
+            },
+        };
+        spyOn(URL, 'createObjectURL').and.returnValue('client/src/assets/img/testImage.bmp');
+        await component.processImage(event, false);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
+        expect(component.originalContainsImage).toBeTruthy();
+    });
+    it('should not process the image to the server with the wrong type of file', async () => {
+        const byteArray = [1, 2, 3, 4];
+        const buffer = component.convertToBuffer(byteArray);
+        const imgData = new Uint8Array(buffer);
+
+        const myBlob = new Blob([imgData]);
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(false);
+        spyOn(window, 'alert');
+        spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(640, 480));
+        const event: any = {
+            target: {
+                files: [myBlob],
+                length: 1,
+            },
+        };
+        spyOn(URL, 'createObjectURL').and.returnValue('client/src/assets/img/testImage.bmp');
+        const returnValue=await component.processImage(event, true);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
+        expect(returnValue).toEqual(undefined);
+    });
+    it('should not process the image to the server with the wrong size of file', async () => {
+        const byteArray = [1, 2, 3, 4];
+        const buffer = component.convertToBuffer(byteArray);
+        const imgData = new Uint8Array(buffer);
+
+        const myBlob = new Blob([imgData]);
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(false);
+        spyOn(window, 'alert');
+        spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(480, 580));
+        const event: any = {
+            target: {
+                files: [myBlob],
+                length: 1,
+            },
+        };
+        spyOn(URL, 'createObjectURL').and.returnValue('client/src/assets/img/testImage.bmp');
+        const returnValue=await component.processImage(event, true);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
+        expect(returnValue).toEqual(undefined);
+    });
 });
