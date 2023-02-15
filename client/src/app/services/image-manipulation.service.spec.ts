@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
@@ -20,7 +20,6 @@ describe('ImageManipulationService', () => {
     // This runs before each test so we put variables we reuse here
     beforeEach(() => {
         service = TestBed.inject(ImageManipulationService);
-
     });
 
     it('should be created', () => {
@@ -30,7 +29,6 @@ describe('ImageManipulationService', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         const src = 'assets/img/image_empty.png';
-        
 
         service.loadCanvasImages(src, ctx);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -95,18 +93,16 @@ describe('ImageManipulationService', () => {
         expect(output2).toEqual(corruptedModifiedImage);
     });
 
-    it('should blink the difference between two images during specified time', () => {
+    it('should blink the difference between two images during specified time', fakeAsync(() => {
         const imageOld: Buffer = Buffer.alloc(100, 1);
         const imageNew: Buffer = Buffer.alloc(100, 0);
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
-        const blinkTime = 100;
 
-        spyOn(service, 'sleep').and.resolveTo();
-        service.blinkDifference(imageOld, imageNew, ctx).then(() => {
-            expect(service.sleep(blinkTime)).toHaveBeenCalled();
-        });
-    });
-    
+        const mySpy = spyOn(service, 'sleep').and.callThrough();
+        service.blinkDifference(imageOld, imageNew, ctx);
+        tick(100 * 6);
+        expect(mySpy).toHaveBeenCalled();
+    }));
 });
