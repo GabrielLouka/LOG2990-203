@@ -12,7 +12,7 @@ export class ChatComponent {
         username: string;
         sentByPlayer1: boolean;
         sentByPlayer2: boolean;
-    }[];
+    }[] = [];
     newMessage = '';
     text: unknown;
     sentByplayer1: boolean;
