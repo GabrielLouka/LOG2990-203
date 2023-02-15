@@ -1,19 +1,16 @@
+/* eslint-disable no-console */
 import { Queue } from '@app/classes/queue';
 import { ImageUploadResult } from '@common/image.upload.result';
-import { Pixel } from '@common/pixel';
+import { MIN_DIFFERENCES, Pixel, REQUIRED_HEIGHT, REQUIRED_SURFACE_PERCENTAGE, REQUIRED_WIDTH } from '@common/pixel';
 import { Vector2 } from '@common/vector2';
 import { Service } from 'typedi';
 
 @Service()
 export class ImageProcessingService {
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    private static readonly requiredImageWidth = 640;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    private static readonly requiredImageHeight = 480;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    private static readonly minDifferencesForHardMode = 7;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    private static readonly hardModeImageSurfaceRequiredPercentage = 0.15;
+    private static readonly requiredImageWidth = REQUIRED_WIDTH;
+    private static readonly requiredImageHeight = REQUIRED_HEIGHT;
+    private static readonly minDifferencesForHardMode = MIN_DIFFERENCES;
+    private static readonly hardModeImageSurfaceRequiredPercentage = REQUIRED_SURFACE_PERCENTAGE;
 
     getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): ImageUploadResult => {
         const imageOutput: Buffer = Buffer.from(imageBuffer1);
@@ -45,16 +42,16 @@ export class ImageProcessingService {
 
         // display the length of each difference group
         allDifferences.forEach((diffGroup, index) => {
-            // eslint-disable-next-line no-console
             console.log('diff group length ' + index + ' : ' + diffGroup.length);
         });
 
         this.turnImageToWhite(imageOutput);
         let sumOfAllDifferences: Vector2[] = [];
-        // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < allDifferences.length; i++) {
-            sumOfAllDifferences = sumOfAllDifferences.concat(allDifferences[i]);
+
+        for (const differences of allDifferences) {
+            sumOfAllDifferences = sumOfAllDifferences.concat(differences);
         }
+
         this.paintBlackPixelsAtPositions(sumOfAllDifferences, imageOutput);
 
         return {
@@ -95,7 +92,6 @@ export class ImageProcessingService {
 
             return differences;
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error('Could not get different pixel positions between images');
             return [];
         }
@@ -107,7 +103,6 @@ export class ImageProcessingService {
                 this.setRGB(position, imageBuffer, Pixel.black);
             });
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error('Cannot paint black pixels at theses given positions');
         }
     };
@@ -199,7 +194,6 @@ export class ImageProcessingService {
 
             return new Pixel(r, g, b);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("OOPS! Couldn't get the RGB values for the pixel at position " + position.x + ', ' + position.y + '!');
             return null;
         }
@@ -214,7 +208,6 @@ export class ImageProcessingService {
             imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
             imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
         }
     };
@@ -280,7 +273,6 @@ export class ImageProcessingService {
                 }
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
             console.error('Cannot turn this image to white');
         }
     };

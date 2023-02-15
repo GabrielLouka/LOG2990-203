@@ -7,8 +7,12 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class ChatComponent {
     @ViewChild('chat') chat: ElementRef;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    messages: any[] = [];
+    messages: {
+        text: string;
+        username: string;
+        sentByPlayer1: boolean;
+        sentByPlayer2: boolean;
+    }[];
     newMessage = '';
     text: unknown;
     sentByplayer1: boolean;

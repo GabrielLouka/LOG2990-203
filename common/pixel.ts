@@ -21,3 +21,5 @@ export const REQUIRED_HEIGHT = 480;
 export const INTERVAL_VALUE = 1000;
 export const MINUTE = 60;
 export const MINUTE_LIMIT = 10;
+export const MIN_DIFFERENCES = 7;
+export const REQUIRED_SURFACE_PERCENTAGE = 0.15;

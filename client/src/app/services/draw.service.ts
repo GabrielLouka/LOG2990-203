@@ -2,7 +2,6 @@
 import { Injectable } from '@angular/core';
 import { Coordinate } from '@app/interfaces/coordinate';
 
-// TODO : Avoir un fichier séparé pour les constantes et ne pas les répéter!
 export const DEFAULT_WIDTH = 500;
 export const DEFAULT_HEIGHT = 500;
 
