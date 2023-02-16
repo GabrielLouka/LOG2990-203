@@ -45,15 +45,13 @@ describe('SocketTestHelper', () => {
         expect(result).toEqual(undefined);   
         
     });
-    // it('should handle undefined callbacks correctly', () => {
-    //     const callback = ((params: any) => {}) as any;
-    //     const getStub=jasmine.createSpyObj(socketTestHelper['callbacks'],['get']);
-    //     getStub.get.and.callFake(()=>{
-    //         return undefined;
-    //     });
-    //     socketTestHelper.on('event1', callback);
-    //     socketTestHelper.on('event2', callback);
-    //   });
-    
+    it('should not push in the callbacks Map',()=>{
+        const callback = ((params: any) => {}) as any;
+
+        spyOn(socketTestHelper['callbacks'],'get').and.returnValue(undefined);
+        socketTestHelper.on('event5',callback);
+        expect(socketTestHelper['callbacks'].get).toHaveBeenCalledWith('event5');
+    });
+  
    
 });

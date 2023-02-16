@@ -297,4 +297,27 @@ describe('ClassicPageComponent', () => {
         await component.refreshModifiedImage();
         expect(imageService.blinkDifference).toHaveBeenCalledWith(buffer, undefined as any, undefined as any);
     });
+    it('should fetch a game with 0 as the gameId when getting the image from the server', () => {
+        component.currentGameId = null;
+        commService.get = jasmine.createSpy().and.returnValue(
+            of({
+                body: JSON.stringify({
+                    originalImage: 'originalImage',
+                    modifiedImage: 'modifiedImage',
+                    gameData: { name: 'test' },
+                }),
+            }),
+        );
+
+        imageService.getModifiedImageWithoutDifferences = jasmine.createSpy().and.returnValue('testImageSource');
+        const loadSpy = spyOn(component, 'loadImagesToCanvas');
+        const restartSpy = spyOn(component, 'requestStartGame');
+
+        component.communicationService = commService;
+        component['imageManipulationService'] = imageService;
+        component.getInitialImagesFromServer();
+        expect(imageService.getImageSourceFromBuffer).toHaveBeenCalledTimes(2);
+        expect(loadSpy).toHaveBeenCalled();
+        expect(restartSpy).toHaveBeenCalled();
+    });
 });

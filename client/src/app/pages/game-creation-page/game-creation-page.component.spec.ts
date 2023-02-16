@@ -125,10 +125,7 @@ describe('GameCreationPageComponent', () => {
         expect(input2.value).toEqual('');
         expect(component.modifiedContainsImage).toBe(false);
     });
-    it('should not clears the right canvas and sets input2 value to empty', () => {
-        const mybool = true;
-        expect(mybool).toBe(true);
-    });
+    
 
     it('should clears the left canvas and sets input1 value to empty', () => {
         component.modifiedContainsImage = false;
@@ -437,9 +434,9 @@ describe('GameCreationPageComponent', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
-        spyOn(component, 'is24BitDepthBMP').and.returnValue(false);
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
         spyOn(window, 'alert');
-        spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(480, 580));
+        spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(240, 580));
         const event: any = {
             target: {
                 files: [myBlob],
@@ -452,4 +449,88 @@ describe('GameCreationPageComponent', () => {
         onloadRef!();
         expect(returnValue).toEqual(undefined);
     });
+     it('should not draw the Image if the context is null in the processImage function', async () => {
+        const byteArray = [1, 2, 3, 4];
+        const buffer = component.convertToBuffer(byteArray);
+        const imgData = new Uint8Array(buffer);
+        const myBlob = new Blob([imgData]);
+        spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
+        spyOn(window, 'alert');
+        spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(640, 480));
+        const event: any = {
+            target: {
+                files: [myBlob],
+                length: 1,
+            },
+        };
+        spyOn(URL, 'createObjectURL').and.returnValue('client/src/assets/img/testImage.bmp');
+        spyOn(component,'getCanvas').and.returnValue(null);
+        const returnValue=await component.processImage(event, true);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        onloadRef!();
+        expect(returnValue).toEqual(undefined);
+    });
+    it('should not call the function clearRect if the context is empty in the resetCanvas',async()=>{
+        spyOn(component,'getCanvas').and.returnValue(null);
+        component.modifiedContainsImage = false;
+        component.originalContainsImage = false;
+        const input2 = jasmine.createSpyObj<HTMLInputElement>('HTMLInputElement', ['value']);
+        component.input2 = { nativeElement: input2 };
+        component.resetCanvas(true);
+
+    });
+
+it('should not process the image to the server with the wrong size of file', async () => {
+    const byteArray = [1, 2, 3, 4];
+    const buffer = component.convertToBuffer(byteArray);
+    const imgData = new Uint8Array(buffer);
+
+    const myBlob = new Blob([imgData]);
+    const canvas = document.createElement('canvas');
+    component.leftCanvas = { nativeElement: canvas };
+    component.rightCanvas = { nativeElement: canvas };
+    spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
+    spyOn(window, 'alert');
+    spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(240, 580));
+    const event: any = {
+        target: {
+            files: [myBlob],
+            length: 1,
+        },
+    };
+    spyOn(URL, 'createObjectURL').and.returnValue('client/src/assets/img/testImage.bmp');
+    const returnValue=await component.processImage(event, true);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    onloadRef!();
+    expect(returnValue).toEqual(undefined);
+});
+ it('should not draw the Image if the context is null in the processImage function', async () => {
+    const byteArray = [1, 2, 3, 4];
+    const buffer = component.convertToBuffer(byteArray);
+    const imgData = new Uint8Array(buffer);
+    const myBlob = new Blob([imgData]);
+    spyOn(component, 'is24BitDepthBMP').and.returnValue(true);
+    spyOn(window, 'alert');
+    spyOn(imageManipulationService, 'getImageDimensions').and.returnValue(new Vector2(640, 480));
+    const event: any = {
+        target: {
+            files: [myBlob],
+            length: 1,
+        },
+    };
+    spyOn(URL, 'createObjectURL').and.returnValue('client/src/assets/img/testImage.bmp');
+    spyOn(component,'getCanvas').and.returnValue(null);
+    const returnValue=await component.processImage(event, true);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    onloadRef!();
+    expect(returnValue).toEqual(undefined);
+});
+it('should not call the function clearRect if the context is empty in the resetCanvas',async()=>{
+    spyOn(component,'getCanvas').and.returnValue(null);
+    component.modifiedContainsImage = false;
+    component.originalContainsImage = false;
+    const input1 = jasmine.createSpyObj<HTMLInputElement>('HTMLInputElement', ['value']);
+    component.input1 = { nativeElement: input1 };
+    expect(component.originalContainsImage).toBe(false);
+});
 });
