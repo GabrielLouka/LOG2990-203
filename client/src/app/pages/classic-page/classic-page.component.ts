@@ -148,16 +148,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     addServerSocketMessagesListeners() {
-        // this.socketService.on('connect', () => {
-        //     this.addMessageToChat(`Connexion par WebSocket sur le socket ${this.socketId}`);
-        // });
-        // Afficher le message envoyé lors de la connexion avec le serveur
-        // this.socketService.on('hello', (message: string) => {
-        //     this.addMessageToChat(message);
-        // });
-        // this.socketService.on('matchJoined', (message: string) => {
-        //     this.addMessageToChat(message);
-        // });
         this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number }) => {
             if (data.isValidated) {
                 this.foundDifferences = data.foundDifferences;
