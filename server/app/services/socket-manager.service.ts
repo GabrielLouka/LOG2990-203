@@ -5,22 +5,23 @@ import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';
 import * as http from 'http';
 import * as io from 'socket.io';
+import { MatchManagerService } from './match-manager.service';
 import { MatchingDifferencesService } from './matching-differences.service';
 
 export class SocketManager {
     matchingDifferencesService: MatchingDifferencesService;
+    // matchManagerService: MatchManagerService;
     private sio: io.Server;
     private readonly room: 'serverRoom';
-    constructor(server: http.Server) {
+    constructor(server: http.Server, private matchManagerService: MatchManagerService) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
         this.matchingDifferencesService = new MatchingDifferencesService();
+        // this.matchManagerService = new MatchManagerService();
     }
 
     handleSockets(): void {
         this.sio.on('connection', (socket) => {
             console.log(`Connexion par l'utilisateur avec id : ${socket.id}`);
-            // message initial
-            socket.emit('hello', 'Hello World!');
             let joinedRoomName = '';
 
             socket.on('message', (message: string) => {
@@ -62,9 +63,6 @@ export class SocketManager {
                     foundDifferenceIndex: foundDifferenceId,
                 });
             });
-            socket.on('broadcastAll', (message: string) => {
-                this.sio.sockets.emit('massMessage', `${socket.id} : ${message}`);
-            });
 
             socket.on('joinRoom', (roomName: string) => {
                 socket.join(roomName);
@@ -81,19 +79,20 @@ export class SocketManager {
                 console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
                 console.log(`Raison de deconnexion : ${reason}`);
             });
-        });
 
-        setInterval(() => {
-            this.emitTime();
-        }, 1000);
+            socket.on('createGame', (data) => {
+                console.log('Creating game (id ' + data.gameId + ')');
+                this.matchManagerService.createMatch(data.gameId, socket.id);
+                this.sio.emit('gameProgressUpdate', {
+                    gameId: data.gameId,
+                    isGameInProgress: true,
+                });
+            });
+        });
     }
 
     disconnect(): void {
         this.sio.disconnectSockets();
         this.sio.close();
-    }
-
-    private emitTime() {
-        this.sio.sockets.emit('clock', new Date().toLocaleTimeString());
     }
 }

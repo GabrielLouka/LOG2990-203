@@ -1,6 +1,8 @@
 <div class="flex-row center overlay">
     <button *ngIf="isPlayable" class="button-style" [routerLink]="['/registration', id]">Jouer</button>
-    <button *ngIf="isPlayable" class="button-style not-allowed">Rejoindre</button>
+    <button *ngIf="isPlayable" class="button-style" (click)="isGameInProgress ? null : createGame()">
+        {{ isGameInProgress ? 'Rejoindre' : 'Creer' }}
+    </button>
     <button *ngIf="!isPlayable" class="button-style not-allowed">Supprimer</button>
     <button *ngIf="!isPlayable" class="button-style not-allowed">Réinitialiser</button>
 </div>

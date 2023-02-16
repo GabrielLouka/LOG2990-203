@@ -1,6 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { CommunicationService } from '@app/services/communication.service';
+import { MatchmakingService } from '@app/services/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Buffer } from 'buffer';
@@ -18,6 +20,7 @@ export class GamesDisplayComponent implements OnInit {
     games: {
         gameData: GameData;
         originalImage: Buffer;
+        isGameInProgress: boolean;
     }[];
     title: string;
     gamesNbr: number = 0;
@@ -25,11 +28,17 @@ export class GamesDisplayComponent implements OnInit {
     showNextButton = true;
 
     showPreviousButton = false;
-    constructor(private readonly communicationService: CommunicationService) {}
+    constructor(
+        private readonly communicationService: CommunicationService,
+        private readonly matchmakingService: MatchmakingService,
+        private readonly socketService: SocketClientService,
+    ) {}
     ngOnInit() {
         this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
         this.justifyContent = this.isSelection ? 'center' : 'right';
         this.fetchGameDataFromServer(this.currentPageNbr);
+        this.matchmakingService.connectSocket();
+        this.addServerSocketMessagesListeners();
     }
 
     async fetchGameDataFromServer(pageId: number): Promise<void> {
@@ -66,5 +75,24 @@ export class GamesDisplayComponent implements OnInit {
             this.showPreviousButton = false;
         }
         await this.fetchGameDataFromServer(this.currentPageNbr);
+    }
+
+    addServerSocketMessagesListeners() {
+        this.socketService.on('gameProgressUpdate', (data: { gameId: number; isGameInProgress: boolean }) => {
+            // eslint-disable-next-line no-console
+            console.log('Receiving game progress update ' + data.gameId + ' | ' + data.isGameInProgress);
+            this.updateGameAvailability(data.gameId, data.isGameInProgress);
+        });
+    }
+
+    updateGameAvailability(gameId: number, isGameInProgress: boolean) {
+        for (const game of this.games) {
+            // i convert the id to a string because otherwise the comparison doesn't work
+            // ...why?
+            if (game.gameData.id.toString() === gameId.toString()) {
+                game.isGameInProgress = isGameInProgress;
+                break;
+            }
+        }
     }
 }

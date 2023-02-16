@@ -5,6 +5,7 @@ import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { DatabaseService } from './services/database.service';
 import { GameStorageService } from './services/game-storage.service';
+import { MatchManagerService } from './services/match-manager.service';
 import { SocketManager } from './services/socket-manager.service';
 
 @Service()
@@ -14,6 +15,7 @@ export class Server {
     private static readonly baseDix: number = 10;
     private server: http.Server;
     private socketManager: SocketManager;
+    private matchManagerService: MatchManagerService;
     constructor(private application: Application, private databaseService: DatabaseService) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -30,8 +32,9 @@ export class Server {
         this.application.app.set('port', Server.appPort);
 
         this.server = http.createServer(this.application.app);
+        this.matchManagerService = new MatchManagerService();
 
-        this.socketManager = new SocketManager(this.server);
+        this.socketManager = new SocketManager(this.server, this.matchManagerService);
         this.socketManager.handleSockets();
 
         this.server.listen(Server.appPort);
@@ -41,7 +44,7 @@ export class Server {
 
         try {
             await this.databaseService.start();
-            this.application.gamesController.gameStorageService = new GameStorageService(this.databaseService);
+            this.application.gamesController.gameStorageService = new GameStorageService(this.databaseService, this.matchManagerService);
             console.log('Database connection successful !');
         } catch {
             console.error('Database connection failed !');

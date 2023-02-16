@@ -8,6 +8,7 @@ import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
+import { MatchManagerService } from './match-manager.service';
 import { SocketManager } from './socket-manager.service';
 @Service()
 export class GameStorageService {
@@ -15,7 +16,7 @@ export class GameStorageService {
     fileSystemManager: FileSystemManager;
     socketManager: SocketManager;
 
-    constructor(private databaseService: DatabaseService) {
+    constructor(private databaseService: DatabaseService, private matchManagerService: MatchManagerService) {
         this.jsonPath = './app/data/default-games.json';
         this.fileSystemManager = new FileSystemManager();
     }
@@ -74,9 +75,12 @@ export class GameStorageService {
         const gamesToReturn = [];
         for (const game of nextGames) {
             const images = this.getGameImages(game.id.toString());
+            this.matchManagerService.noOp();
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
+                isGameInProgress: this.matchManagerService.isMatchAvailableForGame(game.id),
+                // isGameInProgress: false,
             });
         }
         return gamesToReturn;

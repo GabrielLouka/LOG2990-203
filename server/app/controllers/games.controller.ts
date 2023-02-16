@@ -16,6 +16,7 @@ export class GamesController {
     private configureRouter(): void {
         this.router = Router();
 
+        // retrieve a single game whose id is :id
         this.router.get('/fetchGame/:id', async (req: Request, res: Response) => {
             try {
                 const game = await this.gameStorageService.getGameById(req.params.id);
@@ -25,6 +26,7 @@ export class GamesController {
             }
         });
 
+        // retrieve the 4 games in page :id. If you want the first 4 games, :id = 0
         this.router.get('/:id', async (req: Request, res: Response) => {
             try {
                 const games = await this.gameStorageService.getGamesInPage(parseInt(req.params.id, 10));

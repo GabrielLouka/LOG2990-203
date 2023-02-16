@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { MatchmakingService } from '@app/services/matchmaking.service';
 
 @Component({
     selector: 'app-overlay',
@@ -8,4 +9,12 @@ import { Component, Input } from '@angular/core';
 export class OverlayComponent {
     @Input() isPlayable: boolean;
     @Input() id: string;
+    @Input() isGameInProgress: boolean;
+
+    constructor(private readonly matchmakingService: MatchmakingService) {}
+
+    createGame() {
+        this.matchmakingService.createGame(this.id);
+        window.alert('Lets connect to game id ' + this.id);
+    }
 }
