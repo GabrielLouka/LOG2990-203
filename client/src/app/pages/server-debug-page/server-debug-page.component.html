@@ -1,10 +1,11 @@
 <p># {{ debugDisplayMessage.getValue() }}</p>
-<p><img id="image-preview" width="640px" height="480px" /></p>
+<!-- <p><img id="image-preview" width="640px" height="480px" /></p>
 <input type="file" id="browseButton1" name="imageToSend1" accept=".bmp" />
 <input type="file" id="browseButton2" name="imageToSend2" accept=".bmp" />
 <label for="radiusInput">Radius :</label>
-<input type="number" id="radiusInput" name="radiusInput" />
-<p id="gameNameField">
+<input type="number" id="radiusInput" name="radiusInput" /> -->
+<canvas #canvas></canvas>
+<!-- <p id="gameNameField">
     GAME NAME : <input type="text" id="gameName" name="gameName" /> <button class="button" (click)="sendGameAndNameToServer()">pls Send Name</button>
 </p>
 <p>--</p>
@@ -19,12 +20,21 @@
     <input type="number" id="pixelToCheckPositionX" name="pixelToCheckPositionX" />
     <input type="number" id="pixelToCheckPositionY" name="pixelToCheckPositionY" />
 </p>
-<p>
-    <button class="button" (click)="getGames()">Retrieve games</button>
+<p> -->
+<button class="button" (click)="displayChangedPixels()">DISPLAY ALL STROKES</button>
+<button class="button" (click)="undo()">UNDO THIS KING</button>
+<button class="button" (click)="redo()">REDO THIS KING</button>
+<div #palette>
+    <div class="swatch" style="background-color: red"></div>
+    <div class="swatch" style="background-color: blue"></div>
+    <div class="swatch" style="background-color: green"></div>
+    <div class="swatch" style="background-color: yellow"></div>
+</div>
+<!-- <button class="button" (click)="getGames()">Retrieve games</button>
     <button class="button" (click)="getGame()">Retrieve a game</button>
     <button class="button" (click)="showImagesForRetrievedGames()">Display images (click retrieve games first)</button>
     <button class="button" (click)="getDifferenceIndex()">Get difference index</button>
-</p>
+</p> -->
 <p><button class="button" (click)="deleteAllGames()">DELETE EVERYTHING (BEGONE)</button></p>
 <div *ngFor="let game of games">
     <p>id: {{ game.gameData.id }}</p>
