@@ -4,7 +4,7 @@ import { FileSystemManager } from '@app/services/file-system/file-system-manager
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
 import 'dotenv/config';
-import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
+import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
 import { DeleteResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
@@ -63,6 +63,25 @@ export class GameStorageService {
     }
 
     async deleteAllGames(): Promise<DeleteResult> {
+        readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
+            if (err) {
+                console.error(err);
+            } else {
+                files.forEach((file) => {
+                    if (file.isDirectory()) {
+                        const folderPath = `${R_ONLY.persistentDataFolderPath}/${file.name}`;
+                        rmdir(folderPath, { recursive: true }, (error) => {
+                            if (error) {
+                                console.error(error);
+                            } else {
+                                console.log(`Folder ${folderPath} deleted successfully.`);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
         return this.collection.deleteMany({});
     }
 
