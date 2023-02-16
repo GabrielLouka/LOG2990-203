@@ -532,6 +532,5 @@ it('should not call the function clearRect if the context is empty in the resetC
     const input1 = jasmine.createSpyObj<HTMLInputElement>('HTMLInputElement', ['value']);
     component.input1 = { nativeElement: input1 };
     expect(component.originalContainsImage).toBe(false);
-
 });
 });
