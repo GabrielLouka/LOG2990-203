@@ -17,6 +17,10 @@ export class MatchmakingService {
         this.socketService.connect();
     }
 
+    disconnectSocket() {
+        this.socketService.disconnect();
+    }
+
     createGame(gameId: string) {
         this.socketService.send<{ gameId: string }>('createGame', { gameId });
     }

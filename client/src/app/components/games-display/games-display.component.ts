@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
 import { CommunicationService } from '@app/services/communication.service';
 import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -32,6 +33,7 @@ export class GamesDisplayComponent implements OnInit {
         private readonly communicationService: CommunicationService,
         private readonly matchmakingService: MatchmakingService,
         private readonly socketService: SocketClientService,
+        private router: Router,
     ) {}
     ngOnInit() {
         this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
@@ -39,6 +41,11 @@ export class GamesDisplayComponent implements OnInit {
         this.fetchGameDataFromServer(this.currentPageNbr);
         this.matchmakingService.connectSocket();
         this.addServerSocketMessagesListeners();
+        this.router.events.subscribe((event) => {
+            if (event instanceof NavigationEnd) {
+                this.matchmakingService.disconnectSocket();
+            }
+        });
     }
 
     async fetchGameDataFromServer(pageId: number): Promise<void> {

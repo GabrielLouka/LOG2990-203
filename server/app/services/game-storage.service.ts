@@ -8,7 +8,6 @@ import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
 import { DeleteResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
-import { MatchManagerService } from './match-manager.service';
 import { SocketManager } from './socket-manager.service';
 @Service()
 export class GameStorageService {
@@ -16,7 +15,7 @@ export class GameStorageService {
     fileSystemManager: FileSystemManager;
     socketManager: SocketManager;
 
-    constructor(private databaseService: DatabaseService, private matchManagerService: MatchManagerService) {
+    constructor(private databaseService: DatabaseService) {
         this.jsonPath = './app/data/default-games.json';
         this.fileSystemManager = new FileSystemManager();
     }
@@ -70,17 +69,15 @@ export class GameStorageService {
     async getGamesInPage(pageNbr: number) {
         // checks if the number of games available for one page is under four
         const skipNbr = pageNbr * R_ONLY.gamesLimit;
-        const nextGames = await this.collection.find({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
+        const nextGames = await this.collection.find<GameData>({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
 
         const gamesToReturn = [];
         for (const game of nextGames) {
             const images = this.getGameImages(game.id.toString());
-            this.matchManagerService.noOp();
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
-                isGameInProgress: this.matchManagerService.isMatchAvailableForGame(game.id),
-                // isGameInProgress: false,
+                isGameInProgress: false,
             });
         }
         return gamesToReturn;

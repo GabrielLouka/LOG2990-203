@@ -1,4 +1,5 @@
 import { GameStorageService } from '@app/services/game-storage.service';
+import { MatchManagerService } from '@app/services/match-manager.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { GameData } from '@common/game-data';
 import { defaultRankings } from '@common/ranking';
@@ -9,7 +10,7 @@ import { Service } from 'typedi';
 @Service()
 export class GamesController {
     router: Router;
-    constructor(public gameStorageService: GameStorageService) {
+    constructor(public gameStorageService: GameStorageService, public matchManagerService: MatchManagerService) {
         this.configureRouter();
     }
 
@@ -30,6 +31,10 @@ export class GamesController {
         this.router.get('/:id', async (req: Request, res: Response) => {
             try {
                 const games = await this.gameStorageService.getGamesInPage(parseInt(req.params.id, 10));
+                for (const game of games) {
+                    game.isGameInProgress = this.matchManagerService.isMatchAvailableForGame(game.gameData.id);
+                    // game.isGameInProgress = true;
+                }
                 const gameLength = await this.gameStorageService.getGamesLength();
                 const gameInformation = { gameContent: games, nbrOfGame: gameLength };
                 res.send(JSON.stringify(gameInformation));

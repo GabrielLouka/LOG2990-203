@@ -1,3 +1,4 @@
+import { Player } from '@common/player';
 export class Match {
     // this is the id for the game that is being played
     // it's not the same as match id which is the
@@ -5,8 +6,8 @@ export class Match {
     gameId: number;
     // unique id for this match
     matchId: string;
-    player1: string | null;
-    player2: string | null;
+    player1: Player | null;
+    player2: Player | null;
 
     constructor(gameId: number, matchId: string) {
         this.gameId = gameId;
