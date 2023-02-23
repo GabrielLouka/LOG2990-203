@@ -11,4 +11,15 @@ export class RectangleElement extends UndoElement {
     redoEvent(): void {
         throw new Error('Method not implemented.');
     }
+    draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
+        context.beginPath();
+        context.strokeStyle = this.color;
+        context.fillStyle = this.color;
+        context.moveTo(this.pixels[0].x, this.pixels[0].y);
+        const rectStart = this.pixels[0];
+        const rectEnd = this.pixels[1];
+
+        context.fillRect(rectStart.x, rectStart.y, rectEnd.x - rectStart.x, rectEnd.y - rectStart.y);
+        return context;
+    }
 }
