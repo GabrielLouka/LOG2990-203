@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
 import { DifferenceImage } from '@common/difference.image';
@@ -11,63 +10,31 @@ import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
-import { BehaviorSubject } from 'rxjs';
+
 @Component({
     selector: 'app-game-creation-page',
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
 export class GameCreationPageComponent {
-    static readonly maxNumberOfDifferences: number = 9;
-    static readonly minNumberOfDifferences: number = 3;
-
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
-    @ViewChild('bgModal') modal!: ElementRef;
-    @ViewChild('gameNameForm') gameNameForm!: ElementRef;
-    @ViewChild('errorPopupText') errorPopupText!: ElementRef;
-    @ViewChild('imagePreview') imagePreview!: ElementRef;
     @ViewChild('input1') input1!: ElementRef;
     @ViewChild('input2') input2!: ElementRef;
+    @ViewChild('resultModal') resultModal!: CreationResultModalComponent;
 
-    gameName: string = '';
     totalDifferences = 0;
     isEasy = true;
     enlargementRadius: number = 3;
     originalImage: File | null;
     modifiedImage: File | null;
-    differencesImage: Blob;
     modifiedContainsImage = false;
     originalContainsImage = false;
 
-    debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-
-    titleRegistration = new FormGroup({
-        title: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[-a-zA-Z0-9-()]{3,15}(\\s+[-a-zA-Z0-9-()]+)*$')])),
-    });
-
     formToSendAfterServerConfirmation: EntireGameUploadForm;
 
-    constructor(
-        private readonly communicationService: CommunicationService,
-        private readonly router: Router,
-        private readonly imageManipulationService: ImageManipulationService,
-    ) {}
+    constructor(private readonly communicationService: CommunicationService, private readonly imageManipulationService: ImageManipulationService) {}
 
-    showPopUp() {
-        this.toggleElementVisibility(this.gameNameForm, false);
-        this.toggleElementVisibility(this.errorPopupText, false);
-        this.errorPopupText.nativeElement.style.color = 'red';
-        this.modal.nativeElement.style.display = 'flex';
-    }
-
-    closePopUp() {
-        this.modal.nativeElement.style.display = 'none';
-    }
-
-    toggleElementVisibility(element: ElementRef, isVisible: boolean) {
-        element.nativeElement.style.display = isVisible ? 'flex' : 'none';
-    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async processImage(event: any, isModified: boolean) {
         if (event.target.files.length === 0) return;
@@ -143,7 +110,7 @@ export class GameCreationPageComponent {
             return;
         }
 
-        this.showPopUp();
+        this.resultModal.showPopUp();
 
         const routeToSend = '/image_processing/send-image';
 
@@ -162,9 +129,7 @@ export class GameCreationPageComponent {
             const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
             const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
 
-            this.updateImageDisplay(new ArrayBuffer(0));
-
-            this.debugDisplayMessage.next('Sending image to server...');
+            this.resultModal.updateImageDisplay(new ArrayBuffer(0));
 
             const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
             const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
@@ -173,19 +138,9 @@ export class GameCreationPageComponent {
             const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
             this.communicationService.post<ImageUploadForm>(imageUploadForm, routeToSend).subscribe({
                 next: (response) => {
-                    const responseString = ` ${response.status} - 
-                    ${response.statusText} \n`;
                     if (response.body !== null) {
                         const serverResult: ImageUploadResult = JSON.parse(response.body);
-                        this.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
-                        this.debugDisplayMessage.next(
-                            responseString +
-                                serverResult.message +
-                                '\n Number of differences = ' +
-                                serverResult.numberOfDifferences +
-                                '\n Generated game id = ' +
-                                serverResult.generatedGameId,
-                        );
+                        this.resultModal.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
                         this.formToSendAfterServerConfirmation = {
                             differences: serverResult.differences,
                             firstImage,
@@ -196,18 +151,11 @@ export class GameCreationPageComponent {
                         };
                         this.totalDifferences = serverResult.numberOfDifferences;
                         this.isEasy = serverResult.isEasy;
-                        if (this.isNumberOfDifferencesValid()) {
-                            this.toggleElementVisibility(this.gameNameForm, true);
-                        } else {
-                            this.toggleElementVisibility(this.gameNameForm, false);
-                            this.toggleElementVisibility(this.errorPopupText, true);
-                        }
+                        this.resultModal.showGameNameForm(this.totalDifferences);
                     }
                 },
                 error: (err: HttpErrorResponse) => {
-                    const responseString = `Server Error : ${err.message}`;
-                    const serverResult: ImageUploadResult = JSON.parse(err.error);
-                    this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+                    window.alert(err);
                 },
             });
         }
@@ -215,34 +163,6 @@ export class GameCreationPageComponent {
 
     submitRadius(radius: number) {
         this.enlargementRadius = radius;
-    }
-
-    async sendGameNameToServer(): Promise<void> {
-        const routeToSend = '/games/saveGame';
-        this.formToSendAfterServerConfirmation.gameName = this.gameName;
-
-        this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
-        this.communicationService.post<EntireGameUploadForm>(this.formToSendAfterServerConfirmation, routeToSend).subscribe({
-            next: (response) => {
-                const responseString = ` ${response.status} - 
-                ${response.statusText} \n`;
-                this.debugDisplayMessage.next(responseString);
-                this.closePopUp();
-                this.router.navigate(['/home']);
-            },
-            error: (err: HttpErrorResponse) => {
-                const responseString = `Server Error : ${err.message}`;
-                const serverResult: ImageUploadResult = JSON.parse(err.error);
-                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
-            },
-        });
-    }
-
-    isNumberOfDifferencesValid(): boolean {
-        return (
-            this.totalDifferences >= GameCreationPageComponent.minNumberOfDifferences &&
-            this.totalDifferences <= GameCreationPageComponent.maxNumberOfDifferences
-        );
     }
 
     // Convert number[] to ArrayBuffer
@@ -253,17 +173,5 @@ export class GameCreationPageComponent {
             view[i] = byteArray[i];
         }
         return buffer;
-    }
-
-    updateImageDisplay(imgData: ArrayBuffer) {
-        const canvas: HTMLCanvasElement = this.imagePreview.nativeElement;
-        const ctx = canvas.getContext('2d');
-        if (ctx !== null) {
-            const img = new Image();
-            img.src = URL.createObjectURL(new Blob([imgData]));
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
-            };
-        }
     }
 }
