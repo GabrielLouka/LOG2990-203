@@ -36,7 +36,7 @@ describe('ChatComponent', () => {
 
     it('should not add a message to the chat (system)', () => {
         component.newMessage = 'test';
-        component.addMessage('test');
+        component.sendSystemMessage('test');
 
         expect(component.messages.length).toBe(1);
     });

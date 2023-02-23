@@ -55,7 +55,7 @@ describe('ClassicPageComponent', () => {
             socket: { id: '123' },
         });
         commService = jasmine.createSpyObj('CommunicationService', ['basicGet', 'basicPost', 'get', 'post', 'delete']);
-        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
+        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registeredUserName']);
         imageService = jasmine.createSpyObj('ImageManipulationService', [
             'getModifiedImageWithoutDifferences',
             'blinkDifference',

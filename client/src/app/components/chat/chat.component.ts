@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AuthService } from '@app/services/auth.service';
+
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
@@ -15,12 +16,7 @@ export class ChatComponent {
         sentBySystem: boolean;
     }[] = [];
     newMessage = '';
-    text: string;
-    sentByplayer1: boolean;
-    sentByPlayer2: boolean;
-    sentBySystem: boolean;
-
-    username = this.auth.registerUserName();
+    username = this.auth.registeredUserName();
 
     constructor(private auth: AuthService) {}
 

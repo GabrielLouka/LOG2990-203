@@ -146,7 +146,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     requestStartGame() {
-        this.socketService.send('launchGame', { gameData: this.game.gameData, username: this.auth.registerUserName() });
+        this.socketService.send('launchGame', { gameData: this.game.gameData, username: this.auth.registeredUserName() });
     }
 
     addServerSocketMessagesListeners() {
@@ -163,11 +163,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     onFindWrongDifference() {
+        const message = `Erreur par ${this.auth.userName.toUpperCase()}`;
         this.errorMessage.nativeElement.style.display = 'block';
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
         this.showErrorText();
         this.playErrorSound();
+        this.chat.sendSystemMessage(message);
     }
 
     showErrorText() {
@@ -179,9 +181,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     onFindDifference() {
+        const message = `Différence trouvée par ${this.auth.userName.toUpperCase()}`;
         this.differencesFound++;
         this.playSuccessSound();
         this.refreshModifiedImage();
+        this.chat.sendSystemMessage(message);
     }
 
     async refreshModifiedImage() {

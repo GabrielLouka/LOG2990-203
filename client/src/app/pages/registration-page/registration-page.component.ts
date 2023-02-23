@@ -27,6 +27,6 @@ export class RegistrationPageComponent implements OnInit {
     }
 
     getUser() {
-        return this.auth.registerUserName();
+        return this.auth.registeredUserName();
     }
 }

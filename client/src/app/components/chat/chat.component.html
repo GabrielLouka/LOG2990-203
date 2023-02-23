@@ -18,7 +18,7 @@
         </div>
     </div>
     <div class="flex-row center chat-footer">
-        <input type="text" [(ngModel)]="newMessage" (keyup.enter)="sendMessage(1)" />
-        <button (click)="sendMessage(1)"><span class="material-symbols-outlined"> send </span></button>
+        <input type="text" maxlength="200" [(ngModel)]="newMessage" (keyup.enter)="sendMessage(2)" />
+        <button (click)="sendMessage(2)"><span class="material-symbols-outlined"> send </span></button>
     </div>
 </div>
