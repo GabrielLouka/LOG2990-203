@@ -2,7 +2,14 @@
     <div class="flex-row center chat-header">MANIA CHAT</div>
     <div #chat class="chat-body">
         <div *ngFor="let message of messages">
-            <div class="message-container" [ngClass]="{ 'sent-by-player-1': message.sentByPlayer1, 'sent-by-player-2': message.sentByPlayer2 }">
+            <div
+                class="message-container"
+                [ngClass]="{
+                    'sent-by-player-1': message.sentByPlayer1,
+                    'sent-by-player-2': message.sentByPlayer2,
+                    'sent-by-system': message.sentBySystem
+                }"
+            >
                 <div class="font-size message-username">
                     <strong>{{ message.username }}</strong>
                 </div>

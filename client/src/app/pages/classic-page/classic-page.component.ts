@@ -72,8 +72,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.connectSocket();
     }
 
-    addMessageToChat(message: string) {
-        this.chat.addMessage(message);
+    sendSystemMessageToChat(message: string) {
+        this.chat.sendSystemMessage(message);
     }
 
     async playErrorSound() {
@@ -202,7 +202,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     // Called when the player wins the game
     onWinGame() {
-        this.addMessageToChat('Damn, you are goated');
+        this.chat.sendSystemMessage('Damn, you are goated');
         this.socketService.send('gameFinished', {
             minutesElapsed: Math.floor(this.timeInSeconds / 60),
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
