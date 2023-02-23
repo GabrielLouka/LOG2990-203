@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ActionsContainer, Tool } from '@app/classes/actions-container';
+import { UndoElement } from '@app/classes/undo-element.abstract';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
@@ -11,16 +13,16 @@ import { ImageUploadResult } from '@common/image.upload.result';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
+
 @Component({
     selector: 'app-server-debug-page',
     templateUrl: './server-debug-page.component.html',
     styleUrls: ['./server-debug-page.component.scss'],
 })
-export class ServerDebugPageComponent implements OnInit {
-    @ViewChild('canvas', { static: true })
+export class ServerDebugPageComponent implements AfterViewInit {
+    @ViewChild('canvas', { static: false })
     canvas: ElementRef<HTMLCanvasElement>;
-
-    @ViewChild('palette', { static: true })
+    @ViewChild('palette', { static: false })
     palette: ElementRef<HTMLDivElement>;
     context: CanvasRenderingContext2D;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -31,94 +33,49 @@ export class ServerDebugPageComponent implements OnInit {
     actions: { pixels: Vector2[]; color: string }[] = [];
     color: string = 'black';
     redoActions: { pixels: Vector2[]; color: string }[] = [];
+    undoActions: UndoElement[] = [];
+    actionsContainer: ActionsContainer;
+    selectedTool: any;
     constructor(private readonly communicationService: CommunicationService) {}
-
-    ngOnInit(): void {
+    @HostListener('document:keydown', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        if (event.ctrlKey && event.shiftKey && event.key === 'Z') {
+            this.redo();
+        } else if (event.ctrlKey && event.key === 'z') {
+            this.undo();
+        }
+    }
+    ngAfterViewInit(): void {
         this.context = this.canvas.nativeElement.getContext('2d')!;
         this.canvas.nativeElement.width = 500;
         this.canvas.nativeElement.height = 500;
+        this.actionsContainer = new ActionsContainer(this.canvas, this.palette);
+        this.selectedTool = Tool.CRAYON;
         this.setupListeners();
     }
+
+    selectTool(selectedTool: string) {
+        this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
+        this.debugDisplayMessage.next('YOU PICKED: ' + this.actionsContainer.selectedTool);
+    }
     setupListeners() {
-        this.canvas.nativeElement.addEventListener('mousedown', (event) => {
-            this.context.beginPath();
-            this.context.moveTo(event.offsetX, event.offsetY);
-            this.context.strokeStyle = this.color;
-            const modifiedPixels: Vector2[] = [];
-            this.actions.push({ pixels: modifiedPixels, color: this.color });
-            this.canvas.nativeElement.addEventListener('mousemove', this.draw);
-        });
-
         this.canvas.nativeElement.addEventListener('mouseup', () => {
-            this.canvas.nativeElement.removeEventListener('mousemove', this.draw);
-            const lastAction = this.actions[this.actions.length - 1].pixels;
-            this.debugDisplayMessage.next('new drawing event: ' + lastAction.map((p) => p.x + ',' + p.y).join(' '));
-        });
-
-        this.canvas.nativeElement.addEventListener('mouseout', () => {
-            this.canvas.nativeElement.removeEventListener('mousemove', this.draw);
-            const lastAction = this.actions[this.actions.length - 1].pixels;
-            this.debugDisplayMessage.next('new drawing event: ' + lastAction.map((p) => p.x + ',' + p.y).join(' '));
-        });
-
-        const swatches = this.palette.nativeElement.querySelectorAll('.swatch');
-        swatches.forEach((swatch) => {
-            swatch.addEventListener('click', (event: any) => {
-                this.color = event.target.style.backgroundColor;
-            });
+            this.displayChangedPixels();
         });
     }
-
-    draw = (event: MouseEvent) => {
-        this.context.lineTo(event.offsetX, event.offsetY);
-        this.context.stroke();
-        this.actions[this.actions.length - 1].pixels.push(new Vector2(event.offsetX, event.offsetY));
-    };
 
     undo() {
-        if (this.actions.length > 0) {
-            // Create a temporary off-screen canvas to store the previous strokes
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = this.canvas.nativeElement.width;
-            tempCanvas.height = this.canvas.nativeElement.height;
-            const tempContext = tempCanvas.getContext('2d')!;
-
-            // Clear the visible canvas
-            this.context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
-
-            // Redraw all the previous strokes onto the temporary canvas
-            for (let i = 0; i < this.actions.length - 1; i++) {
-                const stroke = this.actions[i].pixels;
-                tempContext.beginPath();
-                tempContext.moveTo(stroke[0].x, stroke[0].y);
-                for (let j = 1; j < stroke.length; j++) {
-                    tempContext.lineTo(stroke[j].x, stroke[j].y);
-                }
-                tempContext.stroke();
-            }
-
-            // Update the actions array to remove the most recent stroke
-            this.redoActions.push(this.actions.pop()!);
-
-            // Copy the temporary canvas back onto the visible canvas
-            this.context.drawImage(tempCanvas, 0, 0);
-
-            // Display the remaining pixels in the debug message
-            this.displayChangedPixels();
-        }
+        this.actionsContainer.undo();
     }
     redo() {
-        const lastRedoAction = this.redoActions.pop();
-        if (lastRedoAction) {
-            this.actions.push(lastRedoAction);
-            this.redraw();
-        }
+        this.actionsContainer.redo();
     }
+
     displayChangedPixels() {
         let message = '';
-        for (let i = 0; i < this.actions.length; i++) {
+        for (let i = 0; i < this.actionsContainer.undoActions.length; i++) {
             message += `Stroke ${i + 1}: `;
-            for (const pixel of this.actions[i].pixels) {
+            for (const pixel of this.actionsContainer.undoActions[i].pixels) {
                 message += `[${pixel.x},${pixel.y}] `;
             }
             message += '\n';
@@ -321,20 +278,20 @@ export class ServerDebugPageComponent implements OnInit {
         if (imagePreview !== null) imagePreview.src = URL.createObjectURL(new Blob([imgData]));
     }
 
-    private redraw() {
-        this.clearCanvas();
-        for (const action of this.actions) {
-            this.context.beginPath();
-            this.context.moveTo(action.pixels[0].x, action.pixels[0].y);
-            this.context.strokeStyle = action.color;
-            for (const pixel of action.pixels) {
-                this.context.lineTo(pixel.x, pixel.y);
-                this.context.stroke();
-            }
-        }
-    }
+    // private redraw() {
+    //     this.clearCanvas();
+    //     for (const action of this.actions) {
+    //         this.context.beginPath();
+    //         this.context.moveTo(action.pixels[0].x, action.pixels[0].y);
+    //         this.context.strokeStyle = action.color;
+    //         for (const pixel of action.pixels) {
+    //             this.context.lineTo(pixel.x, pixel.y);
+    //             this.context.stroke();
+    //         }
+    //     }
+    // }
 
-    private clearCanvas() {
-        this.context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
-    }
+    // private clearCanvas() {
+    //     this.context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+    // }
 }

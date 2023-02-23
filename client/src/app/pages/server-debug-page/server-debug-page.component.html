@@ -24,6 +24,9 @@
 <button class="button" (click)="displayChangedPixels()">DISPLAY ALL STROKES</button>
 <button class="button" (click)="undo()">UNDO THIS KING</button>
 <button class="button" (click)="redo()">REDO THIS KING</button>
+<button class="button" (click)="selectTool('crayon')">YEAH CRAYON</button>
+<button class="button" (click)="selectTool('eraser')">ERASE THE PAIN</button>
+<button class="button" (click)="selectTool('rectangle')">GET RECT</button>
 <div #palette>
     <div class="swatch" style="background-color: red"></div>
     <div class="swatch" style="background-color: blue"></div>
