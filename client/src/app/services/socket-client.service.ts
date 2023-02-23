@@ -20,6 +20,10 @@ export class SocketClientService {
         this.socket.disconnect();
     }
 
+    getSocketId() {
+        return this.socket.id;
+    }
+
     on<T>(event: string, action: (data: T) => void): void {
         this.socket.on(event, action);
     }

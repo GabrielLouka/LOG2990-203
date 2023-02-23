@@ -32,8 +32,7 @@ export class GamesController {
             try {
                 const games = await this.gameStorageService.getGamesInPage(parseInt(req.params.id, 10));
                 for (const game of games) {
-                    game.isGameInProgress = this.matchManagerService.isMatchAvailableForGame(game.gameData.id);
-                    // game.isGameInProgress = true;
+                    game.matchToJoinIfAvailable = this.matchManagerService.getMatchAvailableForGame(game.gameData.id);
                 }
                 const gameLength = await this.gameStorageService.getGamesLength();
                 const gameInformation = { gameContent: games, nbrOfGame: gameLength };

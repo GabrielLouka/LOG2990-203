@@ -2,6 +2,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-console */
 import { GameData } from '@common/game-data';
+import { MatchType } from '@common/match-type';
+import { Player } from '@common/player';
 import { Vector2 } from '@common/vector2';
 import * as http from 'http';
 import * as io from 'socket.io';
@@ -28,21 +30,8 @@ export class SocketManager {
                 console.log(message);
             });
 
-            socket.on('launchGame', (data: { gameData: GameData; username: string }) => {
-                joinedRoomName = data.gameData.id + data.username + socket.id;
-                console.log('launchGame called with ' + joinedRoomName);
-                socket.join(joinedRoomName);
-                if (socket.rooms.has(joinedRoomName)) {
-                    this.sio.to(joinedRoomName).emit('matchJoined', 'User:' + data.username + 'has joined the game with id #' + data.gameData.id);
-                    socket.data = data;
-                    for (const room of socket.rooms) {
-                        console.log('gameData saved for room: ' + room);
-                    }
-
-                    for (const key in socket.data) {
-                        console.log(`${key}: ${socket.data[key]}`);
-                    }
-                }
+            socket.on('registerGameData', (data: { gameData: GameData }) => {
+                socket.data = data;
             });
 
             socket.on('validateDifference', (data: { foundDifferences: boolean[]; position: Vector2 }) => {
@@ -80,14 +69,60 @@ export class SocketManager {
                 console.log(`Raison de deconnexion : ${reason}`);
             });
 
-            socket.on('createGame', (data) => {
+            // Matchmaking sockets
+            socket.on('createMatch', (data) => {
                 console.log('Creating game (id ' + data.gameId + ')');
-                this.matchManagerService.createMatch(data.gameId, socket.id);
+                const newMatchId = this.matchManagerService.createMatch(data.gameId, socket.id).matchId;
+                joinMatchRoom({ matchId: newMatchId });
+                sendGameMatchProgressUpdate({ gameId: data.gameId, matchToJoinIfAvailable: newMatchId });
+            });
+
+            // User requests to set the current match type
+            socket.on('setMatchType', (data: { matchId: string; matchType: MatchType }) => {
+                this.matchManagerService.setMatchType(data.matchId, data.matchType);
+
+                sendMatchUpdate({ matchId: data.matchId });
+            });
+
+            socket.on('setMatchPlayer', (data: { matchId: string; player: Player }) => {
+                this.matchManagerService.setMatchPlayer(data.matchId, data.player);
+
+                sendMatchUpdate({ matchId: data.matchId });
+            });
+
+            // this will simply connect the sockets to the match room
+            // but will not set the player (the host needs to accept the player first)
+            // we do this so that the actual join request can be sent to the correct room
+            socket.on('joinRoom', (data: { matchId: string }) => {
+                joinMatchRoom(data);
+            });
+
+            socket.on('requestToJoinMatch', (data: { matchId: string; player: Player }) => {
+                socket.to(data.matchId).emit('incomingPlayerRequest', data.player); // send the request to the host
+            });
+
+            socket.on('sendIncomingPlayerRequestAnswer', (data: { matchId: string; player: Player; accepted: boolean }) => {
+                this.sio.to(data.matchId).emit('incomingPlayerRequestAnswer', data);
+            });
+
+            const joinMatchRoom = (data: { matchId: string }) => {
+                joinedRoomName = data.matchId;
+                socket.join(joinedRoomName);
+                if (socket.rooms.has(joinedRoomName)) {
+                    this.sio.to(joinedRoomName).emit('matchJoined', 'User:' + socket.id + 'has joined the match');
+                }
+            };
+
+            const sendMatchUpdate = (data: { matchId: string }) => {
+                this.sio.to(data.matchId).emit('gameProgressUpdate', this.matchManagerService.getMatchById(data.matchId));
+            };
+
+            const sendGameMatchProgressUpdate = (data: { gameId: string; matchToJoinIfAvailable: string | null }) => {
                 this.sio.emit('gameProgressUpdate', {
                     gameId: data.gameId,
-                    isGameInProgress: true,
+                    matchToJoinIfAvailable: data.matchToJoinIfAvailable,
                 });
-            });
+            };
         });
     }
 

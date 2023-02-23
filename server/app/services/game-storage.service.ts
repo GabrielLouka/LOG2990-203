@@ -66,7 +66,13 @@ export class GameStorageService {
         return this.collection.deleteMany({});
     }
 
-    async getGamesInPage(pageNbr: number) {
+    async getGamesInPage(pageNbr: number): Promise<
+        {
+            gameData: GameData;
+            originalImage: Buffer;
+            matchToJoinIfAvailable: string | null;
+        }[]
+    > {
         // checks if the number of games available for one page is under four
         const skipNbr = pageNbr * R_ONLY.gamesLimit;
         const nextGames = await this.collection.find<GameData>({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
@@ -77,7 +83,7 @@ export class GameStorageService {
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
-                isGameInProgress: false,
+                matchToJoinIfAvailable: null,
             });
         }
         return gamesToReturn;

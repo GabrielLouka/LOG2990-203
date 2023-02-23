@@ -137,14 +137,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     connectSocket() {
-        if (this.socketService.isSocketAlive()) this.socketService.disconnect();
-
-        this.socketService.connect();
+        // if (this.socketService.isSocketAlive()) this.socketService.disconnect();
+        if (!this.socketService.isSocketAlive()) this.socketService.connect();
         this.addServerSocketMessagesListeners();
     }
 
     requestStartGame() {
-        this.socketService.send('launchGame', { gameData: this.game.gameData, username: this.auth.registerUserName() });
+        this.socketService.send('registerGameData', { gameData: this.game.gameData });
+        // eslint-disable-next-line no-console
+        console.log('requestStartGame ' + this.auth.getUserName());
     }
 
     addServerSocketMessagesListeners() {

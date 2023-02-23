@@ -1,23 +1,66 @@
-import { Match } from '@app/classes/match';
+/* eslint-disable no-console */
+import { Match } from '@common/match';
+import { MatchType } from '@common/match-type';
+import { Player } from '@common/player';
 import { Service } from 'typedi';
+
 @Service()
 export class MatchManagerService {
     currentMatches: Match[] = []; // current online games being played
 
-    createMatch(gameId: number, matchId: string) {
-        this.currentMatches.push(new Match(gameId, matchId));
+    // create a new match and return it
+    createMatch(gameId: number, matchId: string): Match {
+        const matchToCreate = new Match(gameId, matchId);
+        this.currentMatches.push(matchToCreate);
+
+        return matchToCreate;
     }
 
-    isMatchAvailableForGame(gameId: number) {
+    setMatchType(matchId: string, matchType: MatchType) {
+        const matchToChange = this.getMatchById(matchId);
+
+        if (matchToChange != null) {
+            matchToChange.matchType = matchType;
+            console.log('set match ' + matchId + ' type to ' + matchType);
+        }
+    }
+
+    setMatchPlayer(matchId: string, player: Player) {
+        const matchToChange = this.getMatchById(matchId);
+
+        if (matchToChange != null) {
+            if (matchToChange.player1 == null) {
+                matchToChange.player1 = player;
+                console.log('set match ' + matchId + ' player 1' + ' to ' + player);
+            } else {
+                matchToChange.player2 = player;
+                console.log('set match ' + matchId + ' player 2' + ' to ' + player);
+            }
+        } else {
+            console.log('match ' + matchId + ' not found');
+        }
+    }
+
+    getMatchById(matchId: string): Match | null {
         for (const match of this.currentMatches) {
-            if (match.gameId.toString() === gameId.toString()) {
-                // eslint-disable-next-line no-console
-                console.log('checking match ' + match.gameId);
-                if (/* match.player1 != null &&*/ match.player2 == null) return true;
+            if (match.matchId.toString() === matchId.toString()) {
+                return match;
             }
         }
+
         // eslint-disable-next-line no-console
-        console.log('number of current matches ' + this.currentMatches.length);
-        return false;
+        console.log("Couldn't find match " + matchId);
+        return null;
+    }
+
+    // if there is someone waiting for a match, return the matchId
+    // otherwise, return null
+    getMatchAvailableForGame(gameId: number): string | null {
+        for (const match of this.currentMatches) {
+            if (match.gameId.toString() === gameId.toString()) {
+                if (match.player1 != null && match.player2 == null) return match.matchId;
+            }
+        }
+        return null;
     }
 }

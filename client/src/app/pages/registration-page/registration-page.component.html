@@ -8,7 +8,7 @@
         <h1 class="title">Jeu classique</h1>
     </Section>
     <Section class="flex-row center registerContainer">
-        <form [formGroup]="registrationForm" class="flex-row register-input">
+        <form *ngIf="!usernameRegistered" [formGroup]="registrationForm" class="flex-row register-input">
             <label class="flex-row center user-title" for="input"><b>Username :</b></label>
             <input
                 name="userName"
@@ -24,7 +24,6 @@
             <button
                 class="button-style play-button no-hover"
                 (click)="registerUser()"
-                [routerLink]="['/classic', id!]"
                 [disabled]="registrationForm.invalid"
                 [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
             >
@@ -36,5 +35,12 @@
                 />
             </button>
         </form>
+        <div *ngIf="usernameRegistered">
+            <p>{{ waitingMessage }}</p>
+            <div *ngIf="incomingPlayerFound">
+                <button class="button-style play-button no-hover" (click)="acceptIncomingPlayer()">Yes</button>
+                <button class="button-style play-button no-hover" (click)="refuseIncomingPlayer()">No</button>
+            </div>
+        </div>
     </Section>
 </body>

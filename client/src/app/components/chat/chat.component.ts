@@ -18,7 +18,7 @@ export class ChatComponent {
     sentByplayer1: boolean;
     sentByPlayer2: boolean;
 
-    username = this.auth.registerUserName();
+    username = this.auth.getUserName();
 
     constructor(private auth: AuthService) {}
 

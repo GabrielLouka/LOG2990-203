@@ -49,7 +49,7 @@ describe('RegistrationPageComponent', () => {
     });
 
     it('should get the registered user name from the auth service', () => {
-        authService.registerUserName.and.returnValue('testuser');
+        authService.getUserName.and.returnValue('testuser');
         const result = component.getUser();
         expect(result).toBe('testuser');
     });
