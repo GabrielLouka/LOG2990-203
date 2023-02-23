@@ -1,0 +1,12 @@
+<div #bgModal class="bgModal center" *ngIf="displayPopUp">
+    <div class="flex-column center modal-contents">
+        <h1>{{ title }}</h1>
+        <p>
+            <strong>{{ message }}</strong>
+        </p>
+        <div class="flex-row center">
+            <button class="button-style modal-btn" (click)="hidePopUp()">{{ option1 }}</button>
+            <button class="button-style modal-btn" *ngIf="option2" (click)="hidePopUp()">{{ option2 }}</button>
+        </div>
+    </div>
+</div>
