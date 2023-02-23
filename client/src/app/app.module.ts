@@ -28,6 +28,7 @@ import { ParameterPageComponent } from './pages/parameter-page/parameter-page.co
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
+import { CreationResultModalComponent } from './components/creation-result-modal/creation-result-modal.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -56,6 +57,7 @@ import { AuthService } from './services/auth.service';
         ChatComponent,
         GameCreationPageComponent,
         GamesDisplayComponent,
+        CreationResultModalComponent,
     ],
     imports: [
         AppMaterialModule,
