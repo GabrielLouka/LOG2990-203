@@ -11,7 +11,19 @@
 
     <div class="flex-column center difference-container">
         <div class="flex-row center data-container">
-            <app-found-hints-counter [differencesFound]="differencesFound" [differencesNbr]="totalDifferences"></app-found-hints-counter>
+            <div class="hints-container">
+                <app-found-hints-counter
+                    class="hints-container"
+                    [differencesFound]="differencesFound"
+                    [differencesNbr]="totalDifferences"
+                ></app-found-hints-counter>
+                <app-found-hints-counter
+                    class="hints-container"
+                    *ngIf="mode1vs1"
+                    [differencesFound]="differencesFound"
+                    [differencesNbr]="totalDifferences"
+                ></app-found-hints-counter>
+            </div>
             <div class="timer-container">
                 <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
             </div>

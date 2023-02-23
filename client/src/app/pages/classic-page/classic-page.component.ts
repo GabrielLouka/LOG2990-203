@@ -36,6 +36,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     originalImage: File | null;
     modifiedImage: File | null;
     foundDifferences: boolean[];
+    mode1vs1: boolean = true;
     differencesFound: number = 0;
     totalDifferences: number = 0;
     gameTitle: string = '';
