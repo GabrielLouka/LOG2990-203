@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
@@ -23,8 +24,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
     @ViewChild('timerElement') timerElement: TimerComponent;
+    @ViewChild('popUpElement') popUpElement: PopUpComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
-    @ViewChild('bgModal') modal!: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -37,7 +38,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     foundDifferences: boolean[];
     differencesFound: number = 0;
     totalDifferences: number = 0;
-    title: string = '';
+    gameTitle: string = '';
+    popUpTitle: string = 'Félicitations !';
+    popUpMessage: string = 'Tu as trouvé toutes les différences. GG WP.';
+    popUpAcceptTxt: string = 'Menu Principal';
+    popUpRefuseTxt: string = 'Reprise vidéo';
+
     currentModifiedImage: Buffer;
 
     // eslint-disable-next-line max-params
@@ -68,10 +74,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     addMessageToChat(message: string) {
         this.chat.addMessage(message);
-    }
-
-    showPopUp() {
-        this.modal.nativeElement.style.display = 'flex';
     }
 
     async playErrorSound() {
@@ -107,7 +109,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                     const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
                     this.loadImagesToCanvas(img1Source, img2Source);
                     this.requestStartGame();
-                    this.title = this.game.gameData.name;
+                    this.gameTitle = this.game.gameData.name;
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -205,7 +207,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             minutesElapsed: Math.floor(this.timeInSeconds / 60),
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
         });
-        this.showPopUp();
+        this.popUpElement.showPopUp();
         this.timerElement.stopTimer();
         this.socketService.disconnect();
     }

@@ -28,7 +28,11 @@ import { ParameterPageComponent } from './pages/parameter-page/parameter-page.co
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
+<<<<<<< Updated upstream
 import { CreationResultModalComponent } from './components/creation-result-modal/creation-result-modal.component';
+=======
+import { PopUpComponent } from './components/pop-up/pop-up.component';
+>>>>>>> Stashed changes
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -57,7 +61,11 @@ import { CreationResultModalComponent } from './components/creation-result-modal
         ChatComponent,
         GameCreationPageComponent,
         GamesDisplayComponent,
+<<<<<<< Updated upstream
         CreationResultModalComponent,
+=======
+        PopUpComponent,
+>>>>>>> Stashed changes
     ],
     imports: [
         AppMaterialModule,
