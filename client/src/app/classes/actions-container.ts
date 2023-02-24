@@ -1,6 +1,7 @@
 import { ElementRef } from '@angular/core';
 import { Vector2 } from '@common/vector2';
 import { CrayonElement } from './crayon-element';
+import { EraserElement } from './eraser-element';
 import { RectangleElement } from './rectangle-element';
 import { UndoElement } from './undo-element.abstract';
 export enum Tool {
@@ -47,10 +48,19 @@ export class ActionsContainer {
             this.initialPosition = new Vector2(event.offsetX, event.offsetY);
             const modifiedPixels: Vector2[] = [];
             modifiedPixels.push(this.initialPosition);
-            if (this.selectedTool === Tool.CRAYON) {
-                this.undoActions.push(new CrayonElement(modifiedPixels, this.color));
-            } else if (this.selectedTool === Tool.RECTANGLE) {
-                this.undoActions.push(new RectangleElement(modifiedPixels, this.color));
+            switch (this.selectedTool) {
+                case Tool.CRAYON: {
+                    this.undoActions.push(new CrayonElement(modifiedPixels, this.color));
+                    break;
+                }
+                case Tool.RECTANGLE: {
+                    this.undoActions.push(new RectangleElement(modifiedPixels, this.color));
+                    break;
+                }
+                case Tool.ERASER: {
+                    this.undoActions.push(new EraserElement(modifiedPixels, 'white'));
+                    break;
+                }
             }
             this.canvas.nativeElement.addEventListener('mousemove', this.draw);
         });
@@ -83,38 +93,46 @@ export class ActionsContainer {
     }
 
     draw = (event: MouseEvent) => {
-        if (this.selectedTool === Tool.CRAYON) {
-            this.undoActions[this.undoActions.length - 1].pixels.push(new Vector2(event.offsetX, event.offsetY));
-            this.undoActions[this.undoActions.length - 1].draw(this.context);
-        } else if (this.selectedTool === Tool.RECTANGLE) {
-            const x2 = event.offsetX;
-            const y2 = event.offsetY;
+        switch (this.selectedTool) {
+            case Tool.ERASER:
+            case Tool.CRAYON: {
+                this.undoActions[this.undoActions.length - 1].pixels.push(new Vector2(event.offsetX, event.offsetY));
+                this.undoActions[this.undoActions.length - 1].draw(this.context);
+                break;
+            }
+            case Tool.RECTANGLE: {
+                const x2 = event.offsetX;
+                const y2 = event.offsetY;
 
-            // Clear the previous rectangle
-            if (this.previousRectangle) {
-                this.context.clearRect(
+                // Clear the previous rectangle
+                if (this.previousRectangle) {
+                    this.context.clearRect(
+                        this.initialPosition.x,
+                        this.initialPosition.y,
+                        this.previousRectangle.x - this.initialPosition.x,
+                        this.previousRectangle.y - this.initialPosition.y,
+                    );
+                }
+                this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(x2, y2);
+                this.undoActions[this.undoActions.length - 1].color = this.color;
+
+                this.context.beginPath();
+                this.context.fillRect(
                     this.initialPosition.x,
                     this.initialPosition.y,
-                    this.previousRectangle.x - this.initialPosition.x,
-                    this.previousRectangle.y - this.initialPosition.y,
+                    event.offsetX - this.initialPosition.x,
+                    event.offsetY - this.initialPosition.y,
                 );
-            }
-            this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(x2, y2);
-            this.undoActions[this.undoActions.length - 1].color = this.color;
 
-            this.context.beginPath();
-            this.context.fillRect(
-                this.initialPosition.x,
-                this.initialPosition.y,
-                event.offsetX - this.initialPosition.x,
-                event.offsetY - this.initialPosition.y,
-            );
+                // Store the current rectangle for next time and redraw the previous strokes ()
+                this.previousRectangle = new Vector2(x2, y2);
+                for (const action of this.undoActions) {
+                    action.draw(this.context);
+                }
 
-            // Store the current rectangle for next time and redraw the previous strokes ()
-            this.previousRectangle = new Vector2(x2, y2);
-            for (const action of this.undoActions) {
-                action.draw(this.context);
+                break;
             }
+            // No default
         }
     };
 }
