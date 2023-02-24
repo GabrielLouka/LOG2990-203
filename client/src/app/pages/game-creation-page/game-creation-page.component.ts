@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
@@ -16,12 +17,17 @@ import { Buffer } from 'buffer';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent {
+export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
     @ViewChild('input1') input1!: ElementRef;
     @ViewChild('input2') input2!: ElementRef;
     @ViewChild('resultModal') resultModal!: CreationResultModalComponent;
+    @ViewChild('drawingCanvasOne') drawingCanvasOne!: ElementRef;
+    @ViewChild('drawingCanvasTwo') drawingCanvasTwo!: ElementRef;
+    @ViewChild('colorPicker') colorPicker!: ElementRef;
+    @ViewChild('pen') pen!: ElementRef;
+    @ViewChild('rubber') rubber!: ElementRef;
 
     totalDifferences = 0;
     isEasy = true;
@@ -30,10 +36,126 @@ export class GameCreationPageComponent {
     modifiedImage: File | null;
     modifiedContainsImage = false;
     originalContainsImage = false;
+    penWidth: number = 20;
+    penColor: string = 'black';
+    penActive: boolean = false;
+    rubberActive: boolean = false;
+    isDrawing: boolean = false;
+    lastX: number;
+    lastY: number;
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
 
+    private modifiedContext: CanvasRenderingContext2D;
+
     constructor(private readonly communicationService: CommunicationService, private readonly imageManipulationService: ImageManipulationService) {}
+
+    ngAfterViewInit() {
+        const canvases = [
+            {
+                canvas: this.drawingCanvasOne.nativeElement,
+                context: null,
+            },
+            {
+                canvas: this.drawingCanvasTwo.nativeElement,
+                context: null,
+            },
+        ];
+
+        canvases.forEach(({ canvas }, index) => {
+            const context = canvas.getContext('2d')!;
+            canvases[index].context = context;
+
+            canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+            canvas.addEventListener('mousemove', (event: MouseEvent) => this.onMouseMove(event, context));
+            canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
+            canvas.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+        });
+    }
+
+    widthModification(value: boolean) {
+        if (value && this.penWidth < 20) {
+            this.penWidth++;
+        } else if (!value && this.penWidth > 1) {
+            this.penWidth--;
+        }
+        this.modifiedContext.lineWidth = this.penWidth;
+    }
+
+    colorModification() {
+        this.penColor = this.colorPicker.nativeElement.value;
+        this.modifiedContext.strokeStyle = this.penColor;
+    }
+    activatePen() {
+        if (!this.penActive || this.rubberActive) {
+            this.penActive = true;
+            this.rubberActive = false;
+            this.pen.nativeElement.style.backgroundColor = 'salmon';
+            this.rubber.nativeElement.style.backgroundColor = 'white';
+        } else if (this.penActive) {
+            this.deactivateTools();
+        }
+    }
+
+    activateRubber() {
+        if (!this.rubberActive || this.penActive) {
+            this.rubberActive = true;
+            this.penActive = false;
+            this.rubber.nativeElement.style.backgroundColor = 'salmon';
+            this.pen.nativeElement.style.backgroundColor = 'white';
+        } else if (this.rubberActive) {
+            this.deactivateTools();
+        }
+    }
+
+    deactivateTools() {
+        this.penActive = false;
+        this.rubberActive = false;
+
+        this.pen.nativeElement.style.backgroundColor = 'white';
+        this.rubber.nativeElement.style.backgroundColor = 'white';
+    }
+
+    onMouseDown(event: MouseEvent) {
+        if (!this.penActive && !this.rubberActive) return;
+
+        this.isDrawing = true;
+        this.lastX = event.offsetX;
+        this.lastY = event.offsetY;
+    }
+
+    onMouseMove(event: MouseEvent, context: CanvasRenderingContext2D) {
+        if (!this.isDrawing) return;
+
+        // const canvasElement: HTMLCanvasElement = this.drawingCanvasTwo.nativeElement;
+        // const context = canvasElement.getContext('2d')!;
+        context.lineWidth = this.penWidth;
+
+        if (this.penActive) {
+            context.strokeStyle = this.penColor;
+        }
+
+        if (this.rubberActive) {
+            context.clearRect(event.offsetX - this.penWidth / 2, event.offsetY - this.penWidth / 2, this.penWidth, this.penWidth);
+        } else {
+            context.lineCap = 'round';
+            context.beginPath();
+            context.moveTo(this.lastX, this.lastY);
+            context.lineTo(event.offsetX, event.offsetY);
+            context.stroke();
+        }
+
+        this.lastX = event.offsetX;
+        this.lastY = event.offsetY;
+    }
+
+    onMouseUp() {
+        this.isDrawing = false;
+    }
+
+    onMouseLeave() {
+        this.isDrawing = false;
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async processImage(event: any, isModified: boolean) {
@@ -66,7 +188,6 @@ export class GameCreationPageComponent {
             }
         };
     }
-
     is24BitDepthBMP = (imageBuffer: ArrayBuffer): boolean => {
         const BITMAP_TYPE_OFFSET = 28;
         const BIT_COUNT_24 = 24;

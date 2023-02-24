@@ -12,6 +12,7 @@
         <div class="flex-column center">
             <div class="canvas">
                 <canvas #originalImage width="640px" height="480px">IMAGE ORIGINALE</canvas>
+                <canvas #drawingCanvasOne class="drawing-canvas" width="640px" height="480px">CANVAS DE DESSIN</canvas>
             </div>
             <div class="flex-row picture-option">
                 <button class="button-style center" (click)="input1.click()">
@@ -24,22 +25,35 @@
                     <p>Réinitialiser image</p>
                 </button>
                 <button class="button-style center">
-                    <span class="material-symbols-outlined optionIcon center not-allowed"> drive_file_move_outline </span>
+                    <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
                 </button>
             </div>
         </div>
 
         <div class="flex-column center">
             <div class="flex-column">
-                <button class="button-style center not-allowed" title="Crayon">
+                <div class="flex-row center pen">
+                    <button class="button-style no-hover bigger">{{ this.penWidth }}</button>
+                    <div>
+                        <button class="button-style center" title="Rayon" (click)="widthModification(true)">
+                            <span class="material-symbols-outlined"> add </span>
+                        </button>
+                        <button class="button-style center" title="Rayon" (click)="widthModification(false)">
+                            <span class="material-symbols-outlined"> remove </span>
+                        </button>
+                    </div>
+                </div>
+                <button #pen class="button-style center" title="Crayon" (click)="activatePen()">
                     <span class="material-symbols-outlined optionIcon"> edit </span>
                 </button>
-                <button class="button-style center not-allowed" title="Efface"><img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" /></button>
-                <input type="color" class="button-style bigger color not-allowed" title="Couleurs" />
-                <button class="button-style center not-allowed" title="Outil rectangle">
+                <button #rubber class="button-style center" title="Efface" (click)="activateRubber()">
+                    <img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" />
+                </button>
+                <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (change)="colorModification()" />
+                <button class="button-style center" title="Outil rectangle">
                     <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
                 </button>
-                <button class="button-style center not-allowed" title="drawing swapper">
+                <button class="button-style center" title="drawing swapper">
                     <span class="material-symbols-outlined optionIcon"> swap_horiz </span>
                 </button>
             </div>
@@ -48,8 +62,8 @@
             <br />
             <br />
             <div class="reverse-control center">
-                <button class="button-style center not-allowed" title="Undo"><span class="material-symbols-outlined optionIcon"> undo </span></button>
-                <button class="button-style center not-allowed" title="Redo"><span class="material-symbols-outlined optionIcon"> redo </span></button>
+                <button class="button-style center" title="Undo"><span class="material-symbols-outlined optionIcon"> undo </span></button>
+                <button class="button-style center" title="Redo"><span class="material-symbols-outlined optionIcon"> redo </span></button>
             </div>
             <div class="image-option">
                 <button class="button-style center" (click)="bothImagesButton.click()">
@@ -70,10 +84,11 @@
         <div class="flex-column center">
             <div class="canvas">
                 <canvas #modifiedImage width="640px" height="480px">IMAGE MODIFIÉE</canvas>
+                <canvas #drawingCanvasTwo class="drawing-canvas" width="640px" height="480px">CANVAS DE DESSIN</canvas>
             </div>
             <div class="flex-row picture-option">
                 <button class="button-style center">
-                    <span class="material-symbols-outlined optionIcon not-allowed"> drive_file_move_rtl </span>
+                    <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
                 </button>
                 <button class="button-style center" (click)="input2.click()">
                     <span class="material-symbols-outlined optionIcon"> upload_file </span>
