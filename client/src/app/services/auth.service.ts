@@ -10,7 +10,7 @@ export class AuthService {
         this.userName = username;
     }
 
-    registerUserName() {
+    registeredUserName() {
         return this.userName;
     }
 }

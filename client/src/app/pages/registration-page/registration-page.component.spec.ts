@@ -11,7 +11,7 @@ describe('RegistrationPageComponent', () => {
     let authService: jasmine.SpyObj<AuthService>;
 
     beforeEach(() => {
-        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
+        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registeredUserName']);
     });
 
     beforeEach(async () => {
@@ -49,7 +49,7 @@ describe('RegistrationPageComponent', () => {
     });
 
     it('should get the registered user name from the auth service', () => {
-        authService.registerUserName.and.returnValue('testuser');
+        authService.registeredUserName.and.returnValue('testuser');
         const result = component.getUser();
         expect(result).toBe('testuser');
     });

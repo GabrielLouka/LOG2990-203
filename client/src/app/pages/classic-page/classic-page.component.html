@@ -5,13 +5,25 @@
 <body>
     <div class="flex-row center header">
         <app-quit-button></app-quit-button>
-        <h1 class="titre">{{ this.title }}</h1>
+        <h1 class="titre">{{ this.gameTitle }}</h1>
         <app-hint></app-hint>
     </div>
 
     <div class="flex-column center difference-container">
         <div class="flex-row center data-container">
-            <app-found-hints-counter [differencesFound]="differencesFound" [differencesNbr]="totalDifferences"></app-found-hints-counter>
+            <div class="hints-container">
+                <app-found-hints-counter
+                    class="hints-container"
+                    [differencesFound]="differencesFound"
+                    [differencesNbr]="totalDifferences"
+                ></app-found-hints-counter>
+                <app-found-hints-counter
+                    class="hints-container"
+                    *ngIf="mode1vs1"
+                    [differencesFound]="differencesFound"
+                    [differencesNbr]="totalDifferences"
+                ></app-found-hints-counter>
+            </div>
             <div class="timer-container">
                 <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
             </div>
@@ -28,17 +40,7 @@
     </div>
 
     <div #errorMessage class="error-message">ERREUR</div>
-
-    <div #bgModal class="bgModal center">
-        <div class="flex-column center modal-contents">
-            <h2>Félicitations !</h2>
-            <p><strong>Tu as trouvé toutes les différences. GG WP.</strong></p>
-            <div class="flex-row center">
-                <button class="button-style" routerLink="/home">Menu Principal</button>
-                <button class="button-style">Reprise Vidéo</button>
-            </div>
-        </div>
-    </div>
+    <app-pop-up #popUpElement [title]="popUpTitle" [message]="popUpMessage" [option1]="popUpAcceptTxt" [option2]="popUpRefuseTxt"></app-pop-up>
     <audio #successSound src="../../../assets/sound/success2.mp3"></audio>
     <audio #errorSound src="../../../assets/sound/fail2.mp3"></audio>
 </body>
