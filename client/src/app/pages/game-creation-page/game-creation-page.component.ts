@@ -46,8 +46,6 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
 
-    private modifiedContext: CanvasRenderingContext2D;
-
     constructor(private readonly communicationService: CommunicationService, private readonly imageManipulationService: ImageManipulationService) {}
 
     ngAfterViewInit() {
@@ -79,12 +77,10 @@ export class GameCreationPageComponent implements AfterViewInit {
         } else if (!value && this.penWidth > 1) {
             this.penWidth--;
         }
-        this.modifiedContext.lineWidth = this.penWidth;
     }
 
     colorModification() {
         this.penColor = this.colorPicker.nativeElement.value;
-        this.modifiedContext.strokeStyle = this.penColor;
     }
     activatePen() {
         if (!this.penActive || this.rubberActive) {
@@ -127,8 +123,6 @@ export class GameCreationPageComponent implements AfterViewInit {
     onMouseMove(event: MouseEvent, context: CanvasRenderingContext2D) {
         if (!this.isDrawing) return;
 
-        // const canvasElement: HTMLCanvasElement = this.drawingCanvasTwo.nativeElement;
-        // const context = canvasElement.getContext('2d')!;
         context.lineWidth = this.penWidth;
 
         if (this.penActive) {
