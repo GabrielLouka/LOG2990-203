@@ -107,7 +107,7 @@ export class ActionsContainer {
                 this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(this.previousRectangle.x, this.previousRectangle.y);
                 // const rectangle = this.undoActions[this.undoActions.length - 1].pixels;
                 // this.tempContext.fillRect(rectangle[0].x, rectangle[0].y, rectangle[1].x - rectangle[0].x, rectangle[1].y - rectangle[0].y);
-                this.undoActions[this.undoActions.length - 1].draw(this.tempContext);
+                this.undoActions[this.undoActions.length - 1].draw(this.context);
             }
         });
 
@@ -177,6 +177,9 @@ export class ActionsContainer {
 
             // Store the current rectangle for next time
             this.previousRectangle = new Vector2(x2, y2);
+            for (const action of this.undoActions) {
+                action.draw(this.context);
+            }
         }
     };
 }
