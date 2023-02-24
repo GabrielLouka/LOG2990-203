@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
 import { MatchmakingService } from '@app/services/matchmaking.service';
+import { Match } from '@common/match';
 import { MatchType } from '@common/match-type';
 import { Player } from '@common/player';
 
@@ -34,6 +35,8 @@ export class RegistrationPageComponent implements OnInit {
     ngOnInit(): void {
         this.id = this.route.snapshot.paramMap.get('id');
         this.matchmakingService.onGetJoinRequest.add(this.handleIncomingPlayerJoinRequest.bind(this));
+        this.matchmakingService.onGetJoinRequestAnswer.add(this.handleIncomingPlayerJoinRequestAnswer.bind(this));
+        this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
     }
     registerUser() {
         this.auth.registerUser(this.registrationForm.value.username as string);
@@ -44,13 +47,17 @@ export class RegistrationPageComponent implements OnInit {
             if (this.username) this.matchmakingService.setCurrentMatchPlayer(this.username);
             else window.alert('Username to register is not valid !');
             if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
-                this.router.navigate(['/classic', this.id]);
+                this.loadGamePage();
             } else {
                 this.waitingMessage = 'Waiting for an opponent...';
             }
         } else {
             this.sendMatchJoinRequest();
         }
+    }
+
+    loadGamePage() {
+        this.router.navigate(['/classic', this.id]);
     }
 
     sendMatchJoinRequest() {
@@ -64,12 +71,44 @@ export class RegistrationPageComponent implements OnInit {
         this.incomingPlayer = playerThatWantsToJoin;
     }
 
+    handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; accept: boolean }) {
+        window.alert(`Player ${data.player.username} has been ${data.accept ? 'accepted' : 'rejected'}`);
+
+        // if you've been accepted by the host
+        if (data.accept && data.player.playerId === this.matchmakingService.getCurrentSocketId()) {
+            this.loadGamePage();
+        }
+
+        // if you are the host himself and you've accepted the player
+        if (data.accept && this.matchmakingService.isHost) {
+            this.loadGamePage();
+        }
+
+        // if you are the host and you've rejected the player
+        if (!data.accept && this.matchmakingService.isHost) {
+            this.waitingMessage = 'Waiting for an opponent...';
+            this.incomingPlayerFound = false;
+            this.incomingPlayer = null;
+        }
+
+        // if you are the player and you've been rejected
+        if (!data.accept && data.player.playerId === this.matchmakingService.getCurrentSocketId()) {
+            this.router.navigate(['/']);
+        }
+    }
+
+    handleMatchUpdated(match: Match | null) {
+        if (match == null) return;
+    }
+
     acceptIncomingPlayer() {
-        window.alert('You accepted');
+        if (this.incomingPlayer == null) return;
+        this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, true);
     }
 
     refuseIncomingPlayer() {
-        window.alert('You refused');
+        if (this.incomingPlayer == null) return;
+        this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, false);
     }
 
     getUser() {

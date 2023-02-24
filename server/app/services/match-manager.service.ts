@@ -22,6 +22,7 @@ export class MatchManagerService {
         if (matchToChange != null) {
             matchToChange.matchType = matchType;
             console.log('set match ' + matchId + ' type to ' + matchType);
+            console.log('match type is now ' + this.getMatchById(matchId)?.matchType);
         }
     }
 
@@ -31,10 +32,10 @@ export class MatchManagerService {
         if (matchToChange != null) {
             if (matchToChange.player1 == null) {
                 matchToChange.player1 = player;
-                console.log('set match ' + matchId + ' player 1' + ' to ' + player);
+                console.log('set match ' + matchId + ' player 1' + ' to ' + player.username);
             } else {
                 matchToChange.player2 = player;
-                console.log('set match ' + matchId + ' player 2' + ' to ' + player);
+                console.log('set match ' + matchId + ' player 2' + ' to ' + player.username);
             }
         } else {
             console.log('match ' + matchId + ' not found');
@@ -57,7 +58,7 @@ export class MatchManagerService {
     // otherwise, return null
     getMatchAvailableForGame(gameId: number): string | null {
         for (const match of this.currentMatches) {
-            if (match.gameId.toString() === gameId.toString()) {
+            if (match.gameId.toString() === gameId.toString() && match.matchType === MatchType.OneVersusOne) {
                 if (match.player1 != null && match.player2 == null) return match.matchId;
             }
         }

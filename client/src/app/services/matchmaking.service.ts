@@ -13,6 +13,7 @@ export class MatchmakingService {
     sequence = new Observable<{ gameId: number; isGameInProgress: boolean }>();
     onMatchUpdated = new Action<Match | null>();
     onGetJoinRequest = new Action<Player>();
+    onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; accept: boolean }>();
     // if this is null, it means we are not trying to join a match
     // instead, we are creating a new one
     matchIdThatWeAreTryingToJoin: string | null = null;
@@ -20,16 +21,15 @@ export class MatchmakingService {
 
     constructor(private readonly socketService: SocketClientService) {}
 
+    get isHost() {
+        return this.matchIdThatWeAreTryingToJoin == null;
+    }
     // Start a connection to the remote server
     connectSocket() {
         if (this.socketService.isSocketAlive()) this.disconnectSocket();
 
         this.socketService.connect();
         this.handleMatchmakingEvents();
-        this.onMatchUpdated.add((match) => {
-            // eslint-disable-next-line no-console
-            console.log('Match updated : ', match);
-        });
     }
 
     handleMatchmakingEvents() {
@@ -39,6 +39,9 @@ export class MatchmakingService {
         });
         this.socketService.on('incomingPlayerRequest', (data: Player) => {
             this.onGetJoinRequest.invoke(data);
+        });
+        this.socketService.on('incomingPlayerRequestAnswer', (data: { matchId: string; player: Player; accept: boolean }) => {
+            this.onGetJoinRequestAnswer.invoke(data);
         });
     }
 
@@ -53,6 +56,8 @@ export class MatchmakingService {
     }
 
     getCurrentMatch() {
+        // eslint-disable-next-line no-console
+        console.log('current match : ', this.currentMatch);
         return this.currentMatch;
     }
 

@@ -53,10 +53,6 @@ export class SocketManager {
                 });
             });
 
-            socket.on('joinRoom', (roomName: string) => {
-                socket.join(roomName);
-            });
-
             socket.on('roomMessage', (message: string) => {
                 // Seulement un membre de la salle peut envoyer un message aux autres
                 if (socket.rooms.has(this.room)) {
@@ -114,9 +110,10 @@ export class SocketManager {
             };
 
             const sendMatchUpdate = (data: { matchId: string }) => {
-                this.sio.to(data.matchId).emit('gameProgressUpdate', this.matchManagerService.getMatchById(data.matchId));
+                this.sio.to(data.matchId).emit('matchUpdated', this.matchManagerService.getMatchById(data.matchId));
             };
 
+            // this will send information about which matches can be joined or if a new match needs to be created
             const sendGameMatchProgressUpdate = (data: { gameId: string; matchToJoinIfAvailable: string | null }) => {
                 this.sio.emit('gameProgressUpdate', {
                     gameId: data.gameId,
