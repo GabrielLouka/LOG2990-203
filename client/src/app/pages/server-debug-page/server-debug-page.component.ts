@@ -20,8 +20,10 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./server-debug-page.component.scss'],
 })
 export class ServerDebugPageComponent implements AfterViewInit {
-    @ViewChild('canvas', { static: false })
-    canvas: ElementRef<HTMLCanvasElement>;
+    @ViewChild('leftCanvas', { static: false })
+    leftCanvas: ElementRef<HTMLCanvasElement>;
+    @ViewChild('rightCanvas', { static: false })
+    rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('palette', { static: false })
     palette: ElementRef<HTMLDivElement>;
     context: CanvasRenderingContext2D;
@@ -36,6 +38,8 @@ export class ServerDebugPageComponent implements AfterViewInit {
     undoActions: UndoElement[] = [];
     actionsContainer: ActionsContainer;
     selectedTool: any;
+    leftContext: CanvasRenderingContext2D;
+    rightContext: CanvasRenderingContext2D;
     constructor(private readonly communicationService: CommunicationService) {}
     @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
@@ -46,10 +50,13 @@ export class ServerDebugPageComponent implements AfterViewInit {
         }
     }
     ngAfterViewInit(): void {
-        this.context = this.canvas.nativeElement.getContext('2d')!;
-        this.canvas.nativeElement.width = 500;
-        this.canvas.nativeElement.height = 500;
-        this.actionsContainer = new ActionsContainer(this.canvas, this.palette);
+        this.leftContext = this.leftCanvas.nativeElement.getContext('2d')!;
+        this.rightContext = this.rightCanvas.nativeElement.getContext('2d')!;
+        this.leftCanvas.nativeElement.width = 500;
+        this.leftCanvas.nativeElement.height = 500;
+        this.rightCanvas.nativeElement.width = 500;
+        this.rightCanvas.nativeElement.height = 500;
+        this.actionsContainer = new ActionsContainer(this.leftCanvas, this.rightCanvas, this.palette);
         this.selectedTool = Tool.CRAYON;
         this.setupListeners();
     }
@@ -59,7 +66,10 @@ export class ServerDebugPageComponent implements AfterViewInit {
         this.debugDisplayMessage.next('YOU PICKED: ' + this.actionsContainer.selectedTool);
     }
     setupListeners() {
-        this.canvas.nativeElement.addEventListener('mouseup', () => {
+        this.leftCanvas.nativeElement.addEventListener('mouseup', () => {
+            this.displayChangedPixels();
+        });
+        this.rightCanvas.nativeElement.addEventListener('mouseup', () => {
             this.displayChangedPixels();
         });
     }
