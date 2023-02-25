@@ -3,6 +3,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ActionsContainer, Tool } from '@app/classes/actions-container';
+import { DuplicationElement } from '@app/classes/duplication-element';
 import { UndoElement } from '@app/classes/undo-element.abstract';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
@@ -81,6 +82,19 @@ export class ServerDebugPageComponent implements AfterViewInit {
         this.actionsContainer.redo();
     }
 
+    duplicateCanvas(copyOnLeft: boolean) {
+        let squashedContext;
+        if (copyOnLeft) {
+            squashedContext = this.leftContext;
+        } else {
+            squashedContext = this.rightContext;
+        }
+
+        const duplication = new DuplicationElement(copyOnLeft);
+        duplication.loadActions(this.actionsContainer.undoActions);
+        duplication.draw(squashedContext);
+        this.actionsContainer.undoActions.push(duplication);
+    }
     displayChangedPixels() {
         let message = '';
         for (let i = 0; i < this.actionsContainer.undoActions.length; i++) {
