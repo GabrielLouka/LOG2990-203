@@ -1,12 +1,6 @@
 import { UndoElement } from './undo-element.abstract';
 
 export class EraserElement extends UndoElement {
-    undoEvent(): void {
-        throw new Error('Method not implemented.');
-    }
-    redoEvent(): void {
-        throw new Error('Method not implemented.');
-    }
     draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
         context.beginPath();
         context.strokeStyle = 'white';
