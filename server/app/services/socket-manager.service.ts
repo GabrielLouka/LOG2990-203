@@ -63,6 +63,13 @@ export class SocketManager {
             socket.on('disconnect', (reason) => {
                 console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
                 console.log(`Raison de deconnexion : ${reason}`);
+
+                // remove the player from the match they were in
+                const matchThatWasAffected = this.matchManagerService.removePlayerFromMatch(socket.id);
+                if (matchThatWasAffected) {
+                    sendMatchUpdate({ matchId: matchThatWasAffected });
+                    sendGameMatchProgressUpdate(matchThatWasAffected);
+                }
             });
 
             // Matchmaking sockets
@@ -70,7 +77,6 @@ export class SocketManager {
                 console.log('Creating game (id ' + data.gameId + ')');
                 const newMatchId = this.matchManagerService.createMatch(data.gameId, socket.id).matchId;
                 joinMatchRoom({ matchId: newMatchId });
-                sendGameMatchProgressUpdate({ gameId: data.gameId, matchToJoinIfAvailable: newMatchId });
             });
 
             // User requests to set the current match type
@@ -81,9 +87,11 @@ export class SocketManager {
             });
 
             socket.on('setMatchPlayer', (data: { matchId: string; player: Player }) => {
+                console.log('trying to set player ' + data.player.username + ' to match ' + data.matchId);
                 this.matchManagerService.setMatchPlayer(data.matchId, data.player);
 
                 sendMatchUpdate({ matchId: data.matchId });
+                sendGameMatchProgressUpdate(data.matchId);
             });
 
             // this will simply connect the sockets to the match room
@@ -97,7 +105,13 @@ export class SocketManager {
                 socket.to(data.matchId).emit('incomingPlayerRequest', data.player); // send the request to the host
             });
 
-            socket.on('sendIncomingPlayerRequestAnswer', (data: { matchId: string; player: Player; accepted: boolean }) => {
+            socket.on('sendIncomingPlayerRequestAnswer', (data: { matchId: string; player: Player; accept: boolean }) => {
+                if (data.accept) {
+                    console.log('accepted player request for ' + data.player.username + ' in match ' + data.matchId);
+                    this.matchManagerService.setMatchPlayer(data.matchId, data.player);
+                    sendGameMatchProgressUpdate(data.matchId);
+                }
+                console.log('sending request answer to ' + data.matchId + ' for player ' + data.player.username + ' : ' + data.accept);
                 this.sio.to(data.matchId).emit('incomingPlayerRequestAnswer', data);
             });
 
@@ -114,10 +128,13 @@ export class SocketManager {
             };
 
             // this will send information about which matches can be joined or if a new match needs to be created
-            const sendGameMatchProgressUpdate = (data: { gameId: string; matchToJoinIfAvailable: string | null }) => {
+            const sendGameMatchProgressUpdate = (matchId: string) => {
+                const match = this.matchManagerService.getMatchById(matchId);
+                if (match === undefined || match == null) return;
+                const matchToJoinIfAvailable = this.matchManagerService.getMatchAvailableForGame(match.gameId);
                 this.sio.emit('gameProgressUpdate', {
-                    gameId: data.gameId,
-                    matchToJoinIfAvailable: data.matchToJoinIfAvailable,
+                    gameId: match.gameId,
+                    matchToJoinIfAvailable,
                 });
             };
         });

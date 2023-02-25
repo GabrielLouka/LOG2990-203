@@ -72,8 +72,6 @@ export class RegistrationPageComponent implements OnInit {
     }
 
     handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; accept: boolean }) {
-        window.alert(`Player ${data.player.username} has been ${data.accept ? 'accepted' : 'rejected'}`);
-
         // if you've been accepted by the host
         if (data.accept && data.player.playerId === this.matchmakingService.getCurrentSocketId()) {
             this.loadGamePage();
@@ -99,6 +97,9 @@ export class RegistrationPageComponent implements OnInit {
 
     handleMatchUpdated(match: Match | null) {
         if (match == null) return;
+
+        // eslint-disable-next-line no-console
+        console.log('Match updated ! ', match);
     }
 
     acceptIncomingPlayer() {

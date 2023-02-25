@@ -42,6 +42,24 @@ export class MatchManagerService {
         }
     }
 
+    // this is called when a player disconnects
+    // if the player is in a match, remove him from the match
+    // returns the matchId of the match that was removed
+    removePlayerFromMatch(playerId: string): string | null {
+        for (const match of this.currentMatches) {
+            if (match.player1?.playerId === playerId) {
+                match.player1 = null;
+                return match.matchId;
+            }
+            if (match.player2?.playerId === playerId) {
+                match.player2 = null;
+                return match.matchId;
+            }
+        }
+
+        return null;
+    }
+
     getMatchById(matchId: string): Match | null {
         for (const match of this.currentMatches) {
             if (match.matchId.toString() === matchId.toString()) {
