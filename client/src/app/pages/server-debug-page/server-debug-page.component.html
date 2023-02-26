@@ -4,7 +4,8 @@
 <input type="file" id="browseButton2" name="imageToSend2" accept=".bmp" />
 <label for="radiusInput">Radius :</label>
 <input type="number" id="radiusInput" name="radiusInput" /> -->
-<canvas #canvas></canvas>
+<canvas #leftCanvas></canvas>
+<canvas #rightCanvas></canvas>
 <!-- <p id="gameNameField">
     GAME NAME : <input type="text" id="gameName" name="gameName" /> <button class="button" (click)="sendGameAndNameToServer()">pls Send Name</button>
 </p>
@@ -21,12 +22,16 @@
     <input type="number" id="pixelToCheckPositionY" name="pixelToCheckPositionY" />
 </p>
 <p> -->
+
 <button class="button" (click)="displayChangedPixels()">DISPLAY ALL STROKES</button>
 <button class="button" (click)="undo()">UNDO THIS KING</button>
 <button class="button" (click)="redo()">REDO THIS KING</button>
 <button class="button" (click)="selectTool('crayon')">YEAH CRAYON</button>
 <button class="button" (click)="selectTool('eraser')">ERASE THE PAIN</button>
 <button class="button" (click)="selectTool('rectangle')">GET RECT</button>
+<button class="button" (click)="switchCanvases()">SWITCHEROO</button>
+<button class="button" (click)="duplicateCanvas(false)">DUPLICATE LEFT ON RIGHT</button>
+<button class="button" (click)="duplicateCanvas(true)">DUPLICATE RIGHT ON LEFT</button>
 <div #palette>
     <div class="swatch" style="background-color: red"></div>
     <div class="swatch" style="background-color: blue"></div>
