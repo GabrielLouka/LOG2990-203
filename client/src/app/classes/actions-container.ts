@@ -95,9 +95,10 @@ export class ActionsContainer {
                 break;
             }
             case Tool.RECTANGLE: {
-                const x2 = event.offsetX;
-                const y2 = event.offsetY;
-
+                // const x2 = event.offsetX;
+                // const y2 = event.offsetY;
+                let width = event.offsetX - this.initialPosition.x;
+                let height = event.offsetY - this.initialPosition.y;
                 // Clear the previous rectangle
                 if (this.previousRectangle) {
                     activeContext.clearRect(
@@ -108,18 +109,21 @@ export class ActionsContainer {
                     );
                 }
 
-                this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(x2, y2);
-
                 activeContext.beginPath();
-                activeContext.fillRect(
-                    this.initialPosition.x,
-                    this.initialPosition.y,
-                    event.offsetX - this.initialPosition.x,
-                    event.offsetY - this.initialPosition.y,
-                );
+                if (event.shiftKey) {
+                    const size = Math.min(Math.abs(width), Math.abs(height));
+                    width = Math.sign(width) * size;
+                    height = Math.sign(height) * size;
+                }
+                activeContext.fillRect(this.initialPosition.x, this.initialPosition.y, width, height);
 
-                // Store the current rectangle for next time and redraw the previous strokes ()
-                this.previousRectangle = new Vector2(x2, y2);
+                // Store the current rectangle for next time and redraw the previous strokes
+                this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(
+                    width + this.initialPosition.x,
+                    height + this.initialPosition.y,
+                );
+                this.previousRectangle = new Vector2(width + this.initialPosition.x, height + this.initialPosition.y);
+
                 for (const action of this.undoActions) {
                     if (action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas && !(action instanceof SwitchElement)) {
                         action.draw(activeContext);
