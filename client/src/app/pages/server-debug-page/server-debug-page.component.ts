@@ -85,8 +85,8 @@ export class ServerDebugPageComponent implements AfterViewInit {
 
     switchCanvases() {
         const switchElement = new SwitchElement();
-        switchElement.loadActions(this.actionsContainer.undoActions, this.rightContext);
-        switchElement.draw(this.leftContext);
+        switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftContext, this.rightContext);
+        switchElement.draw(this.rightContext);
 
         this.actionsContainer.undoActions.push(switchElement);
     }

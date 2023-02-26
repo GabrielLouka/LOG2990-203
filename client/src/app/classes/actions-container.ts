@@ -3,6 +3,7 @@ import { Vector2 } from '@common/vector2';
 import { CrayonElement } from './crayon-element';
 import { EraserElement } from './eraser-element';
 import { RectangleElement } from './rectangle-element';
+import { SwitchElement } from './switch-element';
 import { UndoElement } from './undo-element.abstract';
 export enum Tool {
     CRAYON = 'crayon',
@@ -120,7 +121,7 @@ export class ActionsContainer {
                 // Store the current rectangle for next time and redraw the previous strokes ()
                 this.previousRectangle = new Vector2(x2, y2);
                 for (const action of this.undoActions) {
-                    if (action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas) {
+                    if (action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas && !(action instanceof SwitchElement)) {
                         action.draw(activeContext);
                     }
                 }
