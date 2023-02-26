@@ -3,7 +3,7 @@ import { UndoElement } from './undo-element.abstract';
 
 export class DuplicationElement extends UndoElement {
     actionsToCopy: UndoElement[];
-    constructor(public isLeftCanvas: boolean, public pixels: Vector2[] = [new Vector2(0, 0)]) {
+    constructor(public isLeftCanvas: boolean = true, public pixels: Vector2[] = [new Vector2(0, 0)]) {
         super(pixels, 'black', isLeftCanvas);
     }
     loadActions(actionsToCopy: UndoElement[]) {
