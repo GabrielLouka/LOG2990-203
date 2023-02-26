@@ -189,17 +189,52 @@ export class GameCreationPageComponent implements AfterViewInit {
         return dataView.getUint16(BITMAP_TYPE_OFFSET, true) === BIT_COUNT_24;
     };
 
-    resetCanvas(rightImage: boolean) {
-        const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
-        const context = this.getCanvas(rightImage);
-        context?.clearRect(0, 0, canvas.width, canvas.height);
+    resetCanvas(rightImage: boolean, isDrawingLayer: boolean) {
+        const canvasSize: HTMLCanvasElement = this.rightCanvas.nativeElement;
 
-        if (rightImage) {
-            this.input2.nativeElement.value = '';
-            this.modifiedContainsImage = false;
+        if (!isDrawingLayer) {
+            const context = this.getCanvas(rightImage);
+            context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
+
+            if (rightImage) {
+                this.input2.nativeElement.value = '';
+                this.modifiedContainsImage = false;
+            } else {
+                this.input1.nativeElement.value = '';
+                this.originalContainsImage = false;
+            }
         } else {
-            this.input1.nativeElement.value = '';
-            this.originalContainsImage = false;
+            if (!rightImage) {
+                const context = this.drawingCanvasOne.nativeElement.getContext('2d');
+                context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
+            } else {
+                const context = this.drawingCanvasTwo.nativeElement.getContext('2d');
+                context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
+            }
+        }
+    }
+
+    switchCanvas(isRight: boolean, switching: boolean) {
+        const leftDrawingCanvas: HTMLCanvasElement = this.drawingCanvasOne.nativeElement;
+        const rightDrawingCanvas: HTMLCanvasElement = this.drawingCanvasTwo.nativeElement;
+        if (!switching) {
+            if (isRight) {
+                leftDrawingCanvas.getContext('2d')?.drawImage(rightDrawingCanvas, 0, 0);
+                // this.resetCanvas(isRight, true);
+            } else {
+                rightDrawingCanvas.getContext('2d')?.drawImage(leftDrawingCanvas, 0, 0);
+                // this.resetCanvas(isRight, true);
+            }
+        } else if (switching) {
+            leftDrawingCanvas.getContext('2d')?.drawImage(rightDrawingCanvas, 0, 0);
+            this.resetCanvas(!isRight, true);
+            rightDrawingCanvas.getContext('2d')?.drawImage(leftDrawingCanvas, 0, 0);
+            this.resetCanvas(isRight, true);
+
+            rightDrawingCanvas.getContext('2d')?.drawImage(leftDrawingCanvas, 0, 0);
+            this.resetCanvas(isRight, true);
+            leftDrawingCanvas.getContext('2d')?.drawImage(rightDrawingCanvas, 0, 0);
+            this.resetCanvas(!isRight, true);
         }
     }
 

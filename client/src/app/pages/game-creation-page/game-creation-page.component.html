@@ -20,31 +20,36 @@
                     Ajouter une image
                 </button>
                 <input #input1 type="file" class="display" accept="image/bmp" (input)="processImage($event, false)" />
-                <button class="button-style center" (click)="resetCanvas(false)">
+                <button class="button-style center" (click)="resetCanvas(false, false)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>
                 </button>
-                <button class="button-style center">
-                    <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
-                </button>
+                <div class="flex-row">
+                    <button class="button-style center" (click)="resetCanvas(false, true)">
+                        <span class="material-symbols-outlined optionIcon center"> delete </span>
+                    </button>
+                    <button class="button-style center" (click)="switchCanvas(false, false)">
+                        <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
+                    </button>
+                </div>
             </div>
         </div>
 
         <div class="flex-column center">
             <div class="flex-column">
-                <div class="flex-row center pen">
+                <div class="flex-row center penWidth">
                     <button class="button-style no-hover bigger">{{ this.penWidth }}</button>
                     <div>
-                        <button class="button-style center" title="Rayon" (click)="widthModification(true)">
+                        <button class="button-style center" title="Augmenter rayon" (click)="widthModification(true)">
                             <span class="material-symbols-outlined"> add </span>
                         </button>
-                        <button class="button-style center" title="Rayon" (click)="widthModification(false)">
+                        <button class="button-style center" title="Diminuer rayon" (click)="widthModification(false)">
                             <span class="material-symbols-outlined"> remove </span>
                         </button>
                     </div>
                 </div>
                 <button #pen class="button-style center" title="Crayon" (click)="activatePen()">
-                    <span class="material-symbols-outlined optionIcon"> edit </span>
+                    <span class="material-symbols-outlined optionIcon"> draw </span>
                 </button>
                 <button #rubber class="button-style center" title="Efface" (click)="activateRubber()">
                     <img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" />
@@ -53,7 +58,7 @@
                 <button class="button-style center" title="Outil rectangle">
                     <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
                 </button>
-                <button class="button-style center" title="drawing swapper">
+                <button class="button-style center" title="Inverser dessin" (click)="switchCanvas(false, true)">
                     <span class="material-symbols-outlined optionIcon"> swap_horiz </span>
                 </button>
             </div>
@@ -87,15 +92,21 @@
                 <canvas #drawingCanvasTwo class="drawing-canvas" width="640px" height="480px">CANVAS DE DESSIN</canvas>
             </div>
             <div class="flex-row picture-option">
-                <button class="button-style center">
-                    <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
-                </button>
+                <div class="flex-row">
+                    <button class="button-style center" (click)="switchCanvas(true, false)">
+                        <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
+                    </button>
+
+                    <button class="button-style center" (click)="resetCanvas(true, true)">
+                        <span class="material-symbols-outlined optionIcon center"> delete </span>
+                    </button>
+                </div>
                 <button class="button-style center" (click)="input2.click()">
                     <span class="material-symbols-outlined optionIcon"> upload_file </span>
                     Ajouter une image
                 </button>
                 <input #input2 type="file" class="display" accept="image/bmp" (input)="processImage($event, true)" />
-                <button class="button-style center" (click)="resetCanvas(true)">
+                <button class="button-style center" (click)="resetCanvas(true, false)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>
                 </button>
