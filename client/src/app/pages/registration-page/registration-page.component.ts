@@ -66,6 +66,7 @@ export class RegistrationPageComponent implements OnInit {
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
+        if (!this.matchmakingService.isHost) return;
         this.incomingPlayerFound = true;
         this.waitingMessage = `${playerThatWantsToJoin.username} wants to join your game !`;
         this.incomingPlayer = playerThatWantsToJoin;
