@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { Match } from '@common/match';
+import { MatchStatus } from '@common/match-status';
 import { MatchType } from '@common/match-type';
 import { Player } from '@common/player';
 import { Service } from 'typedi';
@@ -11,6 +12,7 @@ export class MatchManagerService {
     // create a new match and return it
     createMatch(gameId: number, matchId: string): Match {
         const matchToCreate = new Match(gameId, matchId);
+        matchToCreate.matchStatus = MatchStatus.WaitingForPlayer1;
         this.currentMatches.push(matchToCreate);
 
         return matchToCreate;
@@ -32,11 +34,17 @@ export class MatchManagerService {
         if (matchToChange != null) {
             if (matchToChange.player1 == null) {
                 matchToChange.player1 = player;
+                if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer1) matchToChange.matchStatus = MatchStatus.WaitingForPlayer2;
                 console.log('set match ' + matchId + ' player 1' + ' to ' + player.username);
             } else {
                 matchToChange.player2 = player;
+                if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer2) matchToChange.matchStatus = MatchStatus.InProgress;
                 console.log('set match ' + matchId + ' player 2' + ' to ' + player.username);
             }
+
+            // if (matchToChange.player1 != null && matchToChange.player2 != null) {
+            //     matchToChange.matchStatus = MatchStatus.InProgress;
+            // }
         } else {
             console.log('match ' + matchId + ' not found');
         }
@@ -46,18 +54,26 @@ export class MatchManagerService {
     // if the player is in a match, remove him from the match
     // returns the matchId of the match that was removed
     removePlayerFromMatch(playerId: string): string | null {
+        let modifiedMatch: Match | null = null;
         for (const match of this.currentMatches) {
             if (match.player1?.playerId === playerId) {
                 match.player1 = null;
-                return match.matchId;
+                modifiedMatch = match;
+                break;
             }
             if (match.player2?.playerId === playerId) {
                 match.player2 = null;
-                return match.matchId;
+                modifiedMatch = match;
+                break;
             }
         }
 
-        return null;
+        if (modifiedMatch != null) {
+            modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+            console.log('match ' + modifiedMatch.matchId + ' status changed to ' + modifiedMatch.matchStatus.toString());
+        }
+
+        return modifiedMatch?.matchId ?? null;
     }
 
     getMatchById(matchId: string): Match | null {
@@ -77,7 +93,7 @@ export class MatchManagerService {
     getMatchAvailableForGame(gameId: number): string | null {
         for (const match of this.currentMatches) {
             if (match.gameId.toString() === gameId.toString() && match.matchType === MatchType.OneVersusOne) {
-                if (match.player1 != null && match.player2 == null) return match.matchId;
+                if (match.matchStatus === MatchStatus.WaitingForPlayer2) return match.matchId;
             }
         }
         return null;
