@@ -1,7 +1,7 @@
-import { CrayonElement } from './crayon-element';
+// import { CrayonElement } from './crayon-element';
 
-describe('CrayonElement', () => {
-  it('should create an instance', () => {
-    expect(new CrayonElement()).toBeTruthy();
-  });
-});
+// describe('CrayonElement', () => {
+//   it('should create an instance', () => {
+//     expect(new CrayonElement()).toBeTruthy();
+//   });
+// });

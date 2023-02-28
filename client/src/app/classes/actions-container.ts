@@ -135,7 +135,7 @@ export class ActionsContainer {
         }
     };
 
-    private handleMouseDown(canvas: HTMLCanvasElement, event: MouseEvent) {
+    handleMouseDown(canvas: HTMLCanvasElement, event: MouseEvent) {
         this.initialPosition = new Vector2(event.offsetX, event.offsetY);
         let currentCanvasIsLeft;
         if ((canvas.getContext('2d') as CanvasRenderingContext2D) === this.leftContext) {
@@ -164,11 +164,11 @@ export class ActionsContainer {
     }
 
     // eslint-disable-next-line no-unused-vars
-    private handleMouseUpOrOut(canvas: HTMLCanvasElement, event: MouseEvent) {
+    handleMouseUpOrOut(canvas: HTMLCanvasElement, event: MouseEvent) {
         canvas.removeEventListener('mousemove', this.draw);
-        if (this.selectedTool === Tool.RECTANGLE) {
-            this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(this.previousRectangle.x, this.previousRectangle.y);
-        }
+        // if (this.selectedTool === Tool.RECTANGLE) {
+        //     this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(this.previousRectangle.x, this.previousRectangle.y);
+        // }
         this.redoActions = [];
     }
 }
