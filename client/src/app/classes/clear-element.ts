@@ -13,9 +13,7 @@ export class ClearElement extends UndoElement {
     }
 
     draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
-        for (const action of this.actionsToCopy) {
-            action.draw(context);
-        }
+        context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         return context;
     }
 }

@@ -39,7 +39,12 @@ export class ActionsContainer {
         this.leftContext.clearRect(0, 0, this.leftCanvas.nativeElement.width, this.leftCanvas.nativeElement.height);
         this.rightContext.clearRect(0, 0, this.leftCanvas.nativeElement.width, this.leftCanvas.nativeElement.height);
         // Redraw all the previous strokes onto the canvas
-        for (let i = 0; i < this.undoActions.length - 1; i++) {
+        // const containsClear = this.undoActions.some((element) => element instanceof ClearElement);
+        const maxIndex = this.undoActions.length - 1;
+        // if (containsClear) {
+        //     maxIndex = this.undoActions.length;
+        // }
+        for (let i = 0; i < maxIndex; i++) {
             if (this.undoActions[i].isLeftCanvas) {
                 activeContext = this.leftContext;
             } else {
@@ -47,6 +52,7 @@ export class ActionsContainer {
             }
             this.undoActions[i].draw(activeContext);
         }
+
         // Update the actions array to remove the most recent stroke
         this.redoActions.push(this.undoActions.pop() as UndoElement);
     }
@@ -128,11 +134,23 @@ export class ActionsContainer {
                     height + this.initialPosition.y,
                 );
                 this.previousRectangle = new Vector2(width + this.initialPosition.x, height + this.initialPosition.y);
-
+                const classIndex = this.undoActions.findIndex((element) => element instanceof ClearElement);
+                let undoActionsCopy: UndoElement[] = [];
+                if (classIndex !== -1) {
+                    // make a copy of myArray starting from classIndex
+                    undoActionsCopy = this.undoActions.slice();
+                    this.undoActions = undoActionsCopy.slice(classIndex);
+                }
                 for (const action of this.undoActions) {
-                    if (action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas && !(action instanceof SwitchElement)) {
+                    if (
+                        action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas &&
+                        !(action instanceof SwitchElement || action instanceof ClearElement)
+                    ) {
                         action.draw(activeContext);
                     }
+                }
+                if (classIndex !== -1) {
+                    this.undoActions = undoActionsCopy;
                 }
                 break;
             }

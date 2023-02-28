@@ -88,9 +88,9 @@ export class ServerDebugPageComponent implements AfterViewInit {
         const clearElement = new ClearElement(isLeft);
         clearElement.actionsToCopy = this.actionsContainer.undoActions;
         if (isLeft) {
-            clearElement.clear(this.leftContext);
+            clearElement.draw(this.leftContext);
         } else {
-            clearElement.clear(this.rightContext);
+            clearElement.draw(this.rightContext);
         }
         this.actionsContainer.undoActions.push(clearElement);
     }
