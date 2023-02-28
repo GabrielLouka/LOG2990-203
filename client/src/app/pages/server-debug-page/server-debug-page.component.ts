@@ -3,6 +3,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ActionsContainer, Tool } from '@app/classes/actions-container';
+import { ClearElement } from '@app/classes/clear-element';
 import { DuplicationElement } from '@app/classes/duplication-element';
 import { SwitchElement } from '@app/classes/switch-element';
 import { UndoElement } from '@app/classes/undo-element.abstract';
@@ -83,6 +84,16 @@ export class ServerDebugPageComponent implements AfterViewInit {
         this.actionsContainer.redo();
     }
 
+    eraseCanvas(isLeft: boolean) {
+        const clearElement = new ClearElement(isLeft);
+        clearElement.actionsToCopy = this.actionsContainer.undoActions;
+        if (isLeft) {
+            clearElement.clear(this.leftContext);
+        } else {
+            clearElement.clear(this.rightContext);
+        }
+        this.actionsContainer.undoActions.push(clearElement);
+    }
     switchCanvases() {
         const switchElement = new SwitchElement();
         switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftContext, this.rightContext);

@@ -1,5 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { Vector2 } from '@common/vector2';
+import { ClearElement } from './clear-element';
 import { CrayonElement } from './crayon-element';
 import { EraserElement } from './eraser-element';
 import { RectangleElement } from './rectangle-element';
@@ -60,7 +61,11 @@ export class ActionsContainer {
                 } else {
                     activeContext = this.rightContext;
                 }
-                action.draw(activeContext);
+                if (!(action instanceof ClearElement)) {
+                    action.draw(activeContext);
+                } else {
+                    action.clear(activeContext);
+                }
             }
         }
     }

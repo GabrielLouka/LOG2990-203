@@ -18,15 +18,5 @@ describe('SwitchElement', () => {
             rightCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D,
         );
         switchElement.draw(leftCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D);
-
-        // duplicateCanvas.loadActions(mockActions);
-
-        // const tempCanvas = document.createElement('canvas');
-        // const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-        // tempCanvas.width = 500;
-        // tempCanvas.height = 500;
-
-        // duplicateCanvas.draw(tempContext);
     });
 });
