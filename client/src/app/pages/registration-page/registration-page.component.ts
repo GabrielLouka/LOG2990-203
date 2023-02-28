@@ -21,6 +21,7 @@ export class RegistrationPageComponent implements OnInit {
     incomingPlayerFound: boolean;
     incomingPlayer: Player | null = null;
 
+    waitingPlayers: Player[] = [];
     registrationForm = new FormGroup({
         username: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
     });
@@ -67,9 +68,19 @@ export class RegistrationPageComponent implements OnInit {
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
         if (!this.matchmakingService.isHost) return;
+
         this.incomingPlayerFound = true;
-        this.waitingMessage = `${playerThatWantsToJoin.username} wants to join your game !`;
-        this.incomingPlayer = playerThatWantsToJoin;
+        if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
+            this.waitingPlayers.push(playerThatWantsToJoin);
+        }
+
+        this.waitingMessage = 'Players in queue: ';
+        for (const player of this.waitingPlayers) {
+            this.waitingMessage += `${player.username} is waiting !\n`;
+        }
+
+        this.waitingMessage += `Do you want to play with ${this.waitingPlayers[0].username}?\n`;
+        this.incomingPlayer = this.waitingPlayers[0];
     }
 
     handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; accept: boolean }) {
@@ -84,10 +95,13 @@ export class RegistrationPageComponent implements OnInit {
         }
 
         // if you are the host and you've rejected the player
-        if (!data.accept && this.matchmakingService.isHost) {
+        if (!data.accept && this.matchmakingService.isHost && this.waitingPlayers.length >= 1) {
             this.waitingMessage = 'Waiting for an opponent...';
             this.incomingPlayerFound = false;
-            this.incomingPlayer = null;
+            this.waitingPlayers = this.waitingPlayers.splice(1, this.waitingPlayers.length);
+            if (this.waitingPlayers.length >= 1) {
+                this.handleIncomingPlayerJoinRequest(this.waitingPlayers[0]);
+            }
         }
 
         // if you are the player and you've been rejected
@@ -106,11 +120,21 @@ export class RegistrationPageComponent implements OnInit {
     acceptIncomingPlayer() {
         if (this.incomingPlayer == null) return;
         this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, true);
+        for (const player of this.waitingPlayers) {
+            if (player !== this.incomingPlayer) {
+                this.matchmakingService.sendIncomingPlayerRequestAnswer(player, false);
+            }
+        }
+        this.waitingPlayers = [this.incomingPlayer];
     }
 
     refuseIncomingPlayer() {
         if (this.incomingPlayer == null) return;
         this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, false);
+
+        // this.waitingPlayers = [];
+        // this.incomingPlayer = null;
+        // this.waitingMessage = 'Waiting for an opponent...';
     }
 
     getUser() {
