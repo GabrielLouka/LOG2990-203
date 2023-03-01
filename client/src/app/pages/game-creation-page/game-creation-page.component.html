@@ -56,7 +56,7 @@
                 </button>
                 <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (input)="colorModification()" />
 
-                <button class="button-style center" title="Outil rectangle" (click)="selectTool('rectangle')">
+                <button #rectangle class="button-style center" title="Outil rectangle" (click)="activateRectangle('rectangle')">
                     <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
                 </button>
                 <button class="button-style center" title="Inverser dessin" (click)="switchCanvases()">

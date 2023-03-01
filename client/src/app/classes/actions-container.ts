@@ -11,6 +11,7 @@ export enum Tool {
     CRAYON = 'crayon',
     RECTANGLE = 'rectangle',
     ERASER = 'eraser',
+    NONE = 'none',
 }
 
 export class ActionsContainer {
@@ -32,7 +33,7 @@ export class ActionsContainer {
         this.leftContext = leftDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rightContext = rightDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.setupListeners();
-        // this.selectedTool = Tool.CRAYON;
+        this.selectedTool = Tool.NONE;
     }
     undo() {
         let activeContext;

@@ -32,8 +32,8 @@ export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('colorPicker') colorPicker!: ElementRef;
     @ViewChild('pen') pen!: ElementRef;
     @ViewChild('rubber') rubber!: ElementRef;
+    @ViewChild('rectangle') rectangle!: ElementRef;
 
-    @HostListener('document:keydown', ['$event'])
     totalDifferences = 0;
     isEasy = true;
     enlargementRadius: number = 3;
@@ -44,7 +44,6 @@ export class GameCreationPageComponent implements AfterViewInit {
     penActive: boolean = false;
     rubberActive: boolean = false;
     penWidth: number = 20;
-    // penColor: string = 'black';
     redoActions: { pixels: Vector2[]; color: string }[] = [];
     undoActions: UndoElement[] = [];
     actionsContainer: ActionsContainer;
@@ -56,6 +55,7 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     constructor(private readonly communicationService: CommunicationService, private readonly imageManipulationService: ImageManipulationService) {}
 
+    @HostListener('document:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.ctrlKey && event.shiftKey && event.key === 'Z') {
             this.redo();
@@ -68,8 +68,6 @@ export class GameCreationPageComponent implements AfterViewInit {
         this.leftDrawingContext = this.drawingCanvasOne.nativeElement.getContext('2d')!;
         this.rightDrawingContext = this.drawingCanvasTwo.nativeElement.getContext('2d')!;
         this.actionsContainer = new ActionsContainer(this.drawingCanvasOne, this.drawingCanvasTwo);
-        this.selectedTool = Tool.CRAYON;
-        // this.setupListeners();
     }
 
     colorModification() {
@@ -87,32 +85,33 @@ export class GameCreationPageComponent implements AfterViewInit {
     }
 
     activatePen(selectedTool: string) {
-        if (!this.penActive || this.rubberActive) {
-            this.penActive = true;
-            this.rubberActive = false;
-            this.pen.nativeElement.style.backgroundColor = 'salmon';
-            this.rubber.nativeElement.style.backgroundColor = 'white';
-            this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
-        } else if (this.penActive) {
-            // this.deactivateTools();
-        }
+        this.activateTool(selectedTool, Tool.CRAYON);
     }
 
     activateRubber(selectedTool: string) {
-        if (!this.rubberActive || this.penActive) {
-            this.rubberActive = true;
-            this.penActive = false;
-            this.rubber.nativeElement.style.backgroundColor = 'salmon';
-            this.pen.nativeElement.style.backgroundColor = 'white';
-            this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
-        } else if (this.rubberActive) {
-            // this.deactivateTools();
-        }
+        this.activateTool(selectedTool, Tool.ERASER);
     }
 
-    selectTool(selectedTool: string) {
-        this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
-        // this.debugDisplayMessage.next('YOU PICKED: ' + this.actionsContainer.selectedTool);
+    activateRectangle(selectedTool: string) {
+        this.activateTool(selectedTool, Tool.RECTANGLE);
+    }
+
+    deactivateTools() {
+        this.actionsContainer.selectedTool = Tool.NONE;
+        this.pen.nativeElement.style.backgroundColor = 'white';
+        this.rubber.nativeElement.style.backgroundColor = 'white';
+        this.rectangle.nativeElement.style.backgroundColor = 'white';
+    }
+
+    activateTool(selectedTool: string, tool: Tool) {
+        if (!(this.actionsContainer.selectedTool === tool)) {
+            this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
+            this.pen.nativeElement.style.backgroundColor = tool === Tool.CRAYON ? 'salmon' : 'white';
+            this.rubber.nativeElement.style.backgroundColor = tool === Tool.ERASER ? 'salmon' : 'white';
+            this.rectangle.nativeElement.style.backgroundColor = tool === Tool.RECTANGLE ? 'salmon' : 'white';
+        } else {
+            this.deactivateTools();
+        }
     }
 
     undo() {
