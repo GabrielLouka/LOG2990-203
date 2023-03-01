@@ -106,8 +106,6 @@ export class ActionsContainer {
                 break;
             }
             case Tool.RECTANGLE: {
-                // const x2 = event.offsetX;
-                // const y2 = event.offsetY;
                 let width = event.offsetX - this.initialPosition.x;
                 let height = event.offsetY - this.initialPosition.y;
                 // Clear the previous rectangle
@@ -134,13 +132,9 @@ export class ActionsContainer {
                     height + this.initialPosition.y,
                 );
                 this.previousRectangle = new Vector2(width + this.initialPosition.x, height + this.initialPosition.y);
-                const classIndex = this.undoActions.findIndex((element) => element instanceof ClearElement);
-                let undoActionsCopy: UndoElement[] = [];
-                if (classIndex !== -1) {
-                    // make a copy of myArray starting from classIndex
-                    undoActionsCopy = this.undoActions.slice();
-                    this.undoActions = undoActionsCopy.slice(classIndex);
-                }
+                const clearIndex = this.undoActions.findIndex((element) => element instanceof ClearElement);
+                const undoActionsCopy: UndoElement[] = clearIndex !== -1 ? this.undoActions.slice() : [];
+                this.undoActions = clearIndex !== -1 ? undoActionsCopy.slice(clearIndex) : this.undoActions;
                 for (const action of this.undoActions) {
                     if (
                         action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas &&
@@ -149,9 +143,7 @@ export class ActionsContainer {
                         action.draw(activeContext);
                     }
                 }
-                if (classIndex !== -1) {
-                    this.undoActions = undoActionsCopy;
-                }
+                this.undoActions = clearIndex !== -1 ? undoActionsCopy : this.undoActions;
                 break;
             }
             // No default
