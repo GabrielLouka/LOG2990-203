@@ -3,6 +3,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ActionsContainer, Tool } from '@app/classes/actions-container';
+import { DuplicationElement } from '@app/classes/duplication-element';
 import { SwitchElement } from '@app/classes/switch-element';
 import { UndoElement } from '@app/classes/undo-element.abstract';
 import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
@@ -127,6 +128,20 @@ export class GameCreationPageComponent implements AfterViewInit {
         switchElement.draw(this.rightDrawingContext);
 
         this.actionsContainer.undoActions.push(switchElement);
+    }
+
+    duplicateCanvas(copyOnLeft: boolean) {
+        let squashedContext;
+        if (copyOnLeft) {
+            squashedContext = this.leftDrawingContext;
+        } else {
+            squashedContext = this.rightDrawingContext;
+        }
+
+        const duplication = new DuplicationElement(copyOnLeft);
+        duplication.loadActions(this.actionsContainer.undoActions);
+        duplication.draw(squashedContext);
+        this.actionsContainer.undoActions.push(duplication);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

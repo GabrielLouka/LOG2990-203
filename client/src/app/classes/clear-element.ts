@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Vector2 } from '@common/vector2';
 import { UndoElement } from './undo-element.abstract';
 
@@ -6,7 +7,7 @@ export class ClearElement extends UndoElement {
     leftContext: CanvasRenderingContext2D;
     rightContext: CanvasRenderingContext2D;
     constructor(public isLeftCanvas: boolean = true, public pixels: Vector2[] = [new Vector2(0, 0)]) {
-        super(pixels, 'black', isLeftCanvas);
+        super(pixels, isLeftCanvas, 20, 'black');
     }
     clear(context: CanvasRenderingContext2D) {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
