@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef } from '@angular/core';
 import { Vector2 } from '@common/vector2';
+import { ClearElement } from './clear-element';
 import { CrayonElement } from './crayon-element';
 import { EraserElement } from './eraser-element';
 import { RectangleElement } from './rectangle-element';
@@ -39,7 +40,12 @@ export class ActionsContainer {
         this.leftContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
         this.rightContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
         // Redraw all the previous strokes onto the canvas
-        for (let i = 0; i < this.undoActions.length - 1; i++) {
+        // const containsClear = this.undoActions.some((element) => element instanceof ClearElement);
+        const maxIndex = this.undoActions.length - 1;
+        // if (containsClear) {
+        //     maxIndex = this.undoActions.length;
+        // }
+        for (let i = 0; i < maxIndex; i++) {
             if (this.undoActions[i].isLeftCanvas) {
                 activeContext = this.leftContext;
             } else {
@@ -47,6 +53,7 @@ export class ActionsContainer {
             }
             this.undoActions[i].draw(activeContext);
         }
+
         // Update the actions array to remove the most recent stroke
         this.redoActions.push(this.undoActions.pop() as UndoElement);
     }
@@ -61,7 +68,11 @@ export class ActionsContainer {
                 } else {
                     activeContext = this.rightContext;
                 }
-                action.draw(activeContext);
+                if (!(action instanceof ClearElement)) {
+                    action.draw(activeContext);
+                } else {
+                    action.clear(activeContext);
+                }
             }
         }
     }
@@ -90,9 +101,8 @@ export class ActionsContainer {
                 break;
             }
             case Tool.RECTANGLE: {
-                const x2 = event.offsetX;
-                const y2 = event.offsetY;
-
+                let width = event.offsetX - this.initialPosition.x;
+                let height = event.offsetY - this.initialPosition.y;
                 // Clear the previous rectangle
                 if (this.previousRectangle) {
                     activeContext.clearRect(
@@ -103,30 +113,39 @@ export class ActionsContainer {
                     );
                 }
 
-                this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(x2, y2);
-
                 activeContext.beginPath();
-                activeContext.fillRect(
-                    this.initialPosition.x,
-                    this.initialPosition.y,
-                    event.offsetX - this.initialPosition.x,
-                    event.offsetY - this.initialPosition.y,
-                );
+                if (event.shiftKey) {
+                    const size = Math.min(Math.abs(width), Math.abs(height));
+                    width = Math.sign(width) * size;
+                    height = Math.sign(height) * size;
+                }
+                activeContext.fillRect(this.initialPosition.x, this.initialPosition.y, width, height);
 
-                // Store the current rectangle for next time and redraw the previous strokes ()
-                this.previousRectangle = new Vector2(x2, y2);
+                // Store the current rectangle for next time and redraw the previous strokes
+                this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(
+                    width + this.initialPosition.x,
+                    height + this.initialPosition.y,
+                );
+                this.previousRectangle = new Vector2(width + this.initialPosition.x, height + this.initialPosition.y);
+                const clearIndex = this.undoActions.findIndex((element) => element instanceof ClearElement);
+                const undoActionsCopy: UndoElement[] = clearIndex !== -1 ? this.undoActions.slice() : [];
+                this.undoActions = clearIndex !== -1 ? undoActionsCopy.slice(clearIndex) : this.undoActions;
                 for (const action of this.undoActions) {
-                    if (action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas && !(action instanceof SwitchElement)) {
+                    if (
+                        action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas &&
+                        !(action instanceof SwitchElement || action instanceof ClearElement)
+                    ) {
                         action.draw(activeContext);
                     }
                 }
+                this.undoActions = clearIndex !== -1 ? undoActionsCopy : this.undoActions;
                 break;
             }
             // No default
         }
     };
 
-    private handleMouseDown(canvas: HTMLCanvasElement, event: MouseEvent) {
+    handleMouseDown(canvas: HTMLCanvasElement, event: MouseEvent) {
         this.initialPosition = new Vector2(event.offsetX, event.offsetY);
         let currentCanvasIsLeft;
         if ((canvas.getContext('2d') as CanvasRenderingContext2D) === this.leftContext) {
@@ -155,11 +174,11 @@ export class ActionsContainer {
     }
 
     // eslint-disable-next-line no-unused-vars
-    private handleMouseUpOrOut(canvas: HTMLCanvasElement, event: MouseEvent) {
+    handleMouseUpOrOut(canvas: HTMLCanvasElement, event: MouseEvent) {
         canvas.removeEventListener('mousemove', this.draw);
-        if (this.selectedTool === Tool.RECTANGLE) {
-            this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(this.previousRectangle.x, this.previousRectangle.y);
-        }
+        // if (this.selectedTool === Tool.RECTANGLE) {
+        //     this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(this.previousRectangle.x, this.previousRectangle.y);
+        // }
         this.redoActions = [];
     }
 }
