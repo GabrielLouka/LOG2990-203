@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Vector2 } from '@common/vector2';
 import { UndoElement } from './undo-element.abstract';
 
 export class DuplicationElement extends UndoElement {
     actionsToCopy: UndoElement[];
     constructor(public isLeftCanvas: boolean = true, public pixels: Vector2[] = [new Vector2(0, 0)]) {
-        super(pixels, 'black', isLeftCanvas);
+        super(pixels, isLeftCanvas, 20, 'black');
     }
     loadActions(actionsToCopy: UndoElement[]) {
         this.actionsToCopy = actionsToCopy;

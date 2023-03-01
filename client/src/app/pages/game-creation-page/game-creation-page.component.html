@@ -28,7 +28,7 @@
                     <button class="button-style center" (click)="resetCanvas(false, true)">
                         <span class="material-symbols-outlined optionIcon center"> delete </span>
                     </button>
-                    <button class="button-style center" (click)="switchCanvas(false, false)">
+                    <button class="button-style center">
                         <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
                     </button>
                 </div>
@@ -48,17 +48,18 @@
                         </button>
                     </div>
                 </div>
-                <button #pen class="button-style center" title="Crayon" (click)="activatePen()">
+                <button #pen class="button-style center" title="Crayon" (click)="activatePen('crayon')">
                     <span class="material-symbols-outlined optionIcon"> draw </span>
                 </button>
-                <button #rubber class="button-style center" title="Efface" (click)="activateRubber()">
+                <button #rubber class="button-style center" title="Efface" (click)="activateRubber('eraser')">
                     <img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" />
                 </button>
-                <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (change)="colorModification()" />
-                <button class="button-style center" title="Outil rectangle">
+                <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (input)="colorModification()" />
+
+                <button class="button-style center" title="Outil rectangle" (click)="selectTool('rectangle')">
                     <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
                 </button>
-                <button class="button-style center" title="Inverser dessin" (click)="switchCanvas(false, true)">
+                <button class="button-style center" title="Inverser dessin" (click)="switchCanvases()">
                     <span class="material-symbols-outlined optionIcon"> swap_horiz </span>
                 </button>
             </div>
@@ -67,8 +68,12 @@
             <br />
             <br />
             <div class="reverse-control center">
-                <button class="button-style center" title="Undo"><span class="material-symbols-outlined optionIcon"> undo </span></button>
-                <button class="button-style center" title="Redo"><span class="material-symbols-outlined optionIcon"> redo </span></button>
+                <button class="button-style center" title="Undo" (click)="undo()">
+                    <span class="material-symbols-outlined optionIcon"> undo </span>
+                </button>
+                <button class="button-style center" title="Redo" (click)="redo()">
+                    <span class="material-symbols-outlined optionIcon"> redo </span>
+                </button>
             </div>
             <div class="image-option">
                 <button class="button-style center" (click)="bothImagesButton.click()">
@@ -93,7 +98,7 @@
             </div>
             <div class="flex-row picture-option">
                 <div class="flex-row">
-                    <button class="button-style center" (click)="switchCanvas(true, false)">
+                    <button class="button-style center">
                         <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
                     </button>
 

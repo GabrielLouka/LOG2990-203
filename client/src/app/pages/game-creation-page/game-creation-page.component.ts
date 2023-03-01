@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ActionsContainer, Tool } from '@app/classes/actions-container';
+import { SwitchElement } from '@app/classes/switch-element';
+import { UndoElement } from '@app/classes/undo-element.abstract';
 import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
@@ -29,6 +32,7 @@ export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('pen') pen!: ElementRef;
     @ViewChild('rubber') rubber!: ElementRef;
 
+    @HostListener('document:keydown', ['$event'])
     totalDifferences = 0;
     isEasy = true;
     enlargementRadius: number = 3;
@@ -36,119 +40,93 @@ export class GameCreationPageComponent implements AfterViewInit {
     modifiedImage: File | null;
     modifiedContainsImage = false;
     originalContainsImage = false;
-    penWidth: number = 20;
-    penColor: string = 'black';
     penActive: boolean = false;
     rubberActive: boolean = false;
-    isDrawing: boolean = false;
-    lastX: number;
-    lastY: number;
+    penWidth: number = 20;
+    // penColor: string = 'black';
+    redoActions: { pixels: Vector2[]; color: string }[] = [];
+    undoActions: UndoElement[] = [];
+    actionsContainer: ActionsContainer;
+    leftDrawingContext: CanvasRenderingContext2D;
+    rightDrawingContext: CanvasRenderingContext2D;
+    selectedTool: unknown;
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
 
     constructor(private readonly communicationService: CommunicationService, private readonly imageManipulationService: ImageManipulationService) {}
 
-    ngAfterViewInit() {
-        const canvases = [
-            {
-                canvas: this.drawingCanvasOne.nativeElement,
-                context: null,
-            },
-            {
-                canvas: this.drawingCanvasTwo.nativeElement,
-                context: null,
-            },
-        ];
-
-        canvases.forEach(({ canvas }, index) => {
-            const context = canvas.getContext('2d')!;
-            canvases[index].context = context;
-
-            canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-            canvas.addEventListener('mousemove', (event: MouseEvent) => this.onMouseMove(event, context));
-            canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-            canvas.addEventListener('mouseleave', this.onMouseLeave.bind(this));
-        });
-    }
-
-    widthModification(value: boolean) {
-        if (value && this.penWidth < 20) {
-            this.penWidth++;
-        } else if (!value && this.penWidth > 1) {
-            this.penWidth--;
+    handleKeyboardEvent(event: KeyboardEvent) {
+        if (event.ctrlKey && event.shiftKey && event.key === 'Z') {
+            this.redo();
+        } else if (event.ctrlKey && event.key === 'z') {
+            this.undo();
         }
     }
 
-    colorModification() {
-        this.penColor = this.colorPicker.nativeElement.value;
+    ngAfterViewInit(): void {
+        this.leftDrawingContext = this.drawingCanvasOne.nativeElement.getContext('2d')!;
+        this.rightDrawingContext = this.drawingCanvasTwo.nativeElement.getContext('2d')!;
+        this.actionsContainer = new ActionsContainer(this.drawingCanvasOne, this.drawingCanvasTwo);
+        this.selectedTool = Tool.CRAYON;
+        // this.setupListeners();
     }
-    activatePen() {
+
+    colorModification() {
+        this.actionsContainer.color = this.colorPicker.nativeElement.value;
+    }
+
+    widthModification(isIncremented: boolean) {
+        if (isIncremented && this.actionsContainer.penWidth < 20) {
+            this.penWidth++;
+            this.actionsContainer.penWidth = this.penWidth;
+        } else if (!isIncremented && this.actionsContainer.penWidth > 1) {
+            this.penWidth--;
+            this.actionsContainer.penWidth = this.penWidth;
+        }
+    }
+
+    activatePen(selectedTool: string) {
         if (!this.penActive || this.rubberActive) {
             this.penActive = true;
             this.rubberActive = false;
             this.pen.nativeElement.style.backgroundColor = 'salmon';
             this.rubber.nativeElement.style.backgroundColor = 'white';
+            this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
         } else if (this.penActive) {
-            this.deactivateTools();
+            // this.deactivateTools();
         }
     }
 
-    activateRubber() {
+    activateRubber(selectedTool: string) {
         if (!this.rubberActive || this.penActive) {
             this.rubberActive = true;
             this.penActive = false;
             this.rubber.nativeElement.style.backgroundColor = 'salmon';
             this.pen.nativeElement.style.backgroundColor = 'white';
+            this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
         } else if (this.rubberActive) {
-            this.deactivateTools();
+            // this.deactivateTools();
         }
     }
 
-    deactivateTools() {
-        this.penActive = false;
-        this.rubberActive = false;
-
-        this.pen.nativeElement.style.backgroundColor = 'white';
-        this.rubber.nativeElement.style.backgroundColor = 'white';
+    selectTool(selectedTool: string) {
+        this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
+        // this.debugDisplayMessage.next('YOU PICKED: ' + this.actionsContainer.selectedTool);
     }
 
-    onMouseDown(event: MouseEvent) {
-        if (!this.penActive && !this.rubberActive) return;
-
-        this.isDrawing = true;
-        this.lastX = event.offsetX;
-        this.lastY = event.offsetY;
+    undo() {
+        this.actionsContainer.undo();
+    }
+    redo() {
+        this.actionsContainer.redo();
     }
 
-    onMouseMove(event: MouseEvent, context: CanvasRenderingContext2D) {
-        if (!this.isDrawing) return;
+    switchCanvases() {
+        const switchElement = new SwitchElement();
+        switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftDrawingContext, this.rightDrawingContext);
+        switchElement.draw(this.rightDrawingContext);
 
-        context.lineWidth = this.penWidth;
-
-        if (this.penActive) {
-            context.strokeStyle = this.penColor;
-        }
-
-        if (this.rubberActive) {
-            context.clearRect(event.offsetX - this.penWidth / 2, event.offsetY - this.penWidth / 2, this.penWidth, this.penWidth);
-        } else {
-            context.lineCap = 'round';
-            context.beginPath();
-            context.moveTo(this.lastX, this.lastY);
-            context.lineTo(event.offsetX, event.offsetY);
-            context.stroke();
-        }
-
-        this.lastX = event.offsetX;
-        this.lastY = event.offsetY;
-    }
-
-    onMouseUp() {
-        this.isDrawing = false;
-    }
-
-    onMouseLeave() {
-        this.isDrawing = false;
+        this.actionsContainer.undoActions.push(switchElement);
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -211,30 +189,6 @@ export class GameCreationPageComponent implements AfterViewInit {
                 const context = this.drawingCanvasTwo.nativeElement.getContext('2d');
                 context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
             }
-        }
-    }
-
-    switchCanvas(isRight: boolean, switching: boolean) {
-        const leftDrawingCanvas: HTMLCanvasElement = this.drawingCanvasOne.nativeElement;
-        const rightDrawingCanvas: HTMLCanvasElement = this.drawingCanvasTwo.nativeElement;
-        if (!switching) {
-            if (isRight) {
-                leftDrawingCanvas.getContext('2d')?.drawImage(rightDrawingCanvas, 0, 0);
-                // this.resetCanvas(isRight, true);
-            } else {
-                rightDrawingCanvas.getContext('2d')?.drawImage(leftDrawingCanvas, 0, 0);
-                // this.resetCanvas(isRight, true);
-            }
-        } else if (switching) {
-            leftDrawingCanvas.getContext('2d')?.drawImage(rightDrawingCanvas, 0, 0);
-            this.resetCanvas(!isRight, true);
-            rightDrawingCanvas.getContext('2d')?.drawImage(leftDrawingCanvas, 0, 0);
-            this.resetCanvas(isRight, true);
-
-            rightDrawingCanvas.getContext('2d')?.drawImage(leftDrawingCanvas, 0, 0);
-            this.resetCanvas(isRight, true);
-            leftDrawingCanvas.getContext('2d')?.drawImage(rightDrawingCanvas, 0, 0);
-            this.resetCanvas(!isRight, true);
         }
     }
 

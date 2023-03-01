@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef } from '@angular/core';
 import { Vector2 } from '@common/vector2';
 import { CrayonElement } from './crayon-element';
@@ -18,25 +19,25 @@ export class ActionsContainer {
     rightContext: CanvasRenderingContext2D;
     currentCanvasIsLeft: boolean;
     color: string = 'black';
+    penWidth: number = 20;
     selectedTool: Tool;
     initialPosition: Vector2;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     previousRectangle: Vector2;
     constructor(
-        public leftCanvas: ElementRef<HTMLCanvasElement>,
-        public rightCanvas: ElementRef<HTMLCanvasElement>,
-        public palette: ElementRef<HTMLDivElement>,
+        public leftDrawingCanvas: ElementRef<HTMLCanvasElement>,
+        public rightDrawingCanvas: ElementRef<HTMLCanvasElement>, // public palette: ElementRef<HTMLDivElement>,
     ) {
-        this.leftContext = leftCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
-        this.rightContext = rightCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.leftContext = leftDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
+        this.rightContext = rightDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.setupListeners();
-        this.selectedTool = Tool.CRAYON;
+        // this.selectedTool = Tool.CRAYON;
     }
     undo() {
         let activeContext;
 
-        this.leftContext.clearRect(0, 0, this.leftCanvas.nativeElement.width, this.leftCanvas.nativeElement.height);
-        this.rightContext.clearRect(0, 0, this.leftCanvas.nativeElement.width, this.leftCanvas.nativeElement.height);
+        this.leftContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
+        this.rightContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
         // Redraw all the previous strokes onto the canvas
         for (let i = 0; i < this.undoActions.length - 1; i++) {
             if (this.undoActions[i].isLeftCanvas) {
@@ -66,20 +67,14 @@ export class ActionsContainer {
     }
 
     setupListeners() {
-        this.leftCanvas.nativeElement.addEventListener('mousedown', this.handleMouseDown.bind(this, this.leftCanvas.nativeElement));
-        this.leftCanvas.nativeElement.addEventListener('mouseup', this.handleMouseUpOrOut.bind(this, this.leftCanvas.nativeElement));
-        this.leftCanvas.nativeElement.addEventListener('mouseout', this.handleMouseUpOrOut.bind(this, this.leftCanvas.nativeElement));
-        this.rightCanvas.nativeElement.addEventListener('mousedown', this.handleMouseDown.bind(this, this.rightCanvas.nativeElement));
-        this.rightCanvas.nativeElement.addEventListener('mouseup', this.handleMouseUpOrOut.bind(this, this.rightCanvas.nativeElement));
-        this.rightCanvas.nativeElement.addEventListener('mouseout', this.handleMouseUpOrOut.bind(this, this.rightCanvas.nativeElement));
-        const swatches = this.palette.nativeElement.querySelectorAll('.swatch');
-        swatches.forEach((swatch) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            swatch.addEventListener('click', (event: any) => {
-                this.color = event.target.style.backgroundColor;
-            });
-        });
+        this.leftDrawingCanvas.nativeElement.addEventListener('mousedown', this.handleMouseDown.bind(this, this.leftDrawingCanvas.nativeElement));
+        this.leftDrawingCanvas.nativeElement.addEventListener('mouseup', this.handleMouseUpOrOut.bind(this, this.leftDrawingCanvas.nativeElement));
+        this.leftDrawingCanvas.nativeElement.addEventListener('mouseout', this.handleMouseUpOrOut.bind(this, this.leftDrawingCanvas.nativeElement));
+        this.rightDrawingCanvas.nativeElement.addEventListener('mousedown', this.handleMouseDown.bind(this, this.rightDrawingCanvas.nativeElement));
+        this.rightDrawingCanvas.nativeElement.addEventListener('mouseup', this.handleMouseUpOrOut.bind(this, this.rightDrawingCanvas.nativeElement));
+        this.rightDrawingCanvas.nativeElement.addEventListener('mouseout', this.handleMouseUpOrOut.bind(this, this.rightDrawingCanvas.nativeElement));
     }
+
     draw = (event: MouseEvent) => {
         let activeContext: CanvasRenderingContext2D;
         if (this.undoActions[this.undoActions.length - 1].isLeftCanvas) {
@@ -143,15 +138,15 @@ export class ActionsContainer {
         modifiedPixels.push(this.initialPosition);
         switch (this.selectedTool) {
             case Tool.CRAYON: {
-                this.undoActions.push(new CrayonElement(modifiedPixels, this.color, currentCanvasIsLeft));
+                this.undoActions.push(new CrayonElement(modifiedPixels, currentCanvasIsLeft, this.penWidth, this.color));
                 break;
             }
             case Tool.RECTANGLE: {
-                this.undoActions.push(new RectangleElement(modifiedPixels, this.color, currentCanvasIsLeft));
+                this.undoActions.push(new RectangleElement(modifiedPixels, currentCanvasIsLeft, this.penWidth, this.color));
                 break;
             }
             case Tool.ERASER: {
-                this.undoActions.push(new EraserElement(modifiedPixels, 'white', currentCanvasIsLeft));
+                this.undoActions.push(new EraserElement(modifiedPixels, currentCanvasIsLeft, this.penWidth));
                 break;
             }
         }

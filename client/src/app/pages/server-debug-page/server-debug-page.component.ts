@@ -58,7 +58,7 @@ export class ServerDebugPageComponent implements AfterViewInit {
         this.leftCanvas.nativeElement.height = 500;
         this.rightCanvas.nativeElement.width = 500;
         this.rightCanvas.nativeElement.height = 500;
-        this.actionsContainer = new ActionsContainer(this.leftCanvas, this.rightCanvas, this.palette);
+        // this.actionsContainer = new ActionsContainer(this.leftCanvas, this.rightCanvas, black);
         this.selectedTool = Tool.CRAYON;
         this.setupListeners();
     }
