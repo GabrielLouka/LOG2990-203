@@ -8,6 +8,9 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 export class PopUpComponent {
     @Input() username: string = '';
     @ViewChild('bgModal') modal!: ElementRef;
+    @ViewChild('button1') option1Btn!: ElementRef;
+    @ViewChild('button2') option2Btn!: ElementRef;
+
     popUpInfo: {
         title: string;
         message: string;
@@ -51,5 +54,9 @@ export class PopUpComponent {
 
     hidePopUp() {
         this.displayPopUp = false;
+    }
+    // TODO When a player quits it needs to make other player win
+    isQuitting() {
+        return true;
     }
 }

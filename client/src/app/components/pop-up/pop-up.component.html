@@ -13,8 +13,8 @@
                     <strong>{{ info.message }}</strong>
                 </p>
                 <div class="flex-row center">
-                    <button class="button-style modal-btn" (click)="hidePopUp()">{{ info.option1 }}</button>
-                    <button class="button-style modal-btn" *ngIf="info.option2" (click)="hidePopUp()">{{ info.option2 }}</button>
+                    <button #button1 class="button-style modal-btn" routerLink="/home" (click)="(isQuitting)">{{ info.option1 }}</button>
+                    <button #button2 class="button-style modal-btn" *ngIf="info.option2" (click)="hidePopUp()">{{ info.option2 }}</button>
                 </div>
             </div>
         </div>
