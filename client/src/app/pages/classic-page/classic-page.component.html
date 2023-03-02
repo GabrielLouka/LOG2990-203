@@ -31,8 +31,10 @@
 
     <div #bgModal class="bgModal center">
         <div class="flex-column center modal-contents">
-            <h2>Félicitations !</h2>
-            <p><strong>Tu as trouvé toutes les différences. GG WP.</strong></p>
+            <h2>{{ winScreenTitle }}</h2>
+            <p>
+                <strong>{{ winScreenMessage }}</strong>
+            </p>
             <div class="flex-row center">
                 <button class="button-style" routerLink="/home">Menu Principal</button>
                 <button class="button-style">Reprise Vidéo</button>

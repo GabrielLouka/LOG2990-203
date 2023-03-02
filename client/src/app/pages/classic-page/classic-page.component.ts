@@ -7,8 +7,11 @@ import { TimerComponent } from '@app/components/timer/timer.component';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
+import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
+import { Match } from '@common/match';
+import { MatchStatus } from '@common/match-status';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -39,6 +42,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     totalDifferences: number = 0;
     title: string = '';
     currentModifiedImage: Buffer;
+    winScreenTitle: string = 'Félicitations !';
+    winScreenMessage: string = 'Tu as trouvé toutes les différences. GG WP. !';
 
     // eslint-disable-next-line max-params
     constructor(
@@ -47,6 +52,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         private route: ActivatedRoute,
         private auth: AuthService,
         private imageManipulationService: ImageManipulationService,
+        private matchmakingService: MatchmakingService,
     ) {}
 
     get socketId() {
@@ -64,6 +70,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.connectSocket();
+        this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
     }
 
     addMessageToChat(message: string) {
@@ -83,6 +90,27 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     async playSuccessSound() {
         this.successSound.nativeElement.currentTime = 0;
         this.successSound.nativeElement.play();
+    }
+
+    handleMatchUpdate(match: Match | null) {
+        if (match !== null) {
+            // eslint-disable-next-line no-console
+            console.log('Match updated classic ' + JSON.stringify(match));
+
+            if (match.player1 == null) {
+                window.alert('Player 1 left the game');
+            } else if (match.player2 == null) {
+                window.alert('Player 2 left the game');
+            }
+
+            if (match.matchStatus === MatchStatus.Player1Win) {
+                this.showWinPopup(true);
+                this.finishGame();
+            } else if (match.matchStatus === MatchStatus.Player2Win) {
+                this.showWinPopup(false);
+                this.finishGame();
+            }
+        }
     }
 
     ngAfterViewInit(): void {
@@ -137,8 +165,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     connectSocket() {
-        // if (this.socketService.isSocketAlive()) this.socketService.disconnect();
-        if (!this.socketService.isSocketAlive()) this.socketService.connect();
+        if (!this.socketService.isSocketAlive()) window.alert('Error : socket not connected');
         this.addServerSocketMessagesListeners();
     }
 
@@ -199,15 +226,27 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         }
     }
 
-    // Called when the player wins the game
-    onWinGame() {
-        this.addMessageToChat('Damn, you are goated');
+    showWinPopup(player1Win: boolean) {
+        this.winScreenTitle = player1Win ? 'Le joueur 1 a gagné' : 'Le joueur 2 a gagné';
+        this.winScreenMessage = player1Win
+            ? this.matchmakingService.getCurrentMatch()?.player1?.username + ' remporte la partie. Nice !'
+            : this.matchmakingService.getCurrentMatch()?.player2?.username + ' remporte la partie. Excellent !';
+        this.showPopUp();
+    }
+
+    finishGame() {
+        this.timerElement.stopTimer();
+        this.socketService.disconnect();
         this.socketService.send('gameFinished', {
             minutesElapsed: Math.floor(this.timeInSeconds / 60),
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
         });
+    }
+
+    // Called when the player wins the game
+    onWinGame() {
+        this.addMessageToChat('Damn, you are goated');
+        this.finishGame();
         this.showPopUp();
-        this.timerElement.stopTimer();
-        this.socketService.disconnect();
     }
 }
