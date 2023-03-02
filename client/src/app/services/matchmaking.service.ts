@@ -49,6 +49,9 @@ export class MatchmakingService {
         this.socketService.disconnect();
         this.currentMatch = null;
         this.onMatchUpdated = new Action<Match | null>();
+        this.onGetJoinRequest = new Action<Player>();
+        this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; accept: boolean }>();
+        this.matchIdThatWeAreTryingToJoin = null;
     }
 
     getCurrentSocketId() {
@@ -70,6 +73,7 @@ export class MatchmakingService {
     joinGame(matchId: string) {
         this.socketService.send<{ matchId: string }>('joinRoom', { matchId });
         this.matchIdThatWeAreTryingToJoin = matchId;
+        this.currentMatch = null;
     }
 
     sendMatchJoinRequest(playerName: string) {
