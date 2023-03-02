@@ -41,8 +41,6 @@ export class GameCreationPageComponent implements AfterViewInit {
     modifiedImage: File | null;
     modifiedContainsImage = false;
     originalContainsImage = false;
-    penActive: boolean = false;
-    rubberActive: boolean = false;
     penWidth: number = 20;
     redoActions: { pixels: Vector2[]; color: string }[] = [];
     undoActions: UndoElement[] = [];
@@ -269,7 +267,7 @@ export class GameCreationPageComponent implements AfterViewInit {
                         };
                         this.totalDifferences = serverResult.numberOfDifferences;
                         this.isEasy = serverResult.isEasy;
-                        this.resultModal.showGameNameForm(this.totalDifferences);
+                        this.resultModal.showGameNameForm(this.totalDifferences, this.formToSendAfterServerConfirmation);
                     }
                 },
                 error: (err: HttpErrorResponse) => {

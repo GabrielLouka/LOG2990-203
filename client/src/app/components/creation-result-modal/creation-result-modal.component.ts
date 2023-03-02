@@ -51,23 +51,24 @@ export class CreationResultModalComponent {
         this.modal.nativeElement.style.display = 'none';
     }
 
-    showGameNameForm(totalDifferences: number) {
+    showGameNameForm(totalDifferences: number, gameForm: EntireGameUploadForm) {
+        this.formToSendAfterServerConfirmation = gameForm;
         if (this.isNumberOfDifferencesValid(totalDifferences)) {
             this.toggleElementVisibility(this.gameNameForm, true);
         } else {
-            // this.toggleElementVisibility(this.gameNameForm, false);
             this.toggleElementVisibility(this.errorPopupText, true);
         }
     }
 
     async sendGameNameToServer(): Promise<void> {
         const routeToSend = '/games/saveGame';
+
         this.formToSendAfterServerConfirmation.gameName = this.gameName;
 
         this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
         this.communicationService.post<EntireGameUploadForm>(this.formToSendAfterServerConfirmation, routeToSend).subscribe({
             next: (response) => {
-                const responseString = ` ${response.status} - 
+                const responseString = ` ${response.status} -
         ${response.statusText} \n`;
                 this.debugDisplayMessage.next(responseString);
                 this.closePopUp();
