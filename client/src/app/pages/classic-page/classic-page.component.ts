@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
@@ -21,7 +21,7 @@ import { BehaviorSubject } from 'rxjs';
     templateUrl: './classic-page.component.html',
     styleUrls: ['./classic-page.component.scss'],
 })
-export class ClassicPageComponent implements AfterViewInit, OnInit {
+export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('originalImage', { static: true }) leftCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
@@ -69,8 +69,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
-        this.connectSocket();
+        this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
+    }
+
+    ngOnDestroy(): void {
+        this.socketService.disconnect();
     }
 
     addMessageToChat(message: string) {
@@ -96,11 +100,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
-
-            if (match.player1 == null) {
-                window.alert('Player 1 left the game');
-            } else if (match.player2 == null) {
-                window.alert('Player 2 left the game');
+            if (match.matchStatus === MatchStatus.InProgress) {
+                if (match.player1 == null) {
+                    window.alert('Player 1 left the game');
+                } else if (match.player2 == null) {
+                    window.alert('Player 2 left the game');
+                }
             }
 
             if (match.matchStatus === MatchStatus.Player1Win) {
@@ -164,11 +169,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
 
-    connectSocket() {
-        if (!this.socketService.isSocketAlive()) window.alert('Error : socket not connected');
-        this.addServerSocketMessagesListeners();
-    }
-
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.game.gameData });
         // eslint-disable-next-line no-console
@@ -176,6 +176,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     addServerSocketMessagesListeners() {
+        if (!this.socketService.isSocketAlive()) window.alert('Error : socket not connected');
+
         this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number }) => {
             if (data.isValidated) {
                 this.foundDifferences = data.foundDifferences;
