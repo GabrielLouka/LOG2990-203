@@ -61,8 +61,8 @@ export class SocketManager {
             });
 
             socket.on('disconnect', (reason) => {
-                console.log(`Deconnexion par l'utilisateur avec id : ${socket.id}`);
-                console.log(`Raison de deconnexion : ${reason}`);
+                console.log(`Déconnexion par l'utilisateur avec id : ${socket.id}`);
+                console.log(`Raison de déconnexion : ${reason}`);
 
                 // remove the player from the match they were in
                 const matchThatWasAffected = this.matchManagerService.removePlayerFromMatch(socket.id);
