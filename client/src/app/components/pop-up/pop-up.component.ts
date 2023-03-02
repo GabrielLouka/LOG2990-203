@@ -6,12 +6,44 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
     styleUrls: ['./pop-up.component.scss'],
 })
 export class PopUpComponent {
-    @Input() title: string = '';
-    @Input() message: string = '';
-    @Input() option1: string = 'OK';
-    @Input() option2: string = '';
+    @Input() username: string = '';
     @ViewChild('bgModal') modal!: ElementRef;
+    popUpInfo: {
+        title: string;
+        message: string;
+        option1: string;
+        option2: string;
+        isConfirmation: boolean;
+        isGameOver: boolean;
+        player: string;
+    }[] = [];
     displayPopUp: boolean = true;
+
+    showConfirmationPopUp() {
+        this.popUpInfo.push({
+            title: 'VOULEZ-VOUS VRAIMENT QUITTER ?',
+            message: '',
+            option1: 'OUI',
+            option2: 'NON',
+            isConfirmation: true,
+            isGameOver: false,
+            player: `${this.username}`,
+        });
+        this.showPopUp();
+    }
+
+    showGameOverPopUp() {
+        this.popUpInfo.push({
+            title: 'FÉLICITATIONS !',
+            message: 'Vous avez trouvé toutes les différences.',
+            option1: 'Menu Principal',
+            option2: 'Reprise Vidéo',
+            isConfirmation: false,
+            isGameOver: true,
+            player: `${this.username}`,
+        });
+        this.showPopUp();
+    }
 
     showPopUp() {
         this.modal.nativeElement.style.display = 'flex';

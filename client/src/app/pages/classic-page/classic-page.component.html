@@ -4,7 +4,7 @@
 </head>
 <body>
     <div class="flex-row center header">
-        <app-quit-button></app-quit-button>
+        <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
         <app-hint></app-hint>
     </div>
@@ -40,7 +40,7 @@
     </div>
 
     <div #errorMessage class="error-message">ERREUR</div>
-    <app-pop-up #popUpElement [title]="popUpTitle" [message]="popUpMessage" [option1]="popUpAcceptTxt" [option2]="popUpRefuseTxt"></app-pop-up>
+    <app-pop-up #popUpElement></app-pop-up>
     <audio #successSound src="../../../assets/sound/success2.mp3"></audio>
     <audio #errorSound src="../../../assets/sound/fail2.mp3"></audio>
 </body>

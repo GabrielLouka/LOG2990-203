@@ -1,12 +1,22 @@
 <div #bgModal class="bgModal center" *ngIf="displayPopUp">
     <div class="flex-column center modal-contents">
-        <h1>{{ title }}</h1>
-        <p>
-            <strong>{{ message }}</strong>
-        </p>
-        <div class="flex-row center">
-            <button class="button-style modal-btn" (click)="hidePopUp()">{{ option1 }}</button>
-            <button class="button-style modal-btn" *ngIf="option2" (click)="hidePopUp()">{{ option2 }}</button>
+        <div *ngFor="let info of popUpInfo">
+            <div
+                class="center flex-column modal-contents"
+                [ngClass]="{
+                    'confirmation-modal': info.isConfirmation,
+                    'game-over-modal': info.isGameOver
+                }"
+            >
+                <h1>{{ info.title }}</h1>
+                <p>
+                    <strong>{{ info.message }}</strong>
+                </p>
+                <div class="flex-row center">
+                    <button class="button-style modal-btn" (click)="hidePopUp()">{{ info.option1 }}</button>
+                    <button class="button-style modal-btn" *ngIf="info.option2" (click)="hidePopUp()">{{ info.option2 }}</button>
+                </div>
+            </div>
         </div>
     </div>
 </div>

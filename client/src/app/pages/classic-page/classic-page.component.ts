@@ -40,11 +40,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     differencesFound: number = 0;
     totalDifferences: number = 0;
     gameTitle: string = '';
-    popUpTitle: string = 'Félicitations !';
-    popUpMessage: string = 'Tu as trouvé toutes les différences. GG WP.';
-    popUpAcceptTxt: string = 'Menu Principal';
-    popUpRefuseTxt: string = 'Reprise vidéo';
-
     currentModifiedImage: Buffer;
 
     // eslint-disable-next-line max-params
@@ -205,6 +200,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         }
     }
 
+    onQuitGame() {
+        this.popUpElement.showConfirmationPopUp();
+    }
+
     // Called when the player wins the game
     onWinGame() {
         this.chat.sendSystemMessage('Damn, you are goated');
@@ -212,7 +211,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             minutesElapsed: Math.floor(this.timeInSeconds / 60),
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
         });
-        this.popUpElement.showPopUp();
+        this.popUpElement.showGameOverPopUp();
         this.timerElement.stopTimer();
         this.socketService.disconnect();
     }
