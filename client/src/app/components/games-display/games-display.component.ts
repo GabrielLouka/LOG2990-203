@@ -60,7 +60,23 @@ export class GamesDisplayComponent implements OnInit {
             },
         });
     }
-
+    async deleteAllGames(): Promise<void> {
+        const routeToSend = '/games/deleteAllGames';
+        this.communicationService.delete(routeToSend).subscribe({
+            next: (response) => {
+                if (response.body !== null) {
+                    this.gamesNbr = 0;
+                    location.reload();
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                const responseString = `Server Error : ${err.message}`;
+                const serverResult = JSON.parse(err.error);
+                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+            },
+        });
+        this.socketService.socket.emit('deleteAllGame', { gameToDelete: true });
+    }
     async goToNextSlide() {
         this.currentPageNbr++;
         if (this.currentPageNbr > 0) {

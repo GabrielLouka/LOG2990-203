@@ -123,6 +123,12 @@ export class SocketManager {
                 console.log('sending request answer to ' + data.matchId + ' for player ' + data.player.username + ' : ' + data.accept);
                 this.sio.to(data.matchId).emit('incomingPlayerRequestAnswer', data);
             });
+            socket.on('deleteAllGame', (data) => {
+                this.sio.emit('allGameDeleted', { noGameLeft: data.deletedGames }, socket.id);
+            });
+            socket.on('deletedGame', (data) => {
+                this.sio.emit('gameDeleted', { gameDeleted: data.gameToDelete, id: data.id }, socket.id);
+            });
 
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;

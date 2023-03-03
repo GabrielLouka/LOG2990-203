@@ -87,5 +87,15 @@ export class GamesController {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
                 });
         });
+        this.router.delete('/:id', async (req: Request, res: Response) => {
+            this.gameStorageService
+                .deleteGame(req.params.id)
+                .then(() => {
+                    res.status(StatusCodes.OK).send({ body: this.gameStorageService.getGamesLength() });
+                })
+                .catch((error: Error) => {
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
+                });
+        });
     }
 }

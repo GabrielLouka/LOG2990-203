@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
 import { MatchmakingService } from '@app/services/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 import { Match } from '@common/match';
 import { MatchType } from '@common/match-type';
 import { Player } from '@common/player';
@@ -32,6 +33,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private readonly router: Router,
         private readonly matchmakingService: MatchmakingService,
+        private readonly socketService: SocketClientService,
     ) {}
 
     ngOnInit(): void {
@@ -40,6 +42,8 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchmakingService.onGetJoinCancel.add(this.handleIncomingPlayerJoinCancel.bind(this));
         this.matchmakingService.onGetJoinRequestAnswer.add(this.handleIncomingPlayerJoinRequestAnswer.bind(this));
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
+        this.signalRedirection();
+        this.signalRedirectionOneGame();
     }
 
     ngOnDestroy(): void {
@@ -110,6 +114,30 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
             this.waitingMessage = 'Waiting for an opponent...';
             this.incomingPlayer = null;
         }
+    }
+    signalRedirection() {
+        this.socketService.on('allGameDeleted', () => {
+            const pathSegments = window.location.href.split('/');
+            const lastSegment = pathSegments[pathSegments.length - 2];
+            if (lastSegment === 'registration') {
+                this.router.navigate(['/home']).then(() => {
+                    window.alert("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
+                });
+            }
+        });
+    }
+    signalRedirectionOneGame() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        this.socketService.on('gameDeleted', (data: any) => {
+            const pathSegments = window.location.href.split('/');
+            const pageName = pathSegments[pathSegments.length - 2];
+            const idPage = pathSegments[pathSegments.length - 1];
+            if (pageName === 'registration' && data.id === idPage) {
+                this.router.navigate(['/home']).then(() => {
+                    window.alert("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
+                });
+            }
+        });
     }
 
     handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; accept: boolean }) {

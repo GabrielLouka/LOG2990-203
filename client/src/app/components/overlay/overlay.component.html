@@ -3,6 +3,6 @@
     <button *ngIf="isPlayable" class="button-style" (click)="matchToJoinIfAvailable ? joinGame() : createOneVersusOneGame()">
         {{ matchToJoinIfAvailable ? 'Rejoindre' : 'Creer' }}
     </button>
-    <button *ngIf="!isPlayable" class="button-style not-allowed">Supprimer</button>
+    <button *ngIf="!isPlayable" class="button-style"(click)="deleteSelectedGame()" >Supprimer</button>
     <button *ngIf="!isPlayable" class="button-style not-allowed">Réinitialiser</button>
 </div>
