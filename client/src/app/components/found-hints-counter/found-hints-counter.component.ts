@@ -9,6 +9,6 @@ import { AuthService } from '@app/services/auth.service';
 export class FoundHintsCounterComponent {
     @Input() differencesNbr: number;
     @Input() differencesFound: number;
-    pseudo = this.auth.getUserName();
+    username = this.auth.registeredUserName();
     constructor(private auth: AuthService) {}
 }

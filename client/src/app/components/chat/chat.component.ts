@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { AuthService } from '@app/services/auth.service';
+
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
@@ -12,13 +13,10 @@ export class ChatComponent {
         username: string;
         sentByPlayer1: boolean;
         sentByPlayer2: boolean;
+        sentBySystem: boolean;
     }[] = [];
     newMessage = '';
-    text: string;
-    sentByplayer1: boolean;
-    sentByPlayer2: boolean;
-
-    username = this.auth.getUserName();
+    username = this.auth.registeredUserName();
 
     constructor(private auth: AuthService) {}
 
@@ -30,6 +28,7 @@ export class ChatComponent {
             username: `${this.username}`,
             sentByPlayer1: playerNumber === 1,
             sentByPlayer2: playerNumber === 2,
+            sentBySystem: false,
         });
         this.scrollToBottom();
         this.newMessage = '';
@@ -39,17 +38,17 @@ export class ChatComponent {
         newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
         if (newMessage === '' || newMessage === ' ' || newMessage === null) {
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
-    addMessage(message: string) {
+    sendSystemMessage(message: string) {
         this.messages.push({
             text: message,
             username: 'System',
-            sentByPlayer1: true,
+            sentByPlayer1: false,
             sentByPlayer2: false,
+            sentBySystem: true,
         });
         this.scrollToBottom();
         this.newMessage = '';

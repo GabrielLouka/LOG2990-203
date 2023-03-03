@@ -40,10 +40,17 @@
 
 .sent-by-player-1 {
   background-color: lightblue;
+  color: rgb(34, 34, 243);
 }
   
 .sent-by-player-2 {
-  background-color: lightpink;
+  background-color: rgb(246, 209, 215);
+  color: rgb(210, 91, 131);
+}
+
+.sent-by-system {
+  background-color: rgb(255, 246, 144);
+  color: rgb(255, 136, 0);
 }
   
 .message-username {

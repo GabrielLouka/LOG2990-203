@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
@@ -26,8 +27,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
     @ViewChild('timerElement') timerElement: TimerComponent;
+    @ViewChild('popUpElement') popUpElement: PopUpComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
-    @ViewChild('bgModal') modal!: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -38,9 +39,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     originalImage: File | null;
     modifiedImage: File | null;
     foundDifferences: boolean[];
+    mode1vs1: boolean = true;
     differencesFound: number = 0;
     totalDifferences: number = 0;
-    title: string = '';
+    gameTitle: string = '';
     currentModifiedImage: Buffer;
     winScreenTitle: string = 'Félicitations !';
     winScreenMessage: string = 'Tu as trouvé toutes les différences. GG WP. !';
@@ -73,12 +75,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
     }
 
-    addMessageToChat(message: string) {
-        this.chat.addMessage(message);
-    }
-
-    showPopUp() {
-        this.modal.nativeElement.style.display = 'flex';
+    sendSystemMessageToChat(message: string) {
+        this.chat.sendSystemMessage(message);
     }
 
     async playErrorSound() {
@@ -105,10 +103,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
 
             if (match.matchStatus === MatchStatus.Player1Win) {
                 this.showWinPopup(true);
-                this.finishGame();
+                this.gameOver();
             } else if (match.matchStatus === MatchStatus.Player2Win) {
                 this.showWinPopup(false);
-                this.finishGame();
+                this.gameOver();
             }
         }
     }
@@ -135,7 +133,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
                     const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
                     this.loadImagesToCanvas(img1Source, img2Source);
                     this.requestStartGame();
-                    this.title = this.game.gameData.name;
+                    this.gameTitle = this.game.gameData.name;
                 }
             },
             error: (err: HttpErrorResponse) => {
@@ -172,7 +170,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.game.gameData });
         // eslint-disable-next-line no-console
-        console.log('requestStartGame ' + this.auth.getUserName());
+        console.log('requestStartGame ' + this.auth.registeredUserName());
     }
 
     addServerSocketMessagesListeners() {
@@ -189,11 +187,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     onFindWrongDifference() {
+        const message = `Erreur par ${this.auth.registeredUserName().toUpperCase()}`;
         this.errorMessage.nativeElement.style.display = 'block';
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
         this.showErrorText();
         this.playErrorSound();
+        this.chat.sendSystemMessage(message);
     }
 
     showErrorText() {
@@ -205,9 +205,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
     }
 
     onFindDifference() {
+        const message = `Différence trouvée par ${this.auth.registeredUserName().toUpperCase()}`;
         this.differencesFound++;
         this.playSuccessSound();
         this.refreshModifiedImage();
+        this.chat.sendSystemMessage(message);
     }
 
     async refreshModifiedImage() {
@@ -231,10 +233,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
         this.winScreenMessage = player1Win
             ? this.matchmakingService.getCurrentMatch()?.player1?.username + ' remporte la partie. Nice !'
             : this.matchmakingService.getCurrentMatch()?.player2?.username + ' remporte la partie. Excellent !';
-        this.showPopUp();
     }
 
-    finishGame() {
+    gameOver() {
         this.timerElement.stopTimer();
         this.socketService.disconnect();
         this.socketService.send('gameFinished', {
@@ -242,11 +243,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit {
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
         });
     }
+    
+    onQuitGame() {
+        this.popUpElement.showConfirmationPopUp();
+    }
 
     // Called when the player wins the game
     onWinGame() {
-        this.addMessageToChat('Damn, you are goated');
-        this.finishGame();
-        this.showPopUp();
+        this.chat.sendSystemMessage('Damn, you are goated');
+        this.gameOver();
+        this.popUpElement.showGameOverPopUp();
     }
 }

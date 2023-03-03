@@ -131,13 +131,13 @@ export class RegistrationPageComponent implements OnInit {
     refuseIncomingPlayer() {
         if (this.incomingPlayer == null) return;
         this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, false);
-
+        // TODO dead code
         // this.waitingPlayers = [];
         // this.incomingPlayer = null;
         // this.waitingMessage = 'Waiting for an opponent...';
     }
 
     getUser() {
-        return this.auth.getUserName();
+        return this.auth.registeredUserName();
     }
 }

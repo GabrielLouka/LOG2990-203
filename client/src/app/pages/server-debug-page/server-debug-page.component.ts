@@ -1,5 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ActionsContainer, Tool } from '@app/classes/actions-container';
+import { ClearElement } from '@app/classes/clear-element';
+import { DuplicationElement } from '@app/classes/duplication-element';
+import { SwitchElement } from '@app/classes/switch-element';
+import { UndoElement } from '@app/classes/undo-element.abstract';
 import { CommunicationService } from '@app/services/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
@@ -9,19 +16,115 @@ import { ImageUploadResult } from '@common/image.upload.result';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
+
 @Component({
     selector: 'app-server-debug-page',
     templateUrl: './server-debug-page.component.html',
     styleUrls: ['./server-debug-page.component.scss'],
 })
-export class ServerDebugPageComponent {
+export class ServerDebugPageComponent implements AfterViewInit {
+    @ViewChild('leftCanvas', { static: false })
+    leftCanvas: ElementRef<HTMLCanvasElement>;
+    @ViewChild('rightCanvas', { static: false })
+    rightCanvas: ElementRef<HTMLCanvasElement>;
+    @ViewChild('palette', { static: false })
+    palette: ElementRef<HTMLDivElement>;
+    context: CanvasRenderingContext2D;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[];
     formToSendAfterServerConfirmation: EntireGameUploadForm;
+    actions: { pixels: Vector2[]; color: string }[] = [];
+    color: string = 'black';
+    redoActions: { pixels: Vector2[]; color: string }[] = [];
+    undoActions: UndoElement[] = [];
+    actionsContainer: ActionsContainer;
+    selectedTool: any;
+    leftContext: CanvasRenderingContext2D;
+    rightContext: CanvasRenderingContext2D;
     constructor(private readonly communicationService: CommunicationService) {}
+    @HostListener('document:keydown', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) {
+        if (event.ctrlKey && event.shiftKey && event.key === 'Z') {
+            this.redo();
+        } else if (event.ctrlKey && event.key === 'z') {
+            this.undo();
+        }
+    }
+    ngAfterViewInit(): void {
+        this.leftContext = this.leftCanvas.nativeElement.getContext('2d')!;
+        this.rightContext = this.rightCanvas.nativeElement.getContext('2d')!;
+        this.leftCanvas.nativeElement.width = 500;
+        this.leftCanvas.nativeElement.height = 500;
+        this.rightCanvas.nativeElement.width = 500;
+        this.rightCanvas.nativeElement.height = 500;
+        // this.actionsContainer = new ActionsContainer(this.leftCanvas, this.rightCanvas, black);
+        this.selectedTool = Tool.CRAYON;
+        this.setupListeners();
+    }
 
+    selectTool(selectedTool: string) {
+        this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
+        this.debugDisplayMessage.next('YOU PICKED: ' + this.actionsContainer.selectedTool);
+    }
+    setupListeners() {
+        this.leftCanvas.nativeElement.addEventListener('mouseup', () => {
+            this.displayChangedPixels();
+        });
+        this.rightCanvas.nativeElement.addEventListener('mouseup', () => {
+            this.displayChangedPixels();
+        });
+    }
+
+    undo() {
+        this.actionsContainer.undo();
+    }
+    redo() {
+        this.actionsContainer.redo();
+    }
+
+    eraseCanvas(isLeft: boolean) {
+        const clearElement = new ClearElement(isLeft);
+        clearElement.actionsToCopy = this.actionsContainer.undoActions;
+        if (isLeft) {
+            clearElement.draw(this.leftContext);
+        } else {
+            clearElement.draw(this.rightContext);
+        }
+        this.actionsContainer.undoActions.push(clearElement);
+    }
+    switchCanvases() {
+        const switchElement = new SwitchElement();
+        switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftContext, this.rightContext);
+        switchElement.draw(this.rightContext);
+
+        this.actionsContainer.undoActions.push(switchElement);
+    }
+    duplicateCanvas(copyOnLeft: boolean) {
+        let squashedContext;
+        if (copyOnLeft) {
+            squashedContext = this.leftContext;
+        } else {
+            squashedContext = this.rightContext;
+        }
+
+        const duplication = new DuplicationElement(copyOnLeft);
+        duplication.loadActions(this.actionsContainer.undoActions);
+        duplication.draw(squashedContext);
+        this.actionsContainer.undoActions.push(duplication);
+    }
+    displayChangedPixels() {
+        let message = '';
+        for (let i = 0; i < this.actionsContainer.undoActions.length; i++) {
+            message += `Stroke ${i + 1}: `;
+            for (const pixel of this.actionsContainer.undoActions[i].pixels) {
+                message += `[${pixel.x},${pixel.y}] `;
+            }
+            message += '\n';
+        }
+        this.debugDisplayMessage.next(message);
+    }
     async getGame() {
         let gameId = (document.getElementById('gameId') as HTMLInputElement).value;
         if (gameId === null || gameId === undefined || gameId === '') gameId = '0';
@@ -79,6 +182,7 @@ export class ServerDebugPageComponent {
             },
         });
     }
+
     async sendImageToServer(): Promise<void> {
         const routeToSend = '/image_processing/send-image';
         const inputValue1 = (document.getElementById('browseButton1') as HTMLInputElement).files?.[0];
@@ -216,4 +320,21 @@ export class ServerDebugPageComponent {
         const imagePreview = document.getElementById('image-preview') as HTMLImageElement;
         if (imagePreview !== null) imagePreview.src = URL.createObjectURL(new Blob([imgData]));
     }
+
+    // private redraw() {
+    //     this.clearCanvas();
+    //     for (const action of this.actions) {
+    //         this.context.beginPath();
+    //         this.context.moveTo(action.pixels[0].x, action.pixels[0].y);
+    //         this.context.strokeStyle = action.color;
+    //         for (const pixel of action.pixels) {
+    //             this.context.lineTo(pixel.x, pixel.y);
+    //             this.context.stroke();
+    //         }
+    //     }
+    // }
+
+    // private clearCanvas() {
+    //     this.context.clearRect(0, 0, this.canvas.nativeElement.width, this.canvas.nativeElement.height);
+    // }
 }
