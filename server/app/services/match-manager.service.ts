@@ -7,7 +7,11 @@ import { Service } from 'typedi';
 
 @Service()
 export class MatchManagerService {
-    currentMatches: Match[] = []; // current online games being played
+    private currentMatches: Match[] = []; // current online games being played
+
+    get matches() {
+        return this.currentMatches;
+    }
 
     // create a new match and return it
     createMatch(gameId: number, matchId: string): Match {

@@ -13,6 +13,7 @@ export class MatchmakingService {
     sequence = new Observable<{ gameId: number; isGameInProgress: boolean }>();
     onMatchUpdated = new Action<Match | null>();
     onGetJoinRequest = new Action<Player>();
+    onGetJoinCancel = new Action<string>();
     onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; accept: boolean }>();
     // if this is null, it means we are not trying to join a match
     // instead, we are creating a new one
@@ -39,6 +40,9 @@ export class MatchmakingService {
         });
         this.socketService.on('incomingPlayerRequest', (data: Player) => {
             this.onGetJoinRequest.invoke(data);
+        });
+        this.socketService.on('incomingPlayerCancel', (playerId: string) => {
+            this.onGetJoinCancel.invoke(playerId);
         });
         this.socketService.on('incomingPlayerRequestAnswer', (data: { matchId: string; player: Player; accept: boolean }) => {
             this.onGetJoinRequestAnswer.invoke(data);
@@ -70,12 +74,14 @@ export class MatchmakingService {
     }
 
     // this will ask the server to join a match but it will still be pending
+    // the sockets will be connected to the correct room, but the player will not be added to the match
     joinGame(matchId: string) {
         this.socketService.send<{ matchId: string }>('joinRoom', { matchId });
         this.matchIdThatWeAreTryingToJoin = matchId;
         this.currentMatch = null;
     }
 
+    // this is called when a player wants to join a match
     sendMatchJoinRequest(playerName: string) {
         if (this.matchIdThatWeAreTryingToJoin == null) throw new Error('matchIdThatWeAreTryingToJoin is null');
 
@@ -87,6 +93,23 @@ export class MatchmakingService {
         });
     }
 
+    // this is called when the player that wanted to join the match leaves before being accepted or rejected
+    sendMatchJoinCancel(playerName: string) {
+        if (this.matchIdThatWeAreTryingToJoin == null) throw new Error('matchIdThatWeAreTryingToJoin is null');
+
+        const matchId = this.matchIdThatWeAreTryingToJoin;
+        const player = new Player(playerName, this.getCurrentSocketId().toString());
+
+        this.socketService.send<{ matchId: string; player: Player }>('cancelJoinMatch', {
+            matchId,
+            player,
+        });
+
+        // eslint-disable-next-line no-console
+        console.log('cancel join match');
+    }
+
+    // this is called by the host player to accept or reject a player that wants to join the match
     sendIncomingPlayerRequestAnswer(player: Player, accept: boolean) {
         if (this.currentMatch == null) throw new Error('currentMatch is null');
         const matchId = this.currentMatch.matchId;
