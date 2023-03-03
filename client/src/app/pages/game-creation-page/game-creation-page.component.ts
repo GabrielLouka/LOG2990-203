@@ -34,6 +34,8 @@ export class GameCreationPageComponent implements AfterViewInit {
     @ViewChild('rubber') rubber!: ElementRef;
     @ViewChild('rectangle') rectangle!: ElementRef;
 
+    @ViewChild('combine') combine!: ElementRef;
+
     totalDifferences = 0;
     isEasy = true;
     enlargementRadius: number = 3;
@@ -220,11 +222,21 @@ export class GameCreationPageComponent implements AfterViewInit {
         return this.originalContainsImage && this.modifiedContainsImage;
     }
 
+    combineCanvases() {
+        const combineContext = this.combine.nativeElement.getContext('2d');
+
+        combineContext?.drawImage(this.leftCanvas.nativeElement, 0, 0);
+        combineContext?.drawImage(this.drawingCanvasOne.nativeElement, 0, 0);
+        this.originalImage = this.combine.nativeElement.toDataURL('image/png');
+    }
+
     async sendImageToServer(): Promise<void> {
         if (!this.canSendToServer()) {
             alert('Veuillez ajouter deux images');
             return;
         }
+
+        this.combineCanvases();
 
         this.resultModal.showPopUp();
 
