@@ -70,6 +70,11 @@ export class SocketManager {
                     sendMatchUpdate({ matchId: matchThatWasAffected });
                     sendGameMatchProgressUpdate(matchThatWasAffected);
                 }
+
+                // in case the player wasnt in a match, but had a pending join request
+                this.matchManagerService.matches.forEach((match) => {
+                    sendJoinMatchCancel(match.matchId, socket.id);
+                });
             });
 
             // Matchmaking sockets
@@ -105,6 +110,10 @@ export class SocketManager {
                 socket.to(data.matchId).emit('incomingPlayerRequest', data.player); // send the request to the host
             });
 
+            socket.on('cancelJoinMatch', (data: { matchId: string; player: Player }) => {
+                sendJoinMatchCancel(data.matchId, data.player.playerId);
+            });
+
             socket.on('sendIncomingPlayerRequestAnswer', (data: { matchId: string; player: Player; accept: boolean }) => {
                 if (data.accept) {
                     console.log('accepted player request for ' + data.player.username + ' in match ' + data.matchId);
@@ -121,6 +130,11 @@ export class SocketManager {
                 if (socket.rooms.has(joinedRoomName)) {
                     this.sio.to(joinedRoomName).emit('matchJoined', 'User:' + socket.id + 'has joined the match');
                 }
+            };
+
+            const sendJoinMatchCancel = (matchId: string, playerId: string) => {
+                socket.to(matchId).emit('incomingPlayerCancel', playerId); // send the cancellation to the host
+                console.log('cancelling join match for player id' + playerId + ' in match ' + matchId);
             };
 
             const sendMatchUpdate = (data: { matchId: string }) => {

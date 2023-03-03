@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
@@ -12,7 +12,7 @@ import { Player } from '@common/player';
     templateUrl: './registration-page.component.html',
     styleUrls: ['./registration-page.component.scss'],
 })
-export class RegistrationPageComponent implements OnInit {
+export class RegistrationPageComponent implements OnInit, OnDestroy {
     username: string | null | undefined;
     id: string | null;
     // used to determine if we should display the username field in the page
@@ -20,6 +20,7 @@ export class RegistrationPageComponent implements OnInit {
     waitingMessage: string = 'Loading';
     incomingPlayerFound: boolean;
     incomingPlayer: Player | null = null;
+    hasSentJoinRequest: boolean = false;
 
     waitingPlayers: Player[] = [];
     registrationForm = new FormGroup({
@@ -36,9 +37,15 @@ export class RegistrationPageComponent implements OnInit {
     ngOnInit(): void {
         this.id = this.route.snapshot.paramMap.get('id');
         this.matchmakingService.onGetJoinRequest.add(this.handleIncomingPlayerJoinRequest.bind(this));
+        this.matchmakingService.onGetJoinCancel.add(this.handleIncomingPlayerJoinCancel.bind(this));
         this.matchmakingService.onGetJoinRequestAnswer.add(this.handleIncomingPlayerJoinRequestAnswer.bind(this));
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
     }
+
+    ngOnDestroy(): void {
+        if (this.username && this.hasSentJoinRequest) this.matchmakingService.sendMatchJoinCancel(this.username);
+    }
+
     registerUser() {
         this.auth.registerUser(this.registrationForm.value.username as string);
         this.username = this.registrationForm.value.username;
@@ -62,6 +69,7 @@ export class RegistrationPageComponent implements OnInit {
     }
 
     sendMatchJoinRequest() {
+        this.hasSentJoinRequest = true;
         this.waitingMessage = 'Waiting for the opponent to accept...';
         if (this.username) this.matchmakingService.sendMatchJoinRequest(this.username);
     }
@@ -69,18 +77,39 @@ export class RegistrationPageComponent implements OnInit {
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
         if (!this.matchmakingService.isHost) return;
 
-        this.incomingPlayerFound = true;
         if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
             this.waitingPlayers.push(playerThatWantsToJoin);
         }
 
-        this.waitingMessage = 'Players in queue: ';
-        for (const player of this.waitingPlayers) {
-            this.waitingMessage += `${player.username} is waiting !\n`;
-        }
+        this.refreshQueueDisplay();
+    }
 
-        this.waitingMessage += `Do you want to play with ${this.waitingPlayers[0].username}?\n`;
-        this.incomingPlayer = this.waitingPlayers[0];
+    handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest: string) {
+        if (!this.matchmakingService.isHost) return;
+
+        // eslint-disable-next-line no-console
+        console.log('Player ', playerIdThatCancelledTheirJoinRequest, ' cancelled their join request');
+
+        // remove the player from the waiting players list because they cancelled their join request
+        this.waitingPlayers = this.waitingPlayers.filter((player) => player.playerId !== playerIdThatCancelledTheirJoinRequest);
+
+        this.refreshQueueDisplay();
+    }
+
+    refreshQueueDisplay() {
+        this.incomingPlayerFound = this.waitingPlayers.length >= 1;
+        if (this.incomingPlayerFound) {
+            this.waitingMessage = `Do you want to play with ${this.waitingPlayers[0].username}?\n`;
+            this.waitingMessage += ' | Players in queue: ';
+            for (const player of this.waitingPlayers) {
+                this.waitingMessage += `${player.username} \n ,`;
+            }
+
+            this.incomingPlayer = this.waitingPlayers[0];
+        } else {
+            this.waitingMessage = 'Waiting for an opponent...';
+            this.incomingPlayer = null;
+        }
     }
 
     handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; accept: boolean }) {
@@ -115,6 +144,12 @@ export class RegistrationPageComponent implements OnInit {
 
         // eslint-disable-next-line no-console
         console.log('Match updated ! ', match);
+        if (!this.matchmakingService.isHost) {
+            if (match.player1 == null) {
+                // if the host left the game
+                this.router.navigate(['/']);
+            }
+        }
     }
 
     acceptIncomingPlayer() {

@@ -79,8 +79,6 @@ export class GamesDisplayComponent implements OnInit {
 
     addServerSocketMessagesListeners() {
         this.socketService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
-            // eslint-disable-next-line no-console
-            console.log('Receiving game progress update ' + data.gameId + ' | ' + data.matchToJoinIfAvailable);
             this.updateGameAvailability(data.gameId, data.matchToJoinIfAvailable);
         });
     }
@@ -91,6 +89,8 @@ export class GamesDisplayComponent implements OnInit {
             // ...why?
             if (game.gameData.id.toString() === gameId.toString()) {
                 game.matchToJoinIfAvailable = matchToJoinIfAvailable;
+                // eslint-disable-next-line no-console
+                console.log('Match for game id ' + gameId + ' is now ' + matchToJoinIfAvailable);
                 break;
             }
         }
