@@ -54,6 +54,7 @@ export class MatchmakingService {
         this.currentMatch = null;
         this.onMatchUpdated = new Action<Match | null>();
         this.onGetJoinRequest = new Action<Player>();
+        this.onGetJoinCancel = new Action<string>();
         this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; accept: boolean }>();
         this.matchIdThatWeAreTryingToJoin = null;
     }

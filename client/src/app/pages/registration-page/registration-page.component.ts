@@ -144,6 +144,12 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
         // eslint-disable-next-line no-console
         console.log('Match updated ! ', match);
+        if (!this.matchmakingService.isHost) {
+            if (match.player1 == null) {
+                // if the host left the game
+                this.router.navigate(['/']);
+            }
+        }
     }
 
     acceptIncomingPlayer() {
