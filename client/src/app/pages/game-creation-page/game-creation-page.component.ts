@@ -3,6 +3,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ActionsContainer, Tool } from '@app/classes/actions-container';
+import { ClearElement } from '@app/classes/clear-element';
 import { DuplicationElement } from '@app/classes/duplication-element';
 import { SwitchElement } from '@app/classes/switch-element';
 import { UndoElement } from '@app/classes/undo-element.abstract';
@@ -181,29 +182,30 @@ export class GameCreationPageComponent implements AfterViewInit {
         return dataView.getUint16(BITMAP_TYPE_OFFSET, true) === BIT_COUNT_24;
     };
 
-    resetCanvas(rightImage: boolean, isDrawingLayer: boolean) {
+    resetCanvas(rightImage: boolean) {
         const canvasSize: HTMLCanvasElement = this.rightCanvas.nativeElement;
 
-        if (!isDrawingLayer) {
-            const context = this.getCanvas(rightImage);
-            context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
+        const context = this.getCanvas(rightImage);
+        context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
 
-            if (rightImage) {
-                this.input2.nativeElement.value = '';
-                this.modifiedContainsImage = false;
-            } else {
-                this.input1.nativeElement.value = '';
-                this.originalContainsImage = false;
-            }
+        if (rightImage) {
+            this.input2.nativeElement.value = '';
+            this.modifiedContainsImage = false;
         } else {
-            if (!rightImage) {
-                const context = this.drawingCanvasOne.nativeElement.getContext('2d');
-                context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
-            } else {
-                const context = this.drawingCanvasTwo.nativeElement.getContext('2d');
-                context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
-            }
+            this.input1.nativeElement.value = '';
+            this.originalContainsImage = false;
         }
+    }
+
+    eraseCanvas(isLeft: boolean) {
+        const clearElement = new ClearElement(isLeft);
+        clearElement.actionsToCopy = this.actionsContainer.undoActions;
+        if (isLeft) {
+            clearElement.draw(this.leftDrawingContext);
+        } else {
+            clearElement.draw(this.rightDrawingContext);
+        }
+        this.actionsContainer.undoActions.push(clearElement);
     }
 
     getCanvas(isModified: boolean) {
@@ -222,21 +224,11 @@ export class GameCreationPageComponent implements AfterViewInit {
         return this.originalContainsImage && this.modifiedContainsImage;
     }
 
-    combineCanvases() {
-        const combineContext = this.combine.nativeElement.getContext('2d');
-
-        combineContext?.drawImage(this.leftCanvas.nativeElement, 0, 0);
-        combineContext?.drawImage(this.drawingCanvasOne.nativeElement, 0, 0);
-        this.originalImage = this.combine.nativeElement.toDataURL('image/png');
-    }
-
     async sendImageToServer(): Promise<void> {
         if (!this.canSendToServer()) {
             alert('Veuillez ajouter deux images');
             return;
         }
-
-        this.combineCanvases();
 
         this.resultModal.showPopUp();
 

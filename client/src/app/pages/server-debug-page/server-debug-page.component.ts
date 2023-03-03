@@ -114,6 +114,7 @@ export class ServerDebugPageComponent implements AfterViewInit {
         duplication.draw(squashedContext);
         this.actionsContainer.undoActions.push(duplication);
     }
+
     displayChangedPixels() {
         let message = '';
         for (let i = 0; i < this.actionsContainer.undoActions.length; i++) {

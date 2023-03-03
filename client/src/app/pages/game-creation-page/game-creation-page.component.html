@@ -20,15 +20,15 @@
                     Ajouter une image
                 </button>
                 <input #input1 type="file" class="display" accept="image/bmp" (input)="processImage($event, false)" />
-                <button class="button-style center" (click)="resetCanvas(false, false)">
+                <button class="button-style center" (click)="resetCanvas(false)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>
                 </button>
                 <div class="flex-row">
-                    <button class="button-style center" (click)="resetCanvas(false, true)">
+                    <button class="button-style center" (click)="eraseCanvas(true)">
                         <span class="material-symbols-outlined optionIcon center"> delete </span>
                     </button>
-                    <button class="button-style center">
+                    <button class="button-style center" (click)="duplicateCanvas(false)">
                         <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
                     </button>
                 </div>
@@ -98,11 +98,11 @@
             </div>
             <div class="flex-row picture-option">
                 <div class="flex-row">
-                    <button class="button-style center">
+                    <button class="button-style center" (click)="duplicateCanvas(true)">
                         <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
                     </button>
 
-                    <button class="button-style center" (click)="resetCanvas(true, true)">
+                    <button class="button-style center" (click)="eraseCanvas(false)">
                         <span class="material-symbols-outlined optionIcon center"> delete </span>
                     </button>
                 </div>
@@ -111,7 +111,7 @@
                     Ajouter une image
                 </button>
                 <input #input2 type="file" class="display" accept="image/bmp" (input)="processImage($event, true)" />
-                <button class="button-style center" (click)="resetCanvas(true, false)">
+                <button class="button-style center" (click)="resetCanvas(true)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>
                 </button>
