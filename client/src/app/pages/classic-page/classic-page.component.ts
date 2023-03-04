@@ -33,7 +33,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
-    matchId: string | null;
+    matchId: string | undefined;
     currentGameId: string | null;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     originalImage: File | null;
@@ -71,6 +71,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
+        this.matchId = this.matchmakingService.getCurrentMatch()?.matchId;
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
     }
@@ -187,7 +188,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.onFindWrongDifference();
             }
         });
-        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string }) => {
+        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string; id: string }) => {
             this.chat.messages.push({ text: data.message, username: data.username, sentBySystem: false });
             this.chat.scrollToBottom();
             this.chat.newMessage = '';

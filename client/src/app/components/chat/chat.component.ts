@@ -10,7 +10,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 })
 export class ChatComponent {
     @ViewChild('chat') chat: ElementRef;
-    @Input() idOfTheGame: string | null;
+    @Input() idOfTheGame: string | undefined;
     messages: {
         text: string;
         username: string;
@@ -21,6 +21,7 @@ export class ChatComponent {
 
     constructor(private auth: AuthService, private readonly socketService: SocketClientService) {}
     sendMessage() {
+        window.alert(this.idOfTheGame);
         this.socketService.socket.emit('sendingMessage', { msg: this.newMessage, idGame: this.idOfTheGame, username: this.username });
     }
     isTextValid(newMessage: string) {

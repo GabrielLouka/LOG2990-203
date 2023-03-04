@@ -28,7 +28,6 @@ export class MatchmakingService {
     // Start a connection to the remote server
     connectSocket() {
         if (this.socketService.isSocketAlive()) this.disconnectSocket();
-
         this.socketService.connect();
         this.handleMatchmakingEvents();
     }
