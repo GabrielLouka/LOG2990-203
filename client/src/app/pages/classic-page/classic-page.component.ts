@@ -83,9 +83,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.disconnect();
     }
     // TODO envoyé le joueur qui envoit le message
-    // addMessageToChat(message: string) {
-    //     this.chat.sendMessage(message);
-    // }
 
     async playErrorSound() {
         this.errorSound.nativeElement.currentTime = 0;
@@ -190,6 +187,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.onFindWrongDifference();
             }
         });
+        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string }) => {
+            this.chat.messages.push({ text: data.message, username: data.username, sentBySystem: false });
+            this.chat.scrollToBottom();
+            this.chat.newMessage = '';
+        });
     }
 
     onFindWrongDifference() {
@@ -249,7 +251,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             secondsElapsed: Math.floor(this.timeInSeconds % 60),
         });
     }
-    
+
     onQuitGame() {
         this.popUpElement.showConfirmationPopUp();
     }

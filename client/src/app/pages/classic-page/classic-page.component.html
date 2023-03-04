@@ -36,7 +36,7 @@
             <canvas #modifiedImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
         </div>
 
-        <app-chat #chat class="chat-container"></app-chat>
+        <app-chat #chat [idOfTheGame]="matchId" class="chat-container"></app-chat>
     </div>
 
     <div #errorMessage class="error-message">ERREUR</div>

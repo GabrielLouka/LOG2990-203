@@ -129,6 +129,9 @@ export class SocketManager {
             socket.on('deletedGame', (data) => {
                 this.sio.emit('gameDeleted', { gameDeleted: data.gameToDelete, id: data.id }, socket.id);
             });
+            socket.on('sendingMessage', (data) => {
+                this.sio.emit('messageBetweenPlayer', { username: data.username, message: data.msg });
+            });
 
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;

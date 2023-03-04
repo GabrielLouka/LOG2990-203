@@ -1,5 +1,7 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+/* eslint-disable no-console */
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { AuthService } from '@app/services/auth.service';
+import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
     selector: 'app-chat',
@@ -8,32 +10,19 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class ChatComponent {
     @ViewChild('chat') chat: ElementRef;
+    @Input() idOfTheGame: string | null;
     messages: {
         text: string;
         username: string;
-        sentByPlayer1: boolean;
-        sentByPlayer2: boolean;
         sentBySystem: boolean;
     }[] = [];
     newMessage = '';
     username = this.auth.registeredUserName();
 
-    constructor(private auth: AuthService) {}
-
-    sendMessage(playerNumber: number) {
-        if (!this.isTextValid(this.newMessage)) return;
-
-        this.messages.push({
-            text: this.newMessage,
-            username: `${this.username}`,
-            sentByPlayer1: playerNumber === 1,
-            sentByPlayer2: playerNumber === 2,
-            sentBySystem: false,
-        });
-        this.scrollToBottom();
-        this.newMessage = '';
+    constructor(private auth: AuthService, private readonly socketService: SocketClientService) {}
+    sendMessage() {
+        this.socketService.socket.emit('sendingMessage', { msg: this.newMessage, idGame: this.idOfTheGame, username: this.username });
     }
-
     isTextValid(newMessage: string) {
         newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
         if (newMessage === '' || newMessage === ' ' || newMessage === null) {
@@ -46,8 +35,6 @@ export class ChatComponent {
         this.messages.push({
             text: message,
             username: 'System',
-            sentByPlayer1: false,
-            sentByPlayer2: false,
             sentBySystem: true,
         });
         this.scrollToBottom();
