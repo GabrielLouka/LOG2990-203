@@ -40,8 +40,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     originalImage: File | null;
     modifiedImage: File | null;
     foundDifferences: boolean[];
-    foundDifferences1: boolean[];
-    foundDifferences2: boolean[];
     mode1vs1: boolean = true;
     differencesFound: number = 0;
     totalDifferences: number = 0;
@@ -49,6 +47,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentModifiedImage: Buffer;
     winScreenTitle: string = 'Félicitations !';
     winScreenMessage: string = 'Tu as trouvé toutes les différences. GG WP. !';
+    differencesFound1: number = 0;
+    differencesFound2: number = 0;
+    player2: string = '';
+    player1: string = '';
 
     // eslint-disable-next-line max-params
     constructor(
@@ -119,7 +121,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
-            this.matchId = this.matchmakingService.getCurrentMatch()?.matchId;
+            this.matchId = this.matchmakingService.getCurrentMatch()?.matchId as string;
             if (match.matchStatus === MatchStatus.InProgress) {
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
@@ -177,31 +179,22 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
-        this.foundDifferences1 = new Array(this.game.gameData.nbrDifferences).fill(false);
-        this.foundDifferences2 = new Array(this.game.gameData.nbrDifferences).fill(false);
     }
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
         if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
-            this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences1, position: coordinateClick, isPlayer1: true });
+            this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
         } else if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne) {
-            if (this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId) {
-                this.socketService.send('validateDifference', {
-                    foundDifferences: this.foundDifferences1,
-                    position: coordinateClick,
-                    isPlayer1: true,
-                });
-            } else {
-                this.socketService.send('validateDifference', {
-                    foundDifferences: this.foundDifferences2,
-                    position: coordinateClick,
-                    isPlayer1: false,
-                });
-            }
+            this.socketService.send('validateDifference', {
+                foundDifferences: this.foundDifferences,
+                position: coordinateClick,
+                isPlayer1: this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId,
+            });
+        } else {
+            this.errorMessage.nativeElement.style.left = event.clientX + 'px';
+            this.errorMessage.nativeElement.style.top = event.clientY + 'px';
         }
-        this.errorMessage.nativeElement.style.left = event.clientX + 'px';
-        this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
 
     requestStartGame() {
@@ -219,24 +212,27 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 if (data.isValidated) {
                     let message = 'Différence trouvée par ';
                     if (data.isPlayer1) {
-                        this.foundDifferences1 = data.foundDifferences;
-                        this.differencesFound1++;
                         message += this.player1;
+                        this.differencesFound1++;
                     } else {
-                        this.foundDifferences2 = data.foundDifferences;
-                        this.differencesFound2++;
                         message += this.player2;
+                        this.differencesFound2++;
                     }
-
-                    this.onFindDifference();
                     this.sendSystemMessageToChat(message);
-                    if (
-                        this.differencesFound1 >= Math.ceil(this.totalDifferences / 2) ||
-                        this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)
-                    )
-                        this.onWinGame();
+                    this.foundDifferences = data.foundDifferences;
+                    this.onFindDifference();
+
+                    if (this.is1vs1Mode) {
+                        if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
+                            this.onWinGame(true);
+                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(false);
+                    } else if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
+                        if (this.differencesFound1 >= this.totalDifferences) {
+                            this.onWinGame(true);
+                        }
+                    }
                 } else {
-                    this.onFindWrongDifference();
+                    this.onFindWrongDifference(data.isPlayer1);
                 }
             },
         );
@@ -247,8 +243,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         });
     }
 
-    onFindWrongDifference() {
-        const message = `Erreur par ${this.auth.registeredUserName().toUpperCase()}`;
+    onFindWrongDifference(isPlayer1: boolean) {
+        let message = 'Erreur par ';
+        if (isPlayer1) {
+            message += this.player1.toUpperCase();
+        } else {
+            message += this.player2.toUpperCase();
+        }
         this.errorMessage.nativeElement.style.display = 'block';
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
@@ -271,14 +272,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     async refreshModifiedImage() {
-        const combinedDifferences = [];
-        for (let i = 0; i < this.totalDifferences - 1; i++) {
-            combinedDifferences[i] = this.foundDifferences1[i] || this.foundDifferences2[i];
-        }
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
             this.game.gameData,
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
-            combinedDifferences,
+            this.foundDifferences,
         );
 
         if (this.rightCanvasContext !== null) {
