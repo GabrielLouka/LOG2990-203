@@ -34,16 +34,21 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
-    matchId: string | undefined;
+    matchId: string;
     currentGameId: string | null;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     originalImage: File | null;
     modifiedImage: File | null;
     foundDifferences: boolean[];
+    foundDifferences1: boolean[];
+    foundDifferences2: boolean[];
+    mode1vs1: boolean = true;
     differencesFound: number = 0;
     totalDifferences: number = 0;
     gameTitle: string = '';
     currentModifiedImage: Buffer;
+    winScreenTitle: string = 'Félicitations !';
+    winScreenMessage: string = 'Tu as trouvé toutes les différences. GG WP. !';
 
     // eslint-disable-next-line max-params
     constructor(
@@ -105,11 +110,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleMatchUpdate(match: Match | null) {
+        if (this.player1 == '') {
+            this.player1 = this.matchmakingService.getCurrentMatch()?.player1?.username as string;
+        }
+        if (this.player2 == '') {
+            this.player2 = this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+        }
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
             this.matchId = this.matchmakingService.getCurrentMatch()?.matchId;
-            // TODO dead code ???
             if (match.matchStatus === MatchStatus.InProgress) {
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
@@ -167,12 +177,29 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
+        this.foundDifferences1 = new Array(this.game.gameData.nbrDifferences).fill(false);
+        this.foundDifferences2 = new Array(this.game.gameData.nbrDifferences).fill(false);
     }
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
-        this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick });
-
+        if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
+            this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences1, position: coordinateClick, isPlayer1: true });
+        } else if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne) {
+            if (this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId) {
+                this.socketService.send('validateDifference', {
+                    foundDifferences: this.foundDifferences1,
+                    position: coordinateClick,
+                    isPlayer1: true,
+                });
+            } else {
+                this.socketService.send('validateDifference', {
+                    foundDifferences: this.foundDifferences2,
+                    position: coordinateClick,
+                    isPlayer1: false,
+                });
+            }
+        }
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';
         this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
@@ -186,22 +213,34 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     addServerSocketMessagesListeners() {
         if (!this.socketService.isSocketAlive()) window.alert('Error : socket not connected');
 
-        this.socketService.on('validationReturned', (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number }) => {
-            if (data.isValidated) {
-                this.foundDifferences = data.foundDifferences;
-                this.onFindDifference();
-
-                if (this.differencesFound >= this.totalDifferences) {
-                    const currentMatch = this.matchmakingService.getCurrentMatch();
-                    if (currentMatch != null) {
-                        this.onWinGame(this.isPlayer1Win(currentMatch));
+        this.socketService.on(
+            'validationReturned',
+            (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
+                if (data.isValidated) {
+                    let message = 'Différence trouvée par ';
+                    if (data.isPlayer1) {
+                        this.foundDifferences1 = data.foundDifferences;
+                        this.differencesFound1++;
+                        message += this.player1;
+                    } else {
+                        this.foundDifferences2 = data.foundDifferences;
+                        this.differencesFound2++;
+                        message += this.player2;
                     }
+
+                    this.onFindDifference();
+                    this.sendSystemMessageToChat(message);
+                    if (
+                        this.differencesFound1 >= Math.ceil(this.totalDifferences / 2) ||
+                        this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)
+                    )
+                        this.onWinGame();
+                } else {
+                    this.onFindWrongDifference();
                 }
-            } else {
-                this.onFindWrongDifference();
-            }
-        });
-        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string; id: string }) => {
+            },
+        );
+        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string }) => {
             this.chat.messages.push({ text: data.message, username: data.username, sentBySystem: false });
             this.chat.scrollToBottom();
             this.chat.newMessage = '';
@@ -227,19 +266,21 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onFindDifference() {
-        const message = `Différence trouvée par ${this.auth.registeredUserName().toUpperCase()}`;
-        this.differencesFound++;
         this.playSuccessSound();
         this.refreshModifiedImage();
-        this.sendSystemMessageToChat(message);
     }
 
     async refreshModifiedImage() {
+        const combinedDifferences = [];
+        for (let i = 0; i < this.totalDifferences - 1; i++) {
+            combinedDifferences[i] = this.foundDifferences1[i] || this.foundDifferences2[i];
+        }
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
             this.game.gameData,
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
-            this.foundDifferences,
+            combinedDifferences,
         );
+
         if (this.rightCanvasContext !== null) {
             await this.imageManipulationService.blinkDifference(
                 this.currentModifiedImage != null ? this.currentModifiedImage : this.game.modifiedImage,

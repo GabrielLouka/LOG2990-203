@@ -97,6 +97,9 @@ export class GamesDisplayComponent implements OnInit {
         this.socketService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
             this.updateGameAvailability(data.gameId, data.matchToJoinIfAvailable);
         });
+        this.socketService.on('gameDeleted', () => {
+            window.location.reload();
+        });
     }
 
     updateGameAvailability(gameId: number, matchToJoinIfAvailable: string | null) {
