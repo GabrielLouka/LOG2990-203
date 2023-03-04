@@ -36,7 +36,7 @@ export class SocketManager {
                 sendMatchUpdate({ matchId: joinedRoomName });
             });
 
-            socket.on('validateDifference', (data: { foundDifferences: boolean[]; position: Vector2 }) => {
+            socket.on('validateDifference', (data: { foundDifferences: boolean[]; position: Vector2; isPlayer1: boolean }) => {
                 const foundDifferenceId = this.matchingDifferencesService.getDifferenceIndex(
                     socket.data.gameData as GameData,
                     data.position as Vector2,
@@ -52,6 +52,7 @@ export class SocketManager {
                     foundDifferences: data.foundDifferences,
                     isValidated: successfullyFoundDifference,
                     foundDifferenceIndex: foundDifferenceId,
+                    isPlayer1: data.isPlayer1,
                 });
             });
 
