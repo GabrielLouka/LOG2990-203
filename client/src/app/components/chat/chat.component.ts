@@ -21,7 +21,6 @@ export class ChatComponent {
 
     constructor(private auth: AuthService, private readonly socketService: SocketClientService) {}
     sendMessage() {
-        window.alert(this.idOfTheGame);
         this.socketService.socket.emit('sendingMessage', { msg: this.newMessage, idGame: this.idOfTheGame, username: this.username });
     }
     isTextValid(newMessage: string) {

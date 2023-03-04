@@ -30,6 +30,7 @@ export class SocketManager {
                 console.log(message);
             });
 
+            // called on start of a game in the classic page
             socket.on('registerGameData', (data: { gameData: GameData }) => {
                 socket.data = data;
                 sendMatchUpdate({ matchId: joinedRoomName });

@@ -71,7 +71,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
-        this.matchId = this.matchmakingService.getCurrentMatch()?.matchId;
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
     }
@@ -100,6 +99,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
+            this.matchId = this.matchmakingService.getCurrentMatch()?.matchId;
             if (match.matchStatus === MatchStatus.InProgress) {
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
