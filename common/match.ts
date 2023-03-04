@@ -7,6 +7,7 @@ export class Match {
     // unique identifier for this match
     gameId: number;
     // unique id for this match
+    // this is equal to the socket Id of the host (player 1)
     matchId: string;
     player1: Player | null;
     player2: Player | null;
