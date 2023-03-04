@@ -32,6 +32,7 @@ export class SocketManager {
 
             socket.on('registerGameData', (data: { gameData: GameData }) => {
                 socket.data = data;
+                sendMatchUpdate({ matchId: joinedRoomName });
             });
 
             socket.on('validateDifference', (data: { foundDifferences: boolean[]; position: Vector2 }) => {
