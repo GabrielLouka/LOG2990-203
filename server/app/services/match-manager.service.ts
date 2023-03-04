@@ -73,7 +73,9 @@ export class MatchManagerService {
         }
 
         if (modifiedMatch != null) {
-            modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+            if (modifiedMatch.player1 == null && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
+                modifiedMatch.matchStatus = MatchStatus.Aborted;
+            else modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
             console.log('match ' + modifiedMatch.matchId + ' status changed to ' + modifiedMatch.matchStatus.toString());
         }
 

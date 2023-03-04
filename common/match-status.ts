@@ -4,4 +4,5 @@ export enum MatchStatus {
     InProgress,
     Player1Win,
     Player2Win,
+    Aborted,
 }

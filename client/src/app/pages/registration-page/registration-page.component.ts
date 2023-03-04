@@ -5,6 +5,7 @@ import { AuthService } from '@app/services/auth.service';
 import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Match } from '@common/match';
+import { MatchStatus } from '@common/match-status';
 import { MatchType } from '@common/match-type';
 import { Player } from '@common/player';
 
@@ -172,9 +173,11 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
         // eslint-disable-next-line no-console
         console.log('Match updated ! ', match);
-        if (!this.matchmakingService.isHost) {
-            if (match.player1 == null) {
+        if (!this.matchmakingService.isHost /* && match.matchStatus === MatchStatus.InProgress*/) {
+            if (match.matchStatus === MatchStatus.Aborted) {
                 // if the host left the game
+                // eslint-disable-next-line no-console
+                console.log('Host left the game !' + JSON.stringify(match));
                 this.router.navigate(['/']);
             }
         }
