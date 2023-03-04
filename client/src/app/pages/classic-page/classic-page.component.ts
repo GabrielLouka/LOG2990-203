@@ -74,6 +74,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.rightCanvas.nativeElement.getContext('2d');
     }
 
+    get is1vs1Mode() {
+        return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne;
+    }
+
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
@@ -87,7 +91,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.socketService.disconnect();
     }
-    // TODO envoyé le joueur qui envoit le message
 
     async playErrorSound() {
         this.errorSound.nativeElement.currentTime = 0;
