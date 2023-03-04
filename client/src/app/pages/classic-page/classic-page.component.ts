@@ -51,7 +51,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     winScreenMessage: string = 'Tu as trouvé toutes les différences. GG WP. !';
     differencesFound1: number = 0;
     differencesFound2: number = 0;
-
+    player1: string = '';
+    player2: string = '';
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -109,6 +110,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             console.log('Match updated classic ' + JSON.stringify(match));
             this.matchId = this.matchmakingService.getCurrentMatch()?.matchId as string;
             if (match.matchStatus === MatchStatus.InProgress) {
+                if (this.player1 == '') {
+                    this.player1 = this.matchmakingService.getCurrentMatch()?.player1?.username as string;
+                }
+                if (this.player2 == '') {
+                    this.player2 = this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+                }
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
                 } else if (match.player2 == null) {
@@ -256,11 +263,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     async refreshModifiedImage() {
+        const combinedDifferences = [];
+        for (let i = 0; i < this.totalDifferences - 1; i++) {
+            combinedDifferences[i] = this.foundDifferences1[i] || this.foundDifferences2[i];
+        }
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
             this.game.gameData,
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
-            this.foundDifferences,
+            combinedDifferences,
         );
+
         if (this.rightCanvasContext !== null) {
             await this.imageManipulationService.blinkDifference(
                 this.currentModifiedImage != null ? this.currentModifiedImage : this.game.modifiedImage,
