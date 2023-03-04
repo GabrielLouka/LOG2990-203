@@ -105,17 +105,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleMatchUpdate(match: Match | null) {
+        if (this.player1 == '') {
+            this.player1 = this.matchmakingService.getCurrentMatch()?.player1?.username as string;
+        }
+        if (this.player2 == '') {
+            this.player2 = this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+        }
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
             this.matchId = this.matchmakingService.getCurrentMatch()?.matchId as string;
             if (match.matchStatus === MatchStatus.InProgress) {
-                if (this.player1 == '') {
-                    this.player1 = this.matchmakingService.getCurrentMatch()?.player1?.username as string;
-                }
-                if (this.player2 == '') {
-                    this.player2 = this.matchmakingService.getCurrentMatch()?.player2?.username as string;
-                }
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
                 } else if (match.player2 == null) {
@@ -214,16 +214,24 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             'validationReturned',
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
                 if (data.isValidated) {
+                    let message = 'Différence trouvée par ';
                     if (data.isPlayer1) {
                         this.foundDifferences1 = data.foundDifferences;
                         this.differencesFound1++;
+                        message += this.player1;
                     } else {
                         this.foundDifferences2 = data.foundDifferences;
                         this.differencesFound2++;
+                        message += this.player2;
                     }
-                    this.onFindDifference();
 
-                    if (this.differencesFound >= this.totalDifferences) this.onWinGame();
+                    this.onFindDifference();
+                    this.sendSystemMessageToChat(message);
+                    if (
+                        this.differencesFound1 >= Math.ceil(this.totalDifferences / 2) ||
+                        this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)
+                    )
+                        this.onWinGame();
                 } else {
                     this.onFindWrongDifference();
                 }
@@ -255,11 +263,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onFindDifference() {
-        const message = `Différence trouvée par ${this.auth.registeredUserName().toUpperCase()}`;
-
         this.playSuccessSound();
         this.refreshModifiedImage();
-        this.sendSystemMessageToChat(message);
     }
 
     async refreshModifiedImage() {

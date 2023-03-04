@@ -20,7 +20,7 @@
                 ></app-found-hints-counter>
                 <app-found-hints-counter
                     class="hints-container"
-                    *ngIf="mode1vs1"
+                    *ngIf="is1vs1Mode"
                     [username] = "this.player2"
                     [differencesFound]="differencesFound2"
                     [differencesNbr]="totalDifferences"
