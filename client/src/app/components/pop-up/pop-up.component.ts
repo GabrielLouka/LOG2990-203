@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
     selector: 'app-pop-up',
@@ -6,7 +6,6 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
     styleUrls: ['./pop-up.component.scss'],
 })
 export class PopUpComponent {
-    @Input() username: string = '';
     @ViewChild('bgModal') modal!: ElementRef;
     @ViewChild('button1') option1Btn!: ElementRef;
     @ViewChild('button2') option2Btn!: ElementRef;
@@ -18,7 +17,6 @@ export class PopUpComponent {
         option2: string;
         isConfirmation: boolean;
         isGameOver: boolean;
-        player: string;
     }[] = [];
     displayPopUp: boolean = true;
 
@@ -30,20 +28,18 @@ export class PopUpComponent {
             option2: 'NON',
             isConfirmation: true,
             isGameOver: false,
-            player: `${this.username}`,
         });
         this.showPopUp();
     }
 
-    showGameOverPopUp() {
+    showGameOverPopUp(player1Wins: boolean, winningPlayerMessage: string) {
         this.popUpInfo.push({
-            title: 'FÉLICITATIONS !',
-            message: 'Vous avez trouvé toutes les différences.',
+            title: player1Wins ? 'Le joueur 1 a gagné' : 'Le joueur 2 a gagné',
+            message: winningPlayerMessage,
             option1: 'Menu Principal',
             option2: 'Reprise Vidéo',
             isConfirmation: false,
             isGameOver: true,
-            player: `${this.username}`,
         });
         this.showPopUp();
     }
@@ -55,7 +51,7 @@ export class PopUpComponent {
     hidePopUp() {
         this.displayPopUp = false;
     }
-    // TODO When a player quits it needs to make other player win
+
     isQuitting() {
         return true;
     }

@@ -44,8 +44,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     totalDifferences: number = 0;
     gameTitle: string = '';
     currentModifiedImage: Buffer;
-    winScreenTitle: string = 'Félicitations !';
-    winScreenMessage: string = 'Tu as trouvé toutes les différences. GG WP. !';
 
     // eslint-disable-next-line max-params
     constructor(
@@ -98,11 +96,20 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.successSound.nativeElement.play();
     }
 
+    isPlayer1Win(match: Match) {
+        return match.matchStatus === MatchStatus.Player1Win;
+    }
+
+    isPlayer2Win(match: Match) {
+        return match.matchStatus === MatchStatus.Player2Win;
+    }
+
     handleMatchUpdate(match: Match | null) {
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
             this.matchId = this.matchmakingService.getCurrentMatch()?.matchId;
+            // TODO dead code ???
             if (match.matchStatus === MatchStatus.InProgress) {
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
@@ -111,12 +118,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
             }
 
-            if (match.matchStatus === MatchStatus.Player1Win) {
-                this.showWinPopup(true);
-                this.gameOver();
-            } else if (match.matchStatus === MatchStatus.Player2Win) {
-                this.showWinPopup(false);
-                this.gameOver();
+            if (this.isPlayer1Win(match)) {
+                this.onWinGame(true);
+            } else if (this.isPlayer2Win(match)) {
+                this.onWinGame(false);
             }
         }
     }
@@ -186,7 +191,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.foundDifferences = data.foundDifferences;
                 this.onFindDifference();
 
-                if (this.differencesFound >= this.totalDifferences) this.onWinGame();
+                if (this.differencesFound >= this.totalDifferences) {
+                    const currentMatch = this.matchmakingService.getCurrentMatch();
+                    if (currentMatch != null) {
+                        this.onWinGame(this.isPlayer1Win(currentMatch));
+                    }
+                }
             } else {
                 this.onFindWrongDifference();
             }
@@ -240,13 +250,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    showWinPopup(player1Win: boolean) {
-        this.winScreenTitle = player1Win ? 'Le joueur 1 a gagné' : 'Le joueur 2 a gagné';
-        this.winScreenMessage = player1Win
-            ? this.matchmakingService.getCurrentMatch()?.player1?.username + ' remporte la partie. Nice !'
-            : this.matchmakingService.getCurrentMatch()?.player2?.username + ' remporte la partie. Excellent !';
-    }
-
     gameOver() {
         this.timerElement.stopTimer();
         this.socketService.disconnect();
@@ -261,9 +264,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     // Called when the player wins the game
-    onWinGame() {
-        this.sendSystemMessageToChat('Damn, you are goated');
+    onWinGame(player1Win: boolean) {
+        const winningPlayerMessage = player1Win
+            ? this.matchmakingService.getCurrentMatch()?.player1?.username + ' remporte la partie. Nice !'
+            : this.matchmakingService.getCurrentMatch()?.player2?.username + ' remporte la partie. Excellent !';
         this.gameOver();
-        this.popUpElement.showGameOverPopUp();
+        this.popUpElement.showGameOverPopUp(player1Win, winningPlayerMessage);
     }
 }
