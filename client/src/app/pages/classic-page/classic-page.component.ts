@@ -47,9 +47,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     totalDifferences: number = 0;
     gameTitle: string = '';
     currentModifiedImage: Buffer;
-    winScreenTitle: string = 'Félicitations !';
-    winScreenMessage: string = 'Tu as trouvé toutes les différences. GG WP. !';
-
+    differencesFound1: number = 0;
+    differencesFound2: number = 0;
+    player1: string = '';
+    player2: string = '';
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -119,7 +120,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
-            this.matchId = this.matchmakingService.getCurrentMatch()?.matchId;
+            this.matchId = this.matchmakingService.getCurrentMatch()?.matchId as string;
             if (match.matchStatus === MatchStatus.InProgress) {
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
@@ -234,7 +235,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         this.differencesFound1 >= Math.ceil(this.totalDifferences / 2) ||
                         this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)
                     )
-                        this.onWinGame();
+                        this.onWinGame(data.isPlayer1);
                 } else {
                     this.onFindWrongDifference();
                 }
