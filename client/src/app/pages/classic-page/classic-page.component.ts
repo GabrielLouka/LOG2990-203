@@ -49,6 +49,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound2: number = 0;
     player1: string = '';
     player2: string = '';
+    isIdenticalUsername: boolean;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -73,6 +74,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     get is1vs1Mode() {
         return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne;
+    }
+
+    get currentMatchPlayer1Username() {
+        return this.matchmakingService.getCurrentMatch()?.player1?.username as string;
+    }
+
+    get currentMatchPlayer2Username() {
+        return this.matchmakingService.getCurrentMatch()?.player2?.username as string;
     }
 
     ngOnInit(): void {
@@ -100,20 +109,20 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.successSound.nativeElement.play();
     }
 
-    isPlayer1Win(match: Match) {
+    isPlayer1Win(match: Match): boolean {
         return match.matchStatus === MatchStatus.Player1Win;
     }
 
-    isPlayer2Win(match: Match) {
+    isPlayer2Win(match: Match): boolean {
         return match.matchStatus === MatchStatus.Player2Win;
     }
 
     handleMatchUpdate(match: Match | null) {
-        if (this.player1 == '') {
-            this.player1 = this.matchmakingService.getCurrentMatch()?.player1?.username as string;
+        if (this.player1 === '') {
+            this.player1 = this.currentMatchPlayer1Username;
         }
-        if (this.player2 == '') {
-            this.player2 = this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+        if (this.player2 === '') {
+            this.player2 = this.currentMatchPlayer2Username;
         }
         if (match !== null) {
             // eslint-disable-next-line no-console

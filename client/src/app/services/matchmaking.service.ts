@@ -25,6 +25,7 @@ export class MatchmakingService {
     get isHost() {
         return this.matchIdThatWeAreTryingToJoin == null;
     }
+
     // Start a connection to the remote server
     connectSocket() {
         if (this.socketService.isSocketAlive()) this.disconnectSocket();
@@ -87,6 +88,7 @@ export class MatchmakingService {
 
         const matchId = this.matchIdThatWeAreTryingToJoin;
         const player = new Player(playerName, this.getCurrentSocketId().toString());
+
         this.socketService.send<{ matchId: string; player: Player }>('requestToJoinMatch', {
             matchId,
             player,

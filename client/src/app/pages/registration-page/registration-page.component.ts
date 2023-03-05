@@ -55,18 +55,28 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.auth.registerUser(this.registrationForm.value.username as string);
         this.username = this.registrationForm.value.username;
         this.usernameRegistered = true;
-
         if (this.matchmakingService.getCurrentMatch() != null) {
             if (this.username) this.matchmakingService.setCurrentMatchPlayer(this.username);
             else window.alert('Username to register is not valid !');
             if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
                 this.loadGamePage();
             } else {
-                this.waitingMessage = 'Waiting for an opponent...';
+                this.waitingMessage = "En attente d'un adversaire...";
             }
         } else {
             this.sendMatchJoinRequest();
         }
+    }
+
+    isIdenticalUsername(usernameThatWantsToJoin: string) {
+        return this.username === usernameThatWantsToJoin;
+    }
+
+    setIdenticalUsername(usernameThatWantsToJoin: string) {
+        if (this.username && this.isIdenticalUsername(usernameThatWantsToJoin)) {
+            usernameThatWantsToJoin += ' #2';
+        }
+        return usernameThatWantsToJoin;
     }
 
     loadGamePage() {
@@ -75,7 +85,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
     sendMatchJoinRequest() {
         this.hasSentJoinRequest = true;
-        this.waitingMessage = 'Waiting for the opponent to accept...';
+        this.waitingMessage = "En attente de la réponse de l'adversaire...";
         if (this.username) this.matchmakingService.sendMatchJoinRequest(this.username);
     }
 
@@ -83,6 +93,8 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         if (!this.matchmakingService.isHost) return;
 
         if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
+            const username2 = this.setIdenticalUsername(playerThatWantsToJoin.username);
+            playerThatWantsToJoin.username = username2;
             this.waitingPlayers.push(playerThatWantsToJoin);
         }
 
@@ -104,15 +116,15 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     refreshQueueDisplay() {
         this.incomingPlayerFound = this.waitingPlayers.length >= 1;
         if (this.incomingPlayerFound) {
-            this.waitingMessage = `Do you want to play with ${this.waitingPlayers[0].username}?\n`;
-            this.waitingMessage += ' | Players in queue: ';
+            this.waitingMessage = `Voulez-vous débuter la partie avec ${this.waitingPlayers[0].username}?\n`;
+            this.waitingMessage += ' | Joueurs en attente : ';
             for (const player of this.waitingPlayers) {
-                this.waitingMessage += `${player.username} \n ,`;
+                this.waitingMessage += ` ${player.username} \n ,`;
             }
 
             this.incomingPlayer = this.waitingPlayers[0];
         } else {
-            this.waitingMessage = 'Waiting for an opponent...';
+            this.waitingMessage = "En attente d'un adversaire";
             this.incomingPlayer = null;
         }
     }
@@ -154,7 +166,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
         // if you are the host and you've rejected the player
         if (!data.accept && this.matchmakingService.isHost && this.waitingPlayers.length >= 1) {
-            this.waitingMessage = 'Waiting for an opponent...';
+            this.waitingMessage = "En attente d'un adversaire...";
             this.incomingPlayerFound = false;
             this.waitingPlayers = this.waitingPlayers.splice(1, this.waitingPlayers.length);
             if (this.waitingPlayers.length >= 1) {
@@ -197,10 +209,6 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     refuseIncomingPlayer() {
         if (this.incomingPlayer == null) return;
         this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, false);
-        // TODO dead code
-        // this.waitingPlayers = [];
-        // this.incomingPlayer = null;
-        // this.waitingMessage = 'Waiting for an opponent...';
     }
 
     getUser() {
