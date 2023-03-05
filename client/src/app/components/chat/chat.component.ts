@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { AuthService } from '@app/services/auth.service';
+import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 
 @Component({
@@ -17,12 +17,30 @@ export class ChatComponent {
         sentBySystem: boolean;
     }[] = [];
     newMessage = '';
-    username = this.auth.registeredUserName();
 
-    constructor(private auth: AuthService, private readonly socketService: SocketClientService) {}
-    sendMessage() {
-        this.socketService.socket.emit('sendingMessage', { msg: this.newMessage, idGame: this.idOfTheGame, username: this.username });
+    constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
+
+    get socketId() {
+        return this.socketService.socket.id ? this.socketService.socket.id : '';
     }
+
+    get isPlayer1() {
+        return this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId;
+    }
+
+    get currentMatchPlayer1Username() {
+        return this.matchmakingService.getCurrentMatch()?.player1?.username as string;
+    }
+
+    get currentMatchPlayer2Username() {
+        return this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+    }
+
+    sendMessage() {
+        const currentPlayer = this.isPlayer1 ? this.currentMatchPlayer1Username : this.currentMatchPlayer2Username;
+        this.socketService.socket.emit('sendingMessage', { msg: this.newMessage, idGame: this.idOfTheGame, username: currentPlayer });
+    }
+
     isTextValid(newMessage: string) {
         newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
         if (newMessage === '' || newMessage === ' ' || newMessage === null) {

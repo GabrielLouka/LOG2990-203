@@ -56,8 +56,9 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.username = this.registrationForm.value.username;
         this.usernameRegistered = true;
         if (this.matchmakingService.getCurrentMatch() != null) {
-            if (this.username) this.matchmakingService.setCurrentMatchPlayer(this.username);
-            else window.alert('Username to register is not valid !');
+            if (this.username) {
+                this.matchmakingService.setCurrentMatchPlayer(this.username + '#1');
+            } else window.alert('Username to register is not valid !');
             if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
                 this.loadGamePage();
             } else {
@@ -66,17 +67,6 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         } else {
             this.sendMatchJoinRequest();
         }
-    }
-
-    isIdenticalUsername(usernameThatWantsToJoin: string) {
-        return this.username === usernameThatWantsToJoin;
-    }
-
-    setIdenticalUsername(usernameThatWantsToJoin: string) {
-        if (this.username && this.isIdenticalUsername(usernameThatWantsToJoin)) {
-            usernameThatWantsToJoin += ' #2';
-        }
-        return usernameThatWantsToJoin;
     }
 
     loadGamePage() {
@@ -93,8 +83,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         if (!this.matchmakingService.isHost) return;
 
         if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
-            const username2 = this.setIdenticalUsername(playerThatWantsToJoin.username);
-            playerThatWantsToJoin.username = username2;
+            playerThatWantsToJoin.username += '#2';
             this.waitingPlayers.push(playerThatWantsToJoin);
         }
 
@@ -212,6 +201,6 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     getUser() {
-        return this.auth.registeredUserName();
+        return this.auth.registeredUsername;
     }
 }

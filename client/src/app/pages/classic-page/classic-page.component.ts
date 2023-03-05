@@ -49,7 +49,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound2: number = 0;
     player1: string = '';
     player2: string = '';
-    isIdenticalUsername: boolean;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -135,7 +134,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     window.alert('Player 2 left the game');
                 }
             }
-
             if (this.isPlayer1Win(match)) {
                 this.onWinGame(true);
             } else if (this.isPlayer2Win(match)) {
@@ -206,7 +204,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.game.gameData });
         // eslint-disable-next-line no-console
-        console.log('requestStartGame ' + this.auth.registeredUserName());
+        console.log('requestStartGame ' + this.auth.registeredUsername);
     }
 
     addServerSocketMessagesListeners() {
