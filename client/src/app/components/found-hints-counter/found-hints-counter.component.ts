@@ -9,6 +9,4 @@ export class FoundHintsCounterComponent {
     @Input() differencesNbr: number;
     @Input() differencesFound: number;
     @Input() username: string;
-    // username = this.auth.registeredUserName();
-    constructor() {}
 }

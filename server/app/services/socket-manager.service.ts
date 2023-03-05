@@ -74,7 +74,7 @@ export class SocketManager {
                     sendGameMatchProgressUpdate(matchThatWasAffected);
                 }
 
-                // in case the player wasnt in a match, but had a pending join request
+                // in case the player wasn't in a match, but had a pending join request
                 this.matchManagerService.matches.forEach((match) => {
                     sendJoinMatchCancel(match.matchId, socket.id);
                 });
