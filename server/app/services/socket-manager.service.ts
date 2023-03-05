@@ -133,7 +133,9 @@ export class SocketManager {
                 this.sio.emit('gameDeleted', { gameDeleted: data.gameToDelete, id: data.id }, socket.id);
             });
             socket.on('sendingMessage', (data) => {
-                this.sio.to(joinedRoomName).emit('messageBetweenPlayer', { username: data.username, message: data.msg });
+                this.sio
+                    .to(joinedRoomName)
+                    .emit('messageBetweenPlayer', { username: data.username, message: data.msg, messageSentTime: data.sentTime });
             });
 
             const joinMatchRoom = (data: { matchId: string }) => {

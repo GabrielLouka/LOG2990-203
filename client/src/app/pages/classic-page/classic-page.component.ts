@@ -241,7 +241,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             },
         );
         this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string }) => {
-            this.chat.messages.push({ text: data.message, username: data.username, sentBySystem: false });
+            this.chat.messages.push({ text: data.message, username: data.username, sentBySystem: false, sentTime: Date.now() });
             this.chat.scrollToBottom();
             this.chat.newMessage = '';
         });

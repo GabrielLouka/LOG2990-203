@@ -15,6 +15,7 @@ export class ChatComponent {
         text: string;
         username: string;
         sentBySystem: boolean;
+        sentTime: number;
     }[] = [];
     newMessage = '';
 
@@ -38,7 +39,12 @@ export class ChatComponent {
 
     sendMessage() {
         const currentPlayer = this.isPlayer1 ? this.currentMatchPlayer1Username : this.currentMatchPlayer2Username;
-        this.socketService.socket.emit('sendingMessage', { msg: this.newMessage, idGame: this.idOfTheGame, username: currentPlayer });
+        this.socketService.socket.emit('sendingMessage', {
+            msg: this.newMessage,
+            idGame: this.idOfTheGame,
+            username: currentPlayer,
+            messageSentTime: Date.now(),
+        });
     }
 
     isTextValid(newMessage: string) {
@@ -54,6 +60,7 @@ export class ChatComponent {
             text: message,
             username: 'System',
             sentBySystem: true,
+            sentTime: Date.now(),
         });
         this.scrollToBottom();
         this.newMessage = '';
