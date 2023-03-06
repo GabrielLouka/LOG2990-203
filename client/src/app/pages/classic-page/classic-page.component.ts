@@ -75,6 +75,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne;
     }
 
+    get isSoloMode() {
+        return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo;
+    }
+
     get currentMatchPlayer1Username() {
         return this.matchmakingService.getCurrentMatch()?.player1?.username as string;
     }
@@ -216,10 +220,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 if (data.isValidated) {
                     let message = 'Différence trouvée par ';
                     if (data.isPlayer1) {
-                        message += this.player1;
+                        message += this.player1.toUpperCase();
                         this.differencesFound1++;
                     } else {
-                        message += this.player2;
+                        message += this.player2.toUpperCase();
                         this.differencesFound2++;
                     }
                     this.sendSystemMessageToChat(message);
@@ -230,7 +234,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
                             this.onWinGame(true);
                         } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(false);
-                    } else if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
+                    } else if (this.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
                             this.onWinGame(true);
                         }
@@ -309,6 +313,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onQuitGame() {
+        if (this.isSoloMode) {
+            this.timerElement.stopTimer();
+        }
         this.popUpElement.showConfirmationPopUp();
     }
 

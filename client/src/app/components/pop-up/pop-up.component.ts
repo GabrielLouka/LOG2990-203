@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 
 @Component({
     selector: 'app-pop-up',
@@ -9,6 +9,7 @@ export class PopUpComponent {
     @ViewChild('bgModal') modal!: ElementRef;
     @ViewChild('button1') option1Btn!: ElementRef;
     @ViewChild('button2') option2Btn!: ElementRef;
+    @Input() isDisplayed: boolean;
 
     popUpInfo: {
         title: string;
@@ -18,9 +19,9 @@ export class PopUpComponent {
         isConfirmation: boolean;
         isGameOver: boolean;
     }[] = [];
-    displayPopUp: boolean = true;
 
     showConfirmationPopUp() {
+        this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: 'VOULEZ-VOUS VRAIMENT QUITTER ?',
             message: '',
@@ -33,6 +34,7 @@ export class PopUpComponent {
     }
 
     showGameOverPopUp(username: string | undefined, isMode1vs1: boolean) {
+        this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: isMode1vs1 ? `${username} a remporté la partie !` : `Félicitations ${username}!`,
             message: 'Toutes les différences ont été trouvées',
@@ -48,11 +50,7 @@ export class PopUpComponent {
         this.modal.nativeElement.style.display = 'flex';
     }
 
-    hidePopUp() {
-        this.displayPopUp = false;
-    }
-
-    isQuitting() {
-        return true;
+    closePopUp() {
+        this.modal.nativeElement.style.display = 'none';
     }
 }

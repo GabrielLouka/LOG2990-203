@@ -12,7 +12,6 @@ import { MatchType } from '@common/match-type';
 export class ChatComponent {
     @ViewChild('chat') chat: ElementRef;
     @Input() idOfTheGame: string | undefined;
-    title: string = this.isMode1vs1 ? 'MANIA CHAT' : 'MATCHING MANIA';
     messages: {
         text: string;
         username: string;
@@ -22,6 +21,7 @@ export class ChatComponent {
         sentTime: number;
     }[] = [];
     newMessage = '';
+    title: string = 'MANIA CHAT';
 
     constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
 
