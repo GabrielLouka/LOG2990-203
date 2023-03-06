@@ -13,7 +13,6 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
-import { MatchType } from '@common/match-type';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -59,10 +58,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private matchmakingService: MatchmakingService,
     ) {}
 
-    get socketId() {
-        return this.socketService.socket.id ? this.socketService.socket.id : '';
-    }
-
     get leftCanvasContext() {
         return this.leftCanvas.nativeElement.getContext('2d');
     }
@@ -72,19 +67,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     get is1vs1Mode() {
-        return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne;
-    }
-
-    get isSoloMode() {
-        return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo;
-    }
-
-    get currentMatchPlayer1Username() {
-        return this.matchmakingService.getCurrentMatch()?.player1?.username as string;
-    }
-
-    get currentMatchPlayer2Username() {
-        return this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+        return this.matchmakingService.is1vs1Mode;
     }
 
     ngOnInit(): void {
@@ -122,10 +105,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     handleMatchUpdate(match: Match | null) {
         if (this.player1 === '') {
-            this.player1 = this.currentMatchPlayer1Username;
+            this.player1 = this.matchmakingService.currentMatchPlayer1Username;
         }
         if (this.player2 === '') {
-            this.player2 = this.currentMatchPlayer2Username;
+            this.player2 = this.matchmakingService.currentMatchPlayer2Username;
         }
         if (match !== null) {
             // eslint-disable-next-line no-console
@@ -139,9 +122,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
             }
             if (this.isPlayer1Win(match)) {
-                this.onWinGame(this.currentMatchPlayer1Username, true);
+                this.onWinGame(this.matchmakingService.currentMatchPlayer1Username, true);
             } else if (this.isPlayer2Win(match)) {
-                this.onWinGame(this.currentMatchPlayer2Username, true);
+                this.onWinGame(this.matchmakingService.currentMatchPlayer2Username, true);
             }
         }
     }
@@ -191,13 +174,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
-        if (this.is1vs1Mode) {
+        if (this.matchmakingService.is1vs1Mode) {
             this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
-        } else if (this.isSoloMode) {
+        } else if (this.matchmakingService.isSoloMode) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
-                isPlayer1: this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId,
+                isPlayer1: this.socketService.socketId === this.matchmakingService.player1SocketId,
             });
         }
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';
@@ -211,7 +194,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     addServerSocketMessagesListeners() {
-        if (!this.socketService.isSocketAlive()) window.alert('Error : socket not connected');
+        if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
 
         this.socketService.on(
             'validationReturned',
@@ -229,14 +212,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.foundDifferences = data.foundDifferences;
                     this.onFindDifference();
 
-                    if (this.is1vs1Mode) {
+                    if (this.matchmakingService.is1vs1Mode) {
                         if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
-                            this.onWinGame(this.currentMatchPlayer1Username, false);
+                            this.onWinGame(this.matchmakingService.currentMatchPlayer1Username, false);
                         } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2))
-                            this.onWinGame(this.currentMatchPlayer2Username, false);
-                    } else if (this.isSoloMode) {
+                            this.onWinGame(this.matchmakingService.currentMatchPlayer2Username, false);
+                    } else if (this.matchmakingService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.currentMatchPlayer1Username, false);
+                            this.onWinGame(this.matchmakingService.currentMatchPlayer1Username, false);
                         }
                     }
                 } else {

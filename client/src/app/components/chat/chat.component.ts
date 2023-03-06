@@ -2,7 +2,6 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
-import { MatchType } from '@common/match-type';
 
 @Component({
     selector: 'app-chat',
@@ -25,28 +24,18 @@ export class ChatComponent {
 
     constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
 
-    get socketId() {
-        return this.socketService.socket.id ? this.socketService.socket.id : '';
-    }
-
     get isPlayer1() {
-        return this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId;
-    }
-
-    get currentMatchPlayer1Username() {
-        return this.matchmakingService.getCurrentMatch()?.player1?.username as string;
-    }
-
-    get currentMatchPlayer2Username() {
-        return this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+        return this.socketService.socketId === this.matchmakingService.player1SocketId;
     }
 
     get isMode1vs1() {
-        return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne;
+        return this.matchmakingService.is1vs1Mode;
     }
 
     sendMessage() {
-        const currentPlayer = this.isPlayer1 ? this.currentMatchPlayer1Username : this.currentMatchPlayer2Username;
+        const currentPlayer = this.isPlayer1
+            ? this.matchmakingService.currentMatchPlayer1Username
+            : this.matchmakingService.currentMatchPlayer2Username;
         this.socketService.socket.emit('sendingMessage', {
             msg: this.newMessage,
             idGame: this.idOfTheGame,

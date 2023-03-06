@@ -7,6 +7,7 @@
         <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
         <app-hint></app-hint>
+        <app-hint *ngIf="is1vs1Mode"></app-hint>
     </div>
 
     <div class="flex-column center difference-container">

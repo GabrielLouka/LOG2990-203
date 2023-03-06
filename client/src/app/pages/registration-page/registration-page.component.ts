@@ -6,7 +6,6 @@ import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
-import { MatchType } from '@common/match-type';
 import { Player } from '@common/player';
 
 @Component({
@@ -56,10 +55,12 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.username = this.registrationForm.value.username;
         this.usernameRegistered = true;
         if (this.matchmakingService.getCurrentMatch() != null) {
-            if (this.username) {
+            if (this.username && this.matchmakingService.is1vs1Mode) {
                 this.matchmakingService.setCurrentMatchPlayer(this.username + '#1');
+            } else if (this.username && this.matchmakingService.isSoloMode) {
+                this.matchmakingService.setCurrentMatchPlayer(this.username);
             } else window.alert('Username to register is not valid !');
-            if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
+            if (this.matchmakingService.isSoloMode) {
                 this.loadGamePage();
             } else {
                 this.waitingMessage = "En attente d'un adversaire...";
