@@ -33,12 +33,14 @@ export class PopUpComponent {
         this.showPopUp();
     }
 
-    showGameOverPopUp(username: string | undefined, isWinByDefault: boolean) {
+    showGameOverPopUp(username: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
+        const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
+        const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
+        const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
+
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
-            title: isWinByDefault
-                ? `Félicitations ${username?.toUpperCase()} vous avez remporté !`
-                : `${username?.toUpperCase()} a remporté la partie !`,
+            title: isWinByDefault ? soloMessage : titleMessage,
             message: isWinByDefault ? 'Votre adversaire a quitté la partie...' : 'Excellente partie !',
             option1: 'Menu Principal',
             option2: 'Reprise Vidéo',

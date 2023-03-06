@@ -77,7 +77,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     sendMatchJoinRequest() {
         this.hasSentJoinRequest = true;
         this.waitingMessage = "En attente de la réponse de l'adversaire...";
-        if (this.username) this.matchmakingService.sendMatchJoinRequest(this.username);
+        if (this.username) this.matchmakingService.sendMatchJoinRequest(this.username + '#2');
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
@@ -85,7 +85,6 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
         if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
             this.waitingPlayers.push(playerThatWantsToJoin);
-            playerThatWantsToJoin.username += '#2';
         }
 
         this.refreshQueueDisplay();
