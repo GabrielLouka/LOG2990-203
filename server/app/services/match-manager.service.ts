@@ -45,10 +45,6 @@ export class MatchManagerService {
                 if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer2) matchToChange.matchStatus = MatchStatus.InProgress;
                 console.log('set match ' + matchId + ' player 2' + ' to ' + player.username);
             }
-
-            // if (matchToChange.player1 != null && matchToChange.player2 != null) {
-            //     matchToChange.matchStatus = MatchStatus.InProgress;
-            // }
         } else {
             console.log('match ' + matchId + ' not found');
         }

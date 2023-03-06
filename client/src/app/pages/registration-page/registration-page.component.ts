@@ -84,8 +84,8 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         if (!this.matchmakingService.isHost) return;
 
         if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
-            playerThatWantsToJoin.username += '#2';
             this.waitingPlayers.push(playerThatWantsToJoin);
+            playerThatWantsToJoin.username += '#2';
         }
 
         this.refreshQueueDisplay();
@@ -107,7 +107,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.incomingPlayerFound = this.waitingPlayers.length >= 1;
         if (this.incomingPlayerFound) {
             this.waitingMessage = `Voulez-vous débuter la partie avec ${this.waitingPlayers[0].username}?\n`;
-            this.waitingMessage += ' | Joueurs en attente : ';
+            this.waitingMessage += ' | Joueur(s) en attente : ';
             for (const player of this.waitingPlayers) {
                 this.waitingMessage += ` ${player.username} \n ,`;
             }
