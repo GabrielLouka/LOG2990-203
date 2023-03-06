@@ -32,10 +32,10 @@ export class PopUpComponent {
         this.showPopUp();
     }
 
-    showGameOverPopUp(player1Wins: boolean, winningPlayerMessage: string) {
+    showGameOverPopUp(username: string | undefined, isMode1vs1: boolean) {
         this.popUpInfo.push({
-            title: player1Wins ? 'Le joueur 1 a gagné' : 'Le joueur 2 a gagné',
-            message: winningPlayerMessage,
+            title: isMode1vs1 ? `${username} a remporté la partie !` : `Félicitations ${username}!`,
+            message: 'Toutes les différences ont été trouvées',
             option1: 'Menu Principal',
             option2: 'Reprise Vidéo',
             isConfirmation: false,

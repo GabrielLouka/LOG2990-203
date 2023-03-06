@@ -1,11 +1,13 @@
 <div class="flex-column center chat-container">
-    <div class="flex-row center chat-header">MANIA CHAT</div>
+    <div class="flex-row center chat-header">{{ title }}</div>
     <div #chat class="chat-body">
         <div *ngFor="let message of messages">
             <div
                 class="message-container"
                 [ngClass]="{
-                    'sent-by-system': message.sentBySystem
+                    'sent-by-system': message.sentBySystem,
+                    'sent-by-player-1': message.sentByPlayer1,
+                    'sent-by-player-2': message.sentByPlayer2
                 }"
             >
                 <div class="font-size message-username">
@@ -16,7 +18,7 @@
             </div>
         </div>
     </div>
-    <div class="flex-row center chat-footer">
+    <div class="flex-row center chat-footer" *ngIf="this.isMode1vs1">
         <input type="text" maxlength="200" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
         <button (click)="sendMessage()"><span class="material-symbols-outlined"> send </span></button>
     </div>

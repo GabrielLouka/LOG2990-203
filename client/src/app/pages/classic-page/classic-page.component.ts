@@ -240,8 +240,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
             },
         );
-        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string }) => {
-            this.chat.messages.push({ text: data.message, username: data.username, sentBySystem: false, sentTime: Date.now() });
+        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
+            this.chat.messages.push({
+                text: data.message,
+                username: data.username,
+                sentBySystem: false,
+                sentByPlayer1: data.sentByPlayer1,
+                sentByPlayer2: !data.sentByPlayer1,
+                sentTime: Date.now(),
+            });
             this.chat.scrollToBottom();
             this.chat.newMessage = '';
         });
@@ -307,10 +314,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // Called when the player wins the game
     onWinGame(player1Win: boolean) {
-        const winningPlayerMessage = player1Win
-            ? this.matchmakingService.getCurrentMatch()?.player1?.username + ' remporte la partie. Nice !'
-            : this.matchmakingService.getCurrentMatch()?.player2?.username + ' remporte la partie. Excellent !';
+        const winningPlayer = player1Win
+            ? this.matchmakingService.getCurrentMatch()?.player1?.username
+            : this.matchmakingService.getCurrentMatch()?.player2?.username;
         this.gameOver();
-        this.popUpElement.showGameOverPopUp(player1Win, winningPlayerMessage);
+        this.popUpElement.showGameOverPopUp(winningPlayer, this.is1vs1Mode);
     }
 }
