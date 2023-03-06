@@ -1,37 +1,36 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
+import { Vector2 } from '@common/vector2';
 import { UndoElement } from './undo-element.abstract';
 
 export class EraserElement extends UndoElement {
-    // draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
-    //     context.beginPath();
-
-    //     context.lineWidth = this.penWidth;
-    //     context.lineCap = 'butt';
-
-    //     context.moveTo(this.pixels[0].x, this.pixels[0].y);
-    //     const stroke = this.pixels;
-    //     for (let j = 1; j < stroke.length; j++) {
-    //         context.clearRect(stroke[j].x - this.penWidth / 2, stroke[j].y - this.penWidth / 2, this.penWidth, this.penWidth);
-    //     }
-    //     context.stroke();
-    //     return context;
-    // }
-
     draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
         context.beginPath();
-
+        context.lineWidth = this.penWidth;
         const stroke = this.pixels;
 
+        // Calculate the distance between two consecutive points
+        const pointDistance = (p1: Vector2, p2: Vector2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
+
+        // Create additional points between two consecutive points based on their distance
+        const smoothStroke = [stroke[0]];
         for (let i = 1; i < stroke.length; i++) {
             const prevPoint = stroke[i - 1];
             const currentPoint = stroke[i];
+            const distance = pointDistance(prevPoint, currentPoint);
+            const subDivisions = Math.max(Math.round(distance / 5), 1);
+            for (let j = 0; j < subDivisions; j++) {
+                const point = {
+                    x: prevPoint.x + (currentPoint.x - prevPoint.x) * (j / subDivisions),
+                    y: prevPoint.y + (currentPoint.y - prevPoint.y) * (j / subDivisions),
+                };
+                smoothStroke.push(point);
+            }
+        }
 
-            const x = Math.min(prevPoint.x, currentPoint.x) - this.penWidth / 2;
-            const y = Math.min(prevPoint.y, currentPoint.y) - this.penWidth / 2;
-            const width = Math.abs(prevPoint.x - currentPoint.x) + this.penWidth / 2;
-            const height = Math.abs(prevPoint.y - currentPoint.y) + this.penWidth / 2;
-
-            context.clearRect(x, y, width, height);
+        // Draw the smoothed stroke
+        context.moveTo(smoothStroke[0].x, smoothStroke[0].y);
+        for (let j = 1; j < smoothStroke.length; j++) {
+            context.clearRect(smoothStroke[j].x - this.penWidth / 2, smoothStroke[j].y - this.penWidth / 2, this.penWidth, this.penWidth);
         }
 
         context.stroke();
