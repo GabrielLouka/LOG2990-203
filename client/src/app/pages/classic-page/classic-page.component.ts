@@ -139,9 +139,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
             }
             if (this.isPlayer1Win(match)) {
-                this.onWinGame(true);
+                this.onWinGame(this.currentMatchPlayer1Username, true);
             } else if (this.isPlayer2Win(match)) {
-                this.onWinGame(false);
+                this.onWinGame(this.currentMatchPlayer2Username, true);
             }
         }
     }
@@ -191,18 +191,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
-        if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
+        if (this.is1vs1Mode) {
             this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
-        } else if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne) {
+        } else if (this.isSoloMode) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
                 isPlayer1: this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId,
             });
-        } else {
-            this.errorMessage.nativeElement.style.left = event.clientX + 'px';
-            this.errorMessage.nativeElement.style.top = event.clientY + 'px';
         }
+        this.errorMessage.nativeElement.style.left = event.clientX + 'px';
+        this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
 
     requestStartGame() {
@@ -232,11 +231,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (this.is1vs1Mode) {
                         if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
-                            this.onWinGame(true);
-                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(false);
+                            this.onWinGame(this.currentMatchPlayer1Username, false);
+                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2))
+                            this.onWinGame(this.currentMatchPlayer2Username, false);
                     } else if (this.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(true);
+                            this.onWinGame(this.currentMatchPlayer1Username, false);
                         }
                     }
                 } else {
@@ -313,18 +313,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onQuitGame() {
-        if (this.isSoloMode) {
-            this.timerElement.stopTimer();
-        }
         this.popUpElement.showConfirmationPopUp();
     }
 
     // Called when the player wins the game
-    onWinGame(player1Win: boolean) {
-        const winningPlayer = player1Win
-            ? this.matchmakingService.getCurrentMatch()?.player1?.username
-            : this.matchmakingService.getCurrentMatch()?.player2?.username;
+    onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
-        this.popUpElement.showGameOverPopUp(winningPlayer, this.is1vs1Mode);
+        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault);
     }
 }
