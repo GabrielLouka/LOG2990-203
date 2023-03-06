@@ -26,9 +26,29 @@ export class MatchmakingService {
         return this.matchIdThatWeAreTryingToJoin == null;
     }
 
+    get is1vs1Mode() {
+        return this.getCurrentMatch()?.matchType === MatchType.OneVersusOne;
+    }
+
+    get isSoloMode() {
+        return this.getCurrentMatch()?.matchType === MatchType.Solo;
+    }
+
+    get currentMatchPlayer1Username() {
+        return this.getCurrentMatch()?.player1?.username as string;
+    }
+
+    get currentMatchPlayer2Username() {
+        return this.getCurrentMatch()?.player2?.username as string;
+    }
+
+    get player1SocketId() {
+        return this.getCurrentMatch()?.player1?.playerId;
+    }
+
     // Start a connection to the remote server
     connectSocket() {
-        if (this.socketService.isSocketAlive()) this.disconnectSocket();
+        if (this.socketService.isSocketAlive) this.disconnectSocket();
         this.socketService.connect();
         this.handleMatchmakingEvents();
     }

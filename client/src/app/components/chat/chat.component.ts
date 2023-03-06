@@ -15,35 +15,33 @@ export class ChatComponent {
         text: string;
         username: string;
         sentBySystem: boolean;
+        sentByPlayer1: boolean;
+        sentByPlayer2: boolean;
         sentTime: number;
     }[] = [];
     newMessage = '';
+    title: string = 'MANIA CHAT';
 
     constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
 
-    get socketId() {
-        return this.socketService.socket.id ? this.socketService.socket.id : '';
-    }
-
     get isPlayer1() {
-        return this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId;
+        return this.socketService.socketId === this.matchmakingService.player1SocketId;
     }
 
-    get currentMatchPlayer1Username() {
-        return this.matchmakingService.getCurrentMatch()?.player1?.username as string;
-    }
-
-    get currentMatchPlayer2Username() {
-        return this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+    get isMode1vs1() {
+        return this.matchmakingService.is1vs1Mode;
     }
 
     sendMessage() {
-        const currentPlayer = this.isPlayer1 ? this.currentMatchPlayer1Username : this.currentMatchPlayer2Username;
+        const currentPlayer = this.isPlayer1
+            ? this.matchmakingService.currentMatchPlayer1Username
+            : this.matchmakingService.currentMatchPlayer2Username;
         this.socketService.socket.emit('sendingMessage', {
             msg: this.newMessage,
             idGame: this.idOfTheGame,
             username: currentPlayer,
             messageSentTime: Date.now(),
+            sentByPlayer1: this.isPlayer1,
         });
     }
 
@@ -60,6 +58,8 @@ export class ChatComponent {
             text: message,
             username: 'System',
             sentBySystem: true,
+            sentByPlayer1: false,
+            sentByPlayer2: false,
             sentTime: Date.now(),
         });
         this.scrollToBottom();

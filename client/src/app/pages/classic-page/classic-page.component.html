@@ -7,6 +7,7 @@
         <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
         <app-hint></app-hint>
+        <app-hint *ngIf="is1vs1Mode"></app-hint>
     </div>
 
     <div class="flex-column center difference-container">
@@ -14,14 +15,14 @@
             <div class="hints-container">
                 <app-found-hints-counter
                     class="hints-container"
-                    [username] = "this.player1"
+                    [username]="this.player1"
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="totalDifferences"
                 ></app-found-hints-counter>
                 <app-found-hints-counter
                     class="hints-container"
                     *ngIf="is1vs1Mode"
-                    [username] = "this.player2"
+                    [username]="this.player2"
                     [differencesFound]="differencesFound2"
                     [differencesNbr]="totalDifferences"
                 ></app-found-hints-counter>

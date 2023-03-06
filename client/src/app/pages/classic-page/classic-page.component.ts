@@ -13,7 +13,6 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
-import { MatchType } from '@common/match-type';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -59,10 +58,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private matchmakingService: MatchmakingService,
     ) {}
 
-    get socketId() {
-        return this.socketService.socket.id ? this.socketService.socket.id : '';
-    }
-
     get leftCanvasContext() {
         return this.leftCanvas.nativeElement.getContext('2d');
     }
@@ -72,15 +67,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     get is1vs1Mode() {
-        return this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne;
-    }
-
-    get currentMatchPlayer1Username() {
-        return this.matchmakingService.getCurrentMatch()?.player1?.username as string;
-    }
-
-    get currentMatchPlayer2Username() {
-        return this.matchmakingService.getCurrentMatch()?.player2?.username as string;
+        return this.matchmakingService.is1vs1Mode;
     }
 
     ngOnInit(): void {
@@ -118,15 +105,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     handleMatchUpdate(match: Match | null) {
         if (this.player1 === '') {
-            this.player1 = this.currentMatchPlayer1Username;
+            this.player1 = this.matchmakingService.currentMatchPlayer1Username;
         }
         if (this.player2 === '') {
-            this.player2 = this.currentMatchPlayer2Username;
+            this.player2 = this.matchmakingService.currentMatchPlayer2Username;
         }
         if (match !== null) {
             // eslint-disable-next-line no-console
             console.log('Match updated classic ' + JSON.stringify(match));
             this.matchId = this.matchmakingService.getCurrentMatch()?.matchId as string;
+            // TODO dead code ?? line 114 to 124
             if (match.matchStatus === MatchStatus.InProgress) {
                 if (match.player1 == null) {
                     window.alert('Player 1 left the game');
@@ -134,10 +122,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     window.alert('Player 2 left the game');
                 }
             }
+            const abortedGameMessage = ' a abandonné la partie';
             if (this.isPlayer1Win(match)) {
-                this.onWinGame(true);
+                this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.player1, true);
             } else if (this.isPlayer2Win(match)) {
-                this.onWinGame(false);
+                this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.player2, true);
             }
         }
     }
@@ -187,18 +178,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
-        if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
+        if (this.matchmakingService.is1vs1Mode) {
             this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
-        } else if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.OneVersusOne) {
+        } else if (this.matchmakingService.isSoloMode) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
-                isPlayer1: this.socketId === this.matchmakingService.getCurrentMatch()?.player1?.playerId,
+                isPlayer1: this.socketService.socketId === this.matchmakingService.player1SocketId,
             });
-        } else {
-            this.errorMessage.nativeElement.style.left = event.clientX + 'px';
-            this.errorMessage.nativeElement.style.top = event.clientY + 'px';
         }
+        this.errorMessage.nativeElement.style.left = event.clientX + 'px';
+        this.errorMessage.nativeElement.style.top = event.clientY + 'px';
     }
 
     requestStartGame() {
@@ -208,31 +198,33 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     addServerSocketMessagesListeners() {
-        if (!this.socketService.isSocketAlive()) window.alert('Error : socket not connected');
+        if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
 
         this.socketService.on(
             'validationReturned',
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
                 if (data.isValidated) {
-                    let message = 'Différence trouvée par ';
+                    let message = 'Différence trouvée';
                     if (data.isPlayer1) {
-                        message += this.player1;
                         this.differencesFound1++;
+                        if (!this.matchmakingService.isSoloMode) {
+                            message += ' par ' + this.player1.toUpperCase();
+                        }
                     } else {
-                        message += this.player2;
+                        message += message += ' par ' + this.player2.toUpperCase();
                         this.differencesFound2++;
                     }
                     this.sendSystemMessageToChat(message);
                     this.foundDifferences = data.foundDifferences;
                     this.onFindDifference();
 
-                    if (this.is1vs1Mode) {
+                    if (this.matchmakingService.is1vs1Mode) {
                         if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
-                            this.onWinGame(true);
-                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(false);
-                    } else if (this.matchmakingService.getCurrentMatch()?.matchType === MatchType.Solo) {
+                            this.onWinGame(this.player1, false);
+                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(this.player2, false);
+                    } else if (this.matchmakingService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(true);
+                            this.onWinGame(this.player1, false);
                         }
                     }
                 } else {
@@ -240,19 +232,28 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
             },
         );
-        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string }) => {
-            this.chat.messages.push({ text: data.message, username: data.username, sentBySystem: false, sentTime: Date.now() });
+        this.socketService.on('messageBetweenPlayer', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
+            this.chat.messages.push({
+                text: data.message,
+                username: data.username,
+                sentBySystem: false,
+                sentByPlayer1: data.sentByPlayer1,
+                sentByPlayer2: !data.sentByPlayer1,
+                sentTime: Date.now(),
+            });
             this.chat.scrollToBottom();
             this.chat.newMessage = '';
         });
     }
 
     onFindWrongDifference(isPlayer1: boolean) {
-        let message = 'Erreur par ';
-        if (isPlayer1) {
-            message += this.player1.toUpperCase();
-        } else {
-            message += this.player2.toUpperCase();
+        let message = 'Erreur';
+        if (!this.matchmakingService.isSoloMode) {
+            if (isPlayer1) {
+                message += ' par ' + this.player1.toUpperCase();
+            } else {
+                message += ' par ' + this.player2.toUpperCase();
+            }
         }
         this.errorMessage.nativeElement.style.display = 'block';
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
@@ -306,11 +307,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     // Called when the player wins the game
-    onWinGame(player1Win: boolean) {
-        const winningPlayerMessage = player1Win
-            ? this.matchmakingService.getCurrentMatch()?.player1?.username + ' remporte la partie. Nice !'
-            : this.matchmakingService.getCurrentMatch()?.player2?.username + ' remporte la partie. Excellent !';
+    onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
-        this.popUpElement.showGameOverPopUp(player1Win, winningPlayerMessage);
+        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
     }
 }

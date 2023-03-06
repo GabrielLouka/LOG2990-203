@@ -8,8 +8,12 @@ export class SocketClientService {
     socket: Socket;
     serverAddress: string = 'http://localhost:3000';
 
-    isSocketAlive() {
+    get isSocketAlive() {
         return this.socket && this.socket.connected;
+    }
+
+    get socketId() {
+        return this.socket.id ? this.socket.id : '';
     }
 
     connect() {
