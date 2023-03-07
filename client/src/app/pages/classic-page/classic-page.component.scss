@@ -21,9 +21,9 @@ h1 {
 
 canvas {
     width: 640px;
-    height: 480px; 
+    height: 480px;
     background-color: whitesmoke;
-    border: solid; 
+    border: solid;
 }
 
 .data-container {
@@ -38,6 +38,7 @@ canvas {
 .timer-container {
     margin-bottom: 1.5vw;
 }
+
 .error-message {
     display: none;
     position: absolute;
@@ -51,4 +52,18 @@ canvas {
     position: absolute;
     bottom: 21vh;
     right: 0vw;
+}
+
+.cheat-mode {
+    height: auto;
+    padding: 10px;
+
+    border-radius: 10px;
+    border: solid;
+
+    background-color: whitesmoke;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
 }

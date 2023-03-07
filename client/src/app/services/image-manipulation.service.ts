@@ -65,6 +65,14 @@ export class ImageManipulationService {
         }
     }
 
+    async alternateOldNewImage(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D){                        
+        await Promise.race([
+            this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context),
+            this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context)
+        ])                       
+    } 
+
+
     async sleep(time: number) {
         return new Promise((resolve) => {
             setTimeout(resolve, time);

@@ -30,6 +30,7 @@
             <div class="timer-container">
                 <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
             </div>
+            <div #cheatElement tabindex="0" [ngStyle]="{'background-color': bgColor}" (keydown)="onCheatMode($event)" class="cheat-mode">Mode triche</div>
         </div>
 
         <app-info-card class="info-card" *ngIf="game" [isEasy]="game.gameData.isEasy"></app-info-card>

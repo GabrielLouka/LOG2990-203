@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
@@ -31,6 +31,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('errorMessage') errorMessage: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
+    @ViewChild('cheatElement') cheat: ElementRef | undefined;
+    bgColor = '';
+    @HostListener('window:keydown', ['$event'])
+    letterTPressed: boolean = true;
+    intervalID: number | undefined;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
     matchId: string;
@@ -139,6 +144,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (leftCanvasContext !== null && rightCanvasContext !== null) {
             this.getInitialImagesFromServer();
         }
+        this.focusKeyEvent();
     }
 
     getInitialImagesFromServer() {
@@ -189,6 +195,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';
         this.errorMessage.nativeElement.style.top = event.clientY + 'px';
+        this.focusKeyEvent();
     }
 
     requestStartGame() {
@@ -260,6 +267,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
         this.showErrorText();
         this.playErrorSound();
+        this.focusKeyEvent();
         this.sendSystemMessageToChat(message);
     }
 
@@ -274,6 +282,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onFindDifference() {
         this.playSuccessSound();
         this.refreshModifiedImage();
+        clearInterval(this.intervalID);
+        this.bgColor = '';
+        this.letterTPressed = true;
+        this.focusKeyEvent();
     }
 
     async refreshModifiedImage() {
@@ -311,4 +323,54 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver();
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
     }
+
+    focusKeyEvent(){
+        if (this.cheat) {
+            this.cheat.nativeElement.focus();
+        }
+    }
+
+
+    onCheatMode(event: KeyboardEvent) {        
+        if (event.code === 'KeyT') {                                                     
+            if (this.letterTPressed) {
+                this.bgColor = '#66FF99';        
+                this.cheatMode();
+            } 
+            else {
+                this.bgColor = '';
+                clearInterval(this.intervalID);
+            }                    
+            this.letterTPressed = !this.letterTPressed;            
+        }        
+    }
+
+    cheatMode(){         
+        const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
+            this.game.gameData,
+            { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
+            this.foundDifferences,
+        );
+        if (this.leftCanvasContext && this.rightCanvasContext) {
+            this.intervalID = window.setInterval(async () => {     
+                setTimeout(() => {
+                    this.imageManipulationService.alternateOldNewImage(
+                    this.game.originalImage,
+                    newImage, 
+                    this.leftCanvasContext as CanvasRenderingContext2D,
+                    )
+                }, 0);
+                setTimeout(() => {
+                    this.imageManipulationService.alternateOldNewImage(
+                    this.game.originalImage,
+                    this.currentModifiedImage, 
+                    this.rightCanvasContext as CanvasRenderingContext2D,
+                    )
+                }, 0);  
+              }, 25);
+            this.currentModifiedImage = newImage;
+        }
+    }
+
+
 }
