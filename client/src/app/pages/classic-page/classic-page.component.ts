@@ -340,6 +340,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             else {
                 this.bgColor = '';
                 clearInterval(this.intervalID);
+                this.imageManipulationService.loadCurrentImage(this.currentModifiedImage, this.rightCanvasContext as CanvasRenderingContext2D);
             }                    
             this.letterTPressed = !this.letterTPressed;            
         }        
