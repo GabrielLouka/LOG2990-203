@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Queue } from '@app/classes/queue';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { MIN_DIFFERENCES, Pixel, REQUIRED_HEIGHT, REQUIRED_SURFACE_PERCENTAGE, REQUIRED_WIDTH } from '@common/pixel';
@@ -39,12 +38,6 @@ export class ImageProcessingService {
         if (!this.is24BitDepthBMP(imageBuffer1) || !this.is24BitDepthBMP(imageBuffer2)) throw new Error('Images must be 24 bit depth BMPs!');
 
         const allDifferences: Vector2[][] = this.getDifferencesPositionsList(imageBuffer1, imageBuffer2, radius);
-
-        // display the length of each difference group
-        allDifferences.forEach((diffGroup, index) => {
-            console.log('diff group length ' + index + ' : ' + diffGroup.length);
-        });
-
         this.turnImageToWhite(imageOutput);
         let sumOfAllDifferences: Vector2[] = [];
 
@@ -92,7 +85,6 @@ export class ImageProcessingService {
 
             return differences;
         } catch (e) {
-            console.error('Could not get different pixel positions between images');
             return [];
         }
     };
@@ -103,7 +95,7 @@ export class ImageProcessingService {
                 this.setRGB(position, imageBuffer, Pixel.black);
             });
         } catch (e) {
-            console.error('Cannot paint black pixels at theses given positions');
+            return;
         }
     };
 
@@ -113,19 +105,13 @@ export class ImageProcessingService {
         const differencesList: Vector2[][] = [[]];
         let currentDifferenceGroupIndex = 0;
         const allPixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
-
-        // This is a set of all pixels to visit, used to check if a pixel is supposed to be visited, regardless of the radius
-        // It has a much better performance than checking if the pixel is in the allPixelsToVisit array since it's a set
         const allPixelsToVisitSet: Set<string> = new Set();
         allPixelsToVisit.forEach((pixel) => {
             allPixelsToVisitSet.add(pixel.x + ' ' + pixel.y);
         });
 
-        // This is a map of all pixels that have been visited, and the radius of the visit
         const alreadyVisited: Map<string, number> = new Map();
-        // This is a working queue of the next pixels to visit, and the radius of the visit (BFS algorithm)
         const nextPixelsToVisit: Queue<{ pos: Vector2; radius: number }> = new Queue();
-
         const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
         const imageWidth = imageDimensions.x;
         const imageHeight = imageDimensions.y;
@@ -194,7 +180,6 @@ export class ImageProcessingService {
 
             return new Pixel(r, g, b);
         } catch (e) {
-            console.error("OOPS! Couldn't get the RGB values for the pixel at position " + position.x + ', ' + position.y + '!');
             return null;
         }
     };
@@ -202,13 +187,11 @@ export class ImageProcessingService {
     private setRGB = (position: Vector2, imageBuffer: Buffer, pixel: Pixel): void => {
         try {
             const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
-
-            // Set the R, G, and B values
             imageBuffer.writeUInt8(pixel.b, pixelPosition);
             imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
             imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
         } catch (e) {
-            console.error("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
+            return;
         }
     };
 
@@ -273,7 +256,7 @@ export class ImageProcessingService {
                 }
             }
         } catch (e) {
-            console.error('Cannot turn this image to white');
+            return;
         }
     };
 }

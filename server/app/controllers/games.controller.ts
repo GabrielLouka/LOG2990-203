@@ -44,17 +44,6 @@ export class GamesController {
 
         this.router.post('/saveGame', async (req: Request, res: Response) => {
             const receivedNameForm: EntireGameUploadForm = req.body;
-
-            // eslint-disable-next-line no-console
-            console.log(
-                'saving game, id= ' +
-                    receivedNameForm.gameId +
-                    ' name=' +
-                    receivedNameForm.gameName +
-                    ' num differences=' +
-                    receivedNameForm.differences.length,
-            );
-
             const buffer1 = Buffer.from(receivedNameForm.firstImage.background);
             const buffer2 = Buffer.from(receivedNameForm.secondImage.background);
 

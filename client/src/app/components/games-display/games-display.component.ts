@@ -104,12 +104,8 @@ export class GamesDisplayComponent implements OnInit {
 
     updateGameAvailability(gameId: number, matchToJoinIfAvailable: string | null) {
         for (const game of this.games) {
-            // i convert the id to a string because otherwise the comparison doesn't work
-            // ...why?
             if (game.gameData.id.toString() === gameId.toString()) {
                 game.matchToJoinIfAvailable = matchToJoinIfAvailable;
-                // eslint-disable-next-line no-console
-                console.log('Match for game id ' + gameId + ' is now ' + matchToJoinIfAvailable);
                 break;
             }
         }

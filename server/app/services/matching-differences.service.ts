@@ -1,5 +1,5 @@
-import { GAME_CONST } from '@app/utils/env';
 import { GameData } from '@common/game-data';
+import { NOT_FOUND } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Service } from 'typedi';
 
@@ -16,6 +16,6 @@ export class MatchingDifferencesService {
                 }
             }
         }
-        return GAME_CONST.NOT_FOUND;
+        return NOT_FOUND;
     }
 }

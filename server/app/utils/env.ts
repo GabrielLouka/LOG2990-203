@@ -16,10 +16,5 @@ const R_ONLY = {
     REQUIRED_WIDTH: '640',
     REQUIRED_HEIGHT: '480',
 };
-
-const GAME_CONST = {
-    NOT_FOUND: -1,
-};
 export { DB };
 export { R_ONLY };
-export { GAME_CONST };

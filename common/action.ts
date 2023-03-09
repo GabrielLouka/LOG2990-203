@@ -1,3 +1,5 @@
+import { NOT_FOUND } from '@common/utils/env';
+
 export class Action<T> {
     private funcs: ((arg: T) => void)[] = [];
 
@@ -7,8 +9,7 @@ export class Action<T> {
 
     remove(func: (arg: T) => void): void {
         const index = this.funcs.indexOf(func);
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        if (index !== -1) {
+        if (index !== NOT_FOUND) {
             this.funcs.splice(index, 1);
         }
     }
