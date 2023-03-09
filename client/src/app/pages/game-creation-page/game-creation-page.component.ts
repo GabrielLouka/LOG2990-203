@@ -14,6 +14,7 @@ import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { Pixel } from '@common/pixel';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
@@ -224,6 +225,28 @@ export class GameCreationPageComponent implements AfterViewInit {
         return this.originalContainsImage && this.modifiedContainsImage;
     }
 
+    getColorIndicesForCoord(x: number, y: number, canvas: HTMLCanvasElement): Uint8ClampedArray {
+        const context = canvas.getContext('2d');
+        const imgd = context?.getImageData(x, canvas.height - y, 1, 1);
+        const pix = imgd?.data;
+        return pix as Uint8ClampedArray;
+    }
+
+    combineImages(originaleBuffer: Buffer, drawingCanvas: HTMLCanvasElement) {
+        for (let x = 0; x < drawingCanvas.width; x++) {
+            for (let y = 0; y < drawingCanvas.height; y++) {
+                const inspectedColor = this.getColorIndicesForCoord(x, y, drawingCanvas);
+                if (inspectedColor[3] !== 0) {
+                    this.imageManipulationService.setRGB(
+                        new Vector2(x, y),
+                        originaleBuffer,
+                        new Pixel(inspectedColor[0], inspectedColor[1], inspectedColor[2]),
+                    );
+                }
+            }
+        }
+    }
+
     async sendImageToServer(): Promise<void> {
         if (!this.canSendToServer()) {
             alert('Veuillez ajouter deux images');
@@ -242,9 +265,11 @@ export class GameCreationPageComponent implements AfterViewInit {
             this.originalImage !== null &&
             this.modifiedImage !== null
         ) {
-            const buffer1 = await this.originalImage.arrayBuffer();
+            const buffer1 = await this.originalImage?.arrayBuffer();
             const buffer2 = await this.modifiedImage.arrayBuffer();
 
+            this.combineImages(Buffer.from(buffer1), this.drawingCanvasOne.nativeElement);
+            this.combineImages(Buffer.from(buffer2), this.drawingCanvasTwo.nativeElement);
             // convert buffer to int array
             const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
             const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
