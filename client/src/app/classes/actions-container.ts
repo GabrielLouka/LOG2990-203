@@ -1,5 +1,5 @@
 import { ElementRef } from '@angular/core';
-import { ACTION, PEN } from '@app/utils/env';
+import { NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { ClearElement } from './clear-element';
 import { CrayonElement } from './crayon-element';
@@ -21,7 +21,7 @@ export class ActionsContainer {
     rightContext: CanvasRenderingContext2D;
     currentCanvasIsLeft: boolean;
     color: string = 'black';
-    penWidth: number = PEN.width;
+    penWidth: number = PEN_WIDTH;
     selectedTool: Tool;
     initialPosition: Vector2;
     previousRectangle: Vector2;
@@ -116,8 +116,8 @@ export class ActionsContainer {
                 );
                 this.previousRectangle = new Vector2(width + this.initialPosition.x, height + this.initialPosition.y);
                 const clearIndex = this.undoActions.findIndex((element) => element instanceof ClearElement);
-                const undoActionsCopy: UndoElement[] = clearIndex !== ACTION.notFound ? this.undoActions.slice() : [];
-                this.undoActions = clearIndex !== ACTION.notFound ? undoActionsCopy.slice(clearIndex) : this.undoActions;
+                const undoActionsCopy: UndoElement[] = clearIndex !== NOT_FOUND ? this.undoActions.slice() : [];
+                this.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy.slice(clearIndex) : this.undoActions;
                 for (const action of this.undoActions) {
                     if (
                         action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas &&
@@ -126,7 +126,7 @@ export class ActionsContainer {
                         action.draw(activeContext);
                     }
                 }
-                this.undoActions = clearIndex !== ACTION.notFound ? undoActionsCopy : this.undoActions;
+                this.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy : this.undoActions;
                 break;
             }
         }

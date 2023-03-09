@@ -1,6 +1,4 @@
 /* eslint-disable prettier/prettier */
-
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
@@ -100,6 +98,7 @@ describe('Game storage service', () => {
         const writeFileStub = sinon.spy(fs, 'writeFileSync');
         readFileStub.returns('14');
         const result = gameStorageService.getNextAvailableGameId();
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(result).to.equal(15);
         sinon.assert.calledWith(writeFileStub, R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, '15');
         sandbox.restore();

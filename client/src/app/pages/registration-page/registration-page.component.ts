@@ -92,13 +92,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
     handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest: string) {
         if (!this.matchmakingService.isHost) return;
-
-        // eslint-disable-next-line no-console
-        console.log('Player ', playerIdThatCancelledTheirJoinRequest, ' cancelled their join request');
-
-        // remove the player from the waiting players list because they cancelled their join request
         this.waitingPlayers = this.waitingPlayers.filter((player) => player.playerId !== playerIdThatCancelledTheirJoinRequest);
-
         this.refreshQueueDisplay();
     }
 
@@ -171,14 +165,8 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
     handleMatchUpdated(match: Match | null) {
         if (match == null) return;
-
-        // eslint-disable-next-line no-console
-        console.log('Match updated ! ', match);
-        if (!this.matchmakingService.isHost /* && match.matchStatus === MatchStatus.InProgress*/) {
+        if (!this.matchmakingService.isHost) {
             if (match.matchStatus === MatchStatus.Aborted) {
-                // if the host left the game
-                // eslint-disable-next-line no-console
-                console.log('Host left the game !' + JSON.stringify(match));
                 this.router.navigate(['/']);
             }
         }

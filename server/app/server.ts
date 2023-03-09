@@ -7,12 +7,12 @@ import { DatabaseService } from './services/database.service';
 import { GameStorageService } from './services/game-storage.service';
 import { MatchManagerService } from './services/match-manager.service';
 import { SocketManager } from './services/socket-manager.service';
+const baseDix = 10;
 
 @Service()
 export class Server {
     private static readonly appPort: string | number | boolean = Server.normalizePort(process.env.PORT || '3000');
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    private static readonly baseDix: number = 10;
+    private static readonly baseDix: number = baseDix;
     private server: http.Server;
     private socketManager: SocketManager;
     constructor(private application: Application, private databaseService: DatabaseService, public matchManagerService: MatchManagerService) {}
@@ -71,7 +71,6 @@ export class Server {
     private onListening(): void {
         const addr = this.server.address() as AddressInfo;
         const bind: string = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
-        // eslint-disable-next-line no-console
         console.log(`Listening on ${bind}`);
     }
 }
