@@ -125,8 +125,8 @@ export class GameCreationPageComponent implements AfterViewInit {
     switchCanvases() {
         const switchElement = new SwitchElement();
         switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftDrawingContext, this.rightDrawingContext);
-        switchElement.draw(this.rightDrawingContext);
 
+        switchElement.draw(this.leftDrawingContext);
         this.actionsContainer.undoActions.push(switchElement);
     }
 
