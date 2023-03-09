@@ -1,3 +1,8 @@
 <div class="container">
-    <p>{{ username }} : {{ differencesFound }} sur {{ differencesNbr }} indice(s) trouvée(s) !</p>
+    <p>
+        {{ username }} : {{ differencesFound }} sur {{ differencesNbr }} différence{{ differencesFound > 1 ? 's' : '' }} trouvée{{
+            differencesFound > 1 ? 's' : ''
+        }}
+        !
+    </p>
 </div>
