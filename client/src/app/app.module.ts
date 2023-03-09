@@ -12,7 +12,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { CreationResultModalComponent } from './components/creation-result-modal/creation-result-modal.component';
-import { FoundHintsCounterComponent } from './components/found-hints-counter/found-hints-counter.component';
+import { FoundDifferencesCounterComponent } from './components/found-differences-counter/found-differences-counter.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GamesDisplayComponent } from './components/games-display/games-display.component';
 import { HintComponent } from './components/hint/hint.component';
@@ -52,7 +52,7 @@ import { AuthService } from './services/auth.service';
         InfoCardComponent,
         RegistrationPageComponent,
         ParameterPageComponent,
-        FoundHintsCounterComponent,
+        FoundDifferencesCounterComponent,
         TimerComponent,
         QuitButtonComponent,
         ChatComponent,
@@ -60,6 +60,7 @@ import { AuthService } from './services/auth.service';
         GamesDisplayComponent,
         CreationResultModalComponent,
         PopUpComponent,
+        FoundDifferencesCounterComponent,
     ],
     providers: [AuthService],
     bootstrap: [AppComponent],
