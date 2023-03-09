@@ -11,7 +11,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
-import { CANVAS_WIDTH, HEIGHTH_MILLISECOND, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { CANVAS_HEIGHT, HEIGHTH_MILLISECOND, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -170,7 +170,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onMouseDown(event: MouseEvent) {
-        const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_WIDTH) };
+        const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
         if (this.matchmakingService.is1vs1Mode) {
             this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
         } else if (this.matchmakingService.isSoloMode) {
