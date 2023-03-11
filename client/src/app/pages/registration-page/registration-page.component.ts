@@ -48,6 +48,11 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         if (this.username && this.hasSentJoinRequest) this.matchmakingService.sendMatchJoinCancel(this.username);
+
+        this.matchmakingService.onGetJoinRequest.clear();
+        this.matchmakingService.onGetJoinCancel.clear();
+        this.matchmakingService.onGetJoinRequestAnswer.clear();
+        this.matchmakingService.onMatchUpdated.clear();
     }
 
     registerUser() {

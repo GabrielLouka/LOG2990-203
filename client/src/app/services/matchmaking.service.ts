@@ -88,6 +88,7 @@ export class MatchmakingService {
     createGame(gameId: string) {
         this.socketService.send<{ gameId: string }>('createMatch', { gameId });
         this.currentMatch = new Match(parseInt(gameId, 10), this.getCurrentSocketId().toString());
+        this.matchIdThatWeAreTryingToJoin = null; // We are the host so we don't need to join
     }
 
     joinGame(matchId: string) {
