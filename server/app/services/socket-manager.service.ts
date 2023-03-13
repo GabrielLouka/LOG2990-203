@@ -128,9 +128,11 @@ export class SocketManager {
             });
             socket.on('deleteAllGame', (data) => {
                 this.sio.emit('allGameDeleted', { noGameLeft: data.deletedGames }, socket.id);
+                this.sio.emit('actionOnGameReloadingThePage');
             });
             socket.on('deletedGame', (data) => {
                 this.sio.emit('gameDeleted', { gameDeleted: data.gameToDelete, id: data.id }, socket.id);
+                this.sio.emit('actionOnGameReloadingThePage');
             });
             socket.on('sendingMessage', (data) => {
                 this.sio
