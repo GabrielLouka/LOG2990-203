@@ -71,7 +71,7 @@ export class ImageManipulationService {
             this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context)
         ])                       
     } 
-    // was removed??? 
+    
     loadCurrentImage(image: Buffer, context: CanvasRenderingContext2D){
         this.loadCanvasImages(this.getImageSourceFromBuffer(image), context);                
     }

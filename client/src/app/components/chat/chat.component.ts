@@ -10,6 +10,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 })
 export class ChatComponent {
     @ViewChild('chat') chat: ElementRef;
+    @ViewChild('inputElement') input: ElementRef;
     @Input() idOfTheGame: string | undefined;
     messages: {
         text: string;

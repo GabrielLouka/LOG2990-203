@@ -19,7 +19,7 @@
         </div>
     </div>
     <div class="flex-row center chat-footer" *ngIf="isMode1vs1">
-        <input type="text" maxlength="200" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
+        <input #inputElement type="text" maxlength="200" [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" />
         <button (click)="sendMessage()"><span class="material-symbols-outlined"> send </span></button>
     </div>
 </div>

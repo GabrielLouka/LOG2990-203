@@ -79,6 +79,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
+        window.addEventListener('keydown', this.onCheatMode.bind(this));
     }
 
     sendSystemMessageToChat(message: string) {
@@ -145,6 +146,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.getInitialImagesFromServer();
         }
         this.focusKeyEvent();
+        window.removeEventListener('keydown', this.onCheatMode.bind(this));
     }
 
     getInitialImagesFromServer() {
@@ -331,16 +333,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if (event.code === 'KeyT') {
-            if (this.letterTPressed) {
-                this.bgColor = '#66FF99';
-                this.cheatMode();
-            } else {
-                this.bgColor = '';
-                clearInterval(this.intervalID);
-                this.imageManipulationService.loadCurrentImage(this.currentModifiedImage, this.rightCanvasContext as CanvasRenderingContext2D);
+        if(document.activeElement !== this.chat.input.nativeElement){
+            if (event.key === 't') {
+                if (this.letterTPressed) {
+                    this.bgColor = '#66FF99';
+                    this.cheatMode();
+                } else {
+                    this.bgColor = '';
+                    clearInterval(this.intervalID);
+                    this.imageManipulationService.loadCurrentImage(this.currentModifiedImage, this.rightCanvasContext as CanvasRenderingContext2D);
+                }
+                this.letterTPressed = !this.letterTPressed;
             }
-            this.letterTPressed = !this.letterTPressed;
         }
     }
 
