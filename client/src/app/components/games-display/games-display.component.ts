@@ -100,7 +100,7 @@ export class GamesDisplayComponent implements OnInit {
         this.socketService.on('actionOnGameReloadingThePage', () => {
             const pathSegments = window.location.href.split('/');
             const pageName = pathSegments[pathSegments.length - 2];
-            if (pageName !== 'classic') {
+            if (pageName === 'selections' || pageName === 'config') {
                 window.location.reload();
             }
         });
