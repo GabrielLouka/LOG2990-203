@@ -97,19 +97,19 @@ export class GamesDisplayComponent implements OnInit {
         this.socketService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
             this.updateGameAvailability(data.gameId, data.matchToJoinIfAvailable);
         });
-        this.socketService.on('gameDeleted', () => {
-            window.location.reload();
+        this.socketService.on('actionOnGameReloadingThePage', () => {
+            const pathSegments = window.location.href.split('/');
+            const pageName = pathSegments[pathSegments.length - 2];
+            if (pageName === 'selections' || pageName === 'config') {
+                window.location.reload();
+            }
         });
     }
 
     updateGameAvailability(gameId: number, matchToJoinIfAvailable: string | null) {
         for (const game of this.games) {
-            // i convert the id to a string because otherwise the comparison doesn't work
-            // ...why?
             if (game.gameData.id.toString() === gameId.toString()) {
                 game.matchToJoinIfAvailable = matchToJoinIfAvailable;
-                // eslint-disable-next-line no-console
-                console.log('Match for game id ' + gameId + ' is now ' + matchToJoinIfAvailable);
                 break;
             }
         }

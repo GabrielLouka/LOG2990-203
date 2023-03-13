@@ -1,5 +1,5 @@
-import { GAME_CONST } from '@app/utils/env';
 import { GameData } from '@common/game-data';
+import { NOT_FOUND } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { expect } from 'chai';
 import { assert } from 'console';
@@ -46,6 +46,6 @@ describe('MatchingDifferences service', () => {
     it('getDIfference should return -1 if none have been found', () => {
         click = { x: 0, y: 0 };
         const result = differenceService.getDifferenceIndex(gameData, click);
-        expect(result).to.deep.equal(GAME_CONST.NOT_FOUND);
+        expect(result).to.deep.equal(NOT_FOUND);
     });
 });

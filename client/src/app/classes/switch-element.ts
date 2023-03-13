@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+import { PEN_WIDTH } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { UndoElement } from './undo-element.abstract';
 
@@ -7,7 +7,7 @@ export class SwitchElement extends UndoElement {
     leftContext: CanvasRenderingContext2D;
     rightContext: CanvasRenderingContext2D;
     constructor(public isLeftCanvas: boolean = true, public pixels: Vector2[] = [new Vector2(0, 0)]) {
-        super(pixels, isLeftCanvas, 20, 'black');
+        super(pixels, isLeftCanvas, PEN_WIDTH, 'black');
     }
     loadCanvases(actionsToCopy: UndoElement[], leftContext: CanvasRenderingContext2D, rightContext: CanvasRenderingContext2D) {
         this.actionsToCopy = actionsToCopy;
@@ -15,21 +15,21 @@ export class SwitchElement extends UndoElement {
         this.rightContext = rightContext;
     }
     draw(leftContext: CanvasRenderingContext2D): CanvasRenderingContext2D {
-        const tempCanvas = document.createElement('canvas');
-        const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-        tempCanvas.width = leftContext.canvas.width;
-        tempCanvas.height = leftContext.canvas.height;
-        tempContext.drawImage(this.leftContext.canvas, 0, 0);
-
-        this.leftContext.clearRect(0, 0, this.leftContext.canvas.width, this.leftContext.canvas.height);
-        this.leftContext.drawImage(this.rightContext.canvas, 0, 0);
-
-        this.rightContext.clearRect(0, 0, this.rightContext.canvas.width, this.rightContext.canvas.height);
-        this.rightContext.drawImage(tempCanvas, 0, 0);
+        this.leftContext.clearRect(0, 0, leftContext.canvas.width, this.leftContext.canvas.height);
+        this.rightContext.clearRect(0, 0, this.leftContext.canvas.width, this.leftContext.canvas.height);
         for (const action of this.actionsToCopy) {
-            action.isLeftCanvas = !action.isLeftCanvas;
+            if (action.isLeftCanvas) {
+                if (!(action instanceof SwitchElement)) {
+                    action.draw(this.rightContext);
+                    action.isLeftCanvas = !action.isLeftCanvas;
+                }
+            } else {
+                if (!(action instanceof SwitchElement)) {
+                    action.draw(this.leftContext);
+                    action.isLeftCanvas = !action.isLeftCanvas;
+                }
+            }
         }
-        return this.leftContext;
+        return leftContext;
     }
 }

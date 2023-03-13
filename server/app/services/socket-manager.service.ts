@@ -82,9 +82,9 @@ export class SocketManager {
 
             // Matchmaking sockets
             socket.on('createMatch', (data) => {
-                console.log('Creating game (id ' + data.gameId + ')');
                 const newMatchId = this.matchManagerService.createMatch(data.gameId, socket.id).matchId;
                 joinMatchRoom({ matchId: newMatchId });
+                console.log('Creating match with id ' + newMatchId + ' for player ' + socket.id);
             });
 
             // User requests to set the current match type
@@ -128,9 +128,11 @@ export class SocketManager {
             });
             socket.on('deleteAllGame', (data) => {
                 this.sio.emit('allGameDeleted', { noGameLeft: data.deletedGames }, socket.id);
+                this.sio.emit('actionOnGameReloadingThePage');
             });
             socket.on('deletedGame', (data) => {
                 this.sio.emit('gameDeleted', { gameDeleted: data.gameToDelete, id: data.id }, socket.id);
+                this.sio.emit('actionOnGameReloadingThePage');
             });
             socket.on('sendingMessage', (data) => {
                 this.sio

@@ -13,19 +13,19 @@
     <div class="flex-column center difference-container">
         <div class="flex-row center data-container">
             <div class="hints-container">
-                <app-found-hints-counter
+                <app-found-differences-counter
                     class="hints-container"
                     [username]="this.player1"
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="totalDifferences"
-                ></app-found-hints-counter>
-                <app-found-hints-counter
+                ></app-found-differences-counter>
+                <app-found-differences-counter
                     class="hints-container"
                     *ngIf="is1vs1Mode"
                     [username]="this.player2"
                     [differencesFound]="differencesFound2"
                     [differencesNbr]="totalDifferences"
-                ></app-found-hints-counter>
+                ></app-found-differences-counter>
             </div>
             <div class="timer-container">
                 <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>

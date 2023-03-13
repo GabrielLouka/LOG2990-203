@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-lines */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
-import { AuthService } from '@app/services/auth.service';
 import { CommunicationService } from '@app/services/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking.service';
@@ -13,6 +12,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
+import { CANVAS_HEIGHT, HEIGHTH_MILLISECOND, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -58,7 +58,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
-        private auth: AuthService,
         private imageManipulationService: ImageManipulationService,
         private matchmakingService: MatchmakingService,
     ) {}
@@ -117,17 +116,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.player2 = this.matchmakingService.currentMatchPlayer2Username;
         }
         if (match !== null) {
-            // eslint-disable-next-line no-console
-            console.log('Match updated classic ' + JSON.stringify(match));
             this.matchId = this.matchmakingService.getCurrentMatch()?.matchId as string;
-            // TODO dead code ?? line 114 to 124
-            if (match.matchStatus === MatchStatus.InProgress) {
-                if (match.player1 == null) {
-                    window.alert('Player 1 left the game');
-                } else if (match.player2 == null) {
-                    window.alert('Player 2 left the game');
-                }
-            }
             const abortedGameMessage = ' a abandonné la partie';
             if (this.isPlayer1Win(match)) {
                 this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
@@ -150,7 +139,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     getInitialImagesFromServer() {
-        // retrieve the game id from the url
         const gameId: string = this.currentGameId ? this.currentGameId : '0';
         const routeToSend = '/games/fetchGame/' + gameId;
 
@@ -185,10 +173,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onMouseDown(event: MouseEvent) {
-        const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - 480) };
-        if (this.matchmakingService.is1vs1Mode) {
+        const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
+        if (this.matchmakingService.isSoloMode) {
             this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
-        } else if (this.matchmakingService.isSoloMode) {
+        } else if (this.matchmakingService.is1vs1Mode) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
@@ -202,8 +190,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.game.gameData });
-        // eslint-disable-next-line no-console
-        console.log('requestStartGame ' + this.auth.registeredUsername);
     }
 
     addServerSocketMessagesListeners() {
@@ -278,7 +264,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.errorMessage.nativeElement.style.display = 'none';
             this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
             this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
-        }, 1000);
+        }, MILLISECOND_TO_SECONDS);
     }
 
     onFindDifference() {
@@ -296,7 +282,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
-
         if (this.rightCanvasContext !== null) {
             await this.imageManipulationService.blinkDifference(
                 this.currentModifiedImage != null ? this.currentModifiedImage : this.game.modifiedImage,
@@ -311,8 +296,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.timerElement.stopTimer();
         this.socketService.disconnect();
         this.socketService.send('gameFinished', {
-            minutesElapsed: Math.floor(this.timeInSeconds / 60),
-            secondsElapsed: Math.floor(this.timeInSeconds % 60),
+            minutesElapsed: Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS),
+            secondsElapsed: Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS),
         });
     }
 
@@ -320,7 +305,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showConfirmationPopUp();
     }
 
-    // Called when the player wins the game
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
@@ -370,7 +354,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         this.rightCanvasContext as CanvasRenderingContext2D,
                     );
                 }, 0);
-            }, 25);
+            }, HEIGHTH_MILLISECOND);
             this.currentModifiedImage = newImage;
         }
     }
