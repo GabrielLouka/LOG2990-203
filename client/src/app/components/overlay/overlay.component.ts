@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -16,6 +17,7 @@ export class OverlayComponent {
     @Input() isPlayable: boolean;
     @Input() id: string;
     @Input() matchToJoinIfAvailable: string | null = null;
+    @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     constructor(
         private readonly matchmakingService: MatchmakingService,
@@ -44,20 +46,25 @@ export class OverlayComponent {
         this.matchmakingService.joinGame(this.matchToJoinIfAvailable);
         this.router.navigate(['/registration', this.id]);
     }
-    async deleteSelectedGame(): Promise<void> {
-        const routeToSend = '/games/' + this.id;
-        this.communicationService.delete(routeToSend).subscribe({
-            next: (response) => {
-                if (response.body !== null) {
-                    location.reload();
-                }
-            },
-            error: (err: HttpErrorResponse) => {
-                const responseString = `Server Error : ${err.message}`;
-                const serverResult = JSON.parse(err.error);
-                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
-            },
-        });
-        this.socketService.socket.emit('deletedGame', { gameToDelete: true, id: this.id });
+    showDeletePopUp() {
+        this.popUpElement.showDeleteGamesPopUp(false);
+    }
+    async deleteSelectedGame(isDeleteRequest: boolean): Promise<void> {
+        if (isDeleteRequest) {
+            const routeToSend = '/games/' + this.id;
+            this.communicationService.delete(routeToSend).subscribe({
+                next: (response) => {
+                    if (response.body !== null) {
+                        location.reload();
+                    }
+                },
+                error: (err: HttpErrorResponse) => {
+                    const responseString = `Server Error : ${err.message}`;
+                    const serverResult = JSON.parse(err.error);
+                    this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+                },
+            });
+            this.socketService.socket.emit('deletedGame', { gameToDelete: true, id: this.id });
+        }
     }
 }

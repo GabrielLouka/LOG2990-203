@@ -3,6 +3,9 @@
     <button *ngIf="isPlayable" class="button-style" (click)="matchToJoinIfAvailable ? joinGame() : createOneVersusOneGame()">
         {{ matchToJoinIfAvailable ? 'Rejoindre' : 'Creer' }}
     </button>
-    <button *ngIf="!isPlayable" class="button-style"(click)="deleteSelectedGame()" >Supprimer</button>
+    <button *ngIf="!isPlayable" class="button-style" (click)="showDeletePopUp()">Supprimer</button>
     <button *ngIf="!isPlayable" class="button-style not-allowed">Réinitialiser</button>
+</div>
+<div class="flex-row center">
+    <app-delete-games-pop-up #popUpElement (isDeleteRequest)="deleteSelectedGame($event)"></app-delete-games-pop-up>
 </div>

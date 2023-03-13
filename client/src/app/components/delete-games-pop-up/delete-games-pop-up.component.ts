@@ -8,25 +8,28 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular
 export class DeleteGamesPopUpComponent {
     @ViewChild('bgModal') modal!: ElementRef;
     @Output() isDeleteRequest = new EventEmitter<boolean>();
+    deleteAllGamesMessage = 'TOUS LES JEUX ?';
+    deleteThisGame = 'CE JEU ?';
+    deleteMessage = 'SUPPRIMER ';
     popUpInfo: {
         title: string;
         message: string;
         option1: string;
         option2: string;
+        isDeleteAllGames: boolean;
     }[] = [];
 
     showDeleteGamesPopUp(isDeleteAllGames: boolean) {
-        const deleteAllGamesMessage = 'TOUS LES JEUX ?';
-        const deleteThisGame = 'CE JEU ?';
-        const deleteMessage = 'SUPPRIMER ';
-        const message = isDeleteAllGames ? deleteAllGamesMessage : deleteThisGame;
+        const message = isDeleteAllGames ? this.deleteAllGamesMessage : this.deleteThisGame;
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
-            title: deleteMessage + message,
+            title: this.deleteMessage + message,
             message: '',
             option1: 'OUI',
             option2: 'NON',
+            isDeleteAllGames,
         });
+
         this.showPopUp();
     }
 
