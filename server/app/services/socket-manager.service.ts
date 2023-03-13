@@ -82,9 +82,9 @@ export class SocketManager {
 
             // Matchmaking sockets
             socket.on('createMatch', (data) => {
-                console.log('Creating game (id ' + data.gameId + ')');
                 const newMatchId = this.matchManagerService.createMatch(data.gameId, socket.id).matchId;
                 joinMatchRoom({ matchId: newMatchId });
+                console.log('Creating match with id ' + newMatchId + ' for player ' + socket.id);
             });
 
             // User requests to set the current match type

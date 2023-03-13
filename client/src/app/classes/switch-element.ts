@@ -15,21 +15,21 @@ export class SwitchElement extends UndoElement {
         this.rightContext = rightContext;
     }
     draw(leftContext: CanvasRenderingContext2D): CanvasRenderingContext2D {
-        const tempCanvas = document.createElement('canvas');
-        const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-        tempCanvas.width = leftContext.canvas.width;
-        tempCanvas.height = leftContext.canvas.height;
-        tempContext.drawImage(this.leftContext.canvas, 0, 0);
-
-        this.leftContext.clearRect(0, 0, this.leftContext.canvas.width, this.leftContext.canvas.height);
-        this.leftContext.drawImage(this.rightContext.canvas, 0, 0);
-
-        this.rightContext.clearRect(0, 0, this.rightContext.canvas.width, this.rightContext.canvas.height);
-        this.rightContext.drawImage(tempCanvas, 0, 0);
+        this.leftContext.clearRect(0, 0, leftContext.canvas.width, this.leftContext.canvas.height);
+        this.rightContext.clearRect(0, 0, this.leftContext.canvas.width, this.leftContext.canvas.height);
         for (const action of this.actionsToCopy) {
-            action.isLeftCanvas = !action.isLeftCanvas;
+            if (action.isLeftCanvas) {
+                if (!(action instanceof SwitchElement)) {
+                    action.draw(this.rightContext);
+                    action.isLeftCanvas = !action.isLeftCanvas;
+                }
+            } else {
+                if (!(action instanceof SwitchElement)) {
+                    action.draw(this.leftContext);
+                    action.isLeftCanvas = !action.isLeftCanvas;
+                }
+            }
         }
-        return this.leftContext;
+        return leftContext;
     }
 }

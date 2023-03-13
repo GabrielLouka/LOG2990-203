@@ -53,7 +53,7 @@ export class ActionsContainer {
         if (lastRedoAction) {
             this.undoActions.push(lastRedoAction);
             for (const action of this.undoActions) {
-                if (action.isLeftCanvas) {
+                if (action.isLeftCanvas || action instanceof SwitchElement) {
                     activeContext = this.leftContext;
                 } else {
                     activeContext = this.rightContext;

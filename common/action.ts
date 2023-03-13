@@ -14,6 +14,10 @@ export class Action<T> {
         }
     }
 
+    clear(): void {
+        this.funcs = [];
+    }
+
     invoke(arg: T): void {
         this.funcs.forEach((func) => func(arg));
     }
