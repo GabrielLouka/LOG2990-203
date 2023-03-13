@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
 import { CommunicationService } from '@app/services/communication.service';
 import { MatchmakingService } from '@app/services/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client.service';
@@ -15,6 +16,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class GamesDisplayComponent implements OnInit {
     @Input() isSelection: boolean;
+    @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     currentPageNbr: number = 0;
     games: {
@@ -60,23 +62,31 @@ export class GamesDisplayComponent implements OnInit {
             },
         });
     }
-    async deleteAllGames(): Promise<void> {
-        const routeToSend = '/games/deleteAllGames';
-        this.communicationService.delete(routeToSend).subscribe({
-            next: (response) => {
-                if (response.body !== null) {
-                    this.gamesNbr = 0;
-                    location.reload();
-                }
-            },
-            error: (err: HttpErrorResponse) => {
-                const responseString = `Server Error : ${err.message}`;
-                const serverResult = JSON.parse(err.error);
-                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
-            },
-        });
-        this.socketService.socket.emit('deleteAllGame', { gameToDelete: true });
+
+    onDeleteAllGames() {
+        this.popUpElement.showDeleteGamesPopUp(true);
     }
+
+    async deleteAllGames(isDeleteRequest: boolean): Promise<void> {
+        if (isDeleteRequest) {
+            const routeToSend = '/games/deleteAllGames';
+            this.communicationService.delete(routeToSend).subscribe({
+                next: (response) => {
+                    if (response.body !== null) {
+                        this.gamesNbr = 0;
+                        location.reload();
+                    }
+                },
+                error: (err: HttpErrorResponse) => {
+                    const responseString = `Server Error : ${err.message}`;
+                    const serverResult = JSON.parse(err.error);
+                    this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
+                },
+            });
+            this.socketService.socket.emit('deleteAllGame', { gameToDelete: true });
+        }
+    }
+
     async goToNextSlide() {
         this.currentPageNbr++;
         if (this.currentPageNbr > 0) {

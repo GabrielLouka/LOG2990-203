@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
     selector: 'app-pop-up',
@@ -7,9 +7,6 @@ import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 })
 export class PopUpComponent {
     @ViewChild('bgModal') modal!: ElementRef;
-    @ViewChild('button1') option1Btn!: ElementRef;
-    @ViewChild('button2') option2Btn!: ElementRef;
-    @Input() isDisplayed: boolean;
 
     popUpInfo: {
         title: string;
@@ -37,7 +34,6 @@ export class PopUpComponent {
         const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
         const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
         const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
-
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: isWinByDefault ? soloMessage : titleMessage,

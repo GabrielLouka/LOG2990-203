@@ -30,6 +30,7 @@ import { ParameterPageComponent } from './pages/parameter-page/parameter-page.co
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
+import { DeleteGamesPopUpComponent } from './components/delete-games-pop-up/delete-games-pop-up.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -61,6 +62,7 @@ import { AuthService } from './services/auth.service';
         CreationResultModalComponent,
         PopUpComponent,
         FoundDifferencesCounterComponent,
+        DeleteGamesPopUpComponent,
     ],
     providers: [AuthService],
     bootstrap: [AppComponent],
