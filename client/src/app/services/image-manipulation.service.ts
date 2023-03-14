@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { GameData } from '@common/game-data';
 import { Pixel } from '@common/pixel';
+import { QUARTER_SECOND } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
@@ -65,11 +66,17 @@ export class ImageManipulationService {
         }
     }
 
-    async alternateOldNewImage(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
-        await Promise.race([
-            this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context),
-            this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context)
-        ])                       
+    alternateOldNewImage(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {                           
+        let showOldImage = false;
+        let interval = window.setInterval(() => {
+            if (showOldImage) {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
+            } else {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+            }
+            showOldImage = !showOldImage;
+        }, QUARTER_SECOND / 2);
+        return interval;
     } 
     
     loadCurrentImage(image: Buffer, context: CanvasRenderingContext2D){

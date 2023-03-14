@@ -12,7 +12,7 @@ import { SocketClientService } from '@app/services/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
-import { CANVAS_HEIGHT, HEIGHTH_MILLISECOND, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -35,7 +35,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     // @HostListener('window:keydown.t', ['$event'])
     letterTPressed: boolean = true;
     bgColor = '';
-    intervalID: number | undefined;
+    intervalIDLeft: number | undefined;
+    intervalIDRight: number | undefined;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     timeInSeconds = 0;
     matchId: string;
@@ -270,7 +271,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onFindDifference() {
         this.playSuccessSound();
         this.refreshModifiedImage();
-        clearInterval(this.intervalID);
+        window.clearInterval(this.intervalIDLeft);
+        window.clearInterval(this.intervalIDRight);
         this.bgColor = '';
         this.letterTPressed = true;
         this.focusKeyEvent();
@@ -324,8 +326,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.cheatMode();
                 } else {
                     this.bgColor = '';
-                    clearInterval(this.intervalID);
-                    this.imageManipulationService.loadCurrentImage(this.currentModifiedImage, this.rightCanvasContext as CanvasRenderingContext2D);
+                    window.clearInterval(this.intervalIDLeft);
+                    window.clearInterval(this.intervalIDRight);
+                    if (this.currentModifiedImage && this.game.originalImage){
+                        this.imageManipulationService.loadCurrentImage(this.currentModifiedImage, this.rightCanvasContext as CanvasRenderingContext2D);
+                        this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
+                    }
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
@@ -338,23 +344,30 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
+        
         if (this.leftCanvasContext && this.rightCanvasContext) {
-            this.intervalID = window.setInterval(async () => {
-                setTimeout(() => {
-                    this.imageManipulationService.alternateOldNewImage(
-                        this.game.originalImage,
-                        newImage,
-                        this.leftCanvasContext as CanvasRenderingContext2D,
-                    );
-                }, 0);
-                setTimeout(() => {
-                    this.imageManipulationService.alternateOldNewImage(
-                        this.game.originalImage,
-                        this.currentModifiedImage,
-                        this.rightCanvasContext as CanvasRenderingContext2D,
-                    );
-                }, 0);
-            }, HEIGHTH_MILLISECOND);
+
+            this.intervalIDLeft = this.imageManipulationService.alternateOldNewImage(
+                this.game.originalImage,
+                newImage,
+                this.leftCanvasContext as CanvasRenderingContext2D
+            )
+            
+            if (this.currentModifiedImage){
+                this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
+                    this.game.originalImage,
+                    this.currentModifiedImage,
+                    this.rightCanvasContext as CanvasRenderingContext2D
+                );
+            }
+            else{
+                this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
+                    this.game.originalImage,
+                    this.game.modifiedImage,
+                    this.rightCanvasContext as CanvasRenderingContext2D
+                );
+            }
+                    
             this.currentModifiedImage = newImage;
         }
     }
