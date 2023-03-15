@@ -13,7 +13,6 @@ export class MatchManagerService {
         return this.currentMatches;
     }
 
-    // create a new match and return it
     createMatch(gameId: number, matchId: string): Match {
         const matchToCreate = new Match(gameId, matchId);
         matchToCreate.matchStatus = MatchStatus.WaitingForPlayer1;
@@ -27,8 +26,6 @@ export class MatchManagerService {
 
         if (matchToChange != null) {
             matchToChange.matchType = matchType;
-            console.log('set match ' + matchId + ' type to ' + matchType);
-            console.log('match type is now ' + this.getMatchById(matchId)?.matchType);
         }
     }
 
@@ -39,20 +36,13 @@ export class MatchManagerService {
             if (matchToChange.player1 == null) {
                 matchToChange.player1 = player;
                 if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer1) matchToChange.matchStatus = MatchStatus.WaitingForPlayer2;
-                console.log('set match ' + matchId + ' player 1' + ' to ' + player.username);
             } else {
                 matchToChange.player2 = player;
                 if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer2) matchToChange.matchStatus = MatchStatus.InProgress;
-                console.log('set match ' + matchId + ' player 2' + ' to ' + player.username);
             }
-        } else {
-            console.log('match ' + matchId + ' not found');
         }
     }
 
-    // this is called when a player disconnects
-    // if the player is in a match, remove him from the match
-    // returns the matchId of the match that was removed
     removePlayerFromMatch(playerId: string): string | null {
         let modifiedMatch: Match | null = null;
         for (const match of this.currentMatches) {
@@ -72,7 +62,6 @@ export class MatchManagerService {
             if (modifiedMatch.player1 == null && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
             else modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
-            console.log('match ' + modifiedMatch.matchId + ' status changed to ' + modifiedMatch.matchStatus.toString());
         }
 
         return modifiedMatch?.matchId ?? null;
@@ -84,14 +73,9 @@ export class MatchManagerService {
                 return match;
             }
         }
-
-        // eslint-disable-next-line no-console
-        console.log("Couldn't find match " + matchId);
         return null;
     }
 
-    // if there is someone waiting for a match, return the matchId
-    // otherwise, return null
     getMatchAvailableForGame(gameId: number): string | null {
         for (const match of this.currentMatches) {
             if (match.gameId.toString() === gameId.toString() && match.matchType === MatchType.OneVersusOne) {
