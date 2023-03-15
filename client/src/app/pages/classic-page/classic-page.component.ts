@@ -273,6 +273,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.refreshModifiedImage();
         window.clearInterval(this.intervalIDLeft);
         window.clearInterval(this.intervalIDRight);
+        this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
         this.bgColor = '';
         this.letterTPressed = true;
         this.focusKeyEvent();
