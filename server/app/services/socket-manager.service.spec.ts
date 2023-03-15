@@ -5,6 +5,9 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Server } from '@app/server';
 import { GameData } from '@common/game-data';
+import { Match } from '@common/match';
+import { MatchStatus } from '@common/match-status';
+import { MatchType } from '@common/match-type';
 import { defaultRankings } from '@common/ranking';
 import { Vector2 } from '@common/vector2';
 import { assert, expect } from 'chai';
@@ -12,6 +15,7 @@ import * as sinon from 'sinon';
 import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
+import { MatchManagerService } from './match-manager.service';
 import { MatchingDifferencesService } from './matching-differences.service';
 import { SocketManager } from './socket-manager.service';
 
@@ -23,7 +27,7 @@ describe('SocketManager', () => {
     let connectionStub: SinonStub;
     let emitStub: SinonStub;
     let matchingDifferencesServiceStub: SinonStubbedInstance<MatchingDifferencesService>;
-    // let matchManagerServiceStub: SinonStubbedInstance<MatchManagerService>;
+    let matchManagerServiceStub: SinonStubbedInstance<MatchManagerService>;
     let roomEmitStub: SinonStub;
 
     beforeEach(async () => {
@@ -34,7 +38,9 @@ describe('SocketManager', () => {
         connectionStub = sinon.stub(socketManager['sio'], 'on');
         emitStub = sinon.stub(socketManager['sio'].sockets, <any>'emit');
         matchingDifferencesServiceStub = sinon.createStubInstance(MatchingDifferencesService);
-        // matchManagerServiceStub = sinon.createStubInstance(MatchManagerService);
+        matchManagerServiceStub = sinon.createStubInstance(MatchManagerService);
+        matchManagerServiceStub.getMatchById.resolves(match);
+        matchManagerServiceStub.getMatchAvailableForGame.resolves(match.matchId);
         roomEmitStub = sinon.stub(socketManager['sio'], <any>'to');
     });
 
@@ -48,6 +54,28 @@ describe('SocketManager', () => {
         sinon.restore();
     });
 
+    const matchPlayer = {
+        username: 'player',
+        playerId: 'socket1',
+    };
+    const match: Match = {
+        gameId: 0,
+        matchId: 'match1',
+        player1: matchPlayer,
+        player2: matchPlayer,
+        matchType: MatchType.OneVersusOne,
+        matchStatus: MatchStatus.InProgress,
+    };
+    const socket = {
+        id: 'socket1',
+        emit: sinon.stub(),
+        on: sinon.stub(),
+        join: sinon.stub(),
+        to: sinon.stub(),
+        rooms: new Set<string>(['match1']),
+        data: {},
+    };
+
     it('should disconnect all sockets instances disconnect', (done) => {
         const spy = sinon.spy(socketManager['sio'].sockets, 'disconnectSockets');
         socketManager.disconnect();
@@ -59,63 +87,7 @@ describe('SocketManager', () => {
     });
 
     describe('handleSockets', () => {
-        it('should print to console a connexion message', (done) => {
-            socketManager.handleSockets();
-            const spy = sinon.spy(console, 'log');
-            const connectionCallback = connectionStub.getCall(0).args[1];
-            const socket = {
-                id: 'socket1',
-                emit: sinon.stub(),
-                on: sinon.stub(),
-                rooms: new Set(['room1']),
-            };
-            connectionCallback(socket);
-            // eslint-disable-next-line no-unused-expressions
-            assert(spy.calledOnceWith(`Connexion par l'utilisateur avec id : ${socket.id}`));
-            spy.restore();
-            done();
-        });
-
-        // it('should call "on" method with "connection" event and call "emit" with "hello" event and "Hello World!" message', (done) => {
-        //     socketManager.handleSockets();
-        //     const connectionCallback = connectionStub.getCall(0).args[1];
-        //     const socket = {
-        //         id: 'socket1',
-        //         emit: sinon.stub(),
-        //         on: sinon.stub(),
-        //         rooms: new Set(['room1']),
-        //     };
-
-        //     connectionCallback(socket);
-
-        //     // eslint-disable-next-line no-unused-expressions
-        //     assert(socket.emit.calledOnceWith('hello', 'Hello World!'));
-        //     done();
-        // });
-
-        it('should print to console when socket sends message', (done) => {
-            socketManager.handleSockets();
-            const connectionCallback = connectionStub.getCall(0).args[1];
-            const spy = sinon.spy(console, 'log');
-            const socket = {
-                id: 'socket1',
-                emit: sinon.stub(),
-                on: sinon.stub(),
-                rooms: new Set(['room1']),
-            };
-            const testMessage = 'messageTest';
-
-            connectionCallback(socket);
-            const socketOnCallBack = socket.on.getCall(0).args[1];
-            socketOnCallBack(testMessage);
-
-            // eslint-disable-next-line no-unused-expressions
-            assert(spy.calledWith(testMessage));
-            spy.restore();
-            done();
-        });
-
-        it('should registerGameData', (done) => {
+        it('should registerGameData and call update match', (done) => {
             const dataTest: GameData = {
                 id: 0,
                 name: 'Jeu1',
@@ -130,99 +102,21 @@ describe('SocketManager', () => {
                 ranking: defaultRankings,
             };
             socketManager.handleSockets();
+            matchManagerServiceStub.createMatch(match.gameId, match.matchId);
             const connectionCallback = connectionStub.getCall(0).args[1];
-            const socket = {
-                id: 'socket1',
-                emit: sinon.stub(),
-                on: sinon.stub(),
-                join: sinon.stub(),
-                rooms: new Set<string>(['room1']),
-                data: {},
-            };
-
             connectionCallback(socket);
-            const registerCallback = socket.on.getCall(1).args[1];
+            const fakeEmit = sinon.fake();
+            roomEmitStub.returns({ emit: fakeEmit });
+            validateSocket.rooms.has = sinon.stub().returns(true);
+            const registerCallback = socket.on.getCall(0).args[1];
             registerCallback(dataTest);
             setTimeout(() => {
                 assert(socket.on.calledWith('registerGameData'));
                 expect(socket.data).to.deep.equal(dataTest);
                 done();
-            }, RESPONSE_DELAY * 5); // 1 seconde
+            }, RESPONSE_DELAY); // 1 seconde
         });
     });
-
-    it('should disconnect when disconnect is called and print reason', (done) => {
-        socketManager.handleSockets();
-        const spy = sinon.spy(console, 'log');
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        const socket = {
-            id: 'socket1',
-            emit: sinon.stub(),
-            on: sinon.stub(),
-            join: sinon.stub(),
-            rooms: new Set(),
-            data: {},
-        };
-        connectionCallback(socket);
-
-        const disconnectCallback = socket.on.getCall(4).args[1];
-        const reason = 'Raison test';
-        disconnectCallback(reason);
-        setTimeout(() => {
-            assert(socket.on.calledWith('disconnect'));
-            assert(spy.calledWith(`Déconnexion par l'utilisateur avec id : ${socket.id}`));
-            assert(spy.calledWith(`Raison de déconnexion : ${reason}`));
-            spy.restore();
-            done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
-    });
-
-    it('should call removePlayerFromMatch if player quits when disconnect is called  ', (done) => {
-        socketManager.handleSockets();
-        const spy = sinon.spy(console, 'log');
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        const socket = {
-            id: 'socket1',
-            emit: sinon.stub(),
-            on: sinon.stub(),
-            join: sinon.stub(),
-            rooms: new Set(),
-            data: {},
-        };
-        connectionCallback(socket);
-
-        const disconnectCallback = socket.on.getCall(4).args[1];
-        const reason = 'Raison test';
-        disconnectCallback(reason);
-        setTimeout(() => {
-            spy.restore();
-            done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
-    });
-
-    // it('should broadcast message to all', (done) => {
-    //     socketManager.handleSockets();
-    //     const connectionCallback = connectionStub.getCall(0).args[1];
-    //     const socket = {
-    //         id: 'socket1',
-    //         emit: sinon.stub(),
-    //         on: sinon.stub(),
-    //         join: sinon.stub(),
-    //         rooms: new Set(),
-    //         data: {},
-    //     };
-    //     connectionCallback(socket);
-
-    //     const broadcastCallback = socket.on.getCall(3).args[1];
-    //     const broadcastMessage = 'Broadcast test';
-    //     broadcastCallback(broadcastMessage);
-    //     setTimeout(() => {
-    //         assert(socket.on.calledWith('broadcastAll'));
-    //         assert(emitStub.calledWith('massMessage', `${socket.id} : ${broadcastMessage}`));
-    //         done();
-    //     }, RESPONSE_DELAY * 5); // 1 seconde
-    // });
-
     const data: GameData = {
         id: 0,
         name: 'Jeu1',
@@ -236,166 +130,215 @@ describe('SocketManager', () => {
         ],
         ranking: defaultRankings,
     };
-    // it('should validate difference when one is found', (done) => {
-    //     const spy = sinon.spy(console, 'log');
-    //     const differencePosition: Vector2 = new Vector2(200, 100);
-    //     matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
-    //     socketManager.handleSockets();
-    //     const connectionCallback = connectionStub.getCall(0).args[1];
-    //     const socket = {
-    //         id: 'socket1',
-    //         emit: sinon.stub(),
-    //         on: sinon.stub(),
-    //         join: sinon.stub(),
-    //         rooms: new Set<string>(['0user1socket1']),
-    //         data: {
-    //             gameData: {
-    //                 id: 0,
-    //                 name: 'Jeu1',
-    //                 isEasy: true,
-    //                 nbrDifferences: 2,
-    //                 differences: [
-    //                     [
-    //                         { x: 200, y: 100 },
-    //                         { x: 100, y: 200 },
-    //                     ],
-    //                 ],
-    //                 ranking: defaultRankings,
-    //             },
-    //         },
-    //     };
-    //     connectionCallback(socket);
-    //     const fakeEmit = sinon.fake();
-    //     roomEmitStub.returns({ emit: fakeEmit });
-    //     socket.rooms.has = sinon.stub().returns(true);
-    //     const username = 'user1';
-    //     const launchCallback = socket.on.getCall(1).args[1];
-    //     launchCallback({ gameData: data, username });
-    //     const validateCallback = socket.on.getCall(2).args[1];
-    //     validateCallback({ foundDifferences: [false, false], position: differencePosition });
-    //     setTimeout(() => {
-    //         assert(socket.on.calledWith(''));
-    //         assert(spy.calledWith('launchGame called with 0user1socket1'));
-    //         assert(spy.calledWith('gameData saved for room: 0user1socket1'));
-    //         assert(socket.on.calledWith('validateDifference'));
-    //         assert(spy.calledWith('SUCCESSFULLY FOUND'));
-    //         assert(spy.calledWith('Difference found at index #0'));
-    //         roomEmitStub.restore();
-    //         spy.restore();
-    //         sinon.restore();
-    //         done();
-    //     }, RESPONSE_DELAY * 5); // 1 seconde
-    // });
+    const validateSocket = {
+        id: 'socket1',
+        emit: sinon.stub(),
+        on: sinon.stub(),
+        join: sinon.stub(),
+        rooms: new Set<string>(['0user1socket1']),
+        data: {
+            gameData: {
+                id: 0,
+                name: 'Jeu1',
+                isEasy: true,
+                nbrDifferences: 2,
+                differences: [
+                    [
+                        { x: 200, y: 100 },
+                        { x: 100, y: 200 },
+                    ],
+                ],
+                ranking: defaultRankings,
+            },
+        },
+    };
+    it('should validate difference when one is found', (done) => {
+        const differencePosition: Vector2 = new Vector2(200, 100);
+        matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(validateSocket);
+        const fakeEmit = sinon.fake();
+        roomEmitStub.returns({ emit: fakeEmit });
+        validateSocket.rooms.has = sinon.stub().returns(true);
 
+        const validateCallback = validateSocket.on.getCall(1).args[1];
+        validateCallback({ foundDifferences: [false, false], position: differencePosition, isPlayer1: true });
+        setTimeout(() => {
+            assert(validateSocket.on.calledWith('validateDifference'));
+            assert(roomEmitStub.called);
+            roomEmitStub.restore();
+            sinon.restore();
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
     it('should not validate difference when not found', (done) => {
         const differencePosition: Vector2 = new Vector2(300, 200);
         matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(-1);
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
-        const socket = {
-            id: 'socket1',
-            emit: sinon.stub(),
-            on: sinon.stub(),
-            join: sinon.stub(),
-            rooms: new Set(),
-            data: {
-                gameData: {
-                    id: 0,
-                    name: 'Jeu1',
-                    isEasy: true,
-                    nbrDifferences: 2,
-                    differences: [
-                        [
-                            { x: 200, y: 100 },
-                            { x: 100, y: 200 },
-                        ],
-                    ],
-                    ranking: defaultRankings,
-                },
-            },
-        };
-        connectionCallback(socket);
+        connectionCallback(validateSocket);
         const fakeEmit = sinon.fake();
         roomEmitStub.returns({ emit: fakeEmit });
-        socket.rooms.has = sinon.stub().returns(true);
-        const validateCallback = socket.on.getCall(2).args[1];
+        validateSocket.rooms.has = sinon.stub().returns(true);
+        const validateCallback = validateSocket.on.getCall(2).args[1];
         validateCallback({ foundDifferences: [false, false], position: differencePosition });
         setTimeout(() => {
-            assert(socket.on.calledWith('validateDifference'));
-            roomEmitStub.reset();
+            assert(validateSocket.on.calledWith('validateDifference'));
+            roomEmitStub.restore();
             sinon.restore();
             done();
         }, RESPONSE_DELAY * 5); // 1 seconde
     });
 
-    const matchSocket = {
-        id: 'socket1',
-        emit: sinon.stub(),
-        on: sinon.stub(),
-        join: sinon.stub(),
-        rooms: new Set<string>(['match1']),
-        data: {},
-    };
-    it('should join the given matchId', (done) => {
+    // TODO
+    it('should remove player from match when disconnect is called', (done) => {
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
-        const matchId = 'match1';
-        connectionCallback(matchSocket);
-        const joinRoomCallback = matchSocket.on.getCall(8).args[1];
-        joinRoomCallback(matchId);
-        setTimeout(() => {
-            assert(matchSocket.on.calledWith('joinRoom'));
-            assert(matchSocket.join.calledWith(matchId));
-            sinon.restore();
-            done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
-    });
-
-    it('should emit matchJoined only if socket has room', (done) => {
-        const room = 'room1';
-        socketManager.handleSockets();
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        const socket = {
-            id: 'socket1',
-            emit: sinon.stub(),
-            on: sinon.stub(),
-            join: sinon.stub(),
-            rooms: new Set([room]),
-            data: {},
-        };
         connectionCallback(socket);
-        const joinRoomCallback = socket.on.getCall(8).args[1];
-        socket.rooms.has = sinon.stub().returns(true);
         const fakeEmit = sinon.fake();
         roomEmitStub.returns({ emit: fakeEmit });
-        joinRoomCallback(room);
+        socket.rooms.has = sinon.stub().returns(true);
+        const disconnectCallback = socket.on.getCall(2).args[1];
+        matchManagerServiceStub.removePlayerFromMatch.withArgs('socket1').returns('match1');
+        disconnectCallback();
         setTimeout(() => {
-            assert(socket.on.calledWith('matchJoined'));
-            assert(roomEmitStub.called);
-            sinon.restore();
+            assert(socket.on.calledWith('disconnect'));
             done();
         }, RESPONSE_DELAY * 5); // 1 seconde
     });
 
-    it('should not emit a roomMessage only if socket has not room', (done) => {
-        const room = 'room1';
+    it('should createMatch with matchId and call joinMatchRoom', (done) => {
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
-        const socket = {
-            id: 'socket1',
-            emit: sinon.stub(),
-            on: sinon.stub(),
-            join: sinon.stub(),
-            rooms: new Set([room]),
-            data: {},
-        };
         connectionCallback(socket);
-        const joinRoomCallback = socket.on.getCall(8).args[1];
-        socket.rooms.has = sinon.stub().returns(false);
-        joinRoomCallback(room);
+        const createMatchCallback = socket.on.getCall(3).args[1];
+        createMatchCallback({ gameId: match.gameId, matchId: match.matchId });
         setTimeout(() => {
-            assert(roomEmitStub.notCalled);
-            sinon.restore();
+            assert(socket.on.calledWith('createMatch'));
+            assert(socket.join.called);
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should set match type', (done) => {
+        matchManagerServiceStub.getMatchById.resolves(match);
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const setMatchTypeCallback = socket.on.getCall(4).args[1];
+        setMatchTypeCallback({ matchId: match.matchId, matchType: MatchType.OneVersusOne });
+        setTimeout(() => {
+            assert(socket.on.calledWith('setMatchType'));
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should set match player', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const setMatchPlayerCallback = socket.on.getCall(5).args[1];
+        setMatchPlayerCallback({ matchId: match.matchId, player: matchPlayer });
+        setTimeout(() => {
+            assert(socket.on.calledWith('setMatchPlayer'));
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should join match room', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const joinCallback = socket.on.getCall(6).args[1];
+        joinCallback({ matchId: match.matchId });
+        setTimeout(() => {
+            assert(socket.on.calledWith('joinRoom'));
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should request to join a match', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(7).args[1];
+        joinCallback({ matchId: match.matchId, player: matchPlayer });
+        setTimeout(() => {
+            assert(socket.on.calledWith('requestToJoinMatch'));
+            assert(socket.to.called);
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should cancel join match', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(8).args[1];
+        joinCallback({ matchId: match.matchId, player: matchPlayer });
+        setTimeout(() => {
+            assert(socket.on.calledWith('cancelJoinMatch'));
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should send request answer to incoming player', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(9).args[1];
+        joinCallback({ matchId: match.matchId, player: matchPlayer, accept: true });
+        setTimeout(() => {
+            assert(socket.on.calledWith('sendIncomingPlayerRequestAnswer'));
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should delete game', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const joinCallback = socket.on.getCall(10).args[1];
+        joinCallback({ gameDeleted: true, gameId: match.gameId });
+        setTimeout(() => {
+            assert(socket.on.calledWith('deletedGame'));
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should delete all games', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const joinCallback = socket.on.getCall(11).args[1];
+        joinCallback({ hasDeletedAllGames: true });
+        setTimeout(() => {
+            assert(socket.on.calledWith('deleteAllGame'));
+            done();
+        }, RESPONSE_DELAY * 5); // 1 seconde
+    });
+
+    it('should send a message in the chat', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const fakeEmit = sinon.fake();
+        roomEmitStub.returns({ emit: fakeEmit });
+        socket.rooms.has = sinon.stub().returns(true);
+        const joinCallback = socket.on.getCall(12).args[1];
+        joinCallback({ username: 'player1', message: 'salut', sentByPlayer1: true });
+        setTimeout(() => {
+            assert(socket.on.calledWith('sendingMessage'));
             done();
         }, RESPONSE_DELAY * 5); // 1 seconde
     });
