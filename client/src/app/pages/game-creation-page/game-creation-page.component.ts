@@ -66,6 +66,13 @@ export class GameCreationPageComponent implements AfterViewInit {
         }
     }
 
+    deactivateTools() {
+        this.actionsContainer.selectedTool = Tool.NONE;
+        this.pen.nativeElement.style.backgroundColor = 'white';
+        this.rubber.nativeElement.style.backgroundColor = 'white';
+        this.rectangle.nativeElement.style.backgroundColor = 'white';
+    }
+
     ngAfterViewInit(): void {
         this.leftDrawingContext = this.drawingCanvasOne.nativeElement.getContext('2d')!;
         this.rightDrawingContext = this.drawingCanvasTwo.nativeElement.getContext('2d')!;
@@ -96,13 +103,6 @@ export class GameCreationPageComponent implements AfterViewInit {
 
     activateRectangle(selectedTool: string) {
         this.activateTool(selectedTool, Tool.RECTANGLE);
-    }
-
-    deactivateTools() {
-        this.actionsContainer.selectedTool = Tool.NONE;
-        this.pen.nativeElement.style.backgroundColor = 'white';
-        this.rubber.nativeElement.style.backgroundColor = 'white';
-        this.rectangle.nativeElement.style.backgroundColor = 'white';
     }
 
     activateTool(selectedTool: string, tool: Tool) {

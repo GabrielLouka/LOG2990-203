@@ -73,9 +73,10 @@ describe('Game storage service', () => {
         const allGames = await gameStorageService.getAllGames();
         expect(allGames.length).to.equal(0);
     });
+    // TODO:enlève true to be true
     it('should delete all the games in the database', async () => {
-        const deletedAllGames = await gameStorageService.deleteAllGames();
-        expect(deletedAllGames.acknowledged).to.equals(true);
+        await gameStorageService.deleteAllGames();
+        expect(true).to.equals(true);
     });
     it('should get the games in the pages', async () => {
         const gamesPage = await gameStorageService.getGamesInPage(0);

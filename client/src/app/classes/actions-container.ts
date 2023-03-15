@@ -70,10 +70,8 @@ export class ActionsContainer {
     setupListeners() {
         this.leftDrawingCanvas.nativeElement.addEventListener('mousedown', this.handleMouseDown.bind(this, this.leftDrawingCanvas.nativeElement));
         this.leftDrawingCanvas.nativeElement.addEventListener('mouseup', this.handleMouseUpOrOut.bind(this, this.leftDrawingCanvas.nativeElement));
-        this.leftDrawingCanvas.nativeElement.addEventListener('mouseout', this.handleMouseUpOrOut.bind(this, this.leftDrawingCanvas.nativeElement));
         this.rightDrawingCanvas.nativeElement.addEventListener('mousedown', this.handleMouseDown.bind(this, this.rightDrawingCanvas.nativeElement));
         this.rightDrawingCanvas.nativeElement.addEventListener('mouseup', this.handleMouseUpOrOut.bind(this, this.rightDrawingCanvas.nativeElement));
-        this.rightDrawingCanvas.nativeElement.addEventListener('mouseout', this.handleMouseUpOrOut.bind(this, this.rightDrawingCanvas.nativeElement));
     }
 
     draw = (event: MouseEvent) => {
@@ -159,7 +157,6 @@ export class ActionsContainer {
 
         canvas.addEventListener('mousemove', this.draw);
     }
-
     handleMouseUpOrOut(canvas: HTMLCanvasElement) {
         canvas.removeEventListener('mousemove', this.draw);
         this.redoActions = [];
