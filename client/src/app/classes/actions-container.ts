@@ -125,6 +125,9 @@ export class ActionsContainer {
                     ) {
                         action.draw(activeContext);
                     }
+                    if (action instanceof ClearElement) {
+                        action.clear(activeContext);
+                    }
                 }
                 this.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy : this.undoActions;
                 break;
