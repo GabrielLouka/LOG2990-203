@@ -54,6 +54,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound2: number = 0;
     player1: string = '';
     player2: string = '';
+    isWinByDefault = true;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -121,10 +122,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             const abortedGameMessage = ' a abandonné la partie';
             if (this.isPlayer1Win(match)) {
                 this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player1, true);
+                this.onWinGame(this.player1, this.isWinByDefault);
             } else if (this.isPlayer2Win(match)) {
                 this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player2, true);
+                this.onWinGame(this.player2, this.isWinByDefault);
             }
         }
     }
@@ -207,7 +208,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                             message += ' par ' + this.player1.toUpperCase();
                         }
                     } else {
-                        message += message += ' par ' + this.player2.toUpperCase();
+                        message += ' par ' + this.player2.toUpperCase();
                         this.differencesFound2++;
                     }
                     this.sendSystemMessageToChat(message);
@@ -216,11 +217,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (this.matchmakingService.is1vs1Mode) {
                         if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
-                            this.onWinGame(this.player1, false);
-                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(this.player2, false);
+                            this.onWinGame(this.player1, !this.isWinByDefault);
+                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(this.player2, !this.isWinByDefault);
                     } else if (this.matchmakingService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.player1, false);
+                            this.onWinGame(this.player1, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -329,8 +330,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.bgColor = '';
                     window.clearInterval(this.intervalIDLeft);
                     window.clearInterval(this.intervalIDRight);
-                    if (this.currentModifiedImage && this.game.originalImage){
-                        this.imageManipulationService.loadCurrentImage(this.currentModifiedImage, this.rightCanvasContext as CanvasRenderingContext2D);
+                    if (this.currentModifiedImage && this.game.originalImage) {
+                        this.imageManipulationService.loadCurrentImage(
+                            this.currentModifiedImage,
+                            this.rightCanvasContext as CanvasRenderingContext2D,
+                        );
                         this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
                     }
                 }
@@ -345,30 +349,28 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
-        
-        if (this.leftCanvasContext && this.rightCanvasContext) {
 
+        if (this.leftCanvasContext && this.rightCanvasContext) {
             this.intervalIDLeft = this.imageManipulationService.alternateOldNewImage(
                 this.game.originalImage,
                 newImage,
-                this.leftCanvasContext as CanvasRenderingContext2D
-            )
-            
-            if (this.currentModifiedImage){
+                this.leftCanvasContext as CanvasRenderingContext2D,
+            );
+
+            if (this.currentModifiedImage) {
                 this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
                     this.game.originalImage,
                     this.currentModifiedImage,
-                    this.rightCanvasContext as CanvasRenderingContext2D
+                    this.rightCanvasContext as CanvasRenderingContext2D,
                 );
-            }
-            else{
+            } else {
                 this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
                     this.game.originalImage,
                     this.game.modifiedImage,
-                    this.rightCanvasContext as CanvasRenderingContext2D
+                    this.rightCanvasContext as CanvasRenderingContext2D,
                 );
             }
-                    
+
             this.currentModifiedImage = newImage;
         }
     }
