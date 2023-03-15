@@ -49,7 +49,7 @@ export class SocketManager {
                     sendMatchUpdate({ matchId: matchThatWasAffected });
                     sendGameMatchProgressUpdate(matchThatWasAffected);
                 }
-                this.matchManagerService.matches.forEach((match) => {
+                this.matchManagerService.currentMatches.forEach((match) => {
                     sendJoinMatchCancel(match.matchId, socket.id);
                 });
             });

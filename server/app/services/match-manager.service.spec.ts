@@ -26,13 +26,9 @@ describe('MatchManagerService', () => {
         playerId: 'socket2',
     };
 
-    const expectedMatch: Match = {
+    const expectedMatch = {
         gameId: 0,
         matchId: 'match1',
-        player1: matchPlayer,
-        player2: matchPlayer,
-        matchType: MatchType.OneVersusOne,
-        matchStatus: MatchStatus.WaitingForPlayer1,
     };
 
     beforeEach(async () => {
@@ -43,11 +39,11 @@ describe('MatchManagerService', () => {
     it('should set the match Status when creating a match', () => {
         const methodSpy = sinon.spy(matchManagerService, 'createMatch');
         assert(methodSpy.calledWith(match.gameId, match.matchId));
-        expect(createdMatch.matchStatus).to.deep.equal(expectedMatch.matchStatus);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.WaitingForPlayer1);
     });
 
     it('should add the match to current matches array when create game is called', () => {
-        expect(matchManagerService.matches.length).to.deep.equal(1);
+        expect(matchManagerService.currentMatches.length).to.deep.equal(1);
     });
 
     it('should set the given match type with match id', () => {
@@ -68,6 +64,32 @@ describe('MatchManagerService', () => {
         expect(createdMatch.player1).to.deep.equal(matchPlayer);
         expect(createdMatch.player2).to.deep.equal(undefined);
         expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.WaitingForPlayer2);
+    });
+
+    it('should set match player 1 and not change match status is not waiting for player 1', () => {
+        const newPlayer: Player = {
+            username: 'player3',
+            playerId: 'socket4',
+        };
+        matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
+        matchManagerService.setMatchPlayer(match.matchId, player2);
+        matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
+        matchManagerService.setMatchPlayer(match.matchId, newPlayer);
+        expect(createdMatch.player1).to.deep.equal(newPlayer);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player2Win);
+    });
+
+    it('should set match player 1 and not change match status is not waiting for player 2', () => {
+        const newPlayer: Player = {
+            username: 'player3',
+            playerId: 'socket4',
+        };
+        matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
+        matchManagerService.setMatchPlayer(match.matchId, player2);
+        matchManagerService.removePlayerFromMatch(player2.playerId);
+        matchManagerService.setMatchPlayer(match.matchId, newPlayer);
+        expect(createdMatch.player1).to.deep.equal(matchPlayer);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player1Win);
     });
 
     it('should set match player 2 and set match status to in progress', () => {

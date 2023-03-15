@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
 import { MatchType } from '@common/match-type';
@@ -7,16 +6,16 @@ import { Service } from 'typedi';
 
 @Service()
 export class MatchManagerService {
-    private currentMatches: Match[] = []; // current online games being played
+    private currentOnlinePlayedMatches: Match[] = [];
 
-    get matches() {
-        return this.currentMatches;
+    get currentMatches() {
+        return this.currentOnlinePlayedMatches;
     }
 
     createMatch(gameId: number, matchId: string): Match {
         const matchToCreate = new Match(gameId, matchId);
         matchToCreate.matchStatus = MatchStatus.WaitingForPlayer1;
-        this.currentMatches.push(matchToCreate);
+        this.currentOnlinePlayedMatches.push(matchToCreate);
 
         return matchToCreate;
     }
@@ -45,7 +44,7 @@ export class MatchManagerService {
 
     removePlayerFromMatch(playerId: string): string | null {
         let modifiedMatch: Match | null = null;
-        for (const match of this.currentMatches) {
+        for (const match of this.currentOnlinePlayedMatches) {
             if (match.player1?.playerId === playerId) {
                 match.player1 = null;
                 modifiedMatch = match;
@@ -68,7 +67,7 @@ export class MatchManagerService {
     }
 
     getMatchById(matchId: string): Match | null {
-        for (const match of this.currentMatches) {
+        for (const match of this.currentOnlinePlayedMatches) {
             if (match.matchId.toString() === matchId.toString()) {
                 return match;
             }
@@ -77,7 +76,7 @@ export class MatchManagerService {
     }
 
     getMatchAvailableForGame(gameId: number): string | null {
-        for (const match of this.currentMatches) {
+        for (const match of this.currentOnlinePlayedMatches) {
             if (match.gameId.toString() === gameId.toString() && match.matchType === MatchType.OneVersusOne) {
                 if (match.matchStatus === MatchStatus.WaitingForPlayer2) return match.matchId;
             }
