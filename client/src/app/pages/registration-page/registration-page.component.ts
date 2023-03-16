@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
-import { MatchmakingService } from '@app/services/matchmaking.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { AuthService } from '@app/services/auth-service/auth.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
 import { Player } from '@common/player';

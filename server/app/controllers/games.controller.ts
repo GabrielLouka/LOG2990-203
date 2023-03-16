@@ -1,5 +1,5 @@
-import { GameStorageService } from '@app/services/game-storage.service';
-import { MatchManagerService } from '@app/services/match-manager.service';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { GameData } from '@common/game-data';
 import { defaultRankings } from '@common/ranking';

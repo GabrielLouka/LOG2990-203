@@ -1,5 +1,5 @@
-import { GameStorageService } from '@app/services/game-storage.service';
-import { ImageProcessingService } from '@app/services/image-processing.service';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_CREATED, NOT_FOUND } from '@common/utils/env';

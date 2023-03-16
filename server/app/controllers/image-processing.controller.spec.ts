@@ -4,8 +4,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-unused-expressions */
 import { Application } from '@app/app';
-import { GameStorageService } from '@app/services/game-storage.service';
-import { ImageProcessingService } from '@app/services/image-processing.service';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
 import { DifferenceImage } from '@common/difference.image';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';

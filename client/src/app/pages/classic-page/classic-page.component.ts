@@ -5,10 +5,10 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
-import { CommunicationService } from '@app/services/communication.service';
-import { ImageManipulationService } from '@app/services/image-manipulation.service';
-import { MatchmakingService } from '@app/services/matchmaking.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
@@ -321,7 +321,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if(this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement){
+        if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
                     this.bgColor = '#66FF99';

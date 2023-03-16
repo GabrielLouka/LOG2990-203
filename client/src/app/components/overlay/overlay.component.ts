@@ -2,9 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
-import { CommunicationService } from '@app/services/communication.service';
-import { MatchmakingService } from '@app/services/matchmaking.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { MatchType } from '@common/match-type';
 import { BehaviorSubject } from 'rxjs';
 

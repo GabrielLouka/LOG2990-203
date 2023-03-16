@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application } from '@app/app';
-import { GameStorageService } from '@app/services/game-storage.service';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { GameData } from '@common/game-data';
 import { Vector2 } from '@common/vector2';

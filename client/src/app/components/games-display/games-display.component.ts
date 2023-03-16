@@ -1,9 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
-import { CommunicationService } from '@app/services/communication.service';
-import { MatchmakingService } from '@app/services/matchmaking.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/game-data';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { Buffer } from 'buffer';

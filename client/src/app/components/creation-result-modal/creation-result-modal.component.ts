@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CommunicationService } from '@app/services/communication.service';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
 import { BehaviorSubject } from 'rxjs';

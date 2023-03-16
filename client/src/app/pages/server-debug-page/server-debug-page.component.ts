@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { ActionsContainer, Tool } from '@app/classes/actions-container';
-import { ClearElement } from '@app/classes/clear-element';
-import { DuplicationElement } from '@app/classes/duplication-element';
-import { SwitchElement } from '@app/classes/switch-element';
-import { UndoElement } from '@app/classes/undo-element.abstract';
-import { CommunicationService } from '@app/services/communication.service';
+import { ActionsContainer, Tool } from '@app/classes/actions-container/actions-container';
+import { ClearElement } from '@app/classes/clear-element/clear-element';
+import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
+import { SwitchElement } from '@app/classes/switch-element/switch-element';
+import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { GameData } from '@common/game-data';

@@ -2,14 +2,14 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { ActionsContainer, Tool } from '@app/classes/actions-container';
-import { ClearElement } from '@app/classes/clear-element';
-import { DuplicationElement } from '@app/classes/duplication-element';
-import { SwitchElement } from '@app/classes/switch-element';
-import { UndoElement } from '@app/classes/undo-element.abstract';
+import { ActionsContainer, Tool } from '@app/classes/actions-container/actions-container';
+import { ClearElement } from '@app/classes/clear-element/clear-element';
+import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
+import { SwitchElement } from '@app/classes/switch-element/switch-element';
+import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
-import { CommunicationService } from '@app/services/communication.service';
-import { ImageManipulationService } from '@app/services/image-manipulation.service';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';

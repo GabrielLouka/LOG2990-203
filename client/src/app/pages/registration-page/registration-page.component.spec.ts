@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup } from '@angular/forms';
 
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/services/auth-service/auth.service';
 import { RegistrationPageComponent } from './registration-page.component';
 
 describe('RegistrationPageComponent', () => {

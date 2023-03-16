@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
-import { MatchmakingService } from '@app/services/matchmaking.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 
 @Component({
     selector: 'app-chat',
