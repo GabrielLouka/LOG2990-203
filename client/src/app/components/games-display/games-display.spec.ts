@@ -38,6 +38,7 @@ describe('GamesDisplayComponent', () => {
         expect(component.title).toEqual('Page de configuration');
         expect(component.justifyContent).toEqual('center');
     });
+
     it('should set title and justifyContent based on isSelection (when false)', () => {
         spyOn(component, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
         component.isSelection = false;
@@ -45,6 +46,7 @@ describe('GamesDisplayComponent', () => {
         expect(component.title).toEqual('Page de selection');
         expect(component.justifyContent).toEqual('right');
     });
+
     it('should fetch game data from the server', () => {
         const pageId = 0;
         const gameContent: {
@@ -53,7 +55,8 @@ describe('GamesDisplayComponent', () => {
         }[] = [];
         const expectedGames: {
             gameData: GameData;
-            originalImage: any;
+            originalImage: Buffer;
+            matchToJoinIfAvailable: string | null;
         }[] = [];
         for (let i = 1; i <= 4; i++) {
             const game: GameData = {
@@ -72,8 +75,9 @@ describe('GamesDisplayComponent', () => {
                 ],
                 ranking: defaultRankings,
             };
+            const match = 'match1';
             gameContent.push({ gameData: game, originalImage: Buffer.alloc(3) });
-            expectedGames.push({ gameData: game, originalImage: Object({ type: 'Buffer', data: [0, 0, 0] }) });
+            expectedGames.push({ gameData: game, originalImage: Object({ type: 'Buffer', data: [0, 0, 0] }), matchToJoinIfAvailable: match });
         }
 
         communicationServiceSpy.get.and.returnValue(
@@ -89,11 +93,8 @@ describe('GamesDisplayComponent', () => {
             }),
         );
         component.fetchGameDataFromServer(pageId);
-
         expect(communicationServiceSpy.get).toHaveBeenCalledWith(`/games/${pageId}`);
-
-        // expect(component.games).toEqual(Object.assign({}, gameContent, { originalImage: { type: 'Buffer', data: Buffer.alloc(3) } }));
-
+        expect(component.games).toEqual(Object.assign({ gameData: gameContent, originalImage: Buffer.alloc(3), matchToJoinIfAvailable: 'match1' }));
         expect(component.games).toEqual(expectedGames);
         expect(component.gamesNbr).toEqual(4);
         expect(component.showNextButton).toBeFalse();

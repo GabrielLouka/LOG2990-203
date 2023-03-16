@@ -1,9 +1,5 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-require-imports */
 import { expect } from 'chai';
 import { FileSystemManager } from './file-system-manager';
-// const fs = require('fs');
 
 describe('FileSysteManager', () => {
     let fileManager: FileSystemManager;

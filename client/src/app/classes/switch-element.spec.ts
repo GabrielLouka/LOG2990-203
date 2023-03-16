@@ -8,7 +8,8 @@ describe('SwitchElement', () => {
         const switchElement = new SwitchElement();
         expect(switchElement).toBeTruthy();
         const mockActions: UndoElement[] = [];
-        mockActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], 'black', false));
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        mockActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
         const leftCanvas = { nativeElement: document.createElement('canvas') };
         const rightCanvas = { nativeElement: document.createElement('canvas') };
 

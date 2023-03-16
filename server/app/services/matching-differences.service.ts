@@ -5,7 +5,6 @@ import { Service } from 'typedi';
 
 @Service()
 export class MatchingDifferencesService {
-    // This will return the index of the difference that was clicked, or -1 if no difference was clicked
     getDifferenceIndex(game: GameData, clickPosition: Vector2): number {
         const differences = game.differences;
         for (let i = 0; i < differences.length; i++) {

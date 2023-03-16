@@ -33,7 +33,7 @@ describe('ActionsContainer', () => {
             // Given
             actionsContainer.selectedTool = Tool.ERASER;
             actionsContainer.redoActions = [];
-            actionsContainer.undoActions.push(new EraserElement([new Vector2(1, 2), new Vector2(3, 4)], 'white', false));
+            actionsContainer.undoActions.push(new EraserElement([new Vector2(1, 2), new Vector2(3, 4)], false));
             actionsContainer.draw(new MouseEvent('mousemove'));
             actionsContainer.draw(new MouseEvent('mousedown'));
             actionsContainer.draw(new MouseEvent('mouseup'));
@@ -89,14 +89,14 @@ describe('ActionsContainer', () => {
                 clientY: 10,
             });
             actionsContainer.selectedTool = Tool.RECTANGLE;
-            actionsContainer.leftCanvas.nativeElement.dispatchEvent(mockEvent);
-            actionsContainer.rightCanvas.nativeElement.dispatchEvent(mockEvent);
+            actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
+            actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
             actionsContainer.selectedTool = Tool.CRAYON;
-            actionsContainer.leftCanvas.nativeElement.dispatchEvent(mockEvent);
-            actionsContainer.rightCanvas.nativeElement.dispatchEvent(mockEvent);
+            actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
+            actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
             actionsContainer.selectedTool = Tool.ERASER;
-            actionsContainer.leftCanvas.nativeElement.dispatchEvent(mockEvent);
-            actionsContainer.rightCanvas.nativeElement.dispatchEvent(mockEvent);
+            actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
+            actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
         });
 
         it('should handle mousedown event on left or right canvas', () => {
@@ -104,7 +104,7 @@ describe('ActionsContainer', () => {
                 bubbles: true,
             });
             actionsContainer.selectedTool = Tool.RECTANGLE;
-            actionsContainer.leftCanvas.nativeElement.dispatchEvent(mockEvent);
+            actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
         });
     });
 });
