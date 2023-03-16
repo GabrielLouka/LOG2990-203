@@ -48,12 +48,17 @@ describe('GamesController', () => {
     const gameInfo = {
         gameData: game as any,
         originalImage: images.originalImage,
-        isEasy: true,
+        matchToJoinIfAvailable: 'abcde',
     };
     describe('GET /fetchGame/:id', () => {
         it('GET should return game by id', async () => {
             gameStorageServiceStub.getGameById.returns(
-                Promise.resolve({ gameData: game, originalImage: images.originalImage, modifiedImage: images.modifiedImage }),
+                Promise.resolve({
+                    gameData: game,
+                    originalImage: images.originalImage,
+                    modifiedImage: images.modifiedImage,
+                    matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable,
+                }),
             );
             supertest(expressApp)
                 .get(`${API_URL}/fetchGame/0`)
@@ -77,7 +82,11 @@ describe('GamesController', () => {
     });
     describe('GET /:id', () => {
         it('GET should return games by page id', async () => {
-            gameStorageServiceStub.getGamesInPage.returns(Promise.resolve([{ gameData: gameInfo.gameData, originalImage: gameInfo.originalImage }]));
+            gameStorageServiceStub.getGamesInPage.returns(
+                Promise.resolve([
+                    { gameData: gameInfo.gameData, originalImage: gameInfo.originalImage, matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable },
+                ]),
+            );
             gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
             supertest(expressApp)
                 .get(`${API_URL}/0`)

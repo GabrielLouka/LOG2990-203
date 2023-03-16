@@ -11,13 +11,15 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { BackButtonComponent } from './components/back-button/back-button.component';
 import { ChatComponent } from './components/chat/chat.component';
-import { FoundHintsCounterComponent } from './components/found-hints-counter/found-hints-counter.component';
+import { CreationResultModalComponent } from './components/creation-result-modal/creation-result-modal.component';
+import { FoundDifferencesCounterComponent } from './components/found-differences-counter/found-differences-counter.component';
 import { GameCardComponent } from './components/game-card/game-card.component';
 import { GamesDisplayComponent } from './components/games-display/games-display.component';
 import { HintComponent } from './components/hint/hint.component';
 import { InfoCardComponent } from './components/info-card/info-card.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
+import { PopUpComponent } from './components/pop-up/pop-up.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
 import { QuitButtonComponent } from './components/quit-button/quit-button.component';
 import { TimerComponent } from './components/timer/timer.component';
@@ -28,6 +30,7 @@ import { ParameterPageComponent } from './pages/parameter-page/parameter-page.co
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth.service';
+import { DeleteGamesPopUpComponent } from './components/delete-games-pop-up/delete-games-pop-up.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -50,13 +53,19 @@ import { AuthService } from './services/auth.service';
         InfoCardComponent,
         RegistrationPageComponent,
         ParameterPageComponent,
-        FoundHintsCounterComponent,
+        FoundDifferencesCounterComponent,
         TimerComponent,
         QuitButtonComponent,
         ChatComponent,
         GameCreationPageComponent,
         GamesDisplayComponent,
+        CreationResultModalComponent,
+        PopUpComponent,
+        FoundDifferencesCounterComponent,
+        DeleteGamesPopUpComponent,
     ],
+    providers: [AuthService],
+    bootstrap: [AppComponent],
     imports: [
         AppMaterialModule,
         AppRoutingModule,
@@ -68,7 +77,5 @@ import { AuthService } from './services/auth.service';
         ReactiveFormsModule,
         CommonModule,
     ],
-    providers: [AuthService],
-    bootstrap: [AppComponent],
 })
 export class AppModule {}

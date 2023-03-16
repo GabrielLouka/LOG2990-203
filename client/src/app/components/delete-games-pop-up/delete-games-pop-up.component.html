@@ -1,0 +1,23 @@
+<div #bgModal class="bgModal center">
+    <div class="flex-column center modal-contents">
+        <div *ngFor="let info of popUpInfo">
+            <div #close class="close" (click)="closePopUp()"></div>
+            <div
+                class="center flex-column modal-contents"
+                [ngClass]="{
+                    'delete-game': !info.isDeleteAllGames,
+                    'delete-all-games': info.isDeleteAllGames
+                }"
+            >
+                <h1>{{ info.title }}</h1>
+                <p>
+                    <strong>{{ info.message }}</strong>
+                </p>
+                <div class="flex-row center">
+                    <button #button1 class="button-style modal-btn" routerLink="/home" (click)="deleteGames()">{{ info.option1 }}</button>
+                    <button #button2 class="button-style modal-btn" (click)="closePopUp()">{{ info.option2 }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

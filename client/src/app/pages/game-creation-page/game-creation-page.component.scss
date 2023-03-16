@@ -13,11 +13,12 @@
   &:hover {
     transform: scale(1);
     background-color: white;
+    cursor: default;
   }
 }
 
-.not-allowed {
-  cursor: not-allowed;
+canvas{
+  position: absolute;
 }
 
 .bigger {
@@ -34,13 +35,20 @@ h1 {
   height: 70vh;
 }
 
-
 // Canvas CSS
 .canvas {
+  position: relative;
   width: 640px;
   height: 480px;
   border: solid;
   background-color: whitesmoke;
+}
+
+.drawing-canvas {
+  position: absolute;
+  width: 640px;
+  height: 480px;
+  // border:solid red; 
 }
 
 .picture-option{
@@ -56,6 +64,7 @@ h1 {
   height: 5vh;
   width: 4vw;
   border: solid 2px;
+  margin-left: 1vw;
 }
 
 .reverse-control {
@@ -70,53 +79,15 @@ h1 {
 }
 
 
-// Modal Window Style
 
-.bgModal {
-	background-color: rgba(0, 0, 0, 0.8);
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	display: none;
+.penWidth { 
+  scale: 0.9;
+  width: 6vw;
 }
 
-.modal-contents {
-	height: 80vh;
-	width: 60vw;
-	background-color: white;
-	text-align: center;
-	padding: 20px;
-	position: relative;
-	border-radius: 5px;
-}
-
-input {
-	margin: 15px auto;
-	display: block;
-	width: 75%;
-	padding: 8px;
-	border: 1px solid gray;
-  border-radius: 1vh;
-}
-
-.close {
-	position: absolute;
-	top: 0;
-	right: 10px;
-	font-size: 42px;
-	color: #333;
-	transform: rotate(45deg);
-	cursor: pointer;
-	&:hover {
-		color: #666;
-	}
-}
-
-input.ng-invalid {
-  background-color:rgb(249, 99, 99);
-}
-input.ng-valid {
-  background-color:lightgreen;
+.combine {
+  position: absolute;
+  border: solid 2px;
+  top: 100vh;
 }
 

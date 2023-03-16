@@ -4,8 +4,7 @@ import { FileSystemManager } from '@app/services/file-system/file-system-manager
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/game-data';
 import 'dotenv/config';
-import { mkdir, readFileSync, writeFile, writeFileSync } from 'fs';
-import { DeleteResult } from 'mongodb';
+import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
 import 'reflect-metadata';
 import { Service } from 'typedi';
 import { SocketManager } from './socket-manager.service';
@@ -21,6 +20,47 @@ export class GameStorageService {
     }
     get collection() {
         return this.databaseService.database.collection(process.env.DATABASE_COLLECTION_GAMES as string);
+    }
+    async deleteStoredDataForAllTheGame(): Promise<void> {
+        readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
+            if (err) {
+                console.error(err);
+            } else {
+                files.forEach((file) => {
+                    if (file.isDirectory()) {
+                        const folderPath = `${R_ONLY.persistentDataFolderPath}/${file.name}`;
+                        rmdir(folderPath, { recursive: true }, (error) => {
+                            if (error) {
+                                console.error(error);
+                            } else {
+                                console.log(`Folder ${folderPath} deleted successfully.`);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    async deleteStoredData(gameId: string): Promise<void> {
+        readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
+            if (err) {
+                console.error(err);
+            } else {
+                files.forEach(async (file) => {
+                    if (file.name === gameId) {
+                        const folderPath = `${R_ONLY.persistentDataFolderPath}/${file.name}`;
+                        rmdir(folderPath, { recursive: false }, (error) => {
+                            if (error) {
+                                console.error(error);
+                            } else {
+                                console.log(`Folder ${folderPath} deleted successfully.`);
+                            }
+                        });
+                        return;
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -60,16 +100,24 @@ export class GameStorageService {
     async deleteGame(id: string) {
         const query = { id: parseInt(id, 10) };
         await this.collection.findOneAndDelete(query);
+        await this.deleteStoredData(id);
     }
 
-    async deleteAllGames(): Promise<DeleteResult> {
-        return this.collection.deleteMany({});
+    async deleteAllGames() {
+        await this.deleteStoredDataForAllTheGame();
+        await this.collection.deleteMany({});
     }
 
-    async getGamesInPage(pageNbr: number) {
+    async getGamesInPage(pageNbr: number): Promise<
+        {
+            gameData: GameData;
+            originalImage: Buffer;
+            matchToJoinIfAvailable: string | null;
+        }[]
+    > {
         // checks if the number of games available for one page is under four
         const skipNbr = pageNbr * R_ONLY.gamesLimit;
-        const nextGames = await this.collection.find({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
+        const nextGames = await this.collection.find<GameData>({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
 
         const gamesToReturn = [];
         for (const game of nextGames) {
@@ -77,6 +125,7 @@ export class GameStorageService {
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
+                matchToJoinIfAvailable: null,
             });
         }
         return gamesToReturn;

@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { GameData } from '@common/game-data';
 import { Pixel } from '@common/pixel';
+import { QUARTER_SECOND } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
@@ -65,6 +66,23 @@ export class ImageManipulationService {
         }
     }
 
+    alternateOldNewImage(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {                           
+        let showOldImage = false;
+        let interval = window.setInterval(() => {
+            if (showOldImage) {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
+            } else {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+            }
+            showOldImage = !showOldImage;
+        }, QUARTER_SECOND / 2);
+        return interval;
+    } 
+    
+    loadCurrentImage(image: Buffer, context: CanvasRenderingContext2D){
+        this.loadCanvasImages(this.getImageSourceFromBuffer(image), context);                
+    }
+
     async sleep(time: number) {
         return new Promise((resolve) => {
             setTimeout(resolve, time);
@@ -78,6 +96,20 @@ export class ImageManipulationService {
             context.drawImage(img, 0, 0, 640, 480, 0, 0, 640, 480);
         };
     }
+
+    setRGB = (position: Vector2, imageBuffer: Buffer, pixel: Pixel): void => {
+        try {
+            const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
+
+            // Set the R, G, and B values
+            imageBuffer.writeUInt8(pixel.b, pixelPosition);
+            imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
+            imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
+        } catch (e) {
+            alert(e);
+            alert("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
+        }
+    };
 
     private getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {
         try {
@@ -95,21 +127,6 @@ export class ImageManipulationService {
             return null;
         }
     };
-
-    private setRGB = (position: Vector2, imageBuffer: Buffer, pixel: Pixel): void => {
-        try {
-            const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
-
-            // Set the R, G, and B values
-            imageBuffer.writeUInt8(pixel.b, pixelPosition);
-            imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
-            imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
-        } catch (e) {
-            alert(e);
-            alert("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
-        }
-    };
-
     private getPixelBufferPosAtPixelPos = (position: Vector2, imageBuffer: Buffer): number => {
         // BMP file header is 54 bytes long, so the pixel data starts at byte 54
         const pixelStart = 54;

@@ -8,8 +8,12 @@ export class SocketClientService {
     socket: Socket;
     serverAddress: string = 'http://localhost:3000';
 
-    isSocketAlive() {
+    get isSocketAlive() {
         return this.socket && this.socket.connected;
+    }
+
+    get socketId() {
+        return this.socket.id ? this.socket.id : '';
     }
 
     connect() {
@@ -18,6 +22,10 @@ export class SocketClientService {
 
     disconnect() {
         this.socket.disconnect();
+    }
+
+    getSocketId() {
+        return this.socket.id;
     }
 
     on<T>(event: string, action: (data: T) => void): void {

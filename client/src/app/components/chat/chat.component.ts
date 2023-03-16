@@ -1,5 +1,8 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { AuthService } from '@app/services/auth.service';
+/* eslint-disable no-console */
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { MatchmakingService } from '@app/services/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client.service';
+
 @Component({
     selector: 'app-chat',
     templateUrl: './chat.component.html',
@@ -7,49 +10,58 @@ import { AuthService } from '@app/services/auth.service';
 })
 export class ChatComponent {
     @ViewChild('chat') chat: ElementRef;
+    @ViewChild('inputElement') input: ElementRef;
+    @Input() idOfTheGame: string | undefined;
     messages: {
         text: string;
         username: string;
+        sentBySystem: boolean;
         sentByPlayer1: boolean;
         sentByPlayer2: boolean;
+        sentTime: number;
     }[] = [];
     newMessage = '';
-    text: string;
-    sentByplayer1: boolean;
-    sentByPlayer2: boolean;
+    title: string = 'MANIA CHAT';
 
-    username = this.auth.registerUserName();
+    constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
 
-    constructor(private auth: AuthService) {}
+    get isPlayer1() {
+        return this.socketService.socketId === this.matchmakingService.player1SocketId;
+    }
 
-    sendMessage(playerNumber: number) {
-        if (!this.isTextValid(this.newMessage)) return;
+    get isMode1vs1() {
+        return this.matchmakingService.is1vs1Mode;
+    }
 
-        this.messages.push({
-            text: this.newMessage,
-            username: `${this.username}`,
-            sentByPlayer1: playerNumber === 1,
-            sentByPlayer2: playerNumber === 2,
+    sendMessage() {
+        const currentPlayer = this.isPlayer1
+            ? this.matchmakingService.currentMatchPlayer1Username
+            : this.matchmakingService.currentMatchPlayer2Username;
+        this.socketService.socket.emit('sendingMessage', {
+            msg: this.newMessage,
+            idGame: this.idOfTheGame,
+            username: currentPlayer,
+            messageSentTime: Date.now(),
+            sentByPlayer1: this.isPlayer1,
         });
-        this.scrollToBottom();
-        this.newMessage = '';
     }
 
     isTextValid(newMessage: string) {
         newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
         if (newMessage === '' || newMessage === ' ' || newMessage === null) {
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
-    addMessage(message: string) {
+    sendSystemMessage(message: string) {
         this.messages.push({
             text: message,
             username: 'System',
-            sentByPlayer1: true,
+            sentBySystem: true,
+            sentByPlayer1: false,
             sentByPlayer2: false,
+            sentTime: Date.now(),
         });
         this.scrollToBottom();
         this.newMessage = '';

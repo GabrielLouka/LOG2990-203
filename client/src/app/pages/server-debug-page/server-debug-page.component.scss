@@ -1,0 +1,13 @@
+canvas { 
+    background-color: whitesmoke;
+    border: solid; 
+    margin: 20px;
+}
+.swatch {
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+    margin: 5px;
+    cursor: pointer;
+    display: inline-block
+}  

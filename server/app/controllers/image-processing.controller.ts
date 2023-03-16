@@ -1,13 +1,10 @@
 import { GameStorageService } from '@app/services/game-storage.service';
 import { ImageProcessingService } from '@app/services/image-processing.service';
-import { GAME_CONST } from '@app/utils/env';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
+import { HTTP_STATUS_BAD_REQUEST, HTTP_STATUS_CREATED, NOT_FOUND } from '@common/utils/env';
 import { Request, Response, Router } from 'express';
 import { Service } from 'typedi';
-
-const HTTP_STATUS_CREATED = 201;
-const HTTP_BAD_REQUEST = 400;
 
 @Service()
 export class ImageProcessingController {
@@ -30,7 +27,7 @@ export class ImageProcessingController {
                 resultImageByteArray: Array.from(new Uint8Array(buffer1)),
                 numberOfDifferences: 0,
                 message: '',
-                generatedGameId: GAME_CONST.NOT_FOUND,
+                generatedGameId: NOT_FOUND,
                 differences: [],
                 isEasy: true,
             };
@@ -39,8 +36,7 @@ export class ImageProcessingController {
                 outputResultToSendToClient = out;
                 outputResultToSendToClient.generatedGameId = this.gameStorageService.getNextAvailableGameId();
             } catch (e) {
-                // eslint-disable-next-line no-console
-                status = HTTP_BAD_REQUEST;
+                status = HTTP_STATUS_BAD_REQUEST;
                 outputResultToSendToClient.message = '' + e;
             }
 

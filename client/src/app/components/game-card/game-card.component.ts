@@ -7,7 +7,7 @@ import { Buffer } from 'buffer';
     styleUrls: ['./game-card.component.scss'],
 })
 export class GameCardComponent implements OnInit {
-    @Input() game: { gameData: GameData; originalImage: Buffer };
+    @Input() game: { gameData: GameData; originalImage: Buffer; matchToJoinIfAvailable: string | null };
     @Input() isPlayable: boolean;
     difficulty: string;
     originalImageSrc: string;

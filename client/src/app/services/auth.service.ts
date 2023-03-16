@@ -4,13 +4,13 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class AuthService {
-    userName: string = '';
+    private username: string = '';
 
-    registerUser(username: string) {
-        this.userName = username;
+    get registeredUsername() {
+        return this.username;
     }
 
-    registerUserName() {
-        return this.userName;
+    registerUser(username: string) {
+        this.username = username;
     }
 }
