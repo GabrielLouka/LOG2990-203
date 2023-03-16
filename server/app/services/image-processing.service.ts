@@ -114,10 +114,8 @@ export class ImageProcessingService {
         const visitData: VisitData = { alreadyVisited, allPixelsToVisitSet, visitRadius, imageDimensions };
         const differenceObject = { currentDifferenceGroupIndex, differencesList };
         while (allPixelsToVisit.length > 0) {
-            if (allPixelsToVisit.length > 0) {
-                const nextPixel = allPixelsToVisit.pop();
-                if (nextPixel !== undefined) nextPixelsToVisit.enqueue({ pos: nextPixel as Vector2, radius: visitData.visitRadius });
-            }
+            const nextPixel = allPixelsToVisit.pop();
+            nextPixelsToVisit.enqueue({ pos: nextPixel as Vector2, radius: visitData.visitRadius });
 
             this.addingPixelToListOfDifference(visitData, nextPixelsToVisit, differenceObject);
             if (differenceObject.differencesList[differenceObject.currentDifferenceGroupIndex].length > 0 && allPixelsToVisit.length > 0) {
