@@ -34,19 +34,21 @@ export class ChatComponent {
     }
 
     sendMessage() {
-        const currentPlayer = this.isPlayer1
-            ? this.matchmakingService.currentMatchPlayer1Username
-            : this.matchmakingService.currentMatchPlayer2Username;
-        this.socketService.socket.emit('sendingMessage', {
-            msg: this.newMessage,
-            idGame: this.idOfTheGame,
-            username: currentPlayer,
-            messageSentTime: Date.now(),
-            sentByPlayer1: this.isPlayer1,
-        });
+        if (this.isValidText(this.newMessage)) {
+            const currentPlayer = this.isPlayer1
+                ? this.matchmakingService.currentMatchPlayer1Username
+                : this.matchmakingService.currentMatchPlayer2Username;
+            this.socketService.socket.emit('sendingMessage', {
+                msg: this.newMessage,
+                idGame: this.idOfTheGame,
+                username: currentPlayer,
+                messageSentTime: Date.now(),
+                sentByPlayer1: this.isPlayer1,
+            });
+        }
     }
 
-    isTextValid(newMessage: string) {
+    isValidText(newMessage: string) {
         newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
         if (newMessage === '' || newMessage === ' ' || newMessage === null) {
             return false;
