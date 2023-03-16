@@ -8,7 +8,7 @@ describe('DuplicationElement', () => {
         const duplicateCanvas = new DuplicationElement();
         expect(duplicateCanvas).toBeTruthy();
         const mockActions: UndoElement[] = [];
-        mockActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], 'black', false));
+        mockActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
 
         duplicateCanvas.loadActions(mockActions);
 
