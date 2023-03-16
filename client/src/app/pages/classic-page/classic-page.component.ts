@@ -317,7 +317,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if(document.activeElement !== this.chat.input.nativeElement){
+        if (document.activeElement !== this.chat.input.nativeElement) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
                     this.bgColor = '#66FF99';
