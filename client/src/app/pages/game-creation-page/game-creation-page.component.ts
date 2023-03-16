@@ -11,7 +11,7 @@ import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
@@ -35,20 +35,20 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
 
     @ViewChild('combine') combine!: ElementRef;
 
-    totalDifferences = 0;
-    isEasy = true;
-    enlargementRadius: number = 3;
-    originalImage: File | null;
-    modifiedImage: File | null;
+    isEasy: boolean;
+    enlargementRadius: number = DEFAULT_ENLARGEMENT_RADIUS;
     penWidth: number = PEN_WIDTH;
-    actionsContainer: ActionsContainer;
-    leftDrawingContext: CanvasRenderingContext2D;
-    rightDrawingContext: CanvasRenderingContext2D;
-    selectedTool: unknown;
-    defaultImagePath: string = '../../assets/img/image_empty.bmp';
-    defaultImageFile: File;
+    totalDifferences = 0;
 
-    formToSendAfterServerConfirmation: EntireGameUploadForm;
+    private originalImage: File | null;
+    private modifiedImage: File | null;
+    private actionsContainer: ActionsContainer;
+    private leftDrawingContext: CanvasRenderingContext2D;
+    private rightDrawingContext: CanvasRenderingContext2D;
+    private defaultImagePath: string = '../../assets/img/image_empty.bmp';
+    private defaultImageFile: File;
+
+    private formToSendAfterServerConfirmation: EntireGameUploadForm;
 
     constructor(private readonly communicationService: CommunicationService, private readonly imageManipulationService: ImageManipulationService) {}
 
