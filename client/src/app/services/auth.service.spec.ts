@@ -17,6 +17,6 @@ describe('AuthService', () => {
     it('registerUser should create username', () => {
         const pseudo = 'newPseudo';
         service.registerUser(pseudo);
-        expect(service.userName).toEqual(pseudo);
+        expect(service.registeredUsername).toEqual(pseudo);
     });
 });

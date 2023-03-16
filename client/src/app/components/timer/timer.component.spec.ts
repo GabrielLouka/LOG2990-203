@@ -80,17 +80,17 @@ describe('TimerComponent', () => {
         component.timeInSeconds = 10;
 
         component.tickTock();
-        component.seconds.nativeElement.innerText = component.getSeconds() < MINUTE_LIMIT ? '0' + component.getSeconds() : component.getSeconds();
+        component.second.nativeElement.innerText = component.seconds < MINUTE_LIMIT ? '0' + component.seconds : component.seconds;
 
-        expect(component.seconds.nativeElement.innerText).toBe('11');
+        expect(component.second.nativeElement.innerText).toBe('11');
     });
 
     it('should not add 0 to minutes if minutes is more than 9', () => {
         component.timeInSeconds = 600;
 
         component.tickTock();
-        component.minutes.nativeElement.innerText = component.getMinutes() < MINUTE_LIMIT ? '0' + component.getMinutes() : component.getMinutes();
+        component.minute.nativeElement.innerText = component.minutes < MINUTE_LIMIT ? '0' + component.minutes : component.minutes;
 
-        expect(component.minutes.nativeElement.innerText).toBe('10');
+        expect(component.minute.nativeElement.innerText).toBe('10');
     });
 });

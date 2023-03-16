@@ -8,17 +8,17 @@ import { INTERVAL_VALUE, MINUTE, MINUTE_LIMIT } from '@common/pixel';
 })
 export class TimerComponent implements AfterViewInit, OnDestroy {
     @Input() timeInSeconds: number;
-    @ViewChild('minutes', { static: true }) minutes: ElementRef;
-    @ViewChild('seconds', { static: true }) seconds: ElementRef;
+    @ViewChild('minutes', { static: true }) minute: ElementRef;
+    @ViewChild('seconds', { static: true }) second: ElementRef;
 
     shouldStop = false;
     intervalId: number;
 
-    get minute() {
+    get minutes() {
         return Math.floor(this.timeInSeconds / MINUTE);
     }
 
-    get second() {
+    get seconds() {
         return Math.floor(this.timeInSeconds % MINUTE);
     }
 
@@ -36,8 +36,8 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
 
     tickTock() {
         if (!this.shouldStop) this.timeInSeconds++;
-        this.minutes.nativeElement.innerText = this.minute < MINUTE_LIMIT ? '0' + this.minute : this.minute;
-        this.seconds.nativeElement.innerText = this.second < MINUTE_LIMIT ? '0' + this.second : this.second;
+        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minute : this.minute;
+        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.second : this.second;
     }
 
     stopTimer() {

@@ -22,14 +22,14 @@ describe('ChatComponent', () => {
 
     it('should not add a message to the chat (player) if it is empty', () => {
         component.newMessage = '   ';
-        component.sendMessage(1);
+        component.sendMessage();
 
         expect(component.messages.length).toBe(0);
     });
 
     it('should add a message to the chat (player)', () => {
         component.newMessage = 'test';
-        component.sendMessage(1);
+        component.sendMessage();
 
         expect(component.messages.length).toBe(1);
     });

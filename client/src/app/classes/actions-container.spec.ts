@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef } from '@angular/core';
 import { Vector2 } from '@common/vector2';
 import { ActionsContainer, Tool } from './actions-container';
@@ -9,14 +10,11 @@ describe('ActionsContainer', () => {
     let actionsContainer: ActionsContainer;
     let leftCanvas: ElementRef<HTMLCanvasElement>;
     let rightCanvas: ElementRef<HTMLCanvasElement>;
-    let palette: ElementRef<HTMLDivElement>;
 
     beforeEach(() => {
         leftCanvas = { nativeElement: document.createElement('canvas') };
         rightCanvas = { nativeElement: document.createElement('canvas') };
-        palette = { nativeElement: document.createElement('div') };
-
-        actionsContainer = new ActionsContainer(leftCanvas, rightCanvas, palette);
+        actionsContainer = new ActionsContainer(leftCanvas, rightCanvas);
     });
 
     describe('constructor', () => {
@@ -40,9 +38,9 @@ describe('ActionsContainer', () => {
             actionsContainer.draw(new MouseEvent('mousedown'));
             actionsContainer.draw(new MouseEvent('mouseup'));
 
-            actionsContainer.undoActions.push(new CrayonElement([new Vector2(1, 2), new Vector2(3, 4)], 'black', true));
+            actionsContainer.undoActions.push(new CrayonElement([new Vector2(1, 2), new Vector2(3, 4)], true));
             actionsContainer.draw(new MouseEvent('mouseup'));
-            actionsContainer.undoActions.push(new CrayonElement([new Vector2(1, 2), new Vector2(3, 4)], 'black', false));
+            actionsContainer.undoActions.push(new CrayonElement([new Vector2(1, 2), new Vector2(3, 4)], false));
             actionsContainer.draw(new MouseEvent('mouseup'));
             // When
             actionsContainer.undo();
@@ -57,7 +55,7 @@ describe('ActionsContainer', () => {
 
         it('should draw a rectangle with correct dimensions and clear previous rectangle', () => {
             actionsContainer.selectedTool = Tool.RECTANGLE;
-            actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], 'black', false));
+            actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
 
             actionsContainer.initialPosition = new Vector2(10, 10);
             actionsContainer.previousRectangle = new Vector2(20, 20);
@@ -72,7 +70,7 @@ describe('ActionsContainer', () => {
 
         it('should draw a square when shift key is pressed', () => {
             actionsContainer.selectedTool = Tool.RECTANGLE;
-            actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], 'black', false));
+            actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
             actionsContainer.initialPosition = new Vector2(10, 10);
             const mockEvent = new MouseEvent('click', {
                 bubbles: true,
@@ -84,7 +82,7 @@ describe('ActionsContainer', () => {
         });
 
         it('should handle mousedown event on left or right canvas', () => {
-            actionsContainer = new ActionsContainer(leftCanvas, rightCanvas, palette);
+            actionsContainer = new ActionsContainer(leftCanvas, rightCanvas);
             const mockEvent = new MouseEvent('mousedown', {
                 bubbles: true,
                 clientX: 10,

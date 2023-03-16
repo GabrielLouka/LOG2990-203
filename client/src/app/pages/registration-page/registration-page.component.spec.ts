@@ -49,7 +49,9 @@ describe('RegistrationPageComponent', () => {
     });
 
     it('should get the registered user name from the auth service', () => {
-        authService.registeredUsername.and.returnValue('testuser');
+        authService.registerUser.and.callThrough();
+        component.registrationForm.setValue({ username: 'testuser' });
+        component.registerUser();
         const result = component.getUser();
         expect(result).toBe('testuser');
     });

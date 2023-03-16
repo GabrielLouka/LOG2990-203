@@ -33,19 +33,19 @@ describe('SocketClientService', () => {
 
     it('isSocketAlive should return true if the socket is still connected', () => {
         service.socket.connected = true;
-        const isAlive = service.isSocketAlive();
+        const isAlive = service.isSocketAlive;
         expect(isAlive).toBeTruthy();
     });
 
     it('isSocketAlive should return false if the socket is no longer connected', () => {
         service.socket.connected = false;
-        const isAlive = service.isSocketAlive();
+        const isAlive = service.isSocketAlive;
         expect(isAlive).toBeFalsy();
     });
 
     it('isSocketAlive should return false if the socket is not defined', () => {
         (service.socket as unknown) = undefined;
-        const isAlive = service.isSocketAlive();
+        const isAlive = service.isSocketAlive;
         expect(isAlive).toBeFalsy();
     });
 
