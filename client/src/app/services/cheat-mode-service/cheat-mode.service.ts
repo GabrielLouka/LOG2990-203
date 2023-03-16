@@ -8,14 +8,15 @@ import { ImageManipulationService } from '../image-manipulation-service/image-ma
 })
 export class CheatModeService {  
 
-  constructor(public imageManipulationService: ImageManipulationService) { }
+  constructor(private imageManipulationService: ImageManipulationService) { }
 
   handleCheatEvent(
     keyboardEventWithBgColor: {tKeyEvent: KeyboardEvent, color: string, letterTpressed: boolean, intervalIDLeft: number, intervalIDRight: number}, 
     canvas: {rightCanvasContext: CanvasRenderingContext2D, leftCanvasContext: CanvasRenderingContext2D},
-    images: {currentModifiedImage: Buffer, originalImage: Buffer}
+    images: {currentModifiedImage: Buffer, originalImage: Buffer},
+    
     ){
-
+    
     if (keyboardEventWithBgColor.tKeyEvent.key === 't') {
         if (keyboardEventWithBgColor.letterTpressed) {
             keyboardEventWithBgColor.color = '#66FF99';
@@ -61,21 +62,13 @@ export class CheatModeService {
             newImage as Buffer,
             canvasAndImages.leftCanvasContext as CanvasRenderingContext2D,
         ) as number;
-
-        if (canvasAndImages.currentModifiedImage) {
-            intervals.rightInterval = this.imageManipulationService.alternateOldNewImage(
-                game!.originalImage,
-                canvasAndImages.currentModifiedImage,
-                canvasAndImages.rightCanvasContext as CanvasRenderingContext2D,
-            ) as number;
-        } else {
-            intervals.rightInterval = this.imageManipulationService.alternateOldNewImage(
-                game!.originalImage,
-                game!.modifiedImage as Buffer,
-                canvasAndImages.rightCanvasContext as CanvasRenderingContext2D,
-            ) as number;
-        }
-
+        
+        intervals.rightInterval = this.imageManipulationService.alternateOldNewImage(
+            game!.originalImage,
+            canvasAndImages.currentModifiedImage ? canvasAndImages.currentModifiedImage : game!.modifiedImage as Buffer,
+            canvasAndImages.rightCanvasContext as CanvasRenderingContext2D,
+        ) as number;
+        
         canvasAndImages.currentModifiedImage = newImage as Buffer;
     }
     
@@ -95,9 +88,11 @@ export class CheatModeService {
   }
 
   focusKeyEvent(cheat: ElementRef | undefined) {
-        if (cheat) {
-            cheat.nativeElement.focus();
-        }
+    if (cheat) {
+        cheat.nativeElement.focus();
     }
+  }
+
+  
 
 }
