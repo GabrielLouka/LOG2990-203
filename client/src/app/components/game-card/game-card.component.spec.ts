@@ -27,7 +27,7 @@ describe('GameCardComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GameCardComponent);
         component = fixture.componentInstance;
-        fixture.componentInstance.game = { gameData: gameTest, originalImage: imageBuffer };
+        fixture.componentInstance.game = { gameData: gameTest, originalImage: imageBuffer, matchToJoinIfAvailable: null };
         fixture.detectChanges();
     });
 

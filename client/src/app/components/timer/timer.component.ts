@@ -8,8 +8,8 @@ import { INTERVAL_VALUE, MINUTE, MINUTE_LIMIT } from '@common/pixel';
 })
 export class TimerComponent implements AfterViewInit, OnDestroy {
     @Input() timeInSeconds: number;
-    @ViewChild('minutes', { static: true }) minute: ElementRef;
-    @ViewChild('seconds', { static: true }) second: ElementRef;
+    @ViewChild('minute', { static: true }) minute: ElementRef;
+    @ViewChild('second', { static: true }) second: ElementRef;
 
     shouldStop = false;
     intervalId: number;
@@ -25,7 +25,7 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
     ngAfterViewInit() {
         this.intervalId = window.setInterval(() => {
             if (this.timeInSeconds >= 0) {
-                this.tickTock();
+                this.ticToc();
             }
         }, INTERVAL_VALUE);
     }
@@ -34,10 +34,10 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
         window.clearInterval(this.intervalId);
     }
 
-    tickTock() {
+    ticToc() {
         if (!this.shouldStop) this.timeInSeconds++;
-        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minute : this.minute;
-        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.second : this.second;
+        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
+        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
     }
 
     stopTimer() {

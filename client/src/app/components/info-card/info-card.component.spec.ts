@@ -21,6 +21,6 @@ describe('InfoIconComponent', () => {
 
     it('should return "Difficile" when isEasy is false', () => {
         component.isEasy = false;
-        expect(component.getDifficulty()).toEqual('Difficile');
+        expect(component.difficulty).toEqual('Difficile');
     });
 });
