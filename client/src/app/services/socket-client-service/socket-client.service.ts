@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
     providedIn: 'root',
 })
 export class SocketClientService {
     socket: Socket;
-    serverAddress: string = 'http://localhost:3000';
+    serverAddress: string = environment.serverSocketUrl;
 
     get isSocketAlive() {
         return this.socket && this.socket.connected;
