@@ -32,20 +32,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
-    // @HostListener('window:keydown.t', ['$event'])
-    letterTPressed: boolean = true;
-    bgColor = '';
+    isLetterTPressed: boolean = true;
+    backgroundColor: string = '';
     intervalIDLeft: number | undefined;
     intervalIDRight: number | undefined;
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    timeInSeconds = 0;
+    timeInSeconds: number = 0;
     matchId: string;
     currentGameId: string | null;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     originalImage: File | null;
     modifiedImage: File | null;
     foundDifferences: boolean[];
-    mode1vs1: boolean = true;
     differencesFound: number = 0;
     totalDifferences: number = 0;
     gameTitle: string = '';
@@ -72,7 +70,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.rightCanvas.nativeElement.getContext('2d');
     }
 
-    get is1vs1Mode() {
+    get is1vs1Mode(): boolean {
         return this.matchmakingService.is1vs1Mode;
     }
 
@@ -275,8 +273,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         window.clearInterval(this.intervalIDLeft);
         window.clearInterval(this.intervalIDRight);
         this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
-        this.bgColor = '';
-        this.letterTPressed = true;
+        this.backgroundColor = '';
+        this.isLetterTPressed = true;
         this.focusKeyEvent();
     }
 
@@ -321,13 +319,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if(this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement){
+        if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
             if (event.key === 't') {
-                if (this.letterTPressed) {
-                    this.bgColor = '#66FF99';
+                if (this.isLetterTPressed) {
+                    this.backgroundColor = '#66FF99';
                     this.cheatMode();
                 } else {
-                    this.bgColor = '';
+                    this.backgroundColor = '';
                     window.clearInterval(this.intervalIDLeft);
                     window.clearInterval(this.intervalIDRight);
                     if (this.currentModifiedImage && this.game.originalImage) {
@@ -338,7 +336,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
                     }
                 }
-                this.letterTPressed = !this.letterTPressed;
+                this.isLetterTPressed = !this.isLetterTPressed;
             }
         }
     }

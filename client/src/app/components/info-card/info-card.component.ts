@@ -1,23 +1,27 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
     selector: 'app-info-card',
     templateUrl: './info-card.component.html',
     styleUrls: ['./info-card.component.scss'],
 })
-export class InfoCardComponent implements OnInit {
+export class InfoCardComponent {
     @Input() isEasy: boolean = true;
-    difficulty: string;
+    @Input() is1vs1: boolean = true;
+    @Input() isClassicMode: boolean = true;
 
-    ngOnInit() {
-        this.getDifficulty();
+    get difficulty() {
+        if (this.isEasy) return 'Facile';
+        return 'Difficile';
     }
 
-    getDifficulty() {
-        if (this.isEasy) {
-            return (this.difficulty = 'Facile');
-        } else {
-            return (this.difficulty = 'Difficile');
-        }
+    get matchType() {
+        if (this.is1vs1) return '1 vs 1';
+        return 'Solo';
+    }
+
+    get matchMode() {
+        if (this.isClassicMode) return 'Classique';
+        return 'Temps limité';
     }
 }
