@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { ActionsContainer, Tool } from '@app/classes/actions-container/actions-container';
+import { ActionsContainer, ToolType } from '@app/classes/actions-container/actions-container';
 import { ClearElement } from '@app/classes/clear-element/clear-element';
 import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
@@ -84,19 +84,19 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
     }
 
     deactivateTools() {
-        this.actionsContainer.selectedTool = Tool.NONE;
+        this.actionsContainer.selectTool(ToolType.NONE);
         this.pen.nativeElement.style.backgroundColor = 'white';
         this.rubber.nativeElement.style.backgroundColor = 'white';
         this.rectangle.nativeElement.style.backgroundColor = 'white';
     }
 
     selectTool(toolName: string) {
-        const toolToSelect: Tool = Tool[toolName.toUpperCase() as keyof typeof Tool];
-        if (!(this.actionsContainer.selectedTool === toolToSelect)) {
-            this.actionsContainer.selectedTool = toolToSelect;
-            this.pen.nativeElement.style.backgroundColor = toolToSelect === Tool.CRAYON ? 'salmon' : 'white';
-            this.rubber.nativeElement.style.backgroundColor = toolToSelect === Tool.ERASER ? 'salmon' : 'white';
-            this.rectangle.nativeElement.style.backgroundColor = toolToSelect === Tool.RECTANGLE ? 'salmon' : 'white';
+        const toolToSelect: ToolType = ToolType[toolName.toUpperCase() as keyof typeof ToolType];
+        if (!(this.actionsContainer.selectedToolType === toolToSelect)) {
+            this.actionsContainer.selectTool(toolToSelect);
+            this.pen.nativeElement.style.backgroundColor = toolToSelect === ToolType.CRAYON ? 'salmon' : 'white';
+            this.rubber.nativeElement.style.backgroundColor = toolToSelect === ToolType.ERASER ? 'salmon' : 'white';
+            this.rectangle.nativeElement.style.backgroundColor = toolToSelect === ToolType.RECTANGLE ? 'salmon' : 'white';
         } else {
             this.deactivateTools();
         }
@@ -113,7 +113,7 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
         const switchElement = new SwitchElement();
         switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftDrawingContext, this.rightDrawingContext);
 
-        switchElement.draw(this.leftDrawingContext);
+        switchElement.applyElementAction(this.leftDrawingContext);
         this.actionsContainer.undoActions.push(switchElement);
     }
 
@@ -127,7 +127,7 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
 
         const duplication = new DuplicationElement(copyOnLeft);
         duplication.loadActions(this.actionsContainer.undoActions);
-        duplication.draw(squashedContext);
+        duplication.applyElementAction(squashedContext);
         this.actionsContainer.undoActions.push(duplication);
     }
 
@@ -188,9 +188,9 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
         const clearElement = new ClearElement(isLeft);
         clearElement.actionsToCopy = this.actionsContainer.undoActions;
         if (isLeft) {
-            clearElement.draw(this.leftDrawingContext);
+            clearElement.applyElementAction(this.leftDrawingContext);
         } else {
-            clearElement.draw(this.rightDrawingContext);
+            clearElement.applyElementAction(this.rightDrawingContext);
         }
         this.actionsContainer.undoActions.push(clearElement);
     }

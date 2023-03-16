@@ -1,13 +1,14 @@
 import { ElementRef } from '@angular/core';
+import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
 import { ClearElement } from '@app/classes/clear-element/clear-element';
-import { CrayonElement } from '@app/classes/crayon-element/crayon-element';
-import { EraserElement } from '@app/classes/eraser-element/eraser-element';
-import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
+import { EraserTool } from '@app/classes/eraser-tool/eraser.tool';
+import { PencilTool } from '@app/classes/pencil-tool/pencil.tool';
+import { RectangleTool } from '@app/classes/rectangle-tool/rectangle.tool';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
-import { NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
+import { PEN_WIDTH } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
-export enum Tool {
+export enum ToolType {
     CRAYON = 'crayon',
     RECTANGLE = 'rectangle',
     ERASER = 'eraser',
@@ -21,7 +22,7 @@ export class ActionsContainer {
     rightContext: CanvasRenderingContext2D;
     currentCanvasIsLeft: boolean;
     color: string = 'black';
-    selectedTool: Tool = Tool.NONE;
+    currentToolObject: AbstractTool | null = null;
     initialPosition: Vector2;
     previousRectangle: Vector2;
     penWidth: number = PEN_WIDTH;
@@ -31,6 +32,39 @@ export class ActionsContainer {
         this.setupListeners();
     }
 
+    get selectedToolType(): ToolType {
+        if (this.currentToolObject instanceof PencilTool) {
+            return ToolType.CRAYON;
+        } else if (this.currentToolObject instanceof RectangleTool) {
+            return ToolType.RECTANGLE;
+        } else if (this.currentToolObject instanceof EraserTool) {
+            return ToolType.ERASER;
+        } else {
+            return ToolType.NONE;
+        }
+    }
+
+    selectTool(tool: ToolType) {
+        switch (tool) {
+            case ToolType.CRAYON: {
+                this.currentToolObject = new PencilTool(this);
+
+                break;
+            }
+            case ToolType.RECTANGLE: {
+                this.currentToolObject = new RectangleTool(this);
+                break;
+            }
+            case ToolType.ERASER: {
+                this.currentToolObject = new EraserTool(this);
+                break;
+            }
+            default:
+                this.currentToolObject = null;
+                break;
+        }
+    }
+
     undo() {
         let activeContext;
 
@@ -38,12 +72,8 @@ export class ActionsContainer {
         this.rightContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
         const maxIndex = this.undoActions.length - 1;
         for (let i = 0; i <= maxIndex; i++) {
-            if (this.undoActions[i].isLeftCanvas) {
-                activeContext = this.leftContext;
-            } else {
-                activeContext = this.rightContext;
-            }
-            this.undoActions[i].draw(activeContext);
+            activeContext = this.undoActions[i].isLeftCanvas ? this.leftContext : this.rightContext;
+            this.undoActions[i].applyElementAction(activeContext);
         }
         this.redoActions.push(this.undoActions.pop() as UndoElement);
     }
@@ -60,7 +90,7 @@ export class ActionsContainer {
                     activeContext = this.rightContext;
                 }
                 if (!(action instanceof ClearElement)) {
-                    action.draw(activeContext);
+                    action.applyElementAction(activeContext);
                 } else {
                     action.clear(activeContext);
                 }
@@ -76,87 +106,20 @@ export class ActionsContainer {
     }
 
     draw = (event: MouseEvent) => {
-        let activeContext: CanvasRenderingContext2D;
-        if (this.undoActions[this.undoActions.length - 1].isLeftCanvas) {
-            activeContext = this.leftContext;
-        } else {
-            activeContext = this.rightContext;
-        }
-        switch (this.selectedTool) {
-            case Tool.ERASER:
-            case Tool.CRAYON: {
-                this.undoActions[this.undoActions.length - 1].pixels.push(new Vector2(event.offsetX, event.offsetY));
-                this.undoActions[this.undoActions.length - 1].draw(activeContext);
-                break;
-            }
-            case Tool.RECTANGLE: {
-                let width = event.offsetX - this.initialPosition.x;
-                let height = event.offsetY - this.initialPosition.y;
-                if (this.previousRectangle) {
-                    activeContext.clearRect(
-                        this.initialPosition.x,
-                        this.initialPosition.y,
-                        this.previousRectangle.x - this.initialPosition.x,
-                        this.previousRectangle.y - this.initialPosition.y,
-                    );
-                }
+        const activeContext = this.undoActions[this.undoActions.length - 1].isLeftCanvas ? this.leftContext : this.rightContext;
 
-                activeContext.beginPath();
-                if (event.shiftKey) {
-                    const size = Math.min(Math.abs(width), Math.abs(height));
-                    width = Math.sign(width) * size;
-                    height = Math.sign(height) * size;
-                }
-                activeContext.fillRect(this.initialPosition.x, this.initialPosition.y, width, height);
-
-                this.undoActions[this.undoActions.length - 1].pixels[1] = new Vector2(
-                    width + this.initialPosition.x,
-                    height + this.initialPosition.y,
-                );
-                this.previousRectangle = new Vector2(width + this.initialPosition.x, height + this.initialPosition.y);
-                const clearIndex = this.undoActions.findIndex((element) => element instanceof ClearElement);
-                const undoActionsCopy: UndoElement[] = clearIndex !== NOT_FOUND ? this.undoActions.slice() : [];
-                this.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy.slice(clearIndex) : this.undoActions;
-                for (const action of this.undoActions) {
-                    if (
-                        action.isLeftCanvas === this.undoActions[this.undoActions.length - 1].isLeftCanvas &&
-                        !(action instanceof SwitchElement || action instanceof ClearElement)
-                    ) {
-                        action.draw(activeContext);
-                    }
-                    if (action instanceof ClearElement) {
-                        action.clear(activeContext);
-                    }
-                }
-                this.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy : this.undoActions;
-                break;
-            }
+        if (this.currentToolObject) {
+            this.currentToolObject.use(activeContext, event);
         }
     };
 
     handleMouseDown(canvas: HTMLCanvasElement, event: MouseEvent) {
         this.initialPosition = new Vector2(event.offsetX, event.offsetY);
-        let currentCanvasIsLeft;
-        if ((canvas.getContext('2d') as CanvasRenderingContext2D) === this.leftContext) {
-            currentCanvasIsLeft = true;
-        } else {
-            currentCanvasIsLeft = false;
-        }
+        const currentCanvasIsLeft = (canvas.getContext('2d') as CanvasRenderingContext2D) === this.leftContext;
         const modifiedPixels: Vector2[] = [];
         modifiedPixels.push(this.initialPosition);
-        switch (this.selectedTool) {
-            case Tool.CRAYON: {
-                this.undoActions.push(new CrayonElement(modifiedPixels, currentCanvasIsLeft, this.penWidth, this.color));
-                break;
-            }
-            case Tool.RECTANGLE: {
-                this.undoActions.push(new RectangleElement(modifiedPixels, currentCanvasIsLeft, this.penWidth, this.color));
-                break;
-            }
-            case Tool.ERASER: {
-                this.undoActions.push(new EraserElement(modifiedPixels, currentCanvasIsLeft, this.penWidth));
-                break;
-            }
+        if (this.currentToolObject) {
+            this.currentToolObject.addUndoElementToActionsContainer(modifiedPixels, currentCanvasIsLeft);
         }
 
         canvas.addEventListener('mousemove', this.draw);

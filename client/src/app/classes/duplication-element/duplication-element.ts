@@ -10,11 +10,11 @@ export class DuplicationElement extends UndoElement {
     loadActions(actionsToCopy: UndoElement[]) {
         this.actionsToCopy = actionsToCopy;
     }
-    draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
+    applyElementAction(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         for (const action of this.actionsToCopy) {
             if (action.isLeftCanvas !== this.isLeftCanvas) {
-                action.draw(context);
+                action.applyElementAction(context);
             }
         }
         return context;

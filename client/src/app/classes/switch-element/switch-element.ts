@@ -14,20 +14,13 @@ export class SwitchElement extends UndoElement {
         this.leftContext = leftContext;
         this.rightContext = rightContext;
     }
-    draw(leftContext: CanvasRenderingContext2D): CanvasRenderingContext2D {
+    applyElementAction(leftContext: CanvasRenderingContext2D): CanvasRenderingContext2D {
         this.leftContext.clearRect(0, 0, leftContext.canvas.width, this.leftContext.canvas.height);
         this.rightContext.clearRect(0, 0, this.leftContext.canvas.width, this.leftContext.canvas.height);
         for (const action of this.actionsToCopy) {
-            if (action.isLeftCanvas) {
-                if (!(action instanceof SwitchElement)) {
-                    action.draw(this.rightContext);
-                    action.isLeftCanvas = !action.isLeftCanvas;
-                }
-            } else {
-                if (!(action instanceof SwitchElement)) {
-                    action.draw(this.leftContext);
-                    action.isLeftCanvas = !action.isLeftCanvas;
-                }
+            if (!(action instanceof SwitchElement)) {
+                action.applyElementAction(action.isLeftCanvas ? this.rightContext : this.leftContext);
+                action.isLeftCanvas = !action.isLeftCanvas;
             }
         }
         return leftContext;

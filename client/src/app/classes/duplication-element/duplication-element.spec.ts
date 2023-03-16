@@ -18,6 +18,6 @@ describe('DuplicationElement', () => {
         tempCanvas.width = 500;
         tempCanvas.height = 500;
 
-        duplicateCanvas.draw(tempContext);
+        duplicateCanvas.applyElementAction(tempContext);
     });
 });

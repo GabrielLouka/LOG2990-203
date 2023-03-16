@@ -13,7 +13,7 @@ export class ClearElement extends UndoElement {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     }
 
-    draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
+    applyElementAction(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
         context.clearRect(0, 0, context.canvas.width, context.canvas.height);
         return context;
     }

@@ -18,6 +18,6 @@ describe('SwitchElement', () => {
             leftCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D,
             rightCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D,
         );
-        switchElement.draw(leftCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D);
+        switchElement.applyElementAction(leftCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D);
     });
 });

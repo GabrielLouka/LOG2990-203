@@ -3,7 +3,7 @@ import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abs
 import { Vector2 } from '@common/vector2';
 
 export class CrayonElement extends UndoElement {
-    draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
+    applyElementAction(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
         context.beginPath();
         context.strokeStyle = this.color;
         context.lineWidth = this.penWidth;

@@ -1,7 +1,7 @@
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 
 export class RectangleElement extends UndoElement {
-    draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
+    applyElementAction(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
         context.beginPath();
         context.strokeStyle = this.color;
         context.fillStyle = this.color;
