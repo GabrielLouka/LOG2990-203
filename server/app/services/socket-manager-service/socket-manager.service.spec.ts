@@ -4,6 +4,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { Server } from '@app/server';
+import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
+import { MatchingDifferencesService } from '@app/services/matching-difference-service/matching-differences.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
@@ -14,8 +16,6 @@ import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
-import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
-import { MatchingDifferencesService } from '@app/services/matching-difference-service/matching-differences.service';
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
 
@@ -114,7 +114,7 @@ describe('SocketManager', () => {
                 assert(socket.on.calledWith('registerGameData'));
                 expect(socket.data).to.deep.equal(dataTest);
                 done();
-            }, RESPONSE_DELAY); // 1 seconde
+            }, RESPONSE_DELAY);
         });
     });
     const data: GameData = {
@@ -297,7 +297,7 @@ describe('SocketManager', () => {
         const fakeEmit = sinon.fake();
         socket.to.returns({ emit: fakeEmit });
         const joinCallback = socket.on.getCall(9).args[1];
-        joinCallback({ matchId: match.matchId, player: matchPlayer, accept: true });
+        joinCallback({ matchId: match.matchId, player: matchPlayer, isAccepted: true });
         setTimeout(() => {
             assert(socket.on.calledWith('sendIncomingPlayerRequestAnswer'));
             done();

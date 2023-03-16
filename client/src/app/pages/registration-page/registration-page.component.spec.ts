@@ -52,7 +52,7 @@ describe('RegistrationPageComponent', () => {
         authService.registerUser.and.callThrough();
         component.registrationForm.setValue({ username: 'testuser' });
         component.registerUser();
-        const result = component.getUser();
+        const result = component.user;
         expect(result).toBe('testuser');
     });
 });

@@ -54,7 +54,7 @@ export class OverlayComponent {
             const routeToSend = '/games/' + this.id;
             this.communicationService.delete(routeToSend).subscribe({
                 next: (response) => {
-                    if (response.body !== null) {
+                    if (response.body) {
                         location.reload();
                     }
                 },
@@ -64,7 +64,7 @@ export class OverlayComponent {
                     this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
-            this.socketService.socket.emit('deletedGame', { gameToDelete: true, id: this.id });
+            this.socketService.socket.emit('deletedGame', { hasDeletedGame: true, id: this.id });
         }
     }
 }

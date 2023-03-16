@@ -84,8 +84,8 @@ export class SocketManager {
                 sendJoinMatchCancel(data.matchId, data.player.playerId);
             });
 
-            socket.on('sendIncomingPlayerRequestAnswer', (data: { matchId: string; player: Player; accept: boolean }) => {
-                if (data.accept) {
+            socket.on('sendIncomingPlayerRequestAnswer', (data: { matchId: string; player: Player; isAccepted: boolean }) => {
+                if (data.isAccepted) {
                     this.matchManagerService.setMatchPlayer(data.matchId, data.player);
                     sendGameMatchProgressUpdate(data.matchId);
                 }
@@ -95,14 +95,14 @@ export class SocketManager {
                 this.sio.emit('allGameDeleted', { noGameLeft: data.deletedGames }, socket.id);
                 this.sio.emit('actionOnGameReloadingThePage');
             });
-            socket.on('deletedGame', (data) => {
-                this.sio.emit('gameDeleted', { gameDeleted: data.gameToDelete, id: data.id }, socket.id);
+            socket.on('deletedGame', (data: { hasDeletedGame: boolean; id: string }) => {
+                this.sio.emit('gameDeleted', { gameDeleted: data.hasDeletedGame, id: data.id }, socket.id);
                 this.sio.emit('actionOnGameReloadingThePage');
             });
-            socket.on('sendingMessage', (data) => {
+            socket.on('sendingMessage', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
                 this.sio
                     .to(joinedRoomName)
-                    .emit('messageBetweenPlayer', { username: data.username, message: data.msg, sentByPlayer1: data.sentByPlayer1 });
+                    .emit('messageBetweenPlayer', { username: data.username, message: data.message, sentByPlayer1: data.sentByPlayer1 });
             });
 
             const joinMatchRoom = (data: { matchId: string }) => {

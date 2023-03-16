@@ -7,6 +7,7 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
 import { Player } from '@common/player';
+import { CLASSIC_PATH, HOME_PATH } from '@common/utils/env.http';
 
 @Component({
     selector: 'app-registration-page',
@@ -22,12 +23,13 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     incomingPlayerFound: boolean;
     incomingPlayer: Player | null = null;
     hasSentJoinRequest: boolean = false;
-
     waitingPlayers: Player[] = [];
+
     registrationForm = new FormGroup({
         username: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
     });
 
+    // eslint-disable-next-line max-params
     constructor(
         private auth: AuthService,
         private route: ActivatedRoute,
@@ -35,6 +37,10 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         private readonly matchmakingService: MatchmakingService,
         private readonly socketService: SocketClientService,
     ) {}
+
+    get user() {
+        return this.auth.registeredUsername;
+    }
 
     ngOnInit(): void {
         this.id = this.route.snapshot.paramMap.get('id');
@@ -59,7 +65,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.auth.registerUser(this.registrationForm.value.username as string);
         this.username = this.registrationForm.value.username;
         this.usernameRegistered = true;
-        if (this.matchmakingService.getCurrentMatch() != null) {
+        if (this.matchmakingService.currentMatchPlayed) {
             if (this.username && this.matchmakingService.is1vs1Mode) {
                 this.matchmakingService.setCurrentMatchPlayer(this.username + '#1');
             } else if (this.username && this.matchmakingService.isSoloMode) {
@@ -76,7 +82,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     loadGamePage() {
-        this.router.navigate(['/classic', this.id]);
+        this.router.navigate([CLASSIC_PATH, this.id]);
     }
 
     sendMatchJoinRequest() {
@@ -116,44 +122,60 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
             this.incomingPlayer = null;
         }
     }
+
     signalRedirection() {
         this.socketService.on('allGameDeleted', () => {
             const pathSegments = window.location.href.split('/');
             const lastSegment = pathSegments[pathSegments.length - 2];
             if (lastSegment === 'registration') {
-                this.router.navigate(['/home']).then(() => {
+                this.router.navigate([HOME_PATH]).then(() => {
                     window.alert("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
                 });
             }
         });
     }
+
     signalRedirectionOneGame() {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.socketService.on('gameDeleted', (data: any) => {
+        this.socketService.on('gameDeleted', (data: { hasDeletedGame: boolean; id: string }) => {
             const pathSegments = window.location.href.split('/');
             const pageName = pathSegments[pathSegments.length - 2];
             const idPage = pathSegments[pathSegments.length - 1];
             if (pageName === 'registration' && data.id === idPage) {
-                this.router.navigate(['/home']).then(() => {
+                this.router.navigate([HOME_PATH]).then(() => {
                     window.alert("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
                 });
             }
         });
     }
 
-    handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; accept: boolean }) {
-        // if you've been accepted by the host
-        if (data.accept && data.player.playerId === this.matchmakingService.getCurrentSocketId()) {
+    isPlayer2(player: Player): boolean {
+        return player.playerId === this.matchmakingService.currentSocketId;
+    }
+
+    isAcceptedByHost(isAccepted: boolean, player: Player): boolean {
+        return isAccepted && this.isPlayer2(player);
+    }
+
+    isRejectedByHost(isAccepted: boolean, player: Player): boolean {
+        return !isAccepted && this.isPlayer2(player);
+    }
+
+    isHostAcceptingPlayer2(isAccepted: boolean): boolean {
+        return isAccepted && this.matchmakingService.isHost;
+    }
+
+    isHostRejectingPlayer2(isAccepted: boolean): boolean {
+        return !isAccepted && this.matchmakingService.isHost && this.waitingPlayers.length >= 1;
+    }
+
+    handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; isAccepted: boolean }) {
+        if (this.isAcceptedByHost(data.isAccepted, data.player)) {
             this.loadGamePage();
         }
-
-        // if you are the host himself and you've accepted the player
-        if (data.accept && this.matchmakingService.isHost) {
+        if (this.isHostAcceptingPlayer2(data.isAccepted)) {
             this.loadGamePage();
         }
-
-        // if you are the host and you've rejected the player
-        if (!data.accept && this.matchmakingService.isHost && this.waitingPlayers.length >= 1) {
+        if (this.isHostRejectingPlayer2(data.isAccepted)) {
             this.waitingMessage = "En attente d'un adversaire...";
             this.incomingPlayerFound = false;
             this.waitingPlayers = this.waitingPlayers.splice(1, this.waitingPlayers.length);
@@ -161,15 +183,13 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
                 this.handleIncomingPlayerJoinRequest(this.waitingPlayers[0]);
             }
         }
-
-        // if you are the player and you've been rejected
-        if (!data.accept && data.player.playerId === this.matchmakingService.getCurrentSocketId()) {
+        if (this.isRejectedByHost(data.isAccepted, data.player)) {
             this.router.navigate(['/']);
         }
     }
 
     handleMatchUpdated(match: Match | null) {
-        if (match == null) return;
+        if (!match) return;
         if (!this.matchmakingService.isHost) {
             if (match.matchStatus === MatchStatus.Aborted) {
                 this.router.navigate(['/']);
@@ -178,7 +198,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     acceptIncomingPlayer() {
-        if (this.incomingPlayer == null) return;
+        if (!this.incomingPlayer) return;
         this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, true);
         for (const player of this.waitingPlayers) {
             if (player !== this.incomingPlayer) {
@@ -189,11 +209,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     refuseIncomingPlayer() {
-        if (this.incomingPlayer == null) return;
+        if (!this.incomingPlayer) return;
         this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, false);
-    }
-
-    getUser() {
-        return this.auth.registeredUsername;
     }
 }
