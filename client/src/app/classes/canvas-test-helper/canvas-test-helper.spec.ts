@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { CanvasTestHelper } from '@app/classes/canvas-test-helper';
+import { CanvasTestHelper } from '@app/classes/canvas-test-helper/canvas-test-helper';
 
 describe('CanvasTestHelper', () => {
     let canvasTestHelper: CanvasTestHelper;
