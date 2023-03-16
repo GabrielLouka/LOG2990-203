@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
+import { ChatService } from '@app/services/chat-service/chat.service';
 import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -65,7 +66,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private route: ActivatedRoute,
         private imageManipulationService: ImageManipulationService,
         private matchmakingService: MatchmakingService,
-        private cheatModeService: CheatModeService
+        private cheatModeService: CheatModeService,
+        private chatService: ChatService
     ) {}
 
     get leftCanvasContext() {
@@ -242,7 +244,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 sentByPlayer2: !data.sentByPlayer1,
                 sentTime: Date.now(),
             });
-            this.chat.scrollToBottom();
+            this.chatService.scrollToBottom(this.chat.chat);
             this.chat.newMessage = '';
         });
     }
