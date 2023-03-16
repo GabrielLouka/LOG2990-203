@@ -25,12 +25,14 @@ export class ActionsContainer {
     selectedTool: Tool;
     initialPosition: Vector2;
     previousRectangle: Vector2;
+
     constructor(public leftDrawingCanvas: ElementRef<HTMLCanvasElement>, public rightDrawingCanvas: ElementRef<HTMLCanvasElement>) {
         this.leftContext = leftDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rightContext = rightDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.setupListeners();
         this.selectedTool = Tool.NONE;
     }
+
     undo() {
         let activeContext;
 
@@ -47,6 +49,7 @@ export class ActionsContainer {
         }
         this.redoActions.push(this.undoActions.pop() as UndoElement);
     }
+
     redo() {
         let activeContext;
         const lastRedoAction = this.redoActions.pop();
