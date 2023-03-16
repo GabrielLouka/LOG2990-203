@@ -8,7 +8,7 @@ import { expect } from 'chai';
 import { OptionalId } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import * as sinon from 'sinon';
-import { DatabaseServiceMock } from '../database-service-mock/database.service.mock';
+import { DatabaseServiceMock } from './database.service.mock';
 describe('DatabaseServiceMock', () => {
     let mongoServer: MongoMemoryServer;
 
