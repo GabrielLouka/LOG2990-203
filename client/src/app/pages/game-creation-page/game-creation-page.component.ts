@@ -255,10 +255,6 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
     }
 
     async sendImageToServer(): Promise<void> {
-        // if (!this.areTwoImagesLoaded()) {
-        //     await this.loadDefaultImages();
-        // }
-
         this.resultModal.showPopUp();
 
         // TODO : store this value in a global constant file
