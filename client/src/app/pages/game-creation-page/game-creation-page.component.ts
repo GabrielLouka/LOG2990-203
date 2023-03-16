@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActionsContainer, Tool } from '@app/classes/actions-container/actions-container';
 import { ClearElement } from '@app/classes/clear-element/clear-element';
 import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
@@ -23,7 +23,7 @@ import { Buffer } from 'buffer';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements AfterViewInit {
+export class GameCreationPageComponent implements AfterViewInit, OnInit {
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
     @ViewChild('input1') input1!: ElementRef;
@@ -52,6 +52,8 @@ export class GameCreationPageComponent implements AfterViewInit {
     leftDrawingContext: CanvasRenderingContext2D;
     rightDrawingContext: CanvasRenderingContext2D;
     selectedTool: unknown;
+    defaultImagePath: string = '../../assets/img/image_empty.bmp';
+    defaultImageFile: File;
 
     formToSendAfterServerConfirmation: EntireGameUploadForm;
 
@@ -64,6 +66,10 @@ export class GameCreationPageComponent implements AfterViewInit {
         } else if (event.ctrlKey && event.key === 'z') {
             this.undo();
         }
+    }
+
+    async ngOnInit() {
+        await this.loadDefaultImages();
     }
 
     ngAfterViewInit(): void {
@@ -157,6 +163,7 @@ export class GameCreationPageComponent implements AfterViewInit {
         image.onload = () => {
             if (!this.is24BitDepthBMP(imageBuffer)) {
                 alert("L'image doit être en 24-bits");
+                image.src = URL.createObjectURL(this.defaultImageFile);
                 return;
             }
 
@@ -221,7 +228,7 @@ export class GameCreationPageComponent implements AfterViewInit {
         }
     }
 
-    canSendToServer(): boolean {
+    areTwoImagesLoaded(): boolean {
         return this.originalContainsImage && this.modifiedContainsImage;
     }
 
@@ -232,14 +239,14 @@ export class GameCreationPageComponent implements AfterViewInit {
         return pix as Uint8ClampedArray;
     }
 
-    combineImages(originaleBuffer: Buffer, drawingCanvas: HTMLCanvasElement) {
+    combineImages(originalBuffer: Buffer, drawingCanvas: HTMLCanvasElement) {
         for (let x = 0; x < drawingCanvas.width; x++) {
             for (let y = 0; y < drawingCanvas.height; y++) {
                 const inspectedColor = this.getColorIndicesForCoord(x, y, drawingCanvas);
                 if (inspectedColor[3] !== 0) {
                     this.imageManipulationService.setRGB(
                         new Vector2(x, y),
-                        originaleBuffer,
+                        originalBuffer,
                         new Pixel(inspectedColor[0], inspectedColor[1], inspectedColor[2]),
                     );
                 }
@@ -248,13 +255,13 @@ export class GameCreationPageComponent implements AfterViewInit {
     }
 
     async sendImageToServer(): Promise<void> {
-        if (!this.canSendToServer()) {
-            alert('Veuillez ajouter deux images');
-            return;
-        }
+        // if (!this.areTwoImagesLoaded()) {
+        //     await this.loadDefaultImages();
+        // }
 
         this.resultModal.showPopUp();
 
+        // TODO : store this value in a global constant file
         const routeToSend = '/image_processing/send-image';
 
         if (
@@ -300,10 +307,28 @@ export class GameCreationPageComponent implements AfterViewInit {
                     }
                 },
                 error: (err: HttpErrorResponse) => {
-                    window.alert(err);
+                    window.alert(JSON.stringify(err));
                 },
             });
         }
+    }
+
+    async loadDefaultImages() {
+        this.originalContainsImage = true;
+        this.modifiedContainsImage = true;
+
+        if (!this.defaultImageFile) this.defaultImageFile = await this.createFile(this.defaultImagePath, 'defaultImage.bmp', 'image/bmp');
+        this.originalImage = this.defaultImageFile;
+        this.modifiedImage = this.defaultImageFile;
+    }
+
+    async createFile(path: string, name: string, type: string): Promise<File> {
+        const response = await fetch(path);
+        const data = await response.blob();
+        const metadata = {
+            type,
+        };
+        return new File([data], name, metadata);
     }
 
     submitRadius(radius: number) {
