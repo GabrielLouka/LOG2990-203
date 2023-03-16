@@ -21,16 +21,14 @@ export class ActionsContainer {
     rightContext: CanvasRenderingContext2D;
     currentCanvasIsLeft: boolean;
     color: string = 'black';
-    penWidth: number = PEN_WIDTH;
-    selectedTool: Tool;
+    selectedTool: Tool = Tool.NONE;
     initialPosition: Vector2;
     previousRectangle: Vector2;
-
+    penWidth: number = PEN_WIDTH;
     constructor(public leftDrawingCanvas: ElementRef<HTMLCanvasElement>, public rightDrawingCanvas: ElementRef<HTMLCanvasElement>) {
         this.leftContext = leftDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rightContext = rightDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.setupListeners();
-        this.selectedTool = Tool.NONE;
     }
 
     undo() {

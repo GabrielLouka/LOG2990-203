@@ -98,7 +98,7 @@ export class MatchmakingService {
     }
 
     sendMatchJoinRequest(playerName: string) {
-        if (this.matchIdThatWeAreTryingToJoin == null) throw new Error('matchIdThatWeAreTryingToJoin is null');
+        if (!this.matchIdThatWeAreTryingToJoin) throw new Error('matchIdThatWeAreTryingToJoin is null');
 
         const matchId = this.matchIdThatWeAreTryingToJoin;
         const player = new Player(playerName, this.getCurrentSocketId().toString());
@@ -110,7 +110,7 @@ export class MatchmakingService {
     }
 
     sendMatchJoinCancel(playerName: string) {
-        if (this.matchIdThatWeAreTryingToJoin == null) throw new Error('matchIdThatWeAreTryingToJoin is null');
+        if (!this.matchIdThatWeAreTryingToJoin) throw new Error('matchIdThatWeAreTryingToJoin is null');
 
         const matchId = this.matchIdThatWeAreTryingToJoin;
         const player = new Player(playerName, this.getCurrentSocketId().toString());
@@ -133,7 +133,7 @@ export class MatchmakingService {
     }
 
     setCurrentMatchPlayer(playerName: string) {
-        if (this.currentMatch == null) throw new Error('currentMatch is null');
+        if (!this.currentMatch) throw new Error('currentMatch is null');
 
         const matchId = this.currentMatch.matchId;
         const player = new Player(playerName, this.getCurrentSocketId().toString());

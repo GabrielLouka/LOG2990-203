@@ -20,12 +20,12 @@
                     Ajouter une image
                 </button>
                 <input #input1 type="file" class="display" accept="image/bmp" (input)="processImage($event, false)" />
-                <button class="button-style center" (click)="resetCanvas(false)">
+                <button class="button-style center" (click)="resetBackgroundCanvas(false)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>
                 </button>
                 <div class="flex-row">
-                    <button class="button-style center" (click)="eraseCanvas(true)">
+                    <button class="button-style center" (click)="resetForegroundCanvas(true)">
                         <span class="material-symbols-outlined optionIcon center"> delete </span>
                     </button>
                     <button class="button-style center" (click)="duplicateCanvas(false)">
@@ -40,23 +40,23 @@
                 <div class="flex-row center penWidth">
                     <button class="button-style no-hover bigger">{{ this.penWidth }}</button>
                     <div>
-                        <button class="button-style center" title="Augmenter rayon" (click)="widthModification(true)">
+                        <button class="button-style center" title="Augmenter rayon" (click)="setPenWidth(true)">
                             <span class="material-symbols-outlined"> add </span>
                         </button>
-                        <button class="button-style center" title="Diminuer rayon" (click)="widthModification(false)">
+                        <button class="button-style center" title="Diminuer rayon" (click)="setPenWidth(false)">
                             <span class="material-symbols-outlined"> remove </span>
                         </button>
                     </div>
                 </div>
-                <button #pen class="button-style center" title="Crayon" (click)="activatePen('crayon')">
+                <button #pen class="button-style center" title="Crayon" (click)="selectTool('crayon')">
                     <span class="material-symbols-outlined optionIcon"> draw </span>
                 </button>
-                <button #rubber class="button-style center" title="Efface" (click)="activateRubber('eraser')">
+                <button #rubber class="button-style center" title="Efface" (click)="selectTool('eraser')">
                     <img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" />
                 </button>
-                <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (input)="colorModification()" />
+                <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (input)="refreshSelectedColor()" />
 
-                <button #rectangle class="button-style center" title="Outil rectangle" (click)="activateRectangle('rectangle')">
+                <button #rectangle class="button-style center" title="Outil rectangle" (click)="selectTool('rectangle')">
                     <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
                 </button>
                 <button class="button-style center" title="Inverser dessin" (click)="switchCanvases()">
@@ -102,7 +102,7 @@
                         <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
                     </button>
 
-                    <button class="button-style center" (click)="eraseCanvas(false)">
+                    <button class="button-style center" (click)="resetForegroundCanvas(false)">
                         <span class="material-symbols-outlined optionIcon center"> delete </span>
                     </button>
                 </div>
@@ -111,7 +111,7 @@
                     Ajouter une image
                 </button>
                 <input #input2 type="file" class="display" accept="image/bmp" (input)="processImage($event, true)" />
-                <button class="button-style center" (click)="resetCanvas(true)">
+                <button class="button-style center" (click)="resetBackgroundCanvas(true)">
                     <span class="material-symbols-outlined optionIcon"> reset_image </span>
                     <p>Réinitialiser image</p>
                 </button>

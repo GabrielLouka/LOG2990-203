@@ -1,12 +1,9 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { ActionsContainer, Tool } from '@app/classes/actions-container/actions-container';
 import { ClearElement } from '@app/classes/clear-element/clear-element';
 import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
-import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -14,7 +11,7 @@ import { DifferenceImage } from '@common/difference.image';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadForm } from '@common/image.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
-import { Pixel } from '@common/pixel';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
@@ -43,11 +40,7 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
     enlargementRadius: number = 3;
     originalImage: File | null;
     modifiedImage: File | null;
-    modifiedContainsImage = false;
-    originalContainsImage = false;
-    penWidth: number = 20;
-    redoActions: { pixels: Vector2[]; color: string }[] = [];
-    undoActions: UndoElement[] = [];
+    penWidth: number = PEN_WIDTH;
     actionsContainer: ActionsContainer;
     leftDrawingContext: CanvasRenderingContext2D;
     rightDrawingContext: CanvasRenderingContext2D;
@@ -73,35 +66,21 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
     }
 
     ngAfterViewInit(): void {
-        this.leftDrawingContext = this.drawingCanvasOne.nativeElement.getContext('2d')!;
-        this.rightDrawingContext = this.drawingCanvasTwo.nativeElement.getContext('2d')!;
+        this.leftDrawingContext = this.drawingCanvasOne.nativeElement.getContext('2d');
+        this.rightDrawingContext = this.drawingCanvasTwo.nativeElement.getContext('2d');
         this.actionsContainer = new ActionsContainer(this.drawingCanvasOne, this.drawingCanvasTwo);
     }
 
-    colorModification() {
+    refreshSelectedColor() {
         this.actionsContainer.color = this.colorPicker.nativeElement.value;
     }
 
-    widthModification(isIncremented: boolean) {
-        if (isIncremented && this.actionsContainer.penWidth < 20) {
-            this.penWidth++;
-            this.actionsContainer.penWidth = this.penWidth;
-        } else if (!isIncremented && this.actionsContainer.penWidth > 1) {
-            this.penWidth--;
-            this.actionsContainer.penWidth = this.penWidth;
-        }
-    }
+    setPenWidth(isIncremented: boolean) {
+        this.penWidth = this.penWidth + (isIncremented ? 1 : NOT_FOUND);
+        if (this.penWidth < 1) this.penWidth = 1;
+        if (this.penWidth > PEN_WIDTH) this.penWidth = PEN_WIDTH;
 
-    activatePen(selectedTool: string) {
-        this.activateTool(selectedTool, Tool.CRAYON);
-    }
-
-    activateRubber(selectedTool: string) {
-        this.activateTool(selectedTool, Tool.ERASER);
-    }
-
-    activateRectangle(selectedTool: string) {
-        this.activateTool(selectedTool, Tool.RECTANGLE);
+        this.actionsContainer.penWidth = this.penWidth;
     }
 
     deactivateTools() {
@@ -111,12 +90,13 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
         this.rectangle.nativeElement.style.backgroundColor = 'white';
     }
 
-    activateTool(selectedTool: string, tool: Tool) {
-        if (!(this.actionsContainer.selectedTool === tool)) {
-            this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
-            this.pen.nativeElement.style.backgroundColor = tool === Tool.CRAYON ? 'salmon' : 'white';
-            this.rubber.nativeElement.style.backgroundColor = tool === Tool.ERASER ? 'salmon' : 'white';
-            this.rectangle.nativeElement.style.backgroundColor = tool === Tool.RECTANGLE ? 'salmon' : 'white';
+    selectTool(toolName: string) {
+        const toolToSelect: Tool = Tool[toolName.toUpperCase() as keyof typeof Tool];
+        if (!(this.actionsContainer.selectedTool === toolToSelect)) {
+            this.actionsContainer.selectedTool = toolToSelect;
+            this.pen.nativeElement.style.backgroundColor = toolToSelect === Tool.CRAYON ? 'salmon' : 'white';
+            this.rubber.nativeElement.style.backgroundColor = toolToSelect === Tool.ERASER ? 'salmon' : 'white';
+            this.rectangle.nativeElement.style.backgroundColor = toolToSelect === Tool.RECTANGLE ? 'salmon' : 'white';
         } else {
             this.deactivateTools();
         }
@@ -151,12 +131,12 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
         this.actionsContainer.undoActions.push(duplication);
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async processImage(event: any, isModified: boolean) {
-        if (event.target.files.length === 0) return;
+    async processImage(event: Event, isModified: boolean) {
+        const inputElement = event.target as HTMLInputElement;
+        if (inputElement.files === null || inputElement.files.length === 0) return;
         const image: HTMLImageElement = new Image();
-        const imageBuffer: ArrayBuffer = await event.target.files[0].arrayBuffer();
-        image.src = URL.createObjectURL(event.target.files[0]);
+        const imageBuffer: ArrayBuffer = await inputElement.files[0].arrayBuffer();
+        image.src = URL.createObjectURL(inputElement.files[0]);
         const canvas: HTMLCanvasElement = this.rightCanvas.nativeElement;
         const imageDimensions: Vector2 = this.imageManipulationService.getImageDimensions(Buffer.from(imageBuffer));
 
@@ -167,19 +147,20 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
                 return;
             }
 
-            if (imageDimensions.y !== 480 || imageDimensions.x !== 640) {
+            if (imageDimensions.y !== CANVAS_HEIGHT || imageDimensions.x !== CANVAS_WIDTH) {
                 alert('Taille invalide (' + image.width + 'x' + image.height + '), la taille doit être de : 640x480 pixels');
                 return;
             }
 
             const context = this.getCanvas(isModified);
             context?.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
-            if (isModified) {
-                this.modifiedImage = event.target.files[0];
-                this.modifiedContainsImage = true;
-            } else {
-                this.originalImage = event.target.files[0];
-                this.originalContainsImage = true;
+
+            if (inputElement.files) {
+                if (isModified) {
+                    this.modifiedImage = inputElement.files[0];
+                } else {
+                    this.originalImage = inputElement.files[0];
+                }
             }
         };
     }
@@ -190,7 +171,7 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
         return dataView.getUint16(BITMAP_TYPE_OFFSET, true) === BIT_COUNT_24;
     };
 
-    resetCanvas(rightImage: boolean) {
+    resetBackgroundCanvas(rightImage: boolean) {
         const canvasSize: HTMLCanvasElement = this.rightCanvas.nativeElement;
 
         const context = this.getCanvas(rightImage);
@@ -198,14 +179,12 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
 
         if (rightImage) {
             this.input2.nativeElement.value = '';
-            this.modifiedContainsImage = false;
         } else {
             this.input1.nativeElement.value = '';
-            this.originalContainsImage = false;
         }
     }
 
-    eraseCanvas(isLeft: boolean) {
+    resetForegroundCanvas(isLeft: boolean) {
         const clearElement = new ClearElement(isLeft);
         clearElement.actionsToCopy = this.actionsContainer.undoActions;
         if (isLeft) {
@@ -228,51 +207,18 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
         }
     }
 
-    areTwoImagesLoaded(): boolean {
-        return this.originalContainsImage && this.modifiedContainsImage;
-    }
-
-    getColorIndicesForCoord(x: number, y: number, canvas: HTMLCanvasElement): Uint8ClampedArray {
-        const context = canvas.getContext('2d');
-        const imgd = context?.getImageData(x, canvas.height - y, 1, 1);
-        const pix = imgd?.data;
-        return pix as Uint8ClampedArray;
-    }
-
-    combineImages(originalBuffer: Buffer, drawingCanvas: HTMLCanvasElement) {
-        for (let x = 0; x < drawingCanvas.width; x++) {
-            for (let y = 0; y < drawingCanvas.height; y++) {
-                const inspectedColor = this.getColorIndicesForCoord(x, y, drawingCanvas);
-                if (inspectedColor[3] !== 0) {
-                    this.imageManipulationService.setRGB(
-                        new Vector2(x, y),
-                        originalBuffer,
-                        new Pixel(inspectedColor[0], inspectedColor[1], inspectedColor[2]),
-                    );
-                }
-            }
-        }
-    }
-
     async sendImageToServer(): Promise<void> {
         this.resultModal.showPopUp();
 
         // TODO : store this value in a global constant file
         const routeToSend = '/image_processing/send-image';
 
-        if (
-            this.originalImage !== undefined &&
-            this.modifiedImage !== undefined &&
-            this.originalContainsImage &&
-            this.modifiedContainsImage &&
-            this.originalImage !== null &&
-            this.modifiedImage !== null
-        ) {
-            const buffer1 = await this.originalImage?.arrayBuffer();
+        if (this.originalImage && this.modifiedImage) {
+            const buffer1 = await this.originalImage.arrayBuffer();
             const buffer2 = await this.modifiedImage.arrayBuffer();
 
-            this.combineImages(Buffer.from(buffer1), this.drawingCanvasOne.nativeElement);
-            this.combineImages(Buffer.from(buffer2), this.drawingCanvasTwo.nativeElement);
+            this.imageManipulationService.combineImages(Buffer.from(buffer1), this.drawingCanvasOne.nativeElement);
+            this.imageManipulationService.combineImages(Buffer.from(buffer2), this.drawingCanvasTwo.nativeElement);
             // convert buffer to int array
             const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
             const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
@@ -286,21 +232,7 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
             const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
             this.communicationService.post<ImageUploadForm>(imageUploadForm, routeToSend).subscribe({
                 next: (response) => {
-                    if (response.body !== null) {
-                        const serverResult: ImageUploadResult = JSON.parse(response.body);
-                        this.resultModal.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
-                        this.formToSendAfterServerConfirmation = {
-                            differences: serverResult.differences,
-                            firstImage,
-                            secondImage,
-                            gameId: serverResult.generatedGameId,
-                            gameName: '',
-                            isEasy: serverResult.isEasy,
-                        };
-                        this.totalDifferences = serverResult.numberOfDifferences;
-                        this.isEasy = serverResult.isEasy;
-                        this.resultModal.showGameNameForm(this.totalDifferences, this.formToSendAfterServerConfirmation);
-                    }
+                    this.handleImageUploadResponse(response, firstImage, secondImage);
                 },
                 error: (err: HttpErrorResponse) => {
                     window.alert(JSON.stringify(err));
@@ -309,10 +241,25 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
         }
     }
 
-    async loadDefaultImages() {
-        this.originalContainsImage = true;
-        this.modifiedContainsImage = true;
+    handleImageUploadResponse(response: HttpResponse<string>, firstImage: DifferenceImage, secondImage: DifferenceImage) {
+        if (response.body !== null) {
+            const serverResult: ImageUploadResult = JSON.parse(response.body);
+            this.resultModal.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
+            this.formToSendAfterServerConfirmation = {
+                differences: serverResult.differences,
+                firstImage,
+                secondImage,
+                gameId: serverResult.generatedGameId,
+                gameName: '',
+                isEasy: serverResult.isEasy,
+            };
+            this.totalDifferences = serverResult.numberOfDifferences;
+            this.isEasy = serverResult.isEasy;
+            this.resultModal.showGameNameForm(this.totalDifferences, this.formToSendAfterServerConfirmation);
+        }
+    }
 
+    async loadDefaultImages() {
         if (!this.defaultImageFile) this.defaultImageFile = await this.createFile(this.defaultImagePath, 'defaultImage.bmp', 'image/bmp');
         this.originalImage = this.defaultImageFile;
         this.modifiedImage = this.defaultImageFile;
