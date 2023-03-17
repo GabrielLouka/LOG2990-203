@@ -102,7 +102,7 @@ export class SocketManager {
             socket.on('sendingMessage', (data) => {
                 this.sio
                     .to(joinedRoomName)
-                    .emit('messageBetweenPlayer', { username: data.username, message: data.msg, sentByPlayer1: data.sentByPlayer1 });
+                    .emit('messageBetweenPlayers', { username: data.username, message: data.msg, sentByPlayer1: data.sentByPlayer1 });
             });
 
             const joinMatchRoom = (data: { matchId: string }) => {
