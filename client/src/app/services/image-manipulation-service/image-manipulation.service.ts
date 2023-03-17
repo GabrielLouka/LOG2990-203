@@ -1,8 +1,17 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Injectable } from '@angular/core';
 import { GameData } from '@common/game-data';
 import { Pixel } from '@common/pixel';
-import { QUARTER_SECOND } from '@common/utils/env';
+import {
+    BLINK_TIME,
+    BMP_FILE_HEADER_BYTES_LENGTH,
+    CANVAS_HEIGHT,
+    CANVAS_WIDTH,
+    IMAGE_HEIGHT_OFFSET,
+    IMAGE_WIDTH_OFFSET,
+    NUMBER_OF_BLINKS,
+    PIXEL_BYTES_LENGTH,
+    QUARTER_SECOND,
+} from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
@@ -14,73 +23,64 @@ export class ImageManipulationService {
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
     }
-    getImageDimensions = (imageBuffer: Buffer): Vector2 => {
-        const imageWidthOffset = 18;
-        const imageHeightOffset = 22;
 
-        const imageWidth = imageBuffer.readInt32LE(imageWidthOffset);
-        let imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
+    getImageDimensions = (imageBuffer: Buffer): Vector2 => {
+        const imageWidth = imageBuffer.readInt32LE(IMAGE_WIDTH_OFFSET);
+        let imageHeight = imageBuffer.readInt32LE(IMAGE_HEIGHT_OFFSET);
 
         imageHeight = imageHeight < 0 ? -imageHeight : imageHeight;
 
         return new Vector2(imageWidth, imageHeight);
     };
+
     getModifiedImageWithoutDifferences(
         gameData: GameData,
         images: { originalImage: Buffer; modifiedImage: Buffer },
         foundDifferences: boolean[],
     ): Buffer {
-        const output = Buffer.from(images.modifiedImage);
-
-        // for some reason I need to use Buffer.from to make it work (cant use the originalImage directly)
-        const ogImage = Buffer.from(images.originalImage);
+        const modifiedImageBuffer = Buffer.from(images.modifiedImage);
+        const originalImageBuffer = Buffer.from(images.originalImage);
 
         for (let i = 0; i < foundDifferences.length; i++) {
             if (foundDifferences[i]) {
                 // if the difference was found, we need to remove it
                 const positionInDifference = gameData.differences[i];
                 for (const pos of positionInDifference) {
-                    // get the pixel from the original image
-                    const pixelFromTheOriginalImage = this.getRGB(pos, ogImage);
-                    // set the pixel in the modified image
-                    if (pixelFromTheOriginalImage !== null) {
-                        this.setRGB(pos, output, pixelFromTheOriginalImage);
+                    const pixelFromTheOriginalImage = this.getRGB(pos, originalImageBuffer);
+                    if (pixelFromTheOriginalImage) {
+                        this.setRGB(pos, modifiedImageBuffer, pixelFromTheOriginalImage);
                     }
                 }
             }
         }
-
-        return output;
+        return modifiedImageBuffer;
     }
 
     async blinkDifference(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
-        const numberOfBlinks = 3;
-        const blinkTime = 100;
-
         this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
-        for (let i = 0; i < numberOfBlinks; i++) {
-            await this.sleep(blinkTime);
+        for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
+            await this.sleep(BLINK_TIME);
             this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
-            await this.sleep(blinkTime);
+            await this.sleep(BLINK_TIME);
             this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
         }
     }
 
-    alternateOldNewImage(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {                           
+    alternateOldNewImage(oldImage: Buffer, newImage: Buffer, context: CanvasRenderingContext2D) {
         let showOldImage = false;
-        let interval = window.setInterval(() => {
+        const interval = window.setInterval(() => {
             if (showOldImage) {
-                this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
+                this.loadCanvasImages(this.getImageSourceFromBuffer(oldImage), context);
             } else {
-                this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+                this.loadCanvasImages(this.getImageSourceFromBuffer(newImage), context);
             }
             showOldImage = !showOldImage;
         }, QUARTER_SECOND / 2);
         return interval;
-    } 
-    
-    loadCurrentImage(image: Buffer, context: CanvasRenderingContext2D){
-        this.loadCanvasImages(this.getImageSourceFromBuffer(image), context);                
+    }
+
+    loadCurrentImage(image: Buffer, context: CanvasRenderingContext2D) {
+        this.loadCanvasImages(this.getImageSourceFromBuffer(image), context);
     }
 
     async sleep(time: number) {
@@ -93,15 +93,13 @@ export class ImageManipulationService {
         const img = new Image();
         img.src = srcImg;
         img.onload = () => {
-            context.drawImage(img, 0, 0, 640, 480, 0, 0, 640, 480);
+            context.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         };
     }
 
     setRGB = (position: Vector2, imageBuffer: Buffer, pixel: Pixel): void => {
         try {
             const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
-
-            // Set the R, G, and B values
             imageBuffer.writeUInt8(pixel.b, pixelPosition);
             imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
             imageBuffer.writeUInt8(pixel.r, pixelPosition + 2);
@@ -114,8 +112,6 @@ export class ImageManipulationService {
     private getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {
         try {
             const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
-
-            // Extract the R, G, and B values
             const b = imageBuffer.readUInt8(pixelPosition);
             const g = imageBuffer.readUInt8(pixelPosition + 1);
             const r = imageBuffer.readUInt8(pixelPosition + 2);
@@ -128,11 +124,7 @@ export class ImageManipulationService {
         }
     };
     private getPixelBufferPosAtPixelPos = (position: Vector2, imageBuffer: Buffer): number => {
-        // BMP file header is 54 bytes long, so the pixel data starts at byte 54
-        const pixelStart = 54;
-
-        // Each pixel is 3 bytes (BGR)
-        const pixelLength = 3;
+        const pixelStart = BMP_FILE_HEADER_BYTES_LENGTH;
 
         const dimensions = this.getImageDimensions(imageBuffer);
         const imageWidth = dimensions.x;
@@ -146,13 +138,11 @@ export class ImageManipulationService {
             yPosition = dimensions.y - position.y - 1;
         }
 
-        return (position.x + yPosition * imageWidth) * pixelLength + pixelStart;
+        return (position.x + yPosition * imageWidth) * PIXEL_BYTES_LENGTH + pixelStart;
     };
 
     private isImageUsingTopDownFormat = (imageBuffer: Buffer): boolean => {
-        const imageHeightOffset = 22;
-        const imageHeight = imageBuffer.readInt32LE(imageHeightOffset);
-
+        const imageHeight = imageBuffer.readInt32LE(IMAGE_HEIGHT_OFFSET);
         return imageHeight < 0;
     };
 }
