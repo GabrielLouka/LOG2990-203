@@ -41,7 +41,7 @@ export class ChatService {
       messages.push(
         {
           text: chatELements.message,
-          username: 'System',
+          username: 'System', //add as constant
           sentBySystem: true,
           sentByPlayer1: false,
           sentByPlayer2: false,

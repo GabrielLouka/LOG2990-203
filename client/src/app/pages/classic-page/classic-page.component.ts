@@ -35,8 +35,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
     // @HostListener('window:keydown.t', ['$event'])
-    letterTPressed: boolean = true;
-    isDifferenceFound: boolean = false;
+    letterTPressed: boolean = true;        
+    isCheating: boolean = false;
     backgroundColor = '';
     intervalIDLeft: number | undefined;
     intervalIDRight: number | undefined;
@@ -282,14 +282,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         // window.clearInterval(this.intervalIDRight);
         // this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
         // this.backgroundColor = '';
-        // this.letterTPressed = true;
-        // this.cheatModeService.deactivateCheatMode(
-        //     {backgroundColor: this.backgroundColor, letterTpressed: this.letterTPressed},
-        //     {leftCanvasContext: this.leftCanvasContext as CanvasRenderingContext2D, originalImage: this.game.originalImage},
-        //     {leftInterval: this.intervalIDLeft as number, rightInterval: this.intervalIDRight as number}
-        // )
-        this.isDifferenceFound = true;
-        this.cheatModeService.focusKeyEvent(this.cheat);
+        // this.letterTPressed = true;     
+        if (this.isCheating){
+            this.stopCheating(this.intervalIDLeft, this.intervalIDRight);
+            this.cheatMode();
+        }
+        // this.putCanvasIntoInitialState();
+        this.cheatModeService.focusKeyEvent(this.cheat);        
     }
 
     async refreshModifiedImage() {
@@ -300,7 +299,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         );
         if (this.rightCanvasContext !== null) {
             await this.imageManipulationService.blinkDifference(
-                this.currentModifiedImage != null ? this.currentModifiedImage : this.game.modifiedImage,
+                this.currentModifiedImage ? this.currentModifiedImage : this.game.modifiedImage,
                 newImage,
                 this.rightCanvasContext,
             );
@@ -326,11 +325,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
     }
 
-    // focusKeyEvent() {
-    //     if (this.cheat) {
-    //         this.cheat.nativeElement.focus();
-    //     }
-    // }
+    focusKeyEvent() {
+        if (this.cheat) {
+            this.cheat.nativeElement.focus();
+        }
+    }
 
     onCheatMode(event: KeyboardEvent) {
         if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
@@ -340,25 +339,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.cheatMode();
                 } else {
                     this.backgroundColor = '';
-                    window.clearInterval(this.intervalIDLeft);
-                    window.clearInterval(this.intervalIDRight);
-                    if (this.currentModifiedImage && this.game.originalImage) {
-                        this.imageManipulationService.loadCurrentImage(
-                            this.currentModifiedImage,
-                            this.rightCanvasContext as CanvasRenderingContext2D,
-                        );
-                        this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
-                    }
+                    this.stopCheating(this.intervalIDLeft, this.intervalIDRight);
+                    this.putCanvasIntoInitialState();
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
-            // this.cheatModeService.handleCheatEvent(
-            //     {tKeyEvent: event, color: this.backgroundColor, letterTpressed: this.letterTPressed, 
-            //         intervalIDLeft: this.intervalIDLeft as number, intervalIDRight: this.intervalIDRight as number},
-            //     {rightCanvasContext: this.rightCanvasContext as CanvasRenderingContext2D, 
-            //         leftCanvasContext: this.leftCanvasContext as CanvasRenderingContext2D},
-            //     {currentModifiedImage: this.currentModifiedImage, originalImage: this.game.originalImage}
-            // )
         }
     }
 
@@ -368,8 +353,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
+        this.showHiddenDifferences(newImage);
+        this.isCheating = !this.isCheating;
+    }
 
-        if (this.leftCanvasContext && this.rightCanvasContext) {
+    showHiddenDifferences(newImage: Buffer){
+        if (this.leftCanvasContext && this.rightCanvasContext) {            
             this.intervalIDLeft = this.imageManipulationService.alternateOldNewImage(
                 this.game.originalImage,                
                 newImage,
@@ -377,29 +366,29 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             );
             
             this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
-                this.game.originalImage,                
-                this.currentModifiedImage? this.currentModifiedImage : this.game.modifiedImage,
+                this.game.originalImage,  
+                newImage,              
+                // this.currentModifiedImage? this.currentModifiedImage : this.game.modifiedImage,
                 this.rightCanvasContext as CanvasRenderingContext2D,
             );
-
-            if (this.isDifferenceFound){
-                clearInterval(this.intervalIDLeft);
-                clearInterval(this.intervalIDRight);
-                this.intervalIDLeft = this.imageManipulationService.alternateOldNewImage(
-                    this.game.originalImage,                
-                    newImage,
-                    this.leftCanvasContext as CanvasRenderingContext2D,
-                );
-                
-                this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
-                    this.game.originalImage,                
-                    this.currentModifiedImage? this.currentModifiedImage : this.game.modifiedImage,
-                    this.rightCanvasContext as CanvasRenderingContext2D,
-                );
-                this.isDifferenceFound = !this.isDifferenceFound;
-            }
-
+            
             this.currentModifiedImage = newImage;
+        }        
+    }
+
+    stopCheating(leftInterval: number | undefined, rightInterval: number | undefined){
+        window.clearInterval(leftInterval as number);
+        window.clearInterval(rightInterval as number);               
+        this.isCheating = !this.isCheating;
+    }    
+
+    putCanvasIntoInitialState(){
+        if (this.currentModifiedImage && this.game.originalImage) {
+            this.imageManipulationService.loadCurrentImage(
+                this.currentModifiedImage,
+                this.rightCanvasContext as CanvasRenderingContext2D,
+            );
+            this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
         }
     }
 }
