@@ -83,7 +83,7 @@ export class GamesDisplayComponent implements OnInit {
                     this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
-            this.socketService.socket.emit('deleteAllGame', { gameToDelete: true });
+            this.socketService.socket.emit('deleteAllGames', { gameToDelete: true });
         }
     }
 
