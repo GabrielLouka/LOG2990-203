@@ -2,6 +2,8 @@
   width: 16vw;
   height: 50vh;
 
+  // justify-content: space-around;
+
   margin-right: 0.5vw;
 
   background-color: whitesmoke;
@@ -13,7 +15,7 @@
 .chat-header {
   font-size: 2.5vh;
   font-weight: bold;
-  margin-bottom: 2vh;
+  margin-bottom: 3vh;
 }
   
 .chat-body {
@@ -39,18 +41,18 @@
 }
 
 .sent-by-player-1 {
-  background-color: lightblue;
-  color: rgb(34, 34, 243);
+  background-color: #FFEA20;
+  // color: rgb(34, 34, 243);
 }
   
 .sent-by-player-2 {
-  background-color: rgb(246, 209, 215);
-  color: rgb(210, 91, 131);
+  background-color: #B1D7B4;
+  // color: rgb(210, 91, 131);
 }
 
 .sent-by-system {
-  background-color: rgb(255, 246, 144);
-  color: rgb(255, 136, 0);
+  background-color: #f8ac79
+  // color: rgb(255, 136, 0);
 }
   
 .message-username {

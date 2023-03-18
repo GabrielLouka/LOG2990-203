@@ -59,7 +59,7 @@ export class ChatComponent {
     sendSystemMessage(message: string) {
         this.messages.push({
             text: message,
-            username: 'System',
+            username: 'SYSTEM',
             sentBySystem: true,
             sentByPlayer1: false,
             sentByPlayer2: false,

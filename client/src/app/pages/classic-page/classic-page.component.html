@@ -12,15 +12,15 @@
 
     <div class="flex-column center difference-container">
         <div class="flex-row center data-container">
-            <div class="hints-container">
+            <div class="difference-container">
                 <app-found-differences-counter
-                    class="hints-container"
+                    class="difference-container"
                     [username]="this.player1"
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="totalDifferences"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
-                    class="hints-container"
+                    class="difference-container"
                     *ngIf="is1vs1Mode"
                     [username]="this.player2"
                     [differencesFound]="differencesFound2"
