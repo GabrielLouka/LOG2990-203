@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { EntireGameUploadForm } from '@common/entire.game.upload.form';
 import { ImageUploadResult } from '@common/image.upload.result';
@@ -24,6 +25,9 @@ export class CreationResultModalComponent {
     @ViewChild('imagePreview') imagePreview!: ElementRef;
     @ViewChild('gameNameForm') gameNameForm!: ElementRef;
     @ViewChild('errorPopupText') errorPopupText!: ElementRef;
+    @ViewChild('spinner') spinnerComponent!: SpinnerComponent;
+
+    // spinnerComponent: SpinnerComponent = new SpinnerComponent();
 
     gameName: string = '';
 
@@ -43,6 +47,7 @@ export class CreationResultModalComponent {
     showPopUp() {
         this.toggleElementVisibility(this.gameNameForm, false);
         this.toggleElementVisibility(this.errorPopupText, false);
+        this.spinnerComponent.showSpinner();
         this.errorPopupText.nativeElement.style.color = 'red';
         this.modal.nativeElement.style.display = 'flex';
     }
@@ -52,6 +57,7 @@ export class CreationResultModalComponent {
     }
 
     showGameNameForm(totalDifferences: number, gameForm: EntireGameUploadForm) {
+        this.spinnerComponent.hideSpinner();
         this.formToSendAfterServerConfirmation = gameForm;
         if (this.isNumberOfDifferencesValid(totalDifferences)) {
             this.toggleElementVisibility(this.gameNameForm, true);

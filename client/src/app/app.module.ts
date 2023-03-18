@@ -31,7 +31,7 @@ import { ParameterPageComponent } from './pages/parameter-page/parameter-page.co
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth-service/auth.service';
-import { SpinnerAnnimationComponent } from './components/spinner-annimation/spinner-annimation.component';
+import { SpinnerComponent } from './components/spinner/spinner.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -64,7 +64,7 @@ import { SpinnerAnnimationComponent } from './components/spinner-annimation/spin
         PopUpComponent,
         FoundDifferencesCounterComponent,
         DeleteGamesPopUpComponent,
-        SpinnerAnnimationComponent,
+        SpinnerComponent,
     ],
     providers: [AuthService],
     bootstrap: [AppComponent],

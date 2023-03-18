@@ -3,8 +3,9 @@
         <div #close class="close" (click)="closePopUp()">+</div>
         <h2>Différences entre les deux images</h2>
         <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
-        <p>Il y a {{ totalDifferences }} différences (Difficulté : {{ isEasy ? 'facile' : 'difficile' }})</p>
+        <app-spinner #spinner></app-spinner>
         <form #gameNameForm [formGroup]="titleRegistration" class="flex-column center">
+            <p>Il y a {{ totalDifferences }} différences (Difficulté : {{ isEasy ? 'facile' : 'difficile' }})</p>
             <p>Veuillez choisir un nom pour le jeu :</p>
             <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />
             <button
