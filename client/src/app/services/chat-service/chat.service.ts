@@ -58,6 +58,14 @@ export class ChatService {
     })
   }
 
+  isTextValid(newMessage: string) {
+        newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
+        if (newMessage === '' || newMessage === ' ' || newMessage === null) {
+            return false;
+        }
+        return true;
+  }
+
 
 
 }

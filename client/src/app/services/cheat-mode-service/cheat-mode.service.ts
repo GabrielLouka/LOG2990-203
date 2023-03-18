@@ -1,47 +1,55 @@
 import { ElementRef, Injectable } from '@angular/core';
+import { Buffer } from 'buffer';
+import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CheatModeService {  
-
-  constructor(/*private imageManipulationService: ImageManipulationService, private matchmakingService: MatchmakingService*/) { }
-
-  
-  // handleEvent(chat: ChatComponent, event: KeyboardEvent, isTPressed: boolean, color: string){
-  //   if (this.matchmakingService.isSoloMode || document.activeElement != chat.input.nativeElement){
-  //     if (event.key === 't'){
-  //       if (isTPressed){
-  //         color = '#66FF99';
-  //         this.cheatMode();
-  //       }
-  //       else{
-  //         color = '';
-  //         this.stopShowingDifferences();
-  //         this.putCanvasIntoInitialState();
-  //       }
-  //       isTPressed = !isTPressed;
-  //     }
-  //   }
-  // }
-
-  // cheatMode(newImage: Buffer){
-  //   this.showHiddenDifferences(newImage);
-  // }
-
-  // showHiddenDifferences(newImage: Buffer){
-
-  // }
-
-
-
-  
-  focusKeyEvent(cheat: ElementRef | undefined) {
-    if (cheat) {
-        cheat.nativeElement.focus();
+    constructor(private imageManipulationService: ImageManipulationService) { }
+    
+    focusKeyEvent(cheat: ElementRef | undefined) {
+      if (cheat) {
+          cheat.nativeElement.focus();
+      }
     }
-  }
 
-  
+    putCanvasIntoInitialState(
+      images: {originalImage: Buffer, currentModifiedImage: Buffer},
+      canvas: {leftContext: CanvasRenderingContext2D, rightContext: CanvasRenderingContext2D}
+      ){
+      if (images.currentModifiedImage && images.originalImage) {
+          this.imageManipulationService.loadCurrentImage(
+              images.currentModifiedImage,
+              canvas.rightContext as CanvasRenderingContext2D,
+          );
+          this.imageManipulationService.loadCurrentImage(images.originalImage, canvas.leftContext as CanvasRenderingContext2D);
+      }
+    }
+
+    inverseCheatingState(isCheating: boolean){
+      return !isCheating;
+    }
+
+    stopCheating(leftInterval: number, rightInterval: number){
+      window.clearInterval(leftInterval);
+      window.clearInterval(rightInterval);               
+    }
+
+    leftCanvasInterval(images: {originalImage: Buffer, currentModifiedImage: Buffer, newImage: Buffer}, leftContext: CanvasRenderingContext2D){
+      return this.imageManipulationService.alternateOldNewImage(
+        images.originalImage,                
+        images.newImage,
+        leftContext as CanvasRenderingContext2D,
+      );
+    }
+
+    rightCanvasInterval(images: {originalImage: Buffer, currentModifiedImage: Buffer, newImage: Buffer}, rightContext: CanvasRenderingContext2D){
+      return this.imageManipulationService.alternateOldNewImage(
+        images.originalImage,  
+        images.newImage,              
+        rightContext as CanvasRenderingContext2D,
+    );
+    }
 
 }
