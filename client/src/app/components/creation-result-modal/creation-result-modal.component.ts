@@ -27,8 +27,6 @@ export class CreationResultModalComponent {
     @ViewChild('errorPopupText') errorPopupText!: ElementRef;
     @ViewChild('spinner') spinnerComponent!: SpinnerComponent;
 
-    // spinnerComponent: SpinnerComponent = new SpinnerComponent();
-
     gameName: string = '';
 
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -47,9 +45,9 @@ export class CreationResultModalComponent {
     showPopUp() {
         this.toggleElementVisibility(this.gameNameForm, false);
         this.toggleElementVisibility(this.errorPopupText, false);
-        this.spinnerComponent.showSpinner();
         this.errorPopupText.nativeElement.style.color = 'red';
         this.modal.nativeElement.style.display = 'flex';
+        this.spinnerComponent.showSpinner();
     }
 
     closePopUp() {

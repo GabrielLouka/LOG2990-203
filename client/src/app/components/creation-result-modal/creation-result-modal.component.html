@@ -1,6 +1,6 @@
 <div #bgModal class="bgModal center">
     <div class="flex-column center modal-contents">
-        <div #close class="close" (click)="closePopUp()">+</div>
+        <span #close class="material-symbols-outlined close" (click)="closePopUp()"> close </span>
         <h2>Différences entre les deux images</h2>
         <canvas #imagePreview width="640px" height="480px" class="canvas">Image From Server</canvas>
         <app-spinner #spinner></app-spinner>
@@ -17,6 +17,11 @@
                 <span class="material-symbols-outlined optionIcon"> fact_check </span>Sauvegarder le jeu
             </button>
         </form>
-        <p #errorPopupText>ERREUR : Le nombre de differences doit être compris entre 3 et 9 !</p>
+        <p #errorPopupText>
+            ERREUR : Le nombre de differences doit être compris entre 3 et 9 !
+            <br />
+            <br />
+            Nombre de differences : {{ totalDifferences }}
+        </p>
     </div>
 </div>
