@@ -23,6 +23,7 @@ import { OverlayComponent } from './components/overlay/overlay.component';
 import { PopUpComponent } from './components/pop-up/pop-up.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
 import { QuitButtonComponent } from './components/quit-button/quit-button.component';
+import { SpinnerComponent } from './components/spinner/spinner.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
@@ -31,7 +32,6 @@ import { ParameterPageComponent } from './pages/parameter-page/parameter-page.co
 import { RegistrationPageComponent } from './pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from './pages/selections-page/selections-page.component';
 import { AuthService } from './services/auth-service/auth.service';
-import { SpinnerComponent } from './components/spinner/spinner.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.

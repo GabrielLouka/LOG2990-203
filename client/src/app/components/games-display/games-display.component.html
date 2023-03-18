@@ -13,6 +13,7 @@
         </div>
     </Section>
     <p>{{ debugDisplayMessage.getValue() }}</p>
+
     <mat-grid-list cols="2" rowHeight="42vh">
         <mat-grid-tile *ngFor="let game of games">
             <app-game-card [game]="game" [isPlayable]="isSelection"></app-game-card>

@@ -10,17 +10,15 @@
         <app-hint *ngIf="is1vs1Mode"></app-hint>
     </div>
 
-    <div class="flex-column center difference-container">
+    <div class="flex-column center">
         <div class="flex-row center data-container">
-            <div class="difference-container">
+            <div class="flex-row difference-container">
                 <app-found-differences-counter
-                    class="difference-container"
                     [username]="this.player1"
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="totalDifferences"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
-                    class="difference-container"
                     *ngIf="is1vs1Mode"
                     [username]="this.player2"
                     [differencesFound]="differencesFound2"
@@ -30,7 +28,6 @@
             <div class="timer-container">
                 <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
             </div>
-            <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': backgroundColor }" class="cheat-mode">Mode triche</div>
         </div>
 
         <app-info-card
@@ -40,6 +37,8 @@
             [is1vs1]="this.is1vs1Mode"
             [isClassicMode]="true"
         ></app-info-card>
+
+        <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': backgroundColor }" class="cheat-mode">Mode triche</div>
 
         <div class="flex-row center canvas-container">
             <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
