@@ -145,7 +145,6 @@ export class ActionsContainer {
             currentCanvasIsLeft = false;
         }
         const modifiedPixels: Vector2[] = [];
-        modifiedPixels.push(this.initialPosition);
         switch (this.selectedTool) {
             case Tool.CRAYON: {
                 this.undoActions.push(new CrayonElement(modifiedPixels, currentCanvasIsLeft, this.penWidth, this.color));
@@ -160,7 +159,7 @@ export class ActionsContainer {
                 break;
             }
         }
-
+        canvas.addEventListener('click', this.draw);
         canvas.addEventListener('mousemove', this.draw);
     }
 

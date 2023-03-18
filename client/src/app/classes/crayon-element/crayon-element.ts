@@ -11,7 +11,8 @@ export class CrayonElement extends UndoElement {
         context.lineCap = 'round';
 
         const stroke = this.pixels;
-        if (stroke.length > 2) {
+
+        if (stroke.length > 1) {
             // Calculate the distance between two consecutive points
             const pointDistance = (p1: Vector2, p2: Vector2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2);
 
@@ -36,9 +37,9 @@ export class CrayonElement extends UndoElement {
             for (let j = 1; j < smoothStroke.length; j++) {
                 context.lineTo(smoothStroke[j].x, smoothStroke[j].y);
             }
-        } else {
+        } else if (stroke.length === 1) {
             context.moveTo(stroke[0].x, stroke[0].y);
-            context.lineTo(stroke[1].x, stroke[1].y);
+            context.lineTo(stroke[0].x, stroke[0].y);
         }
         context.stroke();
 

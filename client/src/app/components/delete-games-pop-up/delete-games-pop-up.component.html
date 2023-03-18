@@ -3,7 +3,7 @@
         <div *ngFor="let info of popUpInfo">
             <div #close class="close" (click)="closePopUp()"></div>
             <div
-                class="center flex-column modal-contents"
+                class="center flex-column"
                 [ngClass]="{
                     'delete-game': !info.isDeleteAllGames,
                     'delete-all-games': info.isDeleteAllGames
