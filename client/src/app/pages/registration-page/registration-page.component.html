@@ -1,6 +1,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Register Page</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,700,1,200" />
 </head>
 <body>
     <Section class="flex-row center header">
@@ -27,12 +28,13 @@
                 [disabled]="registrationForm.invalid"
                 [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
             >
-                <img
-                    src=".\assets\img\play-icon.png"
+                <span
+                    class="material-symbols-outlined play-icon"
                     id="play-icon"
                     [ngClass]="{ 'not-allowed': registrationForm.invalid, allowed: registrationForm.valid }"
-                    alt="gameLogo"
-                />
+                >
+                    play_arrow
+                </span>
             </button>
         </form>
         <div *ngIf="usernameRegistered">
