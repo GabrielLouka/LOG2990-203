@@ -107,9 +107,8 @@ export class ActionsContainer {
     }
 
     draw = (event: MouseEvent) => {
-        const activeContext = this.undoActions[this.undoActions.length - 1].isLeftCanvas ? this.leftContext : this.rightContext;
-
         if (this.currentToolObject) {
+            const activeContext = this.undoActions[this.undoActions.length - 1].isLeftCanvas ? this.leftContext : this.rightContext;
             this.currentToolObject.use(activeContext, event);
         }
     };
