@@ -1,14 +1,14 @@
-
 .button-style {
     padding: 2vh 8vh;
     margin: 3vw;
 }
 
-
 /* Icon style */
 .logoContainer {
     display: flex;
     justify-content: center;
+    align-items: center;
+    height: 70vh;
 }
 
 .logoContainer #gameIcon {
@@ -16,33 +16,20 @@
     height: 40vh;
 }
 
-.logoContainer #configIcon {
-    position: absolute;
-    margin: 2vh;
-    top: 0vh;
-    right: 0vh;
-    height: 10vh;
-
-    &:hover {
-        transform: scale(0.9);
-    }
-}
-
 .navBarContainer {
-    height: 50vh;
+    height: 5vh;
 }
 
 /* Credit style */
 .footer-item {
+    margin: 15vh;
     display: flex;
     flex-direction: column;
-
     text-align: center;
 }
 
 .dev-team {
     justify-content: space-evenly;
-
     margin-left: 15vw;
     margin-right: 15vw;
 }
