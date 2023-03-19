@@ -11,10 +11,9 @@
                 }"
             >
                 <div class="font-size message-username">
-                    <strong>{{ message.username }}</strong>
+                    <strong>{{ message.username }}</strong> - {{ message.sentTime | date: 'HH:mm:ss' }}
                 </div>
                 <div class="font-size">{{ message.text }}</div>
-                <p>{{ message.sentTime | date: 'mediumTime' }}</p>
             </div>
         </div>
     </div>

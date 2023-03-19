@@ -45,6 +45,7 @@ export class SocketManager {
 
             socket.on('disconnect', () => {
                 const matchThatWasAffected = this.matchManagerService.removePlayerFromMatch(socket.id);
+
                 if (matchThatWasAffected) {
                     sendMatchUpdate({ matchId: matchThatWasAffected });
                     sendGameMatchProgressUpdate(matchThatWasAffected);
@@ -91,14 +92,17 @@ export class SocketManager {
                 }
                 this.sio.to(data.matchId).emit('incomingPlayerRequestAnswer', data);
             });
-            socket.on('deleteAllGame', (data) => {
-                this.sio.emit('allGameDeleted', { noGameLeft: data.deletedGames }, socket.id);
+
+            socket.on('deleteAllGames', () => {
+                this.sio.emit('allGameDeleted');
                 this.sio.emit('actionOnGameReloadingThePage');
             });
+
             socket.on('deletedGame', (data: { hasDeletedGame: boolean; id: string }) => {
                 this.sio.emit('gameDeleted', { gameDeleted: data.hasDeletedGame, id: data.id }, socket.id);
                 this.sio.emit('actionOnGameReloadingThePage');
             });
+
             socket.on('sendingMessage', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
                 this.sio
                     .to(joinedRoomName)

@@ -8,6 +8,7 @@ import { DuplicationElement } from '@app/classes/duplication-element/duplication
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
+import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { DifferenceImage } from '@common/difference.image';
@@ -35,6 +36,7 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
     @ViewChild('pen') pen!: ElementRef;
     @ViewChild('rubber') rubber!: ElementRef;
     @ViewChild('rectangle') rectangle!: ElementRef;
+    @ViewChild('popUpElement') popUpElement: PopUpComponent;
 
     @ViewChild('combine') combine!: ElementRef;
 
@@ -339,5 +341,9 @@ export class GameCreationPageComponent implements AfterViewInit, OnInit {
             view[i] = byteArray[i];
         }
         return buffer;
+    }
+
+    onQuitGame() {
+        this.popUpElement.showConfirmationPopUp();
     }
 }

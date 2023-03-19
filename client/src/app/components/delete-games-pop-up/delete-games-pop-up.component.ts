@@ -6,7 +6,7 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular
     styleUrls: ['./delete-games-pop-up.component.scss'],
 })
 export class DeleteGamesPopUpComponent {
-    @ViewChild('bgModal') modal!: ElementRef;
+    @ViewChild('modal') modal!: ElementRef;
     @Output() isDeleteRequest = new EventEmitter<boolean>();
     deleteAllGamesMessage = 'TOUS LES JEUX ?';
     deleteThisGame = 'CE JEU ?';

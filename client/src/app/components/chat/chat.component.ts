@@ -29,22 +29,21 @@ export class ChatComponent {
     }
 
     sendMessage() {
-        if (this.isTextValid(this.newMessage)) {
-            const currentPlayer = this.matchManagerService.isPlayer1
-                ? this.matchManagerService.player1Username
-                : this.matchManagerService.player2Username;
-
+        if (this.isValidText(this.newMessage)) {
+            const currentPlayer = this.isPlayer1
+                ? this.matchmakingService.currentMatchPlayer1Username
+                : this.matchmakingService.currentMatchPlayer2Username;
             this.socketService.socket.emit('sendingMessage', {
                 msg: this.newMessage,
-                idGame: this.matchManagerService.currentMatchId,
+                idGame: this.idOfTheGame,
                 username: currentPlayer,
                 messageSentTime: Date.now(),
-                sentByPlayer1: this.matchManagerService.isPlayer1,
+                sentByPlayer1: this.isPlayer1,
             });
         }
     }
 
-    isTextValid(newMessage: string) {
+    isValidText(newMessage: string) {
         newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
 
         if (newMessage === '' || newMessage === ' ' || newMessage === null) {
@@ -56,7 +55,7 @@ export class ChatComponent {
     sendSystemMessage(message: string) {
         this.messages.push({
             text: message,
-            username: 'System',
+            username: 'SYSTEM',
             sentBySystem: true,
             sentByPlayer1: false,
             sentByPlayer2: false,

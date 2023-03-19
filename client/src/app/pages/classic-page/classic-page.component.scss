@@ -8,11 +8,6 @@ h1 {
     margin-right: 7vw;
 }
 
-.difference-container {
-    height: 100%;
-    width: 100%;
-}
-
 
 // Canvas CSS
 .canvas-container {
@@ -27,12 +22,14 @@ canvas {
 }
 
 .data-container {
-    width: 1280px;
+    width: 66vw;
+    height: 15vh;
     margin-right: 6vw;
 }
 
-.hints-container {
-    margin-right: 24vw;
+.difference-container {
+    justify-content: space-between;
+    width: 60vw;
 }
 
 .timer-container {
@@ -50,11 +47,15 @@ canvas {
 
 .chat-container {
     position: absolute;
-    bottom: 21vh;
+    bottom: 20vh;
     right: 0vw;
 }
 
 .cheat-mode {
+    position: absolute;
+    left: 2vw;
+    bottom: 30vh;
+
     height: auto;
     padding: 10px;
 

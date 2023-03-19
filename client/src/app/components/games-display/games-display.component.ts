@@ -17,6 +17,7 @@ import { BehaviorSubject } from 'rxjs';
 export class GamesDisplayComponent implements OnInit {
     @Input() isSelection: boolean;
     @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
+
     debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
     currentPageNbr: number = 0;
     games: {
@@ -83,7 +84,7 @@ export class GamesDisplayComponent implements OnInit {
                     this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
-            this.socketService.socket.emit('deleteAllGame', { gameToDelete: true });
+            this.socketService.socket.emit('deleteAllGames', { gameToDelete: true });
         }
     }
 

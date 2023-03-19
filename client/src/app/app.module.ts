@@ -20,9 +20,11 @@ import { HintComponent } from './components/hint/hint.component';
 import { InfoCardComponent } from './components/info-card/info-card.component';
 import { NextPageButtonComponent } from './components/next-page-button/next-page-button.component';
 import { OverlayComponent } from './components/overlay/overlay.component';
+import { ParameterButtonComponent } from './components/parameters-button/parameters-button.component';
 import { PopUpComponent } from './components/pop-up/pop-up.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
 import { QuitButtonComponent } from './components/quit-button/quit-button.component';
+import { SpinnerComponent } from './components/spinner/spinner.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
 import { ConfigurationPageComponent } from './pages/configuration-page/configuration-page.component';
@@ -63,6 +65,8 @@ import { AuthService } from './services/auth-service/auth.service';
         PopUpComponent,
         FoundDifferencesCounterComponent,
         DeleteGamesPopUpComponent,
+        ParameterButtonComponent,
+        SpinnerComponent,
     ],
     providers: [AuthService],
     bootstrap: [AppComponent],

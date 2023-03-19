@@ -1,6 +1,7 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { QueueManagerService } from '@app/services/queue-manager-service/queue-manager.service';
@@ -15,6 +16,8 @@ import { CLASSIC_PATH, HOME_PATH } from '@common/utils/env.http';
     styleUrls: ['./registration-page.component.scss'],
 })
 export class RegistrationPageComponent implements OnInit, OnDestroy {
+    @ViewChild('spinner') spinner: SpinnerComponent;
+
     username: string | null | undefined;
     id: string | null;
     // used to determine if we should display the username field in the html page

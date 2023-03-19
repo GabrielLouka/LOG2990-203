@@ -6,7 +6,8 @@
 <body class="center">
     <section class="flex-column center">
         <h1>Création de jeu</h1>
-        <app-back-button></app-back-button>
+        <app-quit-button (click)="onQuitGame()"></app-quit-button>
+        <!-- <app-pop-up #popUpElement class="popUp"></app-pop-up> -->
     </section>
     <div class="flex-row center main-container">
         <div class="flex-column center">
@@ -136,6 +137,6 @@
             <span class="material-symbols-outlined optionIcon"> search </span>RECHERCHE DE DIFFERENCES
         </button>
     </div>
-    <canvas #combine width="640px" height="480px" class="combine">IMAGE MODIFIÉE</canvas>
     <app-creation-result-modal #resultModal [totalDifferences]="this.totalDifferences" [isEasy]="this.isEasy"></app-creation-result-modal>
+    <app-pop-up #popUpElement class="popUp"></app-pop-up>
 </body>
