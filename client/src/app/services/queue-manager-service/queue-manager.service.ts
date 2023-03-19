@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { Player } from '@common/player';
-import { CLEAN_USERNAME } from '@common/utils/env';
+import { CLEAN_USERNAME, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
@@ -48,10 +48,6 @@ export class QueueManagerService {
         return this.hasFoundIncomingPlayer;
     }
 
-    set queueMessage(message: string) {
-        this.queueStatusMessage = message;
-    }
-
     isIncomingPlayer(player: Player): boolean {
         return player.playerId === this.matchManagerService.currentSocketId;
     }
@@ -86,9 +82,17 @@ export class QueueManagerService {
 
             this.incomingPlayer = this.firstPlayerInQueue;
         } else {
-            this.queueStatusMessage = "En attente d'un adversaire";
+            this.updateWaitingForIncomingPlayerMessage();
             this.incomingPlayer = null;
         }
+    }
+
+    updateWaitingForIncomingPlayerMessage() {
+        this.queueStatusMessage = WAITING_FOR_PLAYER_MESSAGE;
+    }
+
+    updateWaitingForIncomingPlayerAnswerMessage() {
+        this.queueStatusMessage = WAITING_PLAYER_ANSWER_MESSAGE;
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
@@ -109,7 +113,7 @@ export class QueueManagerService {
     }
 
     handleHostRejectingIncomingPlayer() {
-        this.queueStatusMessage = "En attente d'un adversaire...";
+        this.updateWaitingForIncomingPlayerMessage();
         this.hasFoundIncomingPlayer = false;
         this.waitingPlayers.shift();
     }

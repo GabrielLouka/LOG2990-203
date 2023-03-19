@@ -68,7 +68,6 @@ export class SocketManager {
 
             socket.on('setMatchPlayer', (data: { matchId: string; player: Player }) => {
                 this.matchManagerService.setMatchPlayer(data.matchId, data.player);
-
                 sendMatchUpdate({ matchId: data.matchId });
                 sendGameMatchProgressUpdate(data.matchId);
             });
