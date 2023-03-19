@@ -39,13 +39,10 @@ export class RectangleTool extends AbstractTool {
         this.actionsContainer.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy.slice(clearIndex) : this.actionsContainer.undoActions;
         for (const action of this.actionsContainer.undoActions) {
             if (
-                action.isLeftCanvas === this.actionsContainer.undoActions[this.actionsContainer.undoActions.length - 1].isLeftCanvas &&
+                action.isSourceLeftCanvas === this.actionsContainer.undoActions[this.actionsContainer.undoActions.length - 1].isSourceLeftCanvas &&
                 !(action instanceof SwitchElement || action instanceof ClearElement)
             ) {
                 action.applyElementAction(context);
-            }
-            if (action instanceof ClearElement) {
-                action.clear(context);
             }
         }
         this.actionsContainer.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy : this.actionsContainer.undoActions;

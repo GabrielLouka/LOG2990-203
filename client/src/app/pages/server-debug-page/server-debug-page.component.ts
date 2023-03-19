@@ -4,8 +4,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ActionsContainer, ToolType } from '@app/classes/actions-container/actions-container';
 import { ClearElement } from '@app/classes/clear-element/clear-element';
-import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
-import { SwitchElement } from '@app/classes/switch-element/switch-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DifferenceImage } from '@common/difference.image';
@@ -95,24 +93,22 @@ export class ServerDebugPageComponent implements AfterViewInit {
         this.actionsContainer.undoActions.push(clearElement);
     }
     switchCanvases() {
-        const switchElement = new SwitchElement();
-        switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftContext, this.rightContext);
-        switchElement.applyElementAction(this.rightContext);
-
-        this.actionsContainer.undoActions.push(switchElement);
+        // const switchElement = new SwitchElement();
+        // switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftContext, this.rightContext);
+        // switchElement.applyElementAction(this.rightContext);
+        // this.actionsContainer.undoActions.push(switchElement);
     }
     duplicateCanvas(copyOnLeft: boolean) {
-        let squashedContext;
-        if (copyOnLeft) {
-            squashedContext = this.leftContext;
-        } else {
-            squashedContext = this.rightContext;
-        }
-
-        const duplication = new DuplicationElement(copyOnLeft);
-        duplication.loadActions(this.actionsContainer.undoActions);
-        duplication.applyElementAction(squashedContext);
-        this.actionsContainer.undoActions.push(duplication);
+        // let squashedContext;
+        // if (copyOnLeft) {
+        //     squashedContext = this.leftContext;
+        // } else {
+        //     squashedContext = this.rightContext;
+        // }
+        // const duplication = new DuplicationElement(copyOnLeft);
+        // duplication.loadActions(this.actionsContainer.undoActions);
+        // duplication.applyElementAction(squashedContext);
+        // this.actionsContainer.undoActions.push(duplication);
     }
 
     displayChangedPixels() {

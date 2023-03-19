@@ -1,6 +1,5 @@
 import { ElementRef } from '@angular/core';
 import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
-import { ClearElement } from '@app/classes/clear-element/clear-element';
 import { EraserTool } from '@app/classes/eraser-tool/eraser.tool';
 import { PencilTool } from '@app/classes/pencil-tool/pencil.tool';
 import { RectangleTool } from '@app/classes/rectangle-tool/rectangle.tool';
@@ -72,31 +71,33 @@ export class ActionsContainer {
         this.leftContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
         this.rightContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
         const maxIndex = this.undoActions.length - 1;
-        for (let i = 0; i <= maxIndex; i++) {
-            activeContext = this.undoActions[i].isLeftCanvas ? this.leftContext : this.rightContext;
-            this.undoActions[i].applyElementAction(activeContext);
+        if (maxIndex >= 0) {
+            for (let i = 0; i < maxIndex; i++) {
+                activeContext = this.undoActions[i].isSourceLeftCanvas ? this.leftContext : this.rightContext;
+                this.undoActions[i].applyElementAction(activeContext);
+            }
+
+            this.redoActions.push(this.undoActions.pop() as UndoElement);
         }
-        this.redoActions.push(this.undoActions.pop() as UndoElement);
+
+        this.debugDisplay();
     }
 
     redo() {
         let activeContext;
         const lastRedoAction = this.redoActions.pop();
         if (lastRedoAction) {
+            this.leftContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
+            this.rightContext.clearRect(0, 0, this.leftDrawingCanvas.nativeElement.width, this.leftDrawingCanvas.nativeElement.height);
             this.undoActions.push(lastRedoAction);
             for (const action of this.undoActions) {
-                if (action.isLeftCanvas || action instanceof SwitchElement) {
-                    activeContext = this.leftContext;
-                } else {
-                    activeContext = this.rightContext;
-                }
-                if (!(action instanceof ClearElement)) {
-                    action.applyElementAction(activeContext);
-                } else {
-                    action.clear(activeContext);
-                }
+                activeContext = action.isSourceLeftCanvas || action instanceof SwitchElement ? this.leftContext : this.rightContext;
+
+                action.applyElementAction(activeContext);
             }
         }
+
+        this.debugDisplay();
     }
 
     setupListeners() {
@@ -108,10 +109,28 @@ export class ActionsContainer {
 
     draw = (event: MouseEvent) => {
         if (this.currentToolObject) {
-            const activeContext = this.undoActions[this.undoActions.length - 1].isLeftCanvas ? this.leftContext : this.rightContext;
+            const activeContext = this.undoActions[this.undoActions.length - 1].isSourceLeftCanvas ? this.leftContext : this.rightContext;
             this.currentToolObject.use(activeContext, event);
+            this.debugDisplay();
         }
     };
+
+    debugDisplay() {
+        const debugString = this.undoActions.reduce((acc, action) => {
+            return (
+                acc +
+                action.constructor.name +
+                ' pixels length: ' +
+                action.pixels.length +
+                '(' +
+                (action.isSourceLeftCanvas ? 'left' : 'right') +
+                ')' +
+                ' \n'
+            );
+        }, '');
+        // eslint-disable-next-line no-console
+        console.log('Number of actions: ' + this.undoActions.length + '\n ' + debugString);
+    }
 
     handleMouseDown(canvas: HTMLCanvasElement, event: MouseEvent) {
         this.initialPosition = new Vector2(event.offsetX, event.offsetY);

@@ -9,6 +9,8 @@ import { NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
     providedIn: 'root',
 })
 export class DrawingService {
+    penWidth: number = PEN_WIDTH;
+
     private actionsContainer: ActionsContainer;
 
     private drawingCanvasOne!: ElementRef;
@@ -16,8 +18,6 @@ export class DrawingService {
 
     private leftDrawingContext: CanvasRenderingContext2D;
     private rightDrawingContext: CanvasRenderingContext2D;
-
-    private penWidth: number = PEN_WIDTH;
 
     private pen!: ElementRef;
     private eraser!: ElementRef;
@@ -45,10 +45,17 @@ export class DrawingService {
 
     swapForegrounds() {
         const switchElement = new SwitchElement();
-        switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftDrawingContext, this.rightDrawingContext);
+        switchElement.loadCanvases(this.leftDrawingContext, this.rightDrawingContext);
 
         switchElement.applyElementAction(this.leftDrawingContext);
         this.actionsContainer.undoActions.push(switchElement);
+    }
+
+    duplicateCanvas(isSourceRight: boolean) {
+        const duplication = new DuplicationElement(!isSourceRight);
+        duplication.loadCanvases(this.leftDrawingContext, this.rightDrawingContext);
+        duplication.applyElementAction(this.leftDrawingContext);
+        this.actionsContainer.undoActions.push(duplication);
     }
 
     refreshSelectedColor(newColor: string) {
@@ -80,20 +87,6 @@ export class DrawingService {
         } else {
             this.deactivateTools();
         }
-    }
-
-    duplicateCanvas(copyOnLeft: boolean) {
-        let squashedContext;
-        if (copyOnLeft) {
-            squashedContext = this.leftDrawingContext;
-        } else {
-            squashedContext = this.rightDrawingContext;
-        }
-
-        const duplication = new DuplicationElement(copyOnLeft);
-        duplication.loadActions(this.actionsContainer.undoActions);
-        duplication.applyElementAction(squashedContext);
-        this.actionsContainer.undoActions.push(duplication);
     }
 
     resetForegroundCanvas(isLeft: boolean) {
