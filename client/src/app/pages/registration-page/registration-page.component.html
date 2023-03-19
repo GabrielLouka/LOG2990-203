@@ -8,7 +8,7 @@
         <h1 class="title">Jeu classique</h1>
     </Section>
     <Section class="flex-row center registerContainer">
-        <form *ngIf="!usernameRegistered" [formGroup]="registrationForm" class="flex-row register-input">
+        <form *ngIf="!hasUsernameRegistered" [formGroup]="registrationForm" class="flex-row register-input">
             <label class="flex-row center user-title" for="input"><b>pseudo :</b></label>
             <input
                 name="userName"
@@ -35,9 +35,9 @@
                 />
             </button>
         </form>
-        <div *ngIf="usernameRegistered">
-            <p>{{ waitingMessage }}</p>
-            <div *ngIf="incomingPlayerFound">
+        <div *ngIf="hasUsernameRegistered">
+            <p>{{ this.queueStatusMessage }}</p>
+            <div *ngIf="hasFoundIncomingPlayer">
                 <button class="button-style play-button no-hover" (click)="acceptIncomingPlayer()">Yes</button>
                 <button class="button-style play-button no-hover" (click)="refuseIncomingPlayer()">No</button>
             </div>
