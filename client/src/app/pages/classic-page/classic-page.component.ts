@@ -291,7 +291,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
-        if (this.rightCanvasContext !== null) {
+        if (this.rightCanvasContext) {
             await this.imageManipulationService.blinkDifference(
                 this.currentModifiedImage ? this.currentModifiedImage : this.game.modifiedImage,
                 newImage,
@@ -347,12 +347,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     showHiddenDifferences(newImage: Buffer){
         if (this.leftCanvasContext && this.rightCanvasContext) {            
             this.intervalIDLeft = this.cheatModeService.startInterval(
-                {originalImage: this.game.originalImage, currentModifiedImage: this.currentModifiedImage, newImage: newImage},
+                {originalImage: this.game.originalImage, newImage: newImage},
                 this.leftCanvasContext as CanvasRenderingContext2D
             );
             
             this.intervalIDRight = this.cheatModeService.startInterval(
-                {originalImage: this.game.originalImage, currentModifiedImage: this.currentModifiedImage, newImage: newImage},
+                {originalImage: this.game.originalImage, newImage: newImage},
                 this.rightCanvasContext as CanvasRenderingContext2D
             );           
             this.currentModifiedImage = newImage;

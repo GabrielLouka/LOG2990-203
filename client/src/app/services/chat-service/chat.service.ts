@@ -1,4 +1,5 @@
 import { ElementRef, Injectable } from '@angular/core';
+import { SYSTEM_MESSAGE } from '@common/utils/env';
 import { MatchmakingService } from '../matchmaking-service/matchmaking.service';
 import { SocketClientService } from '../socket-client-service/socket-client.service';
 
@@ -21,13 +22,15 @@ export class ChatService {
     const currentPlayer = isPlayer1
             ? this.matchmakingService.currentMatchPlayer1Username
             : this.matchmakingService.currentMatchPlayer2Username;
-        this.socketService.socket.emit('sendingMessage', {
+        if (!this.isTextNotValid(newMessage)){
+          this.socketService.socket.emit('sendingMessage', {
             msg: newMessage,
             idGame: idOfTheGame,
             username: currentPlayer,
             messageSentTime: Date.now(),
             sentByPlayer1: isPlayer1
         });
+        }
   }
 
   sendMessageFromSystem(chatELements : {message: string, chat: ElementRef, newMessage: string}, messages: {
@@ -37,25 +40,23 @@ export class ChatService {
         sentByPlayer1: boolean;
         sentByPlayer2: boolean;
         sentTime: number;
-    }[]){
-      if(this.isTextValid(chatELements.message)){
-        messages.push(
-          {
-            text: chatELements.message,
-            username: 'System', //add as constant
-            sentBySystem: true,
-            sentByPlayer1: false,
-            sentByPlayer2: false,
-            sentTime: Date.now()
-          }
-        )
-      }
+    }[]){      
+      messages.push(
+        {
+          text: chatELements.message,
+          username: SYSTEM_MESSAGE,
+          sentBySystem: true,
+          sentByPlayer1: false,
+          sentByPlayer2: false,
+          sentTime: Date.now()
+        }
+      )      
         this.scrollToBottom(chatELements.chat);
         chatELements.newMessage = this.clearMessage();
   }
 
   clearMessage(){
-    return ''
+    return '';
   }
 
   scrollToBottom(chat: ElementRef){
@@ -64,14 +65,9 @@ export class ChatService {
     })
   }
 
-  isTextValid(newMessage: string) {
-        newMessage = newMessage.replace(/\s/g, ''); // Replace all space in a string
-        if (newMessage === '' || newMessage === ' ' || newMessage === null) {
-            return false;
-        }
-        return true;
+  isTextNotValid(newMessage: string) {
+      newMessage = newMessage.replace(/\s/g, '');
+      return newMessage === '' || newMessage === ' ' || newMessage === null;
   }
-
-
 
 }

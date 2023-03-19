@@ -32,7 +32,7 @@ export class CheatModeService {
       window.clearInterval(rightInterval);               
     }
 
-    startInterval(images: {originalImage: Buffer, currentModifiedImage: Buffer, newImage: Buffer}, leftContext: CanvasRenderingContext2D){
+    startInterval(images: {originalImage: Buffer, newImage: Buffer}, leftContext: CanvasRenderingContext2D){
       return this.imageManipulationService.alternateOldNewImage(
         images.originalImage,                
         images.newImage,
