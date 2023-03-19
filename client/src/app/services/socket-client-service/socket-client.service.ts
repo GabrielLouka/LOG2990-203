@@ -9,11 +9,11 @@ export class SocketClientService {
     socket: Socket;
     serverAddress: string = environment.serverSocketUrl;
 
-    get isSocketAlive() {
+    get isSocketAlive(): boolean {
         return this.socket && this.socket.connected;
     }
 
-    get socketId() {
+    get socketId(): string {
         return this.socket.id ? this.socket.id : '';
     }
 
@@ -23,10 +23,6 @@ export class SocketClientService {
 
     disconnect() {
         this.socket.disconnect();
-    }
-
-    getSocketId() {
-        return this.socket.id;
     }
 
     on<T>(event: string, action: (data: T) => void): void {

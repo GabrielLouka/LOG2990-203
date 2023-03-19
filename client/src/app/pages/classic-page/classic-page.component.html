@@ -7,7 +7,7 @@
         <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
         <app-hint></app-hint>
-        <app-hint *ngIf="is1vs1Mode"></app-hint>
+        <app-hint *ngIf="isOneVersusOne"></app-hint>
     </div>
 
     <div class="flex-column center difference-container">
@@ -15,14 +15,14 @@
             <div class="hints-container">
                 <app-found-differences-counter
                     class="hints-container"
-                    [username]="this.player1"
+                    [username]="this.getPlayerUsername(true)"
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="totalDifferences"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
                     class="hints-container"
-                    *ngIf="is1vs1Mode"
-                    [username]="this.player2"
+                    *ngIf="isOneVersusOne"
+                    [username]="this.getPlayerUsername(false)"
                     [differencesFound]="differencesFound2"
                     [differencesNbr]="totalDifferences"
                 ></app-found-differences-counter>
@@ -37,7 +37,7 @@
             class="info-card"
             *ngIf="game"
             [isEasy]="game.gameData.isEasy"
-            [is1vs1]="this.is1vs1Mode"
+            [is1vs1]="isOneVersusOne"
             [isClassicMode]="true"
         ></app-info-card>
 
@@ -46,7 +46,7 @@
             <canvas #modifiedImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
         </div>
 
-        <app-chat #chat [idOfTheGame]="matchId" class="chat-container"></app-chat>
+        <app-chat #chat class="chat-container"></app-chat>
     </div>
 
     <div #errorMessage class="error-message">ERREUR</div>

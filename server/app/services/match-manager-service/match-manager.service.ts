@@ -8,7 +8,7 @@ import { Service } from 'typedi';
 export class MatchManagerService {
     private currentOnlinePlayedMatches: Match[] = [];
 
-    get currentMatches() {
+    get currentMatches(): Match[] {
         return this.currentOnlinePlayedMatches;
     }
 

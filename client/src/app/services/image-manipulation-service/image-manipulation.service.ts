@@ -19,7 +19,7 @@ import { Buffer } from 'buffer';
     providedIn: 'root',
 })
 export class ImageManipulationService {
-    // This will return an image source that can be used on a canvas from a buffer
+    // can be used on a canvas from a buffer
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
     }
