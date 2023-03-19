@@ -14,9 +14,7 @@
     </Section>
     <p>{{ debugDisplayMessage.getValue() }}</p>
 
-    <app-spinner *ngIf="isLoading" class="spinner"></app-spinner>
-
-    <mat-grid-list *ngIf="!isLoading" cols="2" rowHeight="42vh">
+    <mat-grid-list cols="2" rowHeight="42vh">
         <mat-grid-tile *ngFor="let game of games">
             <app-game-card [game]="game" [isPlayable]="isSelection"></app-game-card>
         </mat-grid-tile>
