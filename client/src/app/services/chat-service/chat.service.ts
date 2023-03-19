@@ -38,18 +38,24 @@ export class ChatService {
         sentByPlayer2: boolean;
         sentTime: number;
     }[]){
-      messages.push(
-        {
-          text: chatELements.message,
-          username: 'System', //add as constant
-          sentBySystem: true,
-          sentByPlayer1: false,
-          sentByPlayer2: false,
-          sentTime: Date.now()
-        }
-      )
+      if(this.isTextValid(chatELements.message)){
+        messages.push(
+          {
+            text: chatELements.message,
+            username: 'System', //add as constant
+            sentBySystem: true,
+            sentByPlayer1: false,
+            sentByPlayer2: false,
+            sentTime: Date.now()
+          }
+        )
+      }
         this.scrollToBottom(chatELements.chat);
-        chatELements.newMessage = '';
+        chatELements.newMessage = this.clearMessage();
+  }
+
+  clearMessage(){
+    return ''
   }
 
   scrollToBottom(chat: ElementRef){
