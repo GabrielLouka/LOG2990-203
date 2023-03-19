@@ -7,7 +7,7 @@ import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
-import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
@@ -15,7 +15,6 @@ import { MatchStatus } from '@common/match-status';
 import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
-import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -33,33 +32,29 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
     isLetterTPressed: boolean = true;
-    backgroundColor: string = '';
-    intervalIDLeft: number | undefined;
-    intervalIDRight: number | undefined;
-    debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    timeInSeconds: number = 0;
-    matchId: string;
-    currentGameId: string | null;
-    game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
+    isWinByDefault: boolean = true;
+    foundDifferences: boolean[];
     originalImage: File | null;
     modifiedImage: File | null;
-    foundDifferences: boolean[];
-    differencesFound: number = 0;
-    totalDifferences: number = 0;
+    currentGameId: string | null;
+    backgroundColor: string = '';
     gameTitle: string = '';
+    game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     currentModifiedImage: Buffer;
+    intervalIDLeft: number | undefined;
+    intervalIDRight: number | undefined;
+    timeInSeconds: number = 0;
+    totalDifferences: number = 0;
+    differencesFound: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
-    player1: string = '';
-    player2: string = '';
-    isWinByDefault = true;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
         private imageManipulationService: ImageManipulationService,
-        private matchmakingService: MatchmakingService,
+        private matchManagerService: MatchManagerService,
     ) {}
 
     get leftCanvasContext() {
@@ -70,14 +65,27 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.rightCanvas.nativeElement.getContext('2d');
     }
 
-    get is1vs1Mode(): boolean {
-        return this.matchmakingService.is1vs1Mode;
+    get isOneVersusOne() {
+        return this.matchManagerService.is1vs1Mode;
+    }
+
+    getPlayerUsername(isPlayer1: boolean): string {
+        if (isPlayer1) return this.matchManagerService.player1Username;
+        return this.matchManagerService.player2Username;
+    }
+
+    isPlayer1Win(match: Match): boolean {
+        return match.matchStatus === MatchStatus.Player1Win;
+    }
+
+    isPlayer2Win(match: Match): boolean {
+        return match.matchStatus === MatchStatus.Player2Win;
     }
 
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
-        this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
+        this.matchManagerService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
         window.addEventListener('keydown', this.onCheatMode.bind(this));
     }
 
@@ -100,30 +108,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.successSound.nativeElement.play();
     }
 
-    isPlayer1Win(match: Match): boolean {
-        return match.matchStatus === MatchStatus.Player1Win;
-    }
-
-    isPlayer2Win(match: Match): boolean {
-        return match.matchStatus === MatchStatus.Player2Win;
-    }
-
     handleMatchUpdate(match: Match | null) {
-        if (this.player1 === '') {
-            this.player1 = this.matchmakingService.currentMatchPlayer1Username;
-        }
-        if (this.player2 === '') {
-            this.player2 = this.matchmakingService.currentMatchPlayer2Username;
-        }
-        if (match !== null) {
-            this.matchId = this.matchmakingService.getCurrentMatch()?.matchId as string;
+        if (match) {
             const abortedGameMessage = ' a abandonné la partie';
+
             if (this.isPlayer1Win(match)) {
-                this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player1, this.isWinByDefault);
+                this.chat.sendSystemMessage(this.matchManagerService.player2Username.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.matchManagerService.player1Username, this.isWinByDefault);
             } else if (this.isPlayer2Win(match)) {
-                this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player2, this.isWinByDefault);
+                this.chat.sendSystemMessage(this.matchManagerService.player1Username.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.matchManagerService.player2Username, this.isWinByDefault);
             }
         }
     }
@@ -131,7 +125,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     ngAfterViewInit(): void {
         const leftCanvasContext = this.leftCanvasContext;
         const rightCanvasContext = this.rightCanvasContext;
-        if (leftCanvasContext !== null && rightCanvasContext !== null) {
+
+        if (leftCanvasContext && rightCanvasContext) {
             this.getInitialImagesFromServer();
         }
         this.focusKeyEvent();
@@ -144,7 +139,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
-                if (response.body !== null) {
+                if (response.body) {
                     const serverResult = JSON.parse(response.body);
                     this.game = serverResult;
                     const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
@@ -164,7 +159,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     loadImagesToCanvas(imgSource1: string, imgSource2: string) {
         const leftCanvasContext = this.leftCanvasContext;
         const rightCanvasContext = this.rightCanvasContext;
-        if (leftCanvasContext !== null && rightCanvasContext !== null) {
+        if (leftCanvasContext && rightCanvasContext) {
             this.imageManipulationService.loadCanvasImages(imgSource1, leftCanvasContext);
             this.imageManipulationService.loadCanvasImages(imgSource2, rightCanvasContext);
         }
@@ -174,13 +169,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
-        if (this.matchmakingService.isSoloMode) {
+
+        if (this.matchManagerService.isSoloMode) {
             this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
-        } else if (this.matchmakingService.is1vs1Mode) {
+        } else if (this.matchManagerService.is1vs1Mode) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
-                isPlayer1: this.socketService.socketId === this.matchmakingService.player1SocketId,
+                isPlayer1: this.matchManagerService.isPlayer1,
             });
         }
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';
@@ -200,26 +196,28 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
                 if (data.isValidated) {
                     let message = 'Différence trouvée';
+
                     if (data.isPlayer1) {
                         this.differencesFound1++;
-                        if (!this.matchmakingService.isSoloMode) {
-                            message += ' par ' + this.player1.toUpperCase();
+                        if (!this.matchManagerService.isSoloMode) {
+                            message += ' par ' + this.matchManagerService.player1Username.toUpperCase();
                         }
                     } else {
-                        message += ' par ' + this.player2.toUpperCase();
+                        message += ' par ' + this.matchManagerService.player2Username.toUpperCase();
                         this.differencesFound2++;
                     }
                     this.sendSystemMessageToChat(message);
                     this.foundDifferences = data.foundDifferences;
                     this.onFindDifference();
 
-                    if (this.matchmakingService.is1vs1Mode) {
+                    if (this.matchManagerService.is1vs1Mode) {
                         if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
-                            this.onWinGame(this.player1, !this.isWinByDefault);
-                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2)) this.onWinGame(this.player2, !this.isWinByDefault);
-                    } else if (this.matchmakingService.isSoloMode) {
+                            this.onWinGame(this.matchManagerService.player1Username, !this.isWinByDefault);
+                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2))
+                            this.onWinGame(this.matchManagerService.player2Username, !this.isWinByDefault);
+                    } else if (this.matchManagerService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.player1, !this.isWinByDefault);
+                            this.onWinGame(this.matchManagerService.player1Username, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -243,11 +241,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onFindWrongDifference(isPlayer1: boolean) {
         let message = 'Erreur';
-        if (!this.matchmakingService.isSoloMode) {
+
+        if (!this.matchManagerService.isSoloMode) {
             if (isPlayer1) {
-                message += ' par ' + this.player1.toUpperCase();
+                message += ' par ' + this.matchManagerService.player1Username.toUpperCase();
             } else {
-                message += ' par ' + this.player2.toUpperCase();
+                message += ' par ' + this.matchManagerService.player1Username.toUpperCase();
             }
         }
         this.errorMessage.nativeElement.style.display = 'block';
@@ -284,9 +283,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
-        if (this.rightCanvasContext !== null) {
+
+        if (this.rightCanvasContext) {
             await this.imageManipulationService.blinkDifference(
-                this.currentModifiedImage != null ? this.currentModifiedImage : this.game.modifiedImage,
+                this.currentModifiedImage ? this.currentModifiedImage : this.game.modifiedImage,
                 newImage,
                 this.rightCanvasContext,
             );
@@ -309,17 +309,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
-        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
+        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchManagerService.isSoloMode);
     }
 
     focusKeyEvent() {
-        if (this.cheat) {
-            this.cheat.nativeElement.focus();
-        }
+        if (this.cheat) this.cheat.nativeElement.focus();
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
+        if (this.matchManagerService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
             if (event.key === 't') {
                 if (this.isLetterTPressed) {
                     this.backgroundColor = '#66FF99';
@@ -328,6 +326,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.backgroundColor = '';
                     window.clearInterval(this.intervalIDLeft);
                     window.clearInterval(this.intervalIDRight);
+
                     if (this.currentModifiedImage && this.game.originalImage) {
                         this.imageManipulationService.loadCurrentImage(
                             this.currentModifiedImage,
@@ -354,7 +353,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 newImage,
                 this.leftCanvasContext as CanvasRenderingContext2D,
             );
-
             if (this.currentModifiedImage) {
                 this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
                     this.game.originalImage,
