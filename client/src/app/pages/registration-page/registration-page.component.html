@@ -39,13 +39,13 @@
         </form>
         <div *ngIf="hasUsernameRegistered">
             <div class="flex-row center message-container">
-                <div *ngIf="waitingMessage[12] === 'e' || waitingMessage[13] === 'u'" class="flex-column center">
-                    <h2>{{ this.queueStatusMessage }}</h2>
+                <div *ngIf="queueStatusMessage[12] === 'e' || queueStatusMessage[13] === 'u'" class="flex-column center">
+                    <h2>{{ queueStatusMessage }}</h2>
                     <app-spinner #spinner class="spinner"></app-spinner>
                 </div>
 
                 <div *ngIf="hasFoundIncomingPlayer" class="flex-column center">
-                    <h2>{{ waitingMessage }}</h2>
+                    <h2>{{ queueStatusMessage }}</h2>
                     <div class="flex-row space-around yesNo">
                         <button class="button-style play-button" (click)="acceptIncomingPlayer()">Yes</button>
                         <button class="button-style play-button" (click)="refuseIncomingPlayer()">No</button>

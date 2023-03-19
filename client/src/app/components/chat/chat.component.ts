@@ -30,15 +30,15 @@ export class ChatComponent {
 
     sendMessage() {
         if (this.isValidText(this.newMessage)) {
-            const currentPlayer = this.isPlayer1
-                ? this.matchmakingService.currentMatchPlayer1Username
-                : this.matchmakingService.currentMatchPlayer2Username;
+            const currentPlayer = this.matchManagerService.isPlayer1
+                ? this.matchManagerService.player1Username
+                : this.matchManagerService.player2Username;
             this.socketService.socket.emit('sendingMessage', {
                 msg: this.newMessage,
-                idGame: this.idOfTheGame,
+                idGame: this.matchManagerService.currentMatchId,
                 username: currentPlayer,
                 messageSentTime: Date.now(),
-                sentByPlayer1: this.isPlayer1,
+                sentByPlayer1: this.matchManagerService.isPlayer1,
             });
         }
     }

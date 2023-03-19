@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { Player } from '@common/player';
+import { CLEAN_USERNAME } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
@@ -76,7 +77,7 @@ export class QueueManagerService {
         if (this.hasFoundIncomingPlayer) {
             const startingGameMessage = 'Voulez-vous débuter la partie ';
 
-            this.queueStatusMessage = startingGameMessage + `avec ${this.firstPlayerInQueue.username}?\n`;
+            this.queueStatusMessage = startingGameMessage + `avec ${this.firstPlayerInQueue.username.slice(0, CLEAN_USERNAME)}?\n`;
             this.queueStatusMessage += ' | Joueur(s) en attente : ';
 
             for (const player of this.waitingPlayers) {
