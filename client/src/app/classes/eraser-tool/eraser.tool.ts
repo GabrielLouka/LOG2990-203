@@ -3,8 +3,10 @@ import { EraserElement } from '@app/classes/eraser-element/eraser-element';
 import { Vector2 } from '@common/vector2';
 
 export class EraserTool extends AbstractTool {
-    use(): void {
-        return;
+    use(context: CanvasRenderingContext2D, event: MouseEvent): void {
+        const lastAction = this.actionsContainer.undoActions[this.actionsContainer.undoActions.length - 1];
+        lastAction.pixels.push(new Vector2(event.offsetX, event.offsetY));
+        lastAction.applyElementAction(context);
     }
 
     addUndoElementToActionsContainer(modifiedPixels: Vector2[], isLeftCanvas: boolean): void {
