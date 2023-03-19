@@ -23,8 +23,8 @@ export class ActionsContainer {
     previousRectangle: Vector2;
     penWidth: number = PEN_WIDTH;
 
-    private leftContext: CanvasRenderingContext2D;
-    private rightContext: CanvasRenderingContext2D;
+    leftContext: CanvasRenderingContext2D;
+    rightContext: CanvasRenderingContext2D;
 
     constructor(public leftDrawingCanvas: ElementRef<HTMLCanvasElement>, public rightDrawingCanvas: ElementRef<HTMLCanvasElement>) {
         this.leftContext = leftDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;

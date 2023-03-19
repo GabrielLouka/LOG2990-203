@@ -1,9 +1,6 @@
 import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
-import { ClearElement } from '@app/classes/clear-element/clear-element';
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
-import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
-import { NOT_FOUND } from '@common/utils/env';
 import { Vector2 } from '@common/vector2';
 
 export class RectangleTool extends AbstractTool {
@@ -34,18 +31,27 @@ export class RectangleTool extends AbstractTool {
             width + this.actionsContainer.initialPosition.x,
             height + this.actionsContainer.initialPosition.y,
         );
-        const clearIndex = this.actionsContainer.undoActions.findIndex((element) => element instanceof ClearElement);
-        const undoActionsCopy: UndoElement[] = clearIndex !== NOT_FOUND ? this.actionsContainer.undoActions.slice() : [];
-        this.actionsContainer.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy.slice(clearIndex) : this.actionsContainer.undoActions;
-        for (const action of this.actionsContainer.undoActions) {
-            if (
-                action.isSourceLeftCanvas === this.actionsContainer.undoActions[this.actionsContainer.undoActions.length - 1].isSourceLeftCanvas &&
-                !(action instanceof SwitchElement || action instanceof ClearElement)
-            ) {
-                action.applyElementAction(context);
+        this.redoClearedPixels();
+        lastAction.applyElementAction(context);
+    }
+
+    redoClearedPixels() {
+        if (this.actionsContainer.undoActions.length > 1) {
+            const width = this.actionsContainer.leftDrawingCanvas.nativeElement.width;
+            const height = this.actionsContainer.leftDrawingCanvas.nativeElement.height;
+            this.actionsContainer.leftContext.clearRect(0, 0, width, height);
+            this.actionsContainer.rightContext.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < this.actionsContainer.undoActions.length - 1; i++) {
+                const action = this.actionsContainer.undoActions[i];
+                const activeContext =
+                    action.isSourceLeftCanvas || action instanceof SwitchElement
+                        ? this.actionsContainer.leftContext
+                        : this.actionsContainer.rightContext;
+
+                action.applyElementAction(activeContext);
             }
         }
-        this.actionsContainer.undoActions = clearIndex !== NOT_FOUND ? undoActionsCopy : this.actionsContainer.undoActions;
     }
 
     addUndoElementToActionsContainer(modifiedPixels: Vector2[], isLeftCanvas: boolean): void {

@@ -8,8 +8,7 @@ export class RectangleElement extends UndoElement {
         context.moveTo(this.pixels[0].x, this.pixels[0].y);
         const rectStart = this.pixels[0];
         const rectEnd = this.pixels[1];
-
-        context.fillRect(rectStart.x, rectStart.y, rectEnd.x - rectStart.x, rectEnd.y - rectStart.y);
+        if (rectStart && rectEnd) context.fillRect(rectStart.x, rectStart.y, rectEnd.x - rectStart.x, rectEnd.y - rectStart.y);
         return context;
     }
 }
