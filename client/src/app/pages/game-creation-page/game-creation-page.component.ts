@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DrawingService } from '@app/services/drawing-service/drawing.service';
@@ -17,7 +17,7 @@ import { Buffer } from 'buffer';
     templateUrl: './game-creation-page.component.html',
     styleUrls: ['./game-creation-page.component.scss'],
 })
-export class GameCreationPageComponent implements OnInit {
+export class GameCreationPageComponent implements OnInit, AfterViewInit {
     @ViewChild('originalImage') leftCanvas!: ElementRef;
     @ViewChild('modifiedImage') rightCanvas!: ElementRef;
     @ViewChild('input1') input1!: ElementRef;
@@ -60,8 +60,11 @@ export class GameCreationPageComponent implements OnInit {
     }
 
     async ngOnInit() {
-        this.drawingService.initialize(this.drawingCanvasOne, this.drawingCanvasTwo, [this.pen, this.rubber, this.rectangle]);
         await this.loadDefaultImages();
+    }
+
+    ngAfterViewInit() {
+        this.drawingService.initialize(this.drawingCanvasOne, this.drawingCanvasTwo, [this.pen, this.rubber, this.rectangle]);
     }
 
     refreshSelectedColor() {
