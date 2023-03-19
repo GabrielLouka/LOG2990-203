@@ -34,7 +34,7 @@ export class ChatComponent {
                 ? this.matchManagerService.player1Username
                 : this.matchManagerService.player2Username;
             this.socketService.socket.emit('sendingMessage', {
-                msg: this.newMessage,
+                message: this.newMessage,
                 idGame: this.matchManagerService.currentMatchId,
                 username: currentPlayer,
                 messageSentTime: Date.now(),
