@@ -7,7 +7,15 @@
         <form #gameNameForm [formGroup]="titleRegistration" class="flex-column center">
             <p>Il y a {{ totalDifferences }} différences (Difficulté : {{ isEasy ? 'facile' : 'difficile' }})</p>
             <p>Veuillez choisir un nom pour le jeu :</p>
-            <input id="gameName" type="text" placeholder="Titre pour le nouveau jeu" formControlName="title" [(ngModel)]="gameName" required />
+            <input
+                id="gameName"
+                type="text"
+                placeholder="Titre pour le nouveau jeu"
+                formControlName="title"
+                [(ngModel)]="gameName"
+                required
+                autocomplete="off"
+            />
             <button
                 class="button-style no-hover center"
                 [disabled]="titleRegistration.invalid"

@@ -14,7 +14,7 @@
                     <strong>{{ info.message }}</strong>
                 </p>
                 <div class="flex-row center">
-                    <button #button1 class="button-style modal-btn" routerLink="/home" (click)="deleteGames()">{{ info.option1 }}</button>
+                    <button #button1 class="button-style modal-btn" (click)="deleteGames()">{{ info.option1 }}</button>
                     <button #button2 class="button-style modal-btn" (click)="closePopUp()">{{ info.option2 }}</button>
                 </div>
             </div>

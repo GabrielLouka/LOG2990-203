@@ -38,10 +38,19 @@
             </button>
         </form>
         <div *ngIf="usernameRegistered">
-            <p>{{ waitingMessage }}</p>
-            <div *ngIf="incomingPlayerFound">
-                <button class="button-style play-button no-hover" (click)="acceptIncomingPlayer()">Yes</button>
-                <button class="button-style play-button no-hover" (click)="refuseIncomingPlayer()">No</button>
+            <div class="flex-row center message-container">
+                <div *ngIf="waitingMessage[12] === 'e' || waitingMessage[13] === 'u'" class="flex-column center">
+                    <h2>{{ waitingMessage }}</h2>
+                    <app-spinner #spinner class="spinner"></app-spinner>
+                </div>
+
+                <div *ngIf="incomingPlayerFound" class="flex-column center">
+                    <h2>{{ waitingMessage }}</h2>
+                    <div class="flex-row space-around yesNo">
+                        <button class="button-style play-button" (click)="acceptIncomingPlayer()">Yes</button>
+                        <button class="button-style play-button" (click)="refuseIncomingPlayer()">No</button>
+                    </div>
+                </div>
             </div>
         </div>
     </Section>

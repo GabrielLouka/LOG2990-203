@@ -1,12 +1,14 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { Match } from '@common/match';
 import { MatchStatus } from '@common/match-status';
 import { Player } from '@common/player';
+import { CLEAN_USERNAME } from '@common/utils/env';
 
 @Component({
     selector: 'app-registration-page',
@@ -14,6 +16,8 @@ import { Player } from '@common/player';
     styleUrls: ['./registration-page.component.scss'],
 })
 export class RegistrationPageComponent implements OnInit, OnDestroy {
+    @ViewChild('spinner') spinner: SpinnerComponent;
+
     username: string | null | undefined;
     id: string | null;
     // used to determine if we should display the username field in the page
@@ -68,7 +72,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
             if (this.matchmakingService.isSoloMode) {
                 this.loadGamePage();
             } else {
-                this.waitingMessage = "En attente d'un adversaire...";
+                this.waitingMessage = "En attente d'un adversaire ...";
             }
         } else {
             this.sendMatchJoinRequest();
@@ -104,12 +108,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     refreshQueueDisplay() {
         this.incomingPlayerFound = this.waitingPlayers.length >= 1;
         if (this.incomingPlayerFound) {
-            this.waitingMessage = `Voulez-vous débuter la partie avec ${this.waitingPlayers[0].username}?\n`;
-            this.waitingMessage += ' | Joueur(s) en attente : ';
-            for (const player of this.waitingPlayers) {
-                this.waitingMessage += ` ${player.username} \n ,`;
-            }
-
+            this.waitingMessage = `Voulez-vous débuter la partie avec ${this.waitingPlayers[0].username.slice(0, CLEAN_USERNAME)} ?\n`;
             this.incomingPlayer = this.waitingPlayers[0];
         } else {
             this.waitingMessage = "En attente d'un adversaire";

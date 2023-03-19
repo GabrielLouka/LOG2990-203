@@ -67,6 +67,9 @@ export class CreationResultModalComponent {
     async sendGameNameToServer(): Promise<void> {
         const routeToSend = '/games/saveGame';
 
+        this.toggleElementVisibility(this.gameNameForm, false);
+        this.spinnerComponent.showSpinner();
+
         this.formToSendAfterServerConfirmation.gameName = this.gameName;
 
         this.debugDisplayMessage.next('Sending ' + this.gameName + 'to server (game id ' + this.formToSendAfterServerConfirmation.gameId + ')...');
@@ -75,6 +78,7 @@ export class CreationResultModalComponent {
                 const responseString = ` ${response.status} -
         ${response.statusText} \n`;
                 this.debugDisplayMessage.next(responseString);
+                this.spinnerComponent.hideSpinner();
                 this.closePopUp();
                 this.router.navigate(['/home']);
             },
