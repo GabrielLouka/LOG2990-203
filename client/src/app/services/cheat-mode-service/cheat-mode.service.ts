@@ -27,10 +27,6 @@ export class CheatModeService {
       }
     }
 
-    inverseCheatingState(isCheating: boolean){
-      return !isCheating;
-    }
-
     stopCheating(leftInterval: number, rightInterval: number){
       window.clearInterval(leftInterval);
       window.clearInterval(rightInterval);               

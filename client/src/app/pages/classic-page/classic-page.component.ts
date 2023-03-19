@@ -323,10 +323,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
-                    this.backgroundColor = '#66FF99';
                     this.cheatMode();
                 } else {
-                    this.backgroundColor = '';
                     this.stopCheating();
                     this.putCanvasIntoInitialState();
                 }
@@ -336,6 +334,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     cheatMode() {
+        this.backgroundColor = '#66FF99';
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
             this.game.gameData,
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
@@ -361,6 +360,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     stopCheating(){           
+        this.backgroundColor = '';
         this.cheatModeService.stopCheating(this.intervalIDLeft as number, this.intervalIDRight as number);
         this.isCheating = !this.isCheating;
     }    
