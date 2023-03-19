@@ -18,14 +18,15 @@ export enum ToolType {
 export class ActionsContainer {
     undoActions: UndoElement[] = [];
     redoActions: UndoElement[] = [];
-    leftContext: CanvasRenderingContext2D;
-    rightContext: CanvasRenderingContext2D;
-    currentCanvasIsLeft: boolean;
     color: string = 'black';
     currentToolObject: AbstractTool | null = null;
     initialPosition: Vector2;
     previousRectangle: Vector2;
     penWidth: number = PEN_WIDTH;
+
+    private leftContext: CanvasRenderingContext2D;
+    private rightContext: CanvasRenderingContext2D;
+
     constructor(public leftDrawingCanvas: ElementRef<HTMLCanvasElement>, public rightDrawingCanvas: ElementRef<HTMLCanvasElement>) {
         this.leftContext = leftDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;
         this.rightContext = rightDrawingCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D;

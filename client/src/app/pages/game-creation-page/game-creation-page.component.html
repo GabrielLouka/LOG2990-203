@@ -25,10 +25,10 @@
                     <p>Réinitialiser image</p>
                 </button>
                 <div class="flex-row">
-                    <button class="button-style center" (click)="resetForegroundCanvas(true)">
+                    <button class="button-style center" (click)="this.drawingService.resetForegroundCanvas(true)">
                         <span class="material-symbols-outlined optionIcon center"> delete </span>
                     </button>
-                    <button class="button-style center" (click)="duplicateCanvas(false)">
+                    <button class="button-style center" (click)="this.drawingService.duplicateCanvas(false)">
                         <span class="material-symbols-outlined optionIcon center"> drive_file_move_outline </span>
                     </button>
                 </div>
@@ -40,26 +40,26 @@
                 <div class="flex-row center penWidth">
                     <button class="button-style no-hover bigger">{{ this.penWidth }}</button>
                     <div>
-                        <button class="button-style center" title="Augmenter rayon" (click)="setPenWidth(true)">
+                        <button class="button-style center" title="Augmenter rayon" (click)="this.drawingService.setPenWidth(true)">
                             <span class="material-symbols-outlined"> add </span>
                         </button>
-                        <button class="button-style center" title="Diminuer rayon" (click)="setPenWidth(false)">
+                        <button class="button-style center" title="Diminuer rayon" (click)="this.drawingService.setPenWidth(false)">
                             <span class="material-symbols-outlined"> remove </span>
                         </button>
                     </div>
                 </div>
-                <button #pen class="button-style center" title="Crayon" (click)="selectTool('crayon')">
+                <button #pen class="button-style center" title="Crayon" (click)="this.drawingService.selectTool('crayon')">
                     <span class="material-symbols-outlined optionIcon"> draw </span>
                 </button>
-                <button #rubber class="button-style center" title="Efface" (click)="selectTool('eraser')">
+                <button #rubber class="button-style center" title="Efface" (click)="this.drawingService.selectTool('eraser')">
                     <img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" />
                 </button>
                 <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (input)="refreshSelectedColor()" />
 
-                <button #rectangle class="button-style center" title="Outil rectangle" (click)="selectTool('rectangle')">
+                <button #rectangle class="button-style center" title="Outil rectangle" (click)="this.drawingService.selectTool('rectangle')">
                     <span class="material-symbols-outlined optionIcon"> crop_7_5 </span>
                 </button>
-                <button class="button-style center" title="Inverser dessin" (click)="switchCanvases()">
+                <button class="button-style center" title="Inverser dessin" (click)="this.drawingService.swapForegrounds()">
                     <span class="material-symbols-outlined optionIcon"> swap_horiz </span>
                 </button>
             </div>
@@ -68,10 +68,10 @@
             <br />
             <br />
             <div class="reverse-control center">
-                <button class="button-style center" title="Undo" (click)="undo()">
+                <button class="button-style center" title="Undo" (click)="this.drawingService.undo()">
                     <span class="material-symbols-outlined optionIcon"> undo </span>
                 </button>
-                <button class="button-style center" title="Redo" (click)="redo()">
+                <button class="button-style center" title="Redo" (click)="this.drawingService.redo()">
                     <span class="material-symbols-outlined optionIcon"> redo </span>
                 </button>
             </div>
@@ -98,11 +98,11 @@
             </div>
             <div class="flex-row picture-option">
                 <div class="flex-row">
-                    <button class="button-style center" (click)="duplicateCanvas(true)">
+                    <button class="button-style center" (click)="this.drawingService.duplicateCanvas(true)">
                         <span class="material-symbols-outlined optionIcon"> drive_file_move_rtl </span>
                     </button>
 
-                    <button class="button-style center" (click)="resetForegroundCanvas(false)">
+                    <button class="button-style center" (click)="this.drawingService.resetForegroundCanvas(false)">
                         <span class="material-symbols-outlined optionIcon center"> delete </span>
                     </button>
                 </div>
