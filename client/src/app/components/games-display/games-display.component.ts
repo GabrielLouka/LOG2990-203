@@ -27,7 +27,6 @@ export class GamesDisplayComponent implements OnInit {
     }[];
     title: string;
     gamesNbr: number = 0;
-    justifyContent: string;
     showNextButton = true;
     isLoading = true;
 
@@ -39,7 +38,6 @@ export class GamesDisplayComponent implements OnInit {
     ) {}
     ngOnInit() {
         this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
-        // this.justifyContent = this.isSelection ? 'center' : 'right';
         this.fetchGameDataFromServer(this.currentPageNbr);
         this.matchManagerService.connectSocket();
         this.addServerSocketMessagesListeners();
@@ -65,10 +63,6 @@ export class GamesDisplayComponent implements OnInit {
                 this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
             },
         });
-    }
-
-    onDeleteAllGames() {
-        this.popUpElement.showDeleteGamesPopUp(true);
     }
 
     async deleteAllGames(isDeleteRequest: boolean): Promise<void> {
