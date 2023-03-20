@@ -50,10 +50,10 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.id = this.route.snapshot.paramMap.get('id');
-        this.matchmakingService.onGetJoinRequest.add(this.handleIncomingPlayerJoinRequest.bind(this));
-        this.matchmakingService.onGetJoinCancel.add(this.handleIncomingPlayerJoinCancel.bind(this));
         this.matchmakingService.onGetJoinRequestAnswer.add(this.handleIncomingPlayerJoinRequestAnswer.bind(this));
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
+        this.matchmakingService.onGetJoinRequest.add(this.incomingPlayerService.handleIncomingPlayerJoinRequest.bind(this.incomingPlayerService));
+        this.matchmakingService.onGetJoinCancel.add(this.incomingPlayerService.handleIncomingPlayerJoinCancel.bind(this.incomingPlayerService));
         this.signalRedirection();
         this.signalRedirectionOneGame();
     }
@@ -66,6 +66,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchmakingService.onGetJoinRequestAnswer.clear();
         this.matchmakingService.onMatchUpdated.clear();
         this.hasSentJoinRequest = false;
+        this.incomingPlayerService.reset();
     }
 
     loadGamePage() {
@@ -92,14 +93,6 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         } else {
             this.sendMatchJoinRequest();
         }
-    }
-
-    handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
-        this.incomingPlayerService.handleIncomingPlayerJoinRequest(playerThatWantsToJoin);
-    }
-
-    handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest: string) {
-        this.incomingPlayerService.handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest);
     }
 
     handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; isAccepted: boolean }) {

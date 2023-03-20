@@ -12,10 +12,7 @@ export class IncomingPlayerService {
     private joiningStatusMessage: string;
     private hasFoundIncomingPlayer: boolean;
 
-    constructor(private readonly matchmakingService: MatchmakingService) {
-        this.handleIncomingPlayerJoinRequest = this.handleIncomingPlayerJoinRequest.bind(this);
-        this.handleIncomingPlayerJoinCancel = this.handleIncomingPlayerJoinCancel.bind(this);
-    }
+    constructor(private readonly matchmakingService: MatchmakingService) {}
 
     get incomingPlayers(): Player[] {
         return this.waitingPlayers;
@@ -39,6 +36,12 @@ export class IncomingPlayerService {
 
     get hasFoundOpponent(): boolean {
         return this.hasFoundIncomingPlayer;
+    }
+
+    reset() {
+        this.waitingPlayers = [];
+        this.incomingPlayer = null;
+        this.hasFoundIncomingPlayer = false;
     }
 
     isIncomingPlayer(player: Player): boolean {
@@ -84,6 +87,7 @@ export class IncomingPlayerService {
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
+        console.log('handleIncomingPlayerJoinRequest', playerThatWantsToJoin);
         if (!this.matchmakingService.isHost) return;
 
         if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
