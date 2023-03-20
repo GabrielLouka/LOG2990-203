@@ -1,21 +1,18 @@
 import { Injectable } from '@angular/core';
-import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/player';
-import { CLEAN_USERNAME, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
+import { WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
 })
 export class IncomingPlayerService {
-    private waitingPlayers: Player[];
-    private incomingPlayer: Player | null;
+    private waitingPlayers: Player[] = [];
+    private incomingPlayer: Player | null = null;
     private joiningStatusMessage: string;
     private hasFoundIncomingPlayer: boolean;
 
-    constructor(private readonly matchManagerService: MatchManagerService) {
-        this.joiningStatusMessage = 'Loading';
-        this.incomingPlayer = null;
-        this.waitingPlayers = [];
+    constructor(private readonly matchmakingService: MatchmakingService) {
         this.handleIncomingPlayerJoinRequest = this.handleIncomingPlayerJoinRequest.bind(this);
         this.handleIncomingPlayerJoinCancel = this.handleIncomingPlayerJoinCancel.bind(this);
     }
@@ -36,16 +33,16 @@ export class IncomingPlayerService {
         return this.waitingPlayers[0];
     }
 
-    get queueStatusToDisplay(): string {
+    get statusToDisplay(): string {
         return this.joiningStatusMessage;
     }
 
-    get hasFound(): boolean {
+    get hasFoundOpponent(): boolean {
         return this.hasFoundIncomingPlayer;
     }
 
     isIncomingPlayer(player: Player): boolean {
-        return player.playerId === this.matchManagerService.currentSocketId;
+        return player.playerId === this.matchmakingService.currentSocketId;
     }
 
     isAcceptedByHost(isAccepted: boolean, player: Player): boolean {
@@ -57,11 +54,11 @@ export class IncomingPlayerService {
     }
 
     isHostAcceptingIncomingPlayer(isAccepted: boolean): boolean {
-        return isAccepted && this.matchManagerService.isHost;
+        return isAccepted && this.matchmakingService.isHost;
     }
 
     isHostRejectingIncomingPlayer(isAccepted: boolean): boolean {
-        return !isAccepted && this.matchManagerService.isHost && this.hasIncomingPlayer;
+        return !isAccepted && this.matchmakingService.isHost && this.hasIncomingPlayer;
     }
 
     refreshQueueDisplay() {
@@ -69,8 +66,7 @@ export class IncomingPlayerService {
         if (this.hasFoundIncomingPlayer) {
             const startingGameMessage = 'Voulez-vous débuter la partie ';
 
-            this.joiningStatusMessage = startingGameMessage + `avec ${this.firstIncomingPlayer.username.slice(0, CLEAN_USERNAME)}?\n`;
-            this.joiningStatusMessage += ' | Joueur(s) en attente : ';
+            this.joiningStatusMessage = startingGameMessage + `avec ${this.firstIncomingPlayer.username}\n`;
 
             for (const player of this.waitingPlayers) {
                 this.joiningStatusMessage += ` ${player.username} \n ,`;
@@ -92,7 +88,7 @@ export class IncomingPlayerService {
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
-        if (!this.matchManagerService.isHost) return;
+        if (!this.matchmakingService.isHost) return;
 
         if (!this.waitingPlayers.includes(playerThatWantsToJoin)) {
             this.waitingPlayers.push(playerThatWantsToJoin);
@@ -102,7 +98,7 @@ export class IncomingPlayerService {
     }
 
     handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest: string) {
-        if (!this.matchManagerService.isHost) return;
+        if (!this.matchmakingService.isHost) return;
 
         this.waitingPlayers = this.waitingPlayers.filter((player) => player.playerId !== playerIdThatCancelledTheirJoinRequest);
         this.refreshQueueDisplay();
@@ -117,11 +113,11 @@ export class IncomingPlayerService {
     acceptIncomingPlayer() {
         if (!this.incomingPlayer) return;
 
-        this.matchManagerService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, true);
+        this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, true);
 
         for (const player of this.waitingPlayers) {
             if (player !== this.incomingPlayer) {
-                this.matchManagerService.sendIncomingPlayerRequestAnswer(player, false);
+                this.matchmakingService.sendIncomingPlayerRequestAnswer(player, false);
             }
         }
         this.waitingPlayers = [this.incomingPlayer];
@@ -130,6 +126,6 @@ export class IncomingPlayerService {
     refuseIncomingPlayer() {
         if (!this.incomingPlayer) return;
 
-        this.matchManagerService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, false);
+        this.matchmakingService.sendIncomingPlayerRequestAnswer(this.incomingPlayer, false);
     }
 }

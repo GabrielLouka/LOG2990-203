@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 
 @Component({
@@ -22,23 +22,23 @@ export class ChatComponent {
     newMessage = '';
     title: string = 'MANIA CHAT';
 
-    constructor(private readonly socketService: SocketClientService, private matchManagerService: MatchManagerService) {}
+    constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
 
     get isOneVersusOne(): boolean {
-        return this.matchManagerService.is1vs1Mode;
+        return this.matchmakingService.is1vs1Mode;
     }
 
     sendMessage() {
         if (this.isValidText(this.newMessage)) {
-            const currentPlayer = this.matchManagerService.isPlayer1
-                ? this.matchManagerService.player1Username
-                : this.matchManagerService.player2Username;
+            const currentPlayer = this.matchmakingService.isPlayer1
+                ? this.matchmakingService.player1Username
+                : this.matchmakingService.player2Username;
             this.socketService.socket.emit('sendingMessage', {
                 message: this.newMessage,
-                idGame: this.matchManagerService.currentMatchId,
+                idGame: this.matchmakingService.currentMatchId,
                 username: currentPlayer,
                 messageSentTime: Date.now(),
-                sentByPlayer1: this.matchManagerService.isPlayer1,
+                sentByPlayer1: this.matchmakingService.isPlayer1,
             });
         }
     }

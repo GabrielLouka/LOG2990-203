@@ -7,7 +7,7 @@ import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
-import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/game-data';
 import { Match } from '@common/match';
@@ -39,6 +39,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentGameId: string | null;
     backgroundColor: string = '';
     gameTitle: string = '';
+    player1: string = '';
+    player2: string = '';
+    matchId: string;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     currentModifiedImage: Buffer;
     intervalIDLeft: number | undefined;
@@ -48,13 +51,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
+
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
         private route: ActivatedRoute,
         private imageManipulationService: ImageManipulationService,
-        private matchManagerService: MatchManagerService,
+        private matchmakingService: MatchmakingService,
     ) {}
 
     get leftCanvasContext() {
@@ -66,12 +70,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     get isOneVersusOne() {
-        return this.matchManagerService.is1vs1Mode;
+        return this.matchmakingService.is1vs1Mode;
     }
 
     getPlayerUsername(isPlayer1: boolean): string {
-        if (isPlayer1) return this.matchManagerService.player1Username;
-        return this.matchManagerService.player2Username;
+        if (isPlayer1) return this.matchmakingService.player1Username;
+        return this.matchmakingService.player2Username;
     }
 
     isPlayer1Win(match: Match): boolean {
@@ -85,7 +89,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     ngOnInit(): void {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
-        this.matchManagerService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
+        this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
         window.addEventListener('keydown', this.onCheatMode.bind(this));
     }
 
@@ -109,15 +113,25 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleMatchUpdate(match: Match | null) {
+        if (this.player1 === '') {
+            this.player1 = this.matchmakingService.player1Username;
+        }
+        if (this.player2 === '') {
+            this.player2 = this.matchmakingService.player2Username;
+        }
         if (match) {
-            const abortedGameMessage = ' a abandonné la partie';
+            this.matchId = this.matchmakingService.currentMatchId as string;
 
-            if (this.isPlayer1Win(match)) {
-                this.chat.sendSystemMessage(this.matchManagerService.player2Username.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.matchManagerService.player1Username, this.isWinByDefault);
-            } else if (this.isPlayer2Win(match)) {
-                this.chat.sendSystemMessage(this.matchManagerService.player1Username.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.matchManagerService.player2Username, this.isWinByDefault);
+            if (match) {
+                const abortedGameMessage = ' a abandonné la partie';
+
+                if (this.isPlayer1Win(match)) {
+                    this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
+                    this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
+                } else if (this.isPlayer2Win(match)) {
+                    this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
+                    this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
+                }
             }
         }
     }
@@ -170,13 +184,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
 
-        if (this.matchManagerService.isSoloMode) {
+        if (this.matchmakingService.isSoloMode) {
             this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
-        } else if (this.matchManagerService.is1vs1Mode) {
+        } else if (this.matchmakingService.is1vs1Mode) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
-                isPlayer1: this.matchManagerService.isPlayer1,
+                isPlayer1: this.matchmakingService.isPlayer1,
             });
         }
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';
@@ -199,25 +213,25 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (data.isPlayer1) {
                         this.differencesFound1++;
-                        if (!this.matchManagerService.isSoloMode) {
-                            message += ' par ' + this.matchManagerService.player1Username.toUpperCase();
+                        if (!this.matchmakingService.isSoloMode) {
+                            message += ' par ' + this.matchmakingService.player1Username.toUpperCase();
                         }
                     } else {
-                        message += ' par ' + this.matchManagerService.player2Username.toUpperCase();
+                        message += ' par ' + this.matchmakingService.player2Username.toUpperCase();
                         this.differencesFound2++;
                     }
                     this.sendSystemMessageToChat(message);
                     this.foundDifferences = data.foundDifferences;
                     this.onFindDifference();
 
-                    if (this.matchManagerService.is1vs1Mode) {
+                    if (this.matchmakingService.is1vs1Mode) {
                         if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
-                            this.onWinGame(this.matchManagerService.player1Username, !this.isWinByDefault);
+                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
                         } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2))
-                            this.onWinGame(this.matchManagerService.player2Username, !this.isWinByDefault);
-                    } else if (this.matchManagerService.isSoloMode) {
+                            this.onWinGame(this.matchmakingService.player2Username, !this.isWinByDefault);
+                    } else if (this.matchmakingService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.matchManagerService.player1Username, !this.isWinByDefault);
+                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -242,11 +256,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onFindWrongDifference(isPlayer1: boolean) {
         let message = 'Erreur';
 
-        if (!this.matchManagerService.isSoloMode) {
+        if (!this.matchmakingService.isSoloMode) {
             if (isPlayer1) {
-                message += ' par ' + this.matchManagerService.player1Username.toUpperCase();
+                message += ' par ' + this.matchmakingService.player1Username.toUpperCase();
             } else {
-                message += ' par ' + this.matchManagerService.player1Username.toUpperCase();
+                message += ' par ' + this.matchmakingService.player2Username.toUpperCase();
             }
         }
         this.errorMessage.nativeElement.style.display = 'block';
@@ -309,7 +323,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
-        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchManagerService.isSoloMode);
+        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
     }
 
     focusKeyEvent() {
@@ -317,7 +331,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if (this.matchManagerService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
+        if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
             if (event.key === 't') {
                 if (this.isLetterTPressed) {
                     this.backgroundColor = '#66FF99';

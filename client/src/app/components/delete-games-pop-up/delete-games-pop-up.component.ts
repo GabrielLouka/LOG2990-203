@@ -33,7 +33,7 @@ export class DeleteGamesPopUpComponent {
         this.showPopUp();
     }
 
-    deleteGames() {
+    emitDeleteRequestConfirmation() {
         this.isDeleteRequest.emit(true);
     }
 
