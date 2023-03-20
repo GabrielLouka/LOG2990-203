@@ -27,7 +27,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     @ViewChild('drawingCanvasTwo') drawingCanvasTwo!: ElementRef;
     @ViewChild('colorPicker') colorPicker!: ElementRef;
     @ViewChild('pen') pen!: ElementRef;
-    @ViewChild('rubber') rubber!: ElementRef;
+    @ViewChild('eraser') eraser!: ElementRef;
     @ViewChild('rectangle') rectangle!: ElementRef;
 
     @ViewChild('combine') combine!: ElementRef;
@@ -64,7 +64,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        this.drawingService.initialize(this.drawingCanvasOne, this.drawingCanvasTwo, [this.pen, this.rubber, this.rectangle]);
+        this.drawingService.initialize(this.drawingCanvasOne, this.drawingCanvasTwo, [this.pen, this.eraser, this.rectangle]);
     }
 
     refreshSelectedColor() {

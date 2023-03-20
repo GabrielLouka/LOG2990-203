@@ -51,7 +51,7 @@
                 <button #pen class="button-style center" title="Crayon" (click)="this.drawingService.selectTool('crayon')">
                     <span class="material-symbols-outlined optionIcon"> draw </span>
                 </button>
-                <button #rubber class="button-style center" title="Efface" (click)="this.drawingService.selectTool('eraser')">
+                <button #eraser class="button-style center" title="Efface" (click)="this.drawingService.selectTool('eraser')">
                     <img src=".\assets\img\rubber-icon.png" alt="rubber-Icon" />
                 </button>
                 <input #colorPicker type="color" class="button-style bigger color center" title="Couleurs" (input)="refreshSelectedColor()" />
