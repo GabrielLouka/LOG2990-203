@@ -6,8 +6,8 @@ import { AuthService } from '@app/services/auth-service/auth.service';
 import { IncomingPlayerService } from '@app/services/incoming-player-service/incoming-player.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { RegistrationService } from '@app/services/registration-service/registration.service';
-import { Match } from '@common/match';
-import { Player } from '@common/player';
+import { Match } from '@common/classes/match';
+import { Player } from '@common/classes/player';
 
 @Component({
     selector: 'app-registration-page',

@@ -7,8 +7,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable prettier/prettier */
 import Queue from '@app/classes/queue';
-import { Pixel } from '@common/pixel';
-import { Vector2 } from '@common/vector2';
+import { Pixel } from '@common/classes/pixel';
+import { Vector2 } from '@common/classes/vector2';
 import { VisitData } from '@common/visitData';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
@@ -444,74 +444,66 @@ describe('Image-Processing Service', () => {
         spy.restore();
     });
     it('should update the radius in the alreadyVisited map if a previously visited pixel has a smaller radius than the new pixel', () => {
-        
-        const visitData = { alreadyVisited: new Map([['0 0', 1]]),allPixelsToVisitSet:new Set<string>(),visitRadius: 3,
-        imageDimensions:new Vector2(0,0) };
-        const nextPixelsToVisit:Queue<{
+        const visitData = {
+            alreadyVisited: new Map([['0 0', 1]]),
+            allPixelsToVisitSet: new Set<string>(),
+            visitRadius: 3,
+            imageDimensions: new Vector2(0, 0),
+        };
+        const nextPixelsToVisit: Queue<{
             pos: Vector2;
             radius: number;
-        }> = 
-            new Queue<{
-                pos: Vector2;
-                radius: number;
-            }>({pos:(new Vector2(1,1)),radius:0} as any); 
+        }> = new Queue<{
+            pos: Vector2;
+            radius: number;
+        }>({ pos: new Vector2(1, 1), radius: 0 } as any);
         const differenceObject = { currentDifferenceGroupIndex: 0, differencesList: [[]] };
-        sinon.stub(visitData.alreadyVisited,'get').returns(0);
+        sinon.stub(visitData.alreadyVisited, 'get').returns(0);
         imageProcessingService['addingPixelToListOfDifference'](visitData, nextPixelsToVisit, differenceObject);
-  
-      });
-      it('should do nothing if an error occurs during pixel setting', () => {
+    });
+    it('should do nothing if an error occurs during pixel setting', () => {
         // Arrange
         const imageBuffer = Buffer.alloc(16); // replace with the appropriate buffer size
-        const positions: Vector2[] = [
-          new Vector2(0, 0),
-          new Vector2(1, 1),
-          new Vector2(2, 2),
-        ];
+        const positions: Vector2[] = [new Vector2(0, 0), new Vector2(1, 1), new Vector2(2, 2)];
         // mock the setRGB method to throw an error
         imageProcessingService['setRGB'] = () => {
-          throw new Error('Failed to set pixel color');
+            throw new Error('Failed to set pixel color');
         };
-  
+
         // Act
         const action = () => imageProcessingService['paintBlackPixelsAtPositions'](positions, imageBuffer);
-  
+
         // Assert
         expect(action).not.to.throw();
-      });
-      it('should skip pixel if it has been visited before with a bigger radius', () => {
+    });
+    it('should skip pixel if it has been visited before with a bigger radius', () => {
         // Arrange
         const visitData: VisitData = {
-          alreadyVisited: new Map<string, number>([['1 1', 2]]),
-          allPixelsToVisitSet: new Set<string>(),
-          visitRadius: 1,
-          imageDimensions: new Vector2(10, 10),
+            alreadyVisited: new Map<string, number>([['1 1', 2]]),
+            allPixelsToVisitSet: new Set<string>(),
+            visitRadius: 1,
+            imageDimensions: new Vector2(10, 10),
         };
-        const nextPixelsToVisit:Queue<{
+        const nextPixelsToVisit: Queue<{
             pos: Vector2;
             radius: number;
-        }> = 
-            new Queue<{
-                pos: Vector2;
-                radius: number;
-            }>({pos:(new Vector2(1,1)),radius:1} as any);       
+        }> = new Queue<{
+            pos: Vector2;
+            radius: number;
+        }>({ pos: new Vector2(1, 1), radius: 1 } as any);
         const differenceObject = {
-          currentDifferenceGroupIndex: 0,
-          differencesList: [[]],
+            currentDifferenceGroupIndex: 0,
+            differencesList: [[]],
         };
-  
+
         // Act
-        imageProcessingService['addingPixelToListOfDifference'](
-          visitData,
-          nextPixelsToVisit,
-          differenceObject
-        );
-  
+        imageProcessingService['addingPixelToListOfDifference'](visitData, nextPixelsToVisit, differenceObject);
+
         // Assert
         expect(visitData.alreadyVisited.get('1 1')).to.equal(2);
         expect(differenceObject.differencesList[0]).to.deep.equal([]);
-      });
-      it('should add new pixel to differences list if it has been visited before with a smaller radius', () => {
+    });
+    it('should add new pixel to differences list if it has been visited before with a smaller radius', () => {
         const visitData: VisitData = {
             alreadyVisited: new Map<string, number>([['1 1', 1]]),
             allPixelsToVisitSet: new Set<string>(),
@@ -533,5 +525,4 @@ describe('Image-Processing Service', () => {
 
         expect(visitData.alreadyVisited.get('1 1')).to.equal(2);
     });
-   
 });

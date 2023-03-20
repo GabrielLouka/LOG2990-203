@@ -5,8 +5,8 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { GameData } from '@common/game-data';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
+import { GameData } from '@common/interfaces/game-data';
 import { Buffer } from 'buffer';
 import { ImageManipulationService } from './image-manipulation.service';
 describe('ImageManipulationService', () => {

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
-import { EntireGameUploadForm } from '@common/entire.game.upload.form';
-import { GameData } from '@common/game-data';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
+import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
+import { GameData } from '@common/interfaces/game-data';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';

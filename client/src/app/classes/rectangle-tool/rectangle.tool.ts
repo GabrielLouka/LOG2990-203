@@ -1,7 +1,7 @@
 import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 
 export class RectangleTool extends AbstractTool {
     use(context: CanvasRenderingContext2D, event: MouseEvent): void {

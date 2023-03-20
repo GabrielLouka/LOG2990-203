@@ -1,6 +1,6 @@
 import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
 import { CrayonElement } from '@app/classes/crayon-element/crayon-element';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 
 export class PencilTool extends AbstractTool {
     use(context: CanvasRenderingContext2D, event: MouseEvent): void {

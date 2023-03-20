@@ -3,7 +3,7 @@ import { ElementRef } from '@angular/core';
 import { CrayonElement } from '@app/classes/crayon-element/crayon-element';
 import { EraserElement } from '@app/classes/eraser-element/eraser-element';
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 import { ActionsContainer, ToolType } from './actions-container';
 
 describe('ActionsContainer', () => {

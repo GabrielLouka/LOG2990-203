@@ -1,7 +1,7 @@
-import { Match } from '@common/match';
-import { MatchStatus } from '@common/match-status';
-import { MatchType } from '@common/match-type';
-import { Player } from '@common/player';
+import { Match } from '@common/classes/match';
+import { Player } from '@common/classes/player';
+import { MatchStatus } from '@common/enums/match-status';
+import { MatchType } from '@common/enums/match-type';
 import { Service } from 'typedi';
 
 @Service()

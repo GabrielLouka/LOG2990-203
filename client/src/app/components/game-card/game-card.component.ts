@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GameData } from '@common/game-data';
+import { GameData } from '@common/interfaces/game-data';
 import { Buffer } from 'buffer';
 @Component({
     selector: 'app-game-card',

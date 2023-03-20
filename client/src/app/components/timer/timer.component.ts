@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { INTERVAL_VALUE, MINUTE, MINUTE_LIMIT } from '@common/pixel';
+import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 
 @Component({
     selector: 'app-timer',
@@ -15,11 +15,11 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
     intervalId: number;
 
     get minutes() {
-        return Math.floor(this.timeInSeconds / MINUTE);
+        return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
     }
 
     get seconds() {
-        return Math.floor(this.timeInSeconds % MINUTE);
+        return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
     }
 
     ngAfterViewInit() {
@@ -27,7 +27,7 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
             if (this.timeInSeconds >= 0) {
                 this.ticToc();
             }
-        }, INTERVAL_VALUE);
+        }, MILLISECOND_TO_SECONDS);
     }
 
     ngOnDestroy() {

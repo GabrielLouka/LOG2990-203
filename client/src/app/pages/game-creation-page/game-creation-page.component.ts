@@ -5,12 +5,12 @@ import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DrawingService } from '@app/services/drawing-service/drawing.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
-import { DifferenceImage } from '@common/difference.image';
-import { EntireGameUploadForm } from '@common/entire.game.upload.form';
-import { ImageUploadForm } from '@common/image.upload.form';
-import { ImageUploadResult } from '@common/image.upload.result';
+import { Vector2 } from '@common/classes/vector2';
+import { DifferenceImage } from '@common/interfaces/difference.image';
+import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
+import { ImageUploadForm } from '@common/interfaces/image.upload.form';
+import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, PEN_WIDTH } from '@common/utils/env';
-import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
 @Component({
@@ -124,6 +124,10 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
         }
     }
 
+    onQuitGame() {
+        this.popUpElement.showConfirmationPopUp();
+    }
+
     async sendImageToServer(): Promise<void> {
         this.resultModal.showPopUp();
 
@@ -212,9 +216,5 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
             view[i] = byteArray[i];
         }
         return buffer;
-    }
-
-    onQuitGame() {
-        this.popUpElement.showConfirmationPopUp();
     }
 }

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { GameData } from '@common/game-data';
+import { GameData } from '@common/interfaces/game-data';
 import { Buffer } from 'buffer';
 
 import { RouterTestingModule } from '@angular/router/testing';

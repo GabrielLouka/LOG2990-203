@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { Action } from '@common/action';
-import { Match } from '@common/match';
-import { MatchStatus } from '@common/match-status';
-import { MatchType } from '@common/match-type';
-import { Player } from '@common/player';
+import { Action } from '@common/classes/action';
+import { Match } from '@common/classes/match';
+import { Player } from '@common/classes/player';
+import { MatchStatus } from '@common/enums/match-status';
+import { MatchType } from '@common/enums/match-type';
 import { Observable } from 'rxjs';
 
 @Injectable({
