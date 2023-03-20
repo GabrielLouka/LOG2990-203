@@ -1,6 +1,6 @@
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 import { DuplicationElement } from './duplication-element';
 
 describe('DuplicationElement', () => {
@@ -8,9 +8,8 @@ describe('DuplicationElement', () => {
         const duplicateCanvas = new DuplicationElement();
         expect(duplicateCanvas).toBeTruthy();
         const mockActions: UndoElement[] = [];
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         mockActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
-
-        duplicateCanvas.loadActions(mockActions);
 
         const tempCanvas = document.createElement('canvas');
         const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D;

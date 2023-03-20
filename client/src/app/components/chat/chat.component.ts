@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '@app/services/chat-service/chat.service';
+import { CHAT_TITLE } from '@common/utils/env';
 
 @Component({
     selector: 'app-chat',
@@ -19,7 +20,7 @@ export class ChatComponent {
         sentTime: number;
     }[] = [];
     newMessage = '';
-    title: string = 'MANIA CHAT';
+    title = CHAT_TITLE;
 
     constructor(private chatService: ChatService) {}
 

@@ -5,7 +5,7 @@ import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/d
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { MatchType } from '@common/match-type';
+import { MatchType } from '@common/enums/match-type';
 import { REGISTRATION_PATH } from '@common/utils/env.http';
 
 @Component({

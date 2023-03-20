@@ -1,6 +1,6 @@
-import { GameData } from '@common/game-data';
+import { Vector2 } from '@common/classes/vector2';
+import { GameData } from '@common/interfaces/game-data';
 import { NOT_FOUND } from '@common/utils/env';
-import { Vector2 } from '@common/vector2';
 import { Service } from 'typedi';
 
 @Service()

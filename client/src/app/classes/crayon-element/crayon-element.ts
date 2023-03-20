@@ -1,5 +1,5 @@
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 
 export class CrayonElement extends UndoElement {
     applyElementAction(context: CanvasRenderingContext2D): CanvasRenderingContext2D {

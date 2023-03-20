@@ -1,6 +1,6 @@
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
+import { Vector2 } from '@common/classes/vector2';
 import { PEN_WIDTH } from '@common/utils/env';
-import { Vector2 } from '@common/vector2';
 
 export class DuplicationElement extends UndoElement {
     leftContext: CanvasRenderingContext2D;

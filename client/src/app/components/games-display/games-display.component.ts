@@ -4,8 +4,8 @@ import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/d
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { GameData } from '@common/game-data';
-import { ImageUploadResult } from '@common/image.upload.result';
+import { GameData } from '@common/interfaces/game-data';
+import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
 

@@ -14,7 +14,6 @@ describe('SwitchElement', () => {
         const rightCanvas = { nativeElement: document.createElement('canvas') };
 
         switchElement.loadCanvases(
-            mockActions,
             leftCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D,
             rightCanvas.nativeElement.getContext('2d') as CanvasRenderingContext2D,
         );

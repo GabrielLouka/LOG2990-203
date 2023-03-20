@@ -1,8 +1,8 @@
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
-import { EntireGameUploadForm } from '@common/entire.game.upload.form';
-import { GameData } from '@common/game-data';
-import { defaultRankings } from '@common/ranking';
+import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
+import { GameData } from '@common/interfaces/game-data';
+import { defaultRankings } from '@common/interfaces/ranking';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

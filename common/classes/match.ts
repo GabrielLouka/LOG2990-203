@@ -1,6 +1,7 @@
-import { MatchStatus } from './match-status';
-import { MatchType } from './match-type';
+import { MatchStatus } from '../enums/match-status';
+import { MatchType } from '../enums/match-type';
 import { Player } from './player';
+
 export class Match {
     gameId: number;
     matchId: string;

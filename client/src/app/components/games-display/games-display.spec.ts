@@ -3,8 +3,8 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
-import { GameData } from '@common/game-data';
-import { defaultRankings } from '@common/ranking';
+import { GameData } from '@common/interfaces/game-data';
+import { defaultRankings } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
 import { GamesDisplayComponent } from './games-display.component';

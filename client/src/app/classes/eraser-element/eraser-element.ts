@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 
 export class EraserElement extends UndoElement {
     applyElementAction(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
@@ -18,7 +17,7 @@ export class EraserElement extends UndoElement {
                 const prevPoint = stroke[i - 1];
                 const currentPoint = stroke[i];
                 const distance = pointDistance(prevPoint, currentPoint);
-                const subDivisions = Math.max(Math.round(distance / 5), 1);
+                const subDivisions = Math.max(Math.round(distance / 2), 1);
                 for (let j = 0; j < subDivisions; j++) {
                     const point = {
                         x: prevPoint.x + (currentPoint.x - prevPoint.x) * (j / subDivisions),
