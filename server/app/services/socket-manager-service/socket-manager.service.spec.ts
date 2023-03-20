@@ -6,12 +6,12 @@
 import { Server } from '@app/server';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { MatchingDifferencesService } from '@app/services/matching-difference-service/matching-differences.service';
-import { GameData } from '@common/game-data';
-import { Match } from '@common/match';
-import { MatchStatus } from '@common/match-status';
-import { MatchType } from '@common/match-type';
-import { defaultRankings } from '@common/ranking';
-import { Vector2 } from '@common/vector2';
+import { Match } from '@common/classes/match';
+import { Vector2 } from '@common/classes/vector2';
+import { MatchStatus } from '@common/enums/match-status';
+import { MatchType } from '@common/enums/match-type';
+import { GameData } from '@common/interfaces/game-data';
+import { defaultRankings } from '@common/interfaces/ranking';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';

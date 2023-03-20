@@ -3,7 +3,7 @@ import { DatabaseService } from '@app/services/database-service/database.service
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { SocketManager } from '@app/services/socket-manager-service/socket-manager.service';
 import { R_ONLY } from '@app/utils/env';
-import { GameData } from '@common/game-data';
+import { GameData } from '@common/interfaces/game-data';
 import 'dotenv/config';
 import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
 import 'reflect-metadata';

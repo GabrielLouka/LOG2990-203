@@ -6,10 +6,10 @@
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
-import { DifferenceImage } from '@common/difference.image';
-import { ImageUploadForm } from '@common/image.upload.form';
-import { ImageUploadResult } from '@common/image.upload.result';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
+import { DifferenceImage } from '@common/interfaces/difference.image';
+import { ImageUploadForm } from '@common/interfaces/image.upload.form';
+import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { assert, expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';
@@ -96,7 +96,10 @@ describe('ImageProcessingController', () => {
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
             .set('Accept', 'application/json')
-            .expect(HTTP_STATUS_CREATED);
+            .expect(HTTP_STATUS_CREATED)
+            .then((res) => {
+                expect(res).to.deep.equal(expectedResult);
+            });
     });
 
     it('should return a response with status code 400 when getDifferencesBlackAndWhiteImage throws an error', async () => {

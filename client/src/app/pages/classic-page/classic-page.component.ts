@@ -9,11 +9,11 @@ import { CommunicationService } from '@app/services/communication-service/commun
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { GameData } from '@common/game-data';
-import { Match } from '@common/match';
-import { MatchStatus } from '@common/match-status';
+import { Match } from '@common/classes/match';
+import { Vector2 } from '@common/classes/vector2';
+import { MatchStatus } from '@common/enums/match-status';
+import { GameData } from '@common/interfaces/game-data';
 import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
-import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
 @Component({

@@ -1,13 +1,14 @@
 import { Queue } from '@app/classes/queue';
-import { ImageUploadResult } from '@common/image.upload.result';
-import { MIN_DIFFERENCES, Pixel, REQUIRED_HEIGHT, REQUIRED_SURFACE_PERCENTAGE, REQUIRED_WIDTH } from '@common/pixel';
-import { Vector2 } from '@common/vector2';
-import { VisitData } from '@common/visitData';
+import { Pixel } from '@common/classes/pixel';
+import { Vector2 } from '@common/classes/vector2';
+import { ImageUploadResult } from '@common/interfaces/image.upload.result';
+import { VisitData } from '@common/interfaces/visitData';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, MIN_DIFFERENCES, REQUIRED_SURFACE_PERCENTAGE } from '@common/utils/env';
 import { Service } from 'typedi';
 @Service()
 export class ImageProcessingService {
-    private static readonly requiredImageWidth = REQUIRED_WIDTH;
-    private static readonly requiredImageHeight = REQUIRED_HEIGHT;
+    private static readonly requiredImageWidth = CANVAS_WIDTH;
+    private static readonly requiredImageHeight = CANVAS_HEIGHT;
     private static readonly minDifferencesForHardMode = MIN_DIFFERENCES;
     private static readonly hardModeImageSurfaceRequiredPercentage = REQUIRED_SURFACE_PERCENTAGE;
 

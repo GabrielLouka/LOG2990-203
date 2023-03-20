@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatabaseServiceMock } from '@app/services/database-service-mock/database.service.mock';
 import { R_ONLY } from '@app/utils/env';
-import { GameData } from '@common/game-data';
+import { GameData } from '@common/interfaces/game-data';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
@@ -73,11 +73,12 @@ describe('Game storage service', () => {
         const allGames = await gameStorageService.getAllGames();
         expect(allGames.length).to.equal(0);
     });
-    // TODO Property 'acknowledged' does not exist on type 'void'.
-    // it('should delete all the games in the database', async () => {
-    //     const deletedAllGames = await gameStorageService.deleteAllGames();
-    //     expect(deletedAllGames.acknowledged).to.equals(true);
-    // });
+
+    it('should delete all the games in the database', async () => {
+        const deletedAllGames = await gameStorageService.deleteAllGames();
+        expect(deletedAllGames).to.equals(true);
+    });
+
     it('should get the games in the pages', async () => {
         const gamesPage = await gameStorageService.getGamesInPage(0);
         expect(gamesPage.length).to.equal(1);

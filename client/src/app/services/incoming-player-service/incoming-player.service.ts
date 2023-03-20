@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
-import { Player } from '@common/player';
+import { Player } from '@common/classes/player';
 import { WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
 
 @Injectable({

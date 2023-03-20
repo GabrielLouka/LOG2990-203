@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
-import { EntireGameUploadForm } from '@common/entire.game.upload.form';
-import { ImageUploadResult } from '@common/image.upload.result';
+import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
+import { ImageUploadResult } from '@common/interfaces/image.upload.result';
+import { MAX_NBR_OF_DIFFERENCES, MIN_NBR_OF_DIFFERENCES } from '@common/utils/env';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
@@ -15,8 +15,8 @@ import { BehaviorSubject } from 'rxjs';
     styleUrls: ['./creation-result-modal.component.scss'],
 })
 export class CreationResultModalComponent {
-    static readonly maxNumberOfDifferences: number = 9;
-    static readonly minNumberOfDifferences: number = 3;
+    static readonly maxNumberOfDifferences: number = MAX_NBR_OF_DIFFERENCES;
+    static readonly minNumberOfDifferences: number = MIN_NBR_OF_DIFFERENCES;
 
     @Input() totalDifferences: number;
     @Input() isEasy: boolean;

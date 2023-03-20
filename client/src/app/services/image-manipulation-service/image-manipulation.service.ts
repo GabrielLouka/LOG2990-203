@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { GameData } from '@common/game-data';
-import { Pixel } from '@common/pixel';
+import { Pixel } from '@common/classes/pixel';
+import { Vector2 } from '@common/classes/vector2';
+import { GameData } from '@common/interfaces/game-data';
 import {
     BLINK_TIME,
     BMP_FILE_HEADER_BYTES_LENGTH,
@@ -12,7 +13,6 @@ import {
     PIXEL_BYTES_LENGTH,
     QUARTER_SECOND,
 } from '@common/utils/env';
-import { Vector2 } from '@common/vector2';
 import { Buffer } from 'buffer';
 
 @Injectable({
