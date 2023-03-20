@@ -64,13 +64,9 @@ export class IncomingPlayerService {
     refreshQueueDisplay() {
         this.hasFoundIncomingPlayer = this.hasIncomingPlayer;
         if (this.hasFoundIncomingPlayer) {
-            const startingGameMessage = 'Voulez-vous débuter la partie ';
+            const startingGameMessage = 'Voulez-vous jouer avec ';
 
-            this.joiningStatusMessage = startingGameMessage + `avec ${this.firstIncomingPlayer.username}\n`;
-
-            for (const player of this.waitingPlayers) {
-                this.joiningStatusMessage += ` ${player.username} \n ,`;
-            }
+            this.joiningStatusMessage = startingGameMessage + `avec ${this.firstIncomingPlayer.username}?\n`;
 
             this.incomingPlayer = this.firstIncomingPlayer;
         } else {
