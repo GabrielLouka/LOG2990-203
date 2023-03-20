@@ -100,6 +100,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.successSound.nativeElement.play();
     }
 
+    async playSound(foundDifference: boolean) {
+        if (foundDifference) {
+            this.successSound.nativeElement.currentTime = 0;
+            this.successSound.nativeElement.play();
+        } else {
+            this.errorSound.nativeElement.currentTime = 0;
+            this.errorSound.nativeElement.volume = 0.3;
+            this.errorSound.nativeElement.play();
+        }
+    }
+
     isPlayer1Win(match: Match): boolean {
         return match.matchStatus === MatchStatus.Player1Win;
     }
@@ -254,7 +265,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
         this.showErrorText();
-        this.playErrorSound();
+        this.playSound(false);
         this.focusKeyEvent();
         this.sendSystemMessageToChat(message);
     }
@@ -268,7 +279,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onFindDifference() {
-        this.playSuccessSound();
+        this.playSound(true);
         this.refreshModifiedImage();
         clearInterval(this.intervalID);
         this.bgColor = '';
