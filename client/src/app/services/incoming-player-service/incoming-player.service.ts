@@ -6,42 +6,38 @@ import { CLEAN_USERNAME, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSA
 @Injectable({
     providedIn: 'root',
 })
-export class QueueManagerService {
+export class IncomingPlayerService {
     private waitingPlayers: Player[];
     private incomingPlayer: Player | null;
-    private queueStatusMessage: string;
+    private joiningStatusMessage: string;
     private hasFoundIncomingPlayer: boolean;
 
     constructor(private readonly matchManagerService: MatchManagerService) {
-        this.queueStatusMessage = 'Loading';
+        this.joiningStatusMessage = 'Loading';
         this.incomingPlayer = null;
         this.waitingPlayers = [];
         this.handleIncomingPlayerJoinRequest = this.handleIncomingPlayerJoinRequest.bind(this);
         this.handleIncomingPlayerJoinCancel = this.handleIncomingPlayerJoinCancel.bind(this);
     }
 
-    get playersInQueue(): Player[] {
+    get incomingPlayers(): Player[] {
         return this.waitingPlayers;
     }
 
-    get nbrOfPlayersInQueue(): number {
-        return this.playersInQueue.length;
-    }
-
-    get isEmptyQueue() {
-        return this.waitingPlayers.length === 0;
+    get numberOfIncomingPlayers(): number {
+        return this.waitingPlayers.length;
     }
 
     get hasIncomingPlayer(): boolean {
-        return this.nbrOfPlayersInQueue >= 1;
+        return this.numberOfIncomingPlayers > 0;
     }
 
-    get firstPlayerInQueue(): Player {
+    get firstIncomingPlayer(): Player {
         return this.waitingPlayers[0];
     }
 
     get queueStatusToDisplay(): string {
-        return this.queueStatusMessage;
+        return this.joiningStatusMessage;
     }
 
     get hasFound(): boolean {
@@ -65,7 +61,7 @@ export class QueueManagerService {
     }
 
     isHostRejectingIncomingPlayer(isAccepted: boolean): boolean {
-        return !isAccepted && this.matchManagerService.isHost && this.waitingPlayers.length >= 1;
+        return !isAccepted && this.matchManagerService.isHost && this.hasIncomingPlayer;
     }
 
     refreshQueueDisplay() {
@@ -73,14 +69,14 @@ export class QueueManagerService {
         if (this.hasFoundIncomingPlayer) {
             const startingGameMessage = 'Voulez-vous débuter la partie ';
 
-            this.queueStatusMessage = startingGameMessage + `avec ${this.firstPlayerInQueue.username.slice(0, CLEAN_USERNAME)}?\n`;
-            this.queueStatusMessage += ' | Joueur(s) en attente : ';
+            this.joiningStatusMessage = startingGameMessage + `avec ${this.firstIncomingPlayer.username.slice(0, CLEAN_USERNAME)}?\n`;
+            this.joiningStatusMessage += ' | Joueur(s) en attente : ';
 
             for (const player of this.waitingPlayers) {
-                this.queueStatusMessage += ` ${player.username} \n ,`;
+                this.joiningStatusMessage += ` ${player.username} \n ,`;
             }
 
-            this.incomingPlayer = this.firstPlayerInQueue;
+            this.incomingPlayer = this.firstIncomingPlayer;
         } else {
             this.updateWaitingForIncomingPlayerMessage();
             this.incomingPlayer = null;
@@ -88,11 +84,11 @@ export class QueueManagerService {
     }
 
     updateWaitingForIncomingPlayerMessage() {
-        this.queueStatusMessage = WAITING_FOR_PLAYER_MESSAGE;
+        this.joiningStatusMessage = WAITING_FOR_PLAYER_MESSAGE;
     }
 
     updateWaitingForIncomingPlayerAnswerMessage() {
-        this.queueStatusMessage = WAITING_PLAYER_ANSWER_MESSAGE;
+        this.joiningStatusMessage = WAITING_PLAYER_ANSWER_MESSAGE;
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
