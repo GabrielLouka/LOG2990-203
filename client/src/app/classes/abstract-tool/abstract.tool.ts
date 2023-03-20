@@ -1,5 +1,5 @@
 import { ActionsContainer } from '@app/classes/actions-container/actions-container';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 
 export abstract class AbstractTool {
     actionsContainer: ActionsContainer;

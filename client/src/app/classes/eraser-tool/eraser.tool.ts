@@ -1,6 +1,6 @@
 import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
 import { EraserElement } from '@app/classes/eraser-element/eraser-element';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 
 export class EraserTool extends AbstractTool {
     use(context: CanvasRenderingContext2D, event: MouseEvent): void {
