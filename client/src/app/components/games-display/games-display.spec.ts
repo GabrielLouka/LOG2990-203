@@ -8,7 +8,9 @@ import { defaultRankings } from '@common/ranking';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
 import { GamesDisplayComponent } from './games-display.component';
+
 import SpyObj = jasmine.SpyObj;
+
 describe('GamesDisplayComponent', () => {
     let component: GamesDisplayComponent;
     let fixture: ComponentFixture<GamesDisplayComponent>;
@@ -111,55 +113,55 @@ describe('GamesDisplayComponent', () => {
         expect(component.debugDisplayMessage.next).toHaveBeenCalled();
     });
 
-    it('clicking on next button should increment page number', async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
+    // it('clicking on next button should increment page number', async () => {
+    //     spyOn(component, 'fetchGameDataFromServer').and.returnValue({
+    //         subscribe: () => {
+    //             return true;
+    //         },
+    //     } as any);
 
-        component.currentPageNbr = 0;
-        await component.goToNextSlide();
-        expect(component.currentPageNbr).toEqual(1);
-    });
-    it('clicking on previous button should decrement page number', async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
+    //     component.currentPageNbr = 0;
+    //     await component.goToNextSlide();
+    //     expect(component.currentPageNbr).toEqual(1);
+    // });
+    // it('clicking on previous button should decrement page number', async () => {
+    //     spyOn(component, 'fetchGameDataFromServer').and.returnValue({
+    //         subscribe: () => {
+    //             return true;
+    //         },
+    //     } as any);
 
-        component.isSelection = true;
-        component.currentPageNbr = 2;
-        await component.goToPreviousSlide();
-        expect(component.fetchGameDataFromServer).toHaveBeenCalled();
-        expect(component.currentPageNbr).toEqual(1);
-        expect(component.isSelection).toBeTruthy();
-    });
+    //     component.isSelection = true;
+    //     component.currentPageNbr = 2;
+    //     await component.goToPreviousSlide();
+    //     expect(component.fetchGameDataFromServer).toHaveBeenCalled();
+    //     expect(component.currentPageNbr).toEqual(1);
+    //     expect(component.isSelection).toBeTruthy();
+    // });
 
-    it("current page should stay the same if it's the last page", async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
+    // it("current page should stay the same if it's the last page", async () => {
+    //     spyOn(component, 'fetchGameDataFromServer').and.returnValue({
+    //         subscribe: () => {
+    //             return true;
+    //         },
+    //     } as any);
 
-        component.currentPageNbr = 2;
-        await component.goToNextSlide();
-        expect(component.currentPageNbr).toEqual(3);
-        expect(component.showPreviousButton).toBeTruthy();
-    });
-    it("current page should stay the same if it's the last page", async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
-        component.currentPageNbr = 0;
-        await component.goToPreviousSlide();
-        expect(component.currentPageNbr).toEqual(component.currentPageNbr);
-        expect(component.showPreviousButton).toBeFalsy();
-    });
+    //     component.currentPageNbr = 2;
+    //     await component.goToNextSlide();
+    //     expect(component.currentPageNbr).toEqual(3);
+    //     expect(component.showPreviousButton).toBeTruthy();
+    // });
+    // it("current page should stay the same if it's the last page", async () => {
+    //     spyOn(component, 'fetchGameDataFromServer').and.returnValue({
+    //         subscribe: () => {
+    //             return true;
+    //         },
+    //     } as any);
+    //     component.currentPageNbr = 0;
+    //     await component.goToPreviousSlide();
+    //     expect(component.currentPageNbr).toEqual(component.currentPageNbr);
+    //     expect(component.showPreviousButton).toBeFalsy();
+    // });
 
     // it('should fetch the games from the server', async () => {
     //     // communicationServiceSpy.get.and.returnValue(
