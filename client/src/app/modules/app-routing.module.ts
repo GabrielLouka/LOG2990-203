@@ -7,14 +7,12 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { ParameterPageComponent } from '@app/pages/parameter-page/parameter-page.component';
 import { RegistrationPageComponent } from '@app/pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from '@app/pages/selections-page/selections-page.component';
-import { ServerDebugPageComponent } from '@app/pages/server-debug-page/server-debug-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
     { path: 'selections', component: SelectionsPageComponent },
     { path: 'registration/:id', component: RegistrationPageComponent },
-    { path: 'server-debug', component: ServerDebugPageComponent },
     { path: 'classic/:id', component: ClassicPageComponent },
     { path: 'config', component: ConfigurationPageComponent },
     { path: 'parameter', component: ParameterPageComponent },
