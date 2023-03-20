@@ -6,8 +6,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
-import { EntireGameUploadForm } from '@common/entire.game.upload.form';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
+import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { CreationResultModalComponent } from './creation-result-modal.component';
 
 describe('CreationResultModalComponent', () => {

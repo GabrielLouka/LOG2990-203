@@ -2,7 +2,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
-import { Message } from '@common/message';
+import { Message } from '@common/interfaces/message';
 
 describe('CommunicationService', () => {
     let httpMock: HttpTestingController;

@@ -1,6 +1,6 @@
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
-import { Vector2 } from '@common/vector2';
+import { Vector2 } from '@common/classes/vector2';
 import { SwitchElement } from './switch-element';
 
 describe('SwitchElement', () => {
