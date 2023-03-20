@@ -3,7 +3,7 @@ import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abs
 import { Vector2 } from '@common/vector2';
 
 export class EraserElement extends UndoElement {
-    draw(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
+    applyElementAction(context: CanvasRenderingContext2D): CanvasRenderingContext2D {
         context.beginPath();
         context.lineWidth = this.penWidth;
         const stroke = this.pixels;

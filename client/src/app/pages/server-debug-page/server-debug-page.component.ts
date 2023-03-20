@@ -2,10 +2,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { ActionsContainer, Tool } from '@app/classes/actions-container/actions-container';
+import { ActionsContainer, ToolType } from '@app/classes/actions-container/actions-container';
 import { ClearElement } from '@app/classes/clear-element/clear-element';
-import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
-import { SwitchElement } from '@app/classes/switch-element/switch-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DifferenceImage } from '@common/difference.image';
@@ -60,13 +58,13 @@ export class ServerDebugPageComponent implements AfterViewInit {
         this.rightCanvas.nativeElement.width = 500;
         this.rightCanvas.nativeElement.height = 500;
         // this.actionsContainer = new ActionsContainer(this.leftCanvas, this.rightCanvas, black);
-        this.selectedTool = Tool.CRAYON;
+        this.selectedTool = ToolType.CRAYON;
         this.setupListeners();
     }
 
     selectTool(selectedTool: string) {
-        this.actionsContainer.selectedTool = Tool[selectedTool.toUpperCase() as keyof typeof Tool];
-        this.debugDisplayMessage.next('YOU PICKED: ' + this.actionsContainer.selectedTool);
+        this.actionsContainer.selectTool(ToolType[selectedTool.toUpperCase() as keyof typeof ToolType]);
+        this.debugDisplayMessage.next('YOU PICKED: ' + this.actionsContainer.selectedToolType);
     }
     setupListeners() {
         this.leftCanvas.nativeElement.addEventListener('mouseup', () => {
@@ -88,31 +86,29 @@ export class ServerDebugPageComponent implements AfterViewInit {
         const clearElement = new ClearElement(isLeft);
         clearElement.actionsToCopy = this.actionsContainer.undoActions;
         if (isLeft) {
-            clearElement.draw(this.leftContext);
+            clearElement.applyElementAction(this.leftContext);
         } else {
-            clearElement.draw(this.rightContext);
+            clearElement.applyElementAction(this.rightContext);
         }
         this.actionsContainer.undoActions.push(clearElement);
     }
     switchCanvases() {
-        const switchElement = new SwitchElement();
-        switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftContext, this.rightContext);
-        switchElement.draw(this.rightContext);
-
-        this.actionsContainer.undoActions.push(switchElement);
+        // const switchElement = new SwitchElement();
+        // switchElement.loadCanvases(this.actionsContainer.undoActions, this.leftContext, this.rightContext);
+        // switchElement.applyElementAction(this.rightContext);
+        // this.actionsContainer.undoActions.push(switchElement);
     }
     duplicateCanvas(copyOnLeft: boolean) {
-        let squashedContext;
-        if (copyOnLeft) {
-            squashedContext = this.leftContext;
-        } else {
-            squashedContext = this.rightContext;
-        }
-
-        const duplication = new DuplicationElement(copyOnLeft);
-        duplication.loadActions(this.actionsContainer.undoActions);
-        duplication.draw(squashedContext);
-        this.actionsContainer.undoActions.push(duplication);
+        // let squashedContext;
+        // if (copyOnLeft) {
+        //     squashedContext = this.leftContext;
+        // } else {
+        //     squashedContext = this.rightContext;
+        // }
+        // const duplication = new DuplicationElement(copyOnLeft);
+        // duplication.loadActions(this.actionsContainer.undoActions);
+        // duplication.applyElementAction(squashedContext);
+        // this.actionsContainer.undoActions.push(duplication);
     }
 
     displayChangedPixels() {
