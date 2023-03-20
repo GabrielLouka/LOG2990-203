@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { Vector2 } from '@common/vector2';
 
