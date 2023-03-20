@@ -3,8 +3,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
+import { IncomingPlayerService } from '@app/services/incoming-player-service/incoming-player.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
-import { QueueManagerService } from '@app/services/queue-manager-service/queue-manager.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
@@ -34,7 +34,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private readonly router: Router,
         private readonly matchManagerService: MatchManagerService,
-        private readonly queueManagerService: QueueManagerService,
+        private readonly incomingPlayerService: IncomingPlayerService,
         private readonly socketService: SocketClientService,
     ) {
         this.hasSentJoinRequest = false;
@@ -45,11 +45,11 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     get hasFoundIncomingPlayer(): boolean {
-        return this.queueManagerService.hasFound;
+        return this.incomingPlayerService.hasFound;
     }
 
     get queueStatusMessage(): string {
-        return this.queueManagerService.queueStatusToDisplay;
+        return this.incomingPlayerService.queueStatusToDisplay;
     }
 
     ngOnInit(): void {
@@ -69,6 +69,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchManagerService.onGetJoinCancel.clear();
         this.matchManagerService.onGetJoinRequestAnswer.clear();
         this.matchManagerService.onMatchUpdated.clear();
+        this.hasSentJoinRequest = false;
     }
 
     loadGamePage() {
@@ -90,7 +91,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
             if (this.matchManagerService.isSoloMode) {
                 this.loadGamePage();
             } else {
-                this.queueManagerService.queueMessage = "En attente d'un adversaire...";
+                this.incomingPlayerService.updateWaitingForIncomingPlayerMessage();
             }
         } else {
             this.sendMatchJoinRequest();
@@ -98,36 +99,36 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {
-        this.queueManagerService.handleIncomingPlayerJoinRequest(playerThatWantsToJoin);
+        this.incomingPlayerService.handleIncomingPlayerJoinRequest(playerThatWantsToJoin);
     }
 
     handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest: string) {
-        this.queueManagerService.handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest);
+        this.incomingPlayerService.handleIncomingPlayerJoinCancel(playerIdThatCancelledTheirJoinRequest);
     }
 
     handleIncomingPlayerJoinRequestAnswer(data: { matchId: string; player: Player; isAccepted: boolean }) {
         if (
-            this.queueManagerService.isAcceptedByHost(data.isAccepted, data.player) ||
-            this.queueManagerService.isHostAcceptingIncomingPlayer(data.isAccepted)
+            this.incomingPlayerService.isAcceptedByHost(data.isAccepted, data.player) ||
+            this.incomingPlayerService.isHostAcceptingIncomingPlayer(data.isAccepted)
         ) {
             this.loadGamePage();
         }
 
-        if (this.queueManagerService.isHostRejectingIncomingPlayer(data.isAccepted)) {
-            this.queueManagerService.handleHostRejectingIncomingPlayer();
-            if (this.queueManagerService.hasIncomingPlayer) {
-                this.queueManagerService.handleIncomingPlayerJoinRequest(this.queueManagerService.firstPlayerInQueue);
+        if (this.incomingPlayerService.isHostRejectingIncomingPlayer(data.isAccepted)) {
+            this.incomingPlayerService.handleHostRejectingIncomingPlayer();
+            if (this.incomingPlayerService.hasIncomingPlayer) {
+                this.incomingPlayerService.handleIncomingPlayerJoinRequest(this.incomingPlayerService.firstIncomingPlayer);
             }
         }
-        if (this.queueManagerService.isRejectedByHost(data.isAccepted, data.player)) {
+        if (this.incomingPlayerService.isRejectedByHost(data.isAccepted, data.player)) {
             this.router.navigate(['/']);
         }
     }
 
     sendMatchJoinRequest() {
         this.hasSentJoinRequest = true;
-        this.queueManagerService.queueMessage = "En attente de la réponse de l'adversaire...";
-        if (this.username) this.matchManagerService.sendMatchJoinRequest(this.username + '#2');
+        this.incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage();
+        if (this.username) this.matchManagerService.sendMatchJoinRequest(this.username);
     }
 
     signalRedirection() {
@@ -166,10 +167,10 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     acceptIncomingPlayer() {
-        this.queueManagerService.acceptIncomingPlayer();
+        this.incomingPlayerService.acceptIncomingPlayer();
     }
 
     refuseIncomingPlayer() {
-        this.queueManagerService.refuseIncomingPlayer();
+        this.incomingPlayerService.refuseIncomingPlayer();
     }
 }

@@ -111,7 +111,7 @@ export class IncomingPlayerService {
     handleHostRejectingIncomingPlayer() {
         this.updateWaitingForIncomingPlayerMessage();
         this.hasFoundIncomingPlayer = false;
-        this.waitingPlayers.shift();
+        this.waitingPlayers = this.waitingPlayers.splice(1, this.numberOfIncomingPlayers);
     }
 
     acceptIncomingPlayer() {
