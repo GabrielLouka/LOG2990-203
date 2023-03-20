@@ -101,15 +101,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.disconnect();
     }
 
-    async playErrorSound() {
-        this.errorSound.nativeElement.currentTime = 0;
-        this.errorSound.nativeElement.volume = 0.3;
-        this.errorSound.nativeElement.play();
-    }
-
-    async playSuccessSound() {
-        this.successSound.nativeElement.currentTime = 0;
-        this.successSound.nativeElement.play();
+    async playSound(isSuccessSound: boolean) {
+        const audioSource = isSuccessSound ? this.successSound : this.errorSound;
+        audioSource.nativeElement.currentTime = 0;
+        audioSource.nativeElement.volume = isSuccessSound ? 1 : 0.3;
+        audioSource.nativeElement.play();
     }
 
     handleMatchUpdate(match: Match | null) {
@@ -267,7 +263,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
         this.showErrorText();
-        this.playErrorSound();
+        this.playSound(false);
         this.focusKeyEvent();
         this.sendSystemMessageToChat(message);
     }
@@ -281,7 +277,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onFindDifference() {
-        this.playSuccessSound();
+        this.playSound(true);
         this.refreshModifiedImage();
         window.clearInterval(this.intervalIDLeft);
         window.clearInterval(this.intervalIDRight);
