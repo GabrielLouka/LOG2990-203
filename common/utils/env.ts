@@ -16,7 +16,9 @@ const BMP_FILE_HEADER_BYTES_LENGTH = 54;
 const PIXEL_BYTES_LENGTH = 3;
 const WAITING_FOR_PLAYER_MESSAGE = "En attente d'un adversaire...";
 const WAITING_PLAYER_ANSWER_MESSAGE = "En attente de la réponse de l'adversaire...";
+const CHAT_TITLE = 'MANIA CHAT';
 
+export { CHAT_TITLE };
 export { PEN_WIDTH };
 export { BMP_FILE_HEADER_BYTES_LENGTH, PIXEL_BYTES_LENGTH };
 export { NOT_FOUND };

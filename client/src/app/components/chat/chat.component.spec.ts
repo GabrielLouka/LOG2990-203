@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { ChatComponent } from './chat.component';
 
 describe('ChatComponent', () => {
     let component: ChatComponent;
     let fixture: ComponentFixture<ChatComponent>;
+    // let socketService: SocketClientService;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -26,7 +27,6 @@ describe('ChatComponent', () => {
 
         expect(component.messages.length).toBe(0);
     });
-
     it('should add a message to the chat (player)', () => {
         component.newMessage = 'test';
         component.sendMessage();

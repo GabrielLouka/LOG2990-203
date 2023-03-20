@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { GameData } from '@common/game-data';
 import { Buffer } from 'buffer';
 
+import { RouterTestingModule } from '@angular/router/testing';
 import { OverlayComponent } from '@app/components/overlay/overlay.component';
 import { GameCardComponent } from './game-card.component';
 
@@ -20,7 +21,7 @@ describe('GameCardComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
-            declarations: [GameCardComponent, OverlayComponent],
+            declarations: [GameCardComponent, OverlayComponent, RouterTestingModule],
         }).compileComponents();
     }));
 

@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { CHAT_TITLE } from '@common/utils/env';
 
 @Component({
     selector: 'app-chat',
@@ -20,7 +21,7 @@ export class ChatComponent {
         sentTime: number;
     }[] = [];
     newMessage = '';
-    title: string = 'MANIA CHAT';
+    title = CHAT_TITLE;
 
     constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
 
