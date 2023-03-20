@@ -31,7 +31,6 @@ describe('ActionsContainer', () => {
     describe('undo', () => {
         it('should redraw all previous strokes onto the canvas', () => {
             // Given
-            actionsContainer.selectedToolType = ToolType.ERASER;
             actionsContainer.redoActions = [];
             actionsContainer.undoActions.push(new EraserElement([new Vector2(1, 2), new Vector2(3, 4)], false));
             actionsContainer.draw(new MouseEvent('mousemove'));
@@ -54,7 +53,6 @@ describe('ActionsContainer', () => {
         });
 
         it('should draw a rectangle with correct dimensions and clear previous rectangle', () => {
-            actionsContainer.selectedToolType = ToolType.RECTANGLE;
             actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
 
             actionsContainer.initialPosition = new Vector2(10, 10);
@@ -69,7 +67,6 @@ describe('ActionsContainer', () => {
         });
 
         it('should draw a square when shift key is pressed', () => {
-            actionsContainer.selectedToolType = ToolType.RECTANGLE;
             actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
             actionsContainer.initialPosition = new Vector2(10, 10);
             const mockEvent = new MouseEvent('click', {
@@ -88,13 +85,10 @@ describe('ActionsContainer', () => {
                 clientX: 10,
                 clientY: 10,
             });
-            actionsContainer.selectedToolType = ToolType.RECTANGLE;
             actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
             actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
-            actionsContainer.selectedToolType = ToolType.CRAYON;
             actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
             actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
-            actionsContainer.selectedToolType = ToolType.ERASER;
             actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
             actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
         });
@@ -103,7 +97,6 @@ describe('ActionsContainer', () => {
             const mockEvent = new MouseEvent('mouseup', {
                 bubbles: true,
             });
-            actionsContainer.selectedToolType = ToolType.RECTANGLE;
             actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
         });
     });
