@@ -11,8 +11,6 @@ describe('DuplicationElement', () => {
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         mockActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
 
-        duplicateCanvas.loadActions(mockActions);
-
         const tempCanvas = document.createElement('canvas');
         const tempContext = tempCanvas.getContext('2d') as CanvasRenderingContext2D;
 

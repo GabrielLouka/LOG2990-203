@@ -9,10 +9,10 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
 import { InfoCardComponent } from '@app/components/info-card/info-card.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
-import { AuthService } from '@app/services/auth.service';
-import { CommunicationService } from '@app/services/communication.service';
-import { ImageManipulationService } from '@app/services/image-manipulation.service';
-import { SocketClientService } from '@app/services/socket-client.service';
+import { AuthService } from '@app/services/auth-service/auth.service';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
 import { ClassicPageComponent } from './classic-page.component';
@@ -119,13 +119,13 @@ describe('ClassicPageComponent', () => {
 
     it('playError should play', async () => {
         const newTime = 0;
-        await component.playErrorSound();
+        await component.playSound(false);
         expect(component.errorSound.nativeElement.currentTime).toEqual(newTime);
     });
 
     it('playSuccess should play', async () => {
         const newTime = 0;
-        await component.playSuccessSound();
+        await component.playSound(true);
         const currentTime = await component.successSound.nativeElement.currentTime;
         expect(currentTime).toEqual(newTime);
     });
@@ -142,7 +142,7 @@ describe('ClassicPageComponent', () => {
 
     it('onFindDifference should send message about difference found', () => {
         const refresSpy = spyOn(component, 'refreshModifiedImage');
-        const successSpy = spyOn(component, 'playSuccessSound');
+        const successSpy = spyOn(component, 'playSound');
         const nbDiff = component.differencesFound + 1;
         component.onFindDifference();
         expect(component.differencesFound).toEqual(nbDiff);
