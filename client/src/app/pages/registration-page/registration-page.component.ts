@@ -1,14 +1,13 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
 import { IncomingPlayerService } from '@app/services/incoming-player-service/incoming-player.service';
-import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
-import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { RegistrationService } from '@app/services/registration-service/registration.service';
 import { Match } from '@common/match';
 import { Player } from '@common/player';
-import { CLASSIC_PATH, HOME_PATH } from '@common/utils/env.http';
 
 @Component({
     selector: 'app-registration-page',
@@ -21,7 +20,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     username: string | null | undefined;
     id: string | null;
     // used to determine if we should display the username field in the html page
-    hasUsernameRegistered: boolean;
+    hasUsernameRegistered: boolean = false;
     hasSentJoinRequest: boolean;
 
     registrationForm = new FormGroup({
@@ -32,48 +31,45 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     constructor(
         private auth: AuthService,
         private route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly matchManagerService: MatchManagerService,
+        private readonly matchmakingService: MatchmakingService,
         private readonly incomingPlayerService: IncomingPlayerService,
-        private readonly socketService: SocketClientService,
-    ) {
-        this.hasSentJoinRequest = false;
-    }
+        private readonly registrationService: RegistrationService,
+    ) {}
 
     get user() {
         return this.auth.registeredUsername;
     }
 
     get hasFoundIncomingPlayer(): boolean {
-        return this.incomingPlayerService.hasFound;
+        return this.incomingPlayerService.hasFoundOpponent;
     }
 
     get queueStatusMessage(): string {
-        return this.incomingPlayerService.queueStatusToDisplay;
+        return this.incomingPlayerService.statusToDisplay;
     }
 
     ngOnInit(): void {
         this.id = this.route.snapshot.paramMap.get('id');
-        this.matchManagerService.onGetJoinRequest.add(this.handleIncomingPlayerJoinRequest.bind(this));
-        this.matchManagerService.onGetJoinCancel.add(this.handleIncomingPlayerJoinCancel.bind(this));
-        this.matchManagerService.onGetJoinRequestAnswer.add(this.handleIncomingPlayerJoinRequestAnswer.bind(this));
-        this.matchManagerService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
+        this.matchmakingService.onGetJoinRequest.add(this.handleIncomingPlayerJoinRequest.bind(this));
+        this.matchmakingService.onGetJoinCancel.add(this.handleIncomingPlayerJoinCancel.bind(this));
+        this.matchmakingService.onGetJoinRequestAnswer.add(this.handleIncomingPlayerJoinRequestAnswer.bind(this));
+        this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
         this.signalRedirection();
         this.signalRedirectionOneGame();
     }
 
     ngOnDestroy(): void {
-        if (this.username && this.hasSentJoinRequest) this.matchManagerService.sendMatchJoinCancel(this.username);
+        if (this.username && this.hasSentJoinRequest) this.matchmakingService.sendMatchJoinCancel(this.username);
 
-        this.matchManagerService.onGetJoinRequest.clear();
-        this.matchManagerService.onGetJoinCancel.clear();
-        this.matchManagerService.onGetJoinRequestAnswer.clear();
-        this.matchManagerService.onMatchUpdated.clear();
+        this.matchmakingService.onGetJoinRequest.clear();
+        this.matchmakingService.onGetJoinCancel.clear();
+        this.matchmakingService.onGetJoinRequestAnswer.clear();
+        this.matchmakingService.onMatchUpdated.clear();
         this.hasSentJoinRequest = false;
     }
 
     loadGamePage() {
-        this.router.navigate([CLASSIC_PATH, this.id]);
+        this.registrationService.loadGamePage(this.id);
     }
 
     registerUser() {
@@ -81,14 +77,14 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.username = this.registrationForm.value.username;
         this.hasUsernameRegistered = true;
 
-        if (this.matchManagerService.currentMatchPlayed) {
-            if (this.username && this.matchManagerService.is1vs1Mode) {
-                this.matchManagerService.currentMatchPlayer = this.username;
-            } else if (this.username && this.matchManagerService.isSoloMode) {
-                this.matchManagerService.currentMatchPlayer = this.username;
+        if (this.matchmakingService.currentMatchPlayed) {
+            if (this.username && this.matchmakingService.is1vs1Mode) {
+                this.matchmakingService.currentMatchPlayer = this.username;
+            } else if (this.username && this.matchmakingService.isSoloMode) {
+                this.matchmakingService.currentMatchPlayer = this.username;
             } else window.alert('Username to register is not valid !');
 
-            if (this.matchManagerService.isSoloMode) {
+            if (this.matchmakingService.isSoloMode) {
                 this.loadGamePage();
             } else {
                 this.incomingPlayerService.updateWaitingForIncomingPlayerMessage();
@@ -121,51 +117,33 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
             }
         }
         if (this.incomingPlayerService.isRejectedByHost(data.isAccepted, data.player)) {
-            this.router.navigate(['/']);
+            this.registrationService.redirectToMainPage();
         }
     }
 
     sendMatchJoinRequest() {
         this.hasSentJoinRequest = true;
         this.incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage();
-        if (this.username) this.matchManagerService.sendMatchJoinRequest(this.username);
-    }
-
-    signalRedirection() {
-        this.socketService.on('allGameDeleted', () => {
-            const pathSegments = window.location.href.split('/');
-            const lastSegment = pathSegments[pathSegments.length - 2];
-            if (lastSegment === 'registration') {
-                this.router.navigate([HOME_PATH]).then(() => {
-                    alert("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
-                });
-            }
-        });
-    }
-
-    signalRedirectionOneGame() {
-        this.socketService.on('gameDeleted', (data: { hasDeletedGame: boolean; id: string }) => {
-            const pathSegments = window.location.href.split('/');
-            const pageName = pathSegments[pathSegments.length - 2];
-            const idPage = pathSegments[pathSegments.length - 1];
-            if (pageName === 'registration' && data.id === idPage) {
-                this.router.navigate([HOME_PATH]).then(() => {
-                    alert("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
-                });
-            }
-        });
+        if (this.username) this.matchmakingService.sendMatchJoinRequest(this.username);
     }
 
     handleMatchUpdated(match: Match | null) {
         if (!match) return;
 
-        if (!this.matchManagerService.isHost) {
-            if (this.matchManagerService.isMatchAborted(match)) {
-                this.router.navigate(['/']);
+        if (!this.matchmakingService.isHost) {
+            if (this.matchmakingService.isMatchAborted(match)) {
+                this.registrationService.redirectToMainPage();
             }
         }
     }
 
+    signalRedirection() {
+        this.registrationService.signalRedirection();
+    }
+
+    signalRedirectionOneGame() {
+        this.registrationService.signalRedirectionOneGame();
+    }
     acceptIncomingPlayer() {
         this.incomingPlayerService.acceptIncomingPlayer();
     }

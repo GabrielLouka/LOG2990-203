@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
-export class MatchManagerService {
+export class MatchmakingService {
     sequence = new Observable<{ gameId: number; isGameInProgress: boolean }>();
     onMatchUpdated = new Action<Match | null>();
     onGetJoinRequest = new Action<Player>();

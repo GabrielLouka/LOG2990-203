@@ -44,6 +44,7 @@ import { AuthService } from './services/auth-service/auth.service';
         AppComponent,
         MainPageComponent,
         ConfigurationPageComponent,
+        ChatComponent,
         OverlayComponent,
         PreviousPageButtonComponent,
         NextPageButtonComponent,

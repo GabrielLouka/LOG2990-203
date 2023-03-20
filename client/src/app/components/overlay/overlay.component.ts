@@ -3,9 +3,10 @@ import { Component, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
-import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { MatchType } from '@common/match-type';
+import { REGISTRATION_PATH } from '@common/utils/env.http';
 
 @Component({
     selector: 'app-overlay',
@@ -19,31 +20,31 @@ export class OverlayComponent {
     @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
     // eslint-disable-next-line max-params
     constructor(
-        private readonly matchManagerService: MatchManagerService,
+        private readonly matchmakingService: MatchmakingService,
         private readonly router: Router,
         private readonly socketService: SocketClientService,
         private readonly communicationService: CommunicationService,
     ) {}
 
     requestGameCreationToServer(matchType: MatchType) {
-        this.matchManagerService.createGame(this.id);
-        this.matchManagerService.currentMatchType = matchType;
+        this.matchmakingService.createGame(this.id);
+        this.matchmakingService.currentMatchType = matchType;
     }
 
     createOneVersusOneGame() {
         this.requestGameCreationToServer(MatchType.OneVersusOne);
-        this.router.navigate(['/registration', this.id]);
+        this.router.navigate([REGISTRATION_PATH, this.id]);
     }
 
     createSoloGame() {
         this.requestGameCreationToServer(MatchType.Solo);
-        this.router.navigate(['/registration', this.id]);
+        this.router.navigate([REGISTRATION_PATH, this.id]);
     }
 
     joinGame() {
         if (!this.matchToJoinIfAvailable) return;
-        this.matchManagerService.joinGame(this.matchToJoinIfAvailable);
-        this.router.navigate(['/registration', this.id]);
+        this.matchmakingService.joinGame(this.matchToJoinIfAvailable);
+        this.router.navigate([REGISTRATION_PATH, this.id]);
     }
 
     showDeletePopUp() {
