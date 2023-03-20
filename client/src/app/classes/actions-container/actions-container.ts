@@ -120,6 +120,7 @@ export class ActionsContainer {
         }
 
         canvas.addEventListener('mousemove', this.draw);
+        canvas.addEventListener('mousedown', this.draw);
     }
 
     handleMouseUpOrOut(canvas: HTMLCanvasElement) {
