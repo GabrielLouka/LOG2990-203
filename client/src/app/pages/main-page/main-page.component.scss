@@ -8,24 +8,31 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 70vh;
+    height: 60vh;
+
+    // border: solid red;
 }
 
 .logoContainer #gameIcon {
     width: 40vh;
     height: 40vh;
+
+    //border: solid green;
 }
 
 .navBarContainer {
-    height: 5vh;
+    //border: solid yellow;
+    height: 20vh;
 }
 
 /* Credit style */
 .footer-item {
-    margin: 15vh;
+    margin: 10vh 15vh 0vh;
     display: flex;
     flex-direction: column;
     text-align: center;
+
+   //border: solid blue;
 }
 
 .dev-team {
