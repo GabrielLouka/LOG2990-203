@@ -5,6 +5,8 @@ import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
+import { ChatService } from '@app/services/chat-service/chat.service';
+import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
@@ -34,19 +36,21 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isLetterTPressed: boolean = true;
     isWinByDefault: boolean = true;
     foundDifferences: boolean[];
+    letterTPressed: boolean = true;
+    isCheating: boolean = false;
+    backgroundColor = '';
+    intervalIDLeft: number | undefined;
+    intervalIDRight: number | undefined;
+    timeInSeconds = 0;
+    matchId: string;
+    currentGameId: string | null;
+    game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     originalImage: File | null;
     modifiedImage: File | null;
-    currentGameId: string | null;
-    backgroundColor: string = '';
     gameTitle: string = '';
     player1: string = '';
     player2: string = '';
-    matchId: string;
-    game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
     currentModifiedImage: Buffer;
-    intervalIDLeft: number | undefined;
-    intervalIDRight: number | undefined;
-    timeInSeconds: number = 0;
     totalDifferences: number = 0;
     differencesFound: number = 0;
     differencesFound1: number = 0;
@@ -59,6 +63,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private route: ActivatedRoute,
         private imageManipulationService: ImageManipulationService,
         private matchmakingService: MatchmakingService,
+        private cheatModeService: CheatModeService,
+        private chatService: ChatService,
     ) {}
 
     get leftCanvasContext() {
@@ -139,7 +145,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (leftCanvasContext && rightCanvasContext) {
             this.getInitialImagesFromServer();
         }
-        this.focusKeyEvent();
+        this.cheatModeService.focusKeyEvent(this.cheat);
         window.removeEventListener('keydown', this.onCheatMode.bind(this));
     }
 
@@ -191,7 +197,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.errorMessage.nativeElement.style.left = event.clientX + 'px';
         this.errorMessage.nativeElement.style.top = event.clientY + 'px';
-        this.focusKeyEvent();
+        this.cheatModeService.focusKeyEvent(this.cheat);
     }
 
     requestStartGame() {
@@ -244,7 +250,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 sentByPlayer2: !data.sentByPlayer1,
                 sentTime: Date.now(),
             });
-            this.chat.scrollToBottom();
+            this.chatService.scrollToBottom(this.chat.chat);
             this.chat.newMessage = '';
         });
     }
@@ -264,7 +270,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
         this.showErrorText();
         this.playSound(false);
-        this.focusKeyEvent();
+        this.cheatModeService.focusKeyEvent(this.cheat);
         this.sendSystemMessageToChat(message);
     }
 
@@ -279,12 +285,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onFindDifference() {
         this.playSound(true);
         this.refreshModifiedImage();
-        window.clearInterval(this.intervalIDLeft);
-        window.clearInterval(this.intervalIDRight);
-        this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
-        this.backgroundColor = '';
-        this.isLetterTPressed = true;
-        this.focusKeyEvent();
+        if (this.isCheating) {
+            this.stopCheating();
+            this.cheatMode();
+        }
+        this.cheatModeService.focusKeyEvent(this.cheat);
     }
 
     async refreshModifiedImage() {
@@ -322,28 +327,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
     }
 
-    focusKeyEvent() {
-        if (this.cheat) this.cheat.nativeElement.focus();
-    }
-
     onCheatMode(event: KeyboardEvent) {
         if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
             if (event.key === 't') {
-                if (this.isLetterTPressed) {
-                    this.backgroundColor = '#66FF99';
+                if (this.letterTPressed) {
                     this.cheatMode();
                 } else {
-                    this.backgroundColor = '';
-                    window.clearInterval(this.intervalIDLeft);
-                    window.clearInterval(this.intervalIDRight);
-
-                    if (this.currentModifiedImage && this.game.originalImage) {
-                        this.imageManipulationService.loadCurrentImage(
-                            this.currentModifiedImage,
-                            this.rightCanvasContext as CanvasRenderingContext2D,
-                        );
-                        this.imageManipulationService.loadCurrentImage(this.game.originalImage, this.leftCanvasContext as CanvasRenderingContext2D);
-                    }
+                    this.stopCheating();
+                    this.putCanvasIntoInitialState();
                 }
                 this.isLetterTPressed = !this.isLetterTPressed;
             }
@@ -351,33 +342,41 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     cheatMode() {
+        this.backgroundColor = '#66FF99';
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
             this.game.gameData,
             { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
             this.foundDifferences,
         );
+        this.showHiddenDifferences(newImage);
+        this.isCheating = !this.isCheating;
+    }
 
+    showHiddenDifferences(newImage: Buffer) {
         if (this.leftCanvasContext && this.rightCanvasContext) {
-            this.intervalIDLeft = this.imageManipulationService.alternateOldNewImage(
-                this.game.originalImage,
-                newImage,
+            this.intervalIDLeft = this.cheatModeService.startInterval(
+                { originalImage: this.game.originalImage, newImage },
                 this.leftCanvasContext as CanvasRenderingContext2D,
             );
-            if (this.currentModifiedImage) {
-                this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
-                    this.game.originalImage,
-                    this.currentModifiedImage,
-                    this.rightCanvasContext as CanvasRenderingContext2D,
-                );
-            } else {
-                this.intervalIDRight = this.imageManipulationService.alternateOldNewImage(
-                    this.game.originalImage,
-                    this.game.modifiedImage,
-                    this.rightCanvasContext as CanvasRenderingContext2D,
-                );
-            }
 
+            this.intervalIDRight = this.cheatModeService.startInterval(
+                { originalImage: this.game.originalImage, newImage },
+                this.rightCanvasContext as CanvasRenderingContext2D,
+            );
             this.currentModifiedImage = newImage;
         }
+    }
+
+    stopCheating() {
+        this.backgroundColor = '';
+        this.cheatModeService.stopCheating(this.intervalIDLeft as number, this.intervalIDRight as number);
+        this.isCheating = !this.isCheating;
+    }
+
+    putCanvasIntoInitialState() {
+        this.cheatModeService.putCanvasIntoInitialState(
+            { originalImage: this.game.originalImage, currentModifiedImage: this.currentModifiedImage },
+            { leftContext: this.leftCanvasContext as CanvasRenderingContext2D, rightContext: this.rightCanvasContext as CanvasRenderingContext2D },
+        );
     }
 }

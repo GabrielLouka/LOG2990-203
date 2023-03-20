@@ -16,6 +16,7 @@ const BMP_FILE_HEADER_BYTES_LENGTH = 54;
 const PIXEL_BYTES_LENGTH = 3;
 const WAITING_FOR_PLAYER_MESSAGE = "En attente d'un adversaire...";
 const WAITING_PLAYER_ANSWER_MESSAGE = "En attente de la réponse de l'adversaire...";
+const SYSTEM_MESSAGE = 'System';
 
 export { PEN_WIDTH };
 export { BMP_FILE_HEADER_BYTES_LENGTH, PIXEL_BYTES_LENGTH };
@@ -27,3 +28,4 @@ export { MILLISECOND_TO_SECONDS, QUARTER_SECOND, MINUTE_TO_SECONDS };
 export { IMAGE_WIDTH_OFFSET, IMAGE_HEIGHT_OFFSET };
 export { BLINK_TIME, NUMBER_OF_BLINKS };
 export { DEFAULT_ENLARGEMENT_RADIUS };
+export { SYSTEM_MESSAGE };
