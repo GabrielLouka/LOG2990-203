@@ -33,7 +33,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
-    isLetterTPressed: boolean = true;
     isWinByDefault: boolean = true;
     foundDifferences: boolean[];
     letterTPressed: boolean = true;
@@ -124,16 +123,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (match) {
             this.matchId = this.matchmakingService.currentMatchId as string;
 
-            if (match) {
-                const abortedGameMessage = ' a abandonné la partie';
+            const abortedGameMessage = ' a abandonné la partie';
 
-                if (this.isPlayer1Win(match)) {
-                    this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
-                    this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
-                } else if (this.isPlayer2Win(match)) {
-                    this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
-                    this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
-                }
+            if (this.isPlayer2Win(match)) {
+                this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
+            } else if (this.isPlayer1Win(match)) {
+                this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
             }
         }
     }
@@ -328,7 +325,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if (this.matchmakingService.isSoloMode || document.activeElement !== this.chat.input.nativeElement) {
+        if (this.matchmakingService.isSoloMode || (this.chat && document.activeElement !== this.chat.input.nativeElement)) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
                     this.cheatMode();
@@ -336,7 +333,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.stopCheating();
                     this.putCanvasIntoInitialState();
                 }
-                this.isLetterTPressed = !this.isLetterTPressed;
+                this.letterTPressed = !this.letterTPressed;
             }
         }
     }
