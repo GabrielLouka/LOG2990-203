@@ -29,6 +29,7 @@ export class GamesDisplayComponent implements OnInit {
     gamesNbr: number = 0;
     justifyContent: string;
     showNextButton = true;
+    isLoading = true;
 
     showPreviousButton = false;
     constructor(
@@ -45,11 +46,13 @@ export class GamesDisplayComponent implements OnInit {
     }
 
     async fetchGameDataFromServer(pageId: number): Promise<void> {
+        this.isLoading = true;
         const routeToSend = '/games/' + pageId.toString();
         const numberOfGamesInAPage = 4;
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 if (response.body !== null) {
+                    this.isLoading = false;
                     const serverResult = JSON.parse(response.body);
                     this.games = serverResult.gameContent;
                     this.gamesNbr = serverResult.nbrOfGame;
