@@ -27,7 +27,6 @@ export class GamesDisplayComponent implements OnInit {
     }[];
     title: string;
     gamesNbr: number = 0;
-    justifyContent: string;
     showNextButton = true;
     isLoading = true;
 
@@ -39,7 +38,6 @@ export class GamesDisplayComponent implements OnInit {
     ) {}
     ngOnInit() {
         this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
-        this.justifyContent = this.isSelection ? 'center' : 'right';
         this.fetchGameDataFromServer(this.currentPageNbr);
         this.matchManagerService.connectSocket();
         this.addServerSocketMessagesListeners();
@@ -67,10 +65,6 @@ export class GamesDisplayComponent implements OnInit {
         });
     }
 
-    onDeleteAllGames() {
-        this.popUpElement.showDeleteGamesPopUp(true);
-    }
-
     async deleteAllGames(isDeleteRequest: boolean): Promise<void> {
         if (isDeleteRequest) {
             const routeToSend = '/games/deleteAllGames';
@@ -90,18 +84,11 @@ export class GamesDisplayComponent implements OnInit {
             this.socketService.socket.emit('deleteAllGames', { gameToDelete: true });
         }
     }
-
-    async goToNextSlide() {
-        this.currentPageNbr++;
+    async changeGamePages(isNext: boolean) {
+        this.currentPageNbr = isNext ? this.currentPageNbr + 1 : this.currentPageNbr - 1;
         if (this.currentPageNbr > 0) {
             this.showPreviousButton = true;
-        }
-        await this.fetchGameDataFromServer(this.currentPageNbr);
-    }
-
-    async goToPreviousSlide() {
-        this.currentPageNbr--;
-        if (this.currentPageNbr <= 0) {
+        } else {
             this.showPreviousButton = false;
         }
         await this.fetchGameDataFromServer(this.currentPageNbr);

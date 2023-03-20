@@ -31,20 +31,18 @@ describe('GamesDisplayComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should set title and justifyContent based on isSelection (when true)', () => {
+    it('should set title based on isSelection (when true)', () => {
         spyOn(component, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
         component.isSelection = true;
         component.ngOnInit();
         expect(component.title).toEqual('Page de configuration');
-        expect(component.justifyContent).toEqual('center');
     });
 
-    it('should set title and justifyContent based on isSelection (when false)', () => {
+    it('should set title based on isSelection (when false)', () => {
         spyOn(component, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
         component.isSelection = false;
         component.ngOnInit();
         expect(component.title).toEqual('Page de selection');
-        expect(component.justifyContent).toEqual('right');
     });
 
     it('should fetch game data from the server', () => {
