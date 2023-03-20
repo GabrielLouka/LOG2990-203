@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { Player } from '@common/player';
-import { CLEAN_USERNAME, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
+import { WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
@@ -67,14 +67,9 @@ export class IncomingPlayerService {
     refreshQueueDisplay() {
         this.hasFoundIncomingPlayer = this.hasIncomingPlayer;
         if (this.hasFoundIncomingPlayer) {
-            const startingGameMessage = 'Voulez-vous débuter la partie ';
+            const startingGameMessage = 'Voulez-vous jouer avec ';
 
-            this.joiningStatusMessage = startingGameMessage + `avec ${this.firstIncomingPlayer.username.slice(0, CLEAN_USERNAME)}?\n`;
-            this.joiningStatusMessage += ' | Joueur(s) en attente : ';
-
-            for (const player of this.waitingPlayers) {
-                this.joiningStatusMessage += ` ${player.username} \n ,`;
-            }
+            this.joiningStatusMessage = startingGameMessage + `avec ${this.firstIncomingPlayer.username}?\n`;
 
             this.incomingPlayer = this.firstIncomingPlayer;
         } else {
