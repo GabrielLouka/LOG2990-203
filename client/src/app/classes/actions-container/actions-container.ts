@@ -79,8 +79,6 @@ export class ActionsContainer {
 
             this.redoActions.push(this.undoActions.pop() as UndoElement);
         }
-
-        this.debugDisplay();
     }
 
     redo() {
@@ -96,8 +94,6 @@ export class ActionsContainer {
                 action.applyElementAction(activeContext);
             }
         }
-
-        this.debugDisplay();
     }
 
     setupListeners() {
@@ -111,26 +107,8 @@ export class ActionsContainer {
         if (this.currentToolObject) {
             const activeContext = this.undoActions[this.undoActions.length - 1].isSourceLeftCanvas ? this.leftContext : this.rightContext;
             this.currentToolObject.use(activeContext, event);
-            this.debugDisplay();
         }
     };
-
-    debugDisplay() {
-        const debugString = this.undoActions.reduce((acc, action) => {
-            return (
-                acc +
-                action.constructor.name +
-                ' pixels length: ' +
-                action.pixels.length +
-                '(' +
-                (action.isSourceLeftCanvas ? 'left' : 'right') +
-                ')' +
-                ' \n'
-            );
-        }, '');
-        // eslint-disable-next-line no-console
-        console.log('Number of actions: ' + this.undoActions.length + '\n ' + debugString);
-    }
 
     handleMouseDown(canvas: HTMLCanvasElement, event: MouseEvent) {
         this.initialPosition = new Vector2(event.offsetX, event.offsetY);
