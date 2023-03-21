@@ -241,8 +241,6 @@ describe('GameCreationPageComponent', () => {
         expect(component.resultModal.showGameNameForm).toHaveBeenCalledWith(0, component['formToSendAfterServerConfirmation']);
     });
 
-    // FUCKS UP EVERYTHING
-
     it('send an image to the server with hidden element ', async () => {
         const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
         component.resultModal = modalSpy;
