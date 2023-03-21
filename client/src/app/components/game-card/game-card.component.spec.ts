@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameData } from '@common/interfaces/game-data';
 import { defaultRankings } from '@common/interfaces/ranking';
-import { GameCardComponent } from './game-card.component';
 import { Buffer } from 'buffer';
+import { GameCardComponent } from './game-card.component';
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
@@ -54,9 +54,7 @@ describe('GameCardComponent', () => {
         expect(component.getDifficultyColor()).toEqual('green');
     });
 
-    
     it('should return red if the game is not easy', () => {
-        
         const game2: GameData = {
             id: 1,
             name: 'Test',
@@ -74,9 +72,8 @@ describe('GameCardComponent', () => {
             ranking: defaultRankings,
         };
         component.game = { gameData: game2, originalImage: Buffer.alloc(3), matchToJoinIfAvailable: '1' };
-        component.isPlayable = true;
+        component.ngOnInit();
         fixture.detectChanges();
-        //component.game.gameData.isEasy = false;
         expect(component.getDifficultyColor()).toEqual('red');
     });
 });
