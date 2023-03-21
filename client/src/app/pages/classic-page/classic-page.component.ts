@@ -54,6 +54,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
+    canvasIsClickable: boolean = false;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -162,6 +163,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.startTimer();
                     // this.enableClick();
                     this.requestStartGame();
+                    this.canvasIsClickable = true;
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -189,19 +191,24 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
-
-        if (this.matchmakingService.isSoloMode) {
-            this.socketService.send('validateDifference', { foundDifferences: this.foundDifferences, position: coordinateClick, isPlayer1: true });
-        } else if (this.matchmakingService.is1vs1Mode) {
-            this.socketService.send('validateDifference', {
-                foundDifferences: this.foundDifferences,
-                position: coordinateClick,
-                isPlayer1: this.matchmakingService.isPlayer1,
-            });
+        if (this.canvasIsClickable) {
+            if (this.matchmakingService.isSoloMode) {
+                this.socketService.send('validateDifference', {
+                    foundDifferences: this.foundDifferences,
+                    position: coordinateClick,
+                    isPlayer1: true,
+                });
+            } else if (this.matchmakingService.is1vs1Mode) {
+                this.socketService.send('validateDifference', {
+                    foundDifferences: this.foundDifferences,
+                    position: coordinateClick,
+                    isPlayer1: this.matchmakingService.isPlayer1,
+                });
+            }
+            this.errorMessage.nativeElement.style.left = event.clientX + 'px';
+            this.errorMessage.nativeElement.style.top = event.clientY + 'px';
+            this.cheatModeService.focusKeyEvent(this.cheat);
         }
-        this.errorMessage.nativeElement.style.left = event.clientX + 'px';
-        this.errorMessage.nativeElement.style.top = event.clientY + 'px';
-        this.cheatModeService.focusKeyEvent(this.cheat);
     }
 
     requestStartGame() {

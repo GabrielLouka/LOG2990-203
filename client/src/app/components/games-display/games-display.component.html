@@ -12,16 +12,16 @@
             <button class="button-style game-btn not-allowed">Réinitialiser les jeux</button>
         </div>
     </Section>
-    <p>{{ debugDisplayMessage.getValue() }}</p>
+    <p>{{ this.theGamesService.debugDisplayMessage.getValue() }}</p>
 
-    <app-spinner *ngIf="isLoading" class="spinner"></app-spinner>
+    <app-spinner *ngIf="this.theGamesService.isLoading" class="spinner"></app-spinner>
 
-    <mat-grid-list *ngIf="!isLoading" cols="2" rowHeight="42vh">
-        <mat-grid-tile *ngFor="let game of games">
+    <mat-grid-list *ngIf="!this.theGamesService.isLoading" cols="2" rowHeight="42vh">
+        <mat-grid-tile *ngFor="let game of this.theGamesService.games">
             <app-game-card [game]="game" [isPlayable]="isSelection"></app-game-card>
         </mat-grid-tile>
     </mat-grid-list>
-    <app-next-page-button *ngIf="showNextButton" (click)="changeGamePages(true)"></app-next-page-button>
-    <app-previous-page-button *ngIf="showPreviousButton" (click)="changeGamePages(false)"></app-previous-page-button>
-    <app-delete-games-pop-up #popUpElement (isDeleteRequest)="deleteAllGames($event)"></app-delete-games-pop-up>
+    <app-next-page-button *ngIf="this.theGamesService.showNextButton" (click)="this.theGamesService.changeGamePages(true)"></app-next-page-button>
+    <app-previous-page-button *ngIf="this.theGamesService.showPreviousButton" (click)="this.theGamesService.changeGamePages(false)"></app-previous-page-button>
+    <app-delete-games-pop-up #popUpElement (isDeleteRequest)="this.theGamesService.deleteAllGames($event)"></app-delete-games-pop-up>
 </body>
