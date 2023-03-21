@@ -1,40 +1,49 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable no-restricted-imports */
+/* eslint-disable no-unused-vars */
+import { ElementRef } from '@angular/core';
+import { ActionsContainer } from '../actions-container/actions-container';
+import { EraserTool } from './eraser.tool';
 
 describe('EraserTool', () => {
-    // let eraserTool: EraserTool;
-    // let context: CanvasRenderingContext2D;
-    // let event: MouseEvent;
+    let actionsContainer: ActionsContainer;
+    let leftCanvas: ElementRef<HTMLCanvasElement>;
+    let rightCanvas: ElementRef<HTMLCanvasElement>;
+    let eraserTool: EraserTool;
+    // let contextMock: CanvasRenderingContext2D;
+    beforeEach(() => {
+        leftCanvas = { nativeElement: document.createElement('canvas') };
+        rightCanvas = { nativeElement: document.createElement('canvas') };
+        actionsContainer = new ActionsContainer(leftCanvas, rightCanvas);
+        eraserTool = new EraserTool(actionsContainer);
+        // contextMock = jasmine.createSpyObj('CanvasRenderingContext2D', ['beginPath', 'moveTo', 'lineTo', 'stroke']);
+        eraserTool.actionsContainer.undoActions = [];
+    });
 
-    // beforeEach(() => {
-    //     eraserTool = new EraserTool();
-    //     context = jasmine.createSpyObj('CanvasRenderingContext2D', ['method1', 'method2']);
-    //     event = new MouseEvent('click', { offsetX: 10, offsetY: 20 });
+    it('should create', () => {
+        expect(eraserTool).toBeTruthy();
+    });
+
+    // describe('use', () => {
+    // it('should add new Vector2 to the pixels array of the last action and apply the action', () => {
+    //     const eventMock = {
+    //         offsetX: 100,
+    //         offsetY: 200,
+    //     };
+    //     const lastAction = jasmine.createSpyObj('EraserElement', ['applyElementAction', 'pixels']);
+    //     eraserTool.actionsContainer.undoActions.push(lastAction);
+    //     eraserTool.use(contextMock, new MouseEvent('click'));
+    //     expect(lastAction.pixels[0].x).toEqual(eventMock.offsetX);
+    //     expect(lastAction.pixels[0].y).toEqual(eventMock.offsetY);
+    // });
     // });
 
-    // it('should use the tool and apply the action', () => {
-    //     eraserTool.use(context, event);
-    //     const lastAction = eraserTool.actionsContainer.undoActions[eraserTool.actionsContainer.undoActions.length - 1];
-    //     expect(lastAction.pixels[lastAction.pixels.length - 1]).toEqual(new Vector2(event.offsetX, event.offsetY));
-    //     expect(lastAction.applyElementAction).toHaveBeenCalledWith(context);
-    // });
+    describe('addUndoElementToActionsContainer', () => {
+        it('should add a new EraserElement to the undoActions array of the actionsContainer', () => {
+            const modifiedPixelsMock = [jasmine.createSpyObj('Vector2', ['x', 'y'])];
+            const isLeftCanvasMock = true;
+            eraserTool.actionsContainer.undoActions = [];
 
-    // it('should add an undo element to the actions container', () => {
-    //     const modifiedPixels: Vector2[] = [new Vector2(5, 5), new Vector2(10, 10)];
-    //     const isLeftCanvas = true;
-    //     eraserTool.addUndoElementToActionsContainer(modifiedPixels, isLeftCanvas);
-    //     const lastAction = eraserTool.actionsContainer.undoActions[eraserTool.actionsContainer.undoActions.length - 1];
-    //     expect(lastAction).toEqual(jasmine.any(EraserElement));
-    //     expect(lastAction.modifiedPixels).toEqual(modifiedPixels);
-    //     expect(lastAction.isLeftCanvas).toEqual(isLeftCanvas);
-    //     expect(lastAction.penWidth).toEqual(eraserTool.actionsContainer.penWidth);
-    //     expect(lastAction.color).toEqual(eraserTool.actionsContainer.color);
-    // });
-
-    it('should do nothing', () => expect(true).toBeTrue());
-
-    // it('use method should be called', () => {
-    //     const spy = spyOn(eraserTool, 'use');
-    //     eraserTool.use(context, event);
-    //     expect(spy).toHaveBeenCalled();
-    // });
+            eraserTool.addUndoElementToActionsContainer(modifiedPixelsMock, isLeftCanvasMock);
+        });
+    });
 });
