@@ -2,28 +2,43 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/interfaces/game-data';
 import { defaultRankings } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
+import { Socket } from 'socket.io-client';
 import { GamesDisplayComponent } from './games-display.component';
 
 import SpyObj = jasmine.SpyObj;
+
+class SocketClientServiceMock extends SocketClientService {
+    override connect() {}
+}
 
 describe('GamesDisplayComponent', () => {
     let component: GamesDisplayComponent;
     let fixture: ComponentFixture<GamesDisplayComponent>;
     let communicationServiceSpy: SpyObj<CommunicationService>;
     let socketClientService: SocketClientService;
+    let socketTestHelper: SocketTestHelper;
+    let socketServiceMock: SocketClientServiceMock;
     beforeEach(() => {
+        socketTestHelper = new SocketTestHelper();
+        socketServiceMock = new SocketClientServiceMock();
+        socketServiceMock.socket = socketTestHelper as unknown as Socket;
         communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['get', 'post', 'delete', 'handleError']);
     });
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [GamesDisplayComponent],
-            providers: [{ provide: CommunicationService, useValue: communicationServiceSpy }, HttpClient, SocketClientService],
+            providers: [
+                { provide: CommunicationService, useValue: communicationServiceSpy },
+                HttpClient,
+                { provide: SocketClientService, useValue: socketServiceMock },
+            ],
         }).compileComponents();
     }));
     beforeEach(() => {
@@ -109,8 +124,6 @@ describe('GamesDisplayComponent', () => {
         );
         component.fetchGameDataFromServer(pageId);
         expect(communicationServiceSpy.get).toHaveBeenCalledWith(`/games/${pageId}`);
-        // expect(component.games).toEqual(Object.assign({ gameData: gameContent, originalImage: Buffer.alloc(3), matchToJoinIfAvailable: 'match1' }));
-        // expect(component.games).toEqual(expectedGames);
         expect(component.gamesNbr).toEqual(4);
         expect(component.showNextButton).toBeFalse();
     });
@@ -137,17 +150,23 @@ describe('GamesDisplayComponent', () => {
             }),
         );
         spyOn(socketClientService.socket, 'emit');
-        spyOn(component, 'reloadPage').and.stub(); // Mock the reloadPage method
+        spyOn(component, 'reloadPage').and.stub();
         await component.deleteAllGames(true);
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/deleteAllGames');
         expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames', { gameToDelete: true });
-        expect(component.reloadPage).toHaveBeenCalled(); // Check if the reloadPage method was called
+        expect(component.reloadPage).toHaveBeenCalled();
     });
 
     it('should add server socket messages listeners', () => {
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
-
+        const callback = ((params: any) => {}) as any;
+        spyOn(component, 'reloadPage').and.stub();
+        spyOn(component, 'updateGameAvailability').and.stub();
+        socketTestHelper.on('gameProgressUpdate', callback);
+        socketTestHelper.peerSideEmit('actionOnGameReloadingThePage');
+        const data = { gameId: 1, matchToJoinIfAvailable: 'match' };
+        socketTestHelper.peerSideEmit('gameProgressUpdate', data);
         expect(socketClientService.on).toHaveBeenCalledTimes(2);
         expect(socketClientService.on).toHaveBeenCalledWith('gameProgressUpdate', jasmine.any(Function));
         expect(socketClientService.on).toHaveBeenCalledWith('actionOnGameReloadingThePage', jasmine.any(Function));

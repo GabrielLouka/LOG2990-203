@@ -102,7 +102,7 @@ export class GamesDisplayComponent implements OnInit {
             const pathSegments = window.location.href.split('/');
             const pageName = pathSegments[pathSegments.length - 2];
             if (pageName === 'selections' || pageName === 'config') {
-                window.location.reload();
+                this.reloadPage();
             }
         });
     }
