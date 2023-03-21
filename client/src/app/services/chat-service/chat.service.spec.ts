@@ -23,6 +23,7 @@ describe('ChatService', () => {
         service = TestBed.inject(ChatService);
         socketService = TestBed.inject(SocketClientService) as jasmine.SpyObj<SocketClientService>;
         matchService = TestBed.inject(MatchmakingService) as jasmine.SpyObj<MatchmakingService>;
+        service = new ChatService(socketService, matchService);
     });
 
     it('should be created', () => {
@@ -33,7 +34,7 @@ describe('ChatService', () => {
         const message = 'hello';
         const isPlayer1 = true;
         service.sendMessage(isPlayer1, message);
-        spyOn(socketService.socket, 'emit');
+        // spyOn(socketService.socket, 'emit');
         expect(socketService.socket.emit).toHaveBeenCalled();
     });
 
