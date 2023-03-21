@@ -1,17 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable max-lines */
-// /* eslint-disable @typescript-eslint/no-non-null-assertion */
-// /* eslint-disable prettier/prettier */
-// /* eslint-disable max-len */
-// /* eslint-disable max-lines */
-// /* eslint-disable no-underscore-dangle */
-// /* eslint-disable @typescript-eslint/ban-types */
-// /* eslint-disable max-lines */
-// /* eslint-disable @typescript-eslint/no-magic-numbers */
 // /* eslint-disable @typescript-eslint/no-explicit-any */
+// /* eslint-disable @typescript-eslint/no-magic-numbers */
+// /* eslint-disable @typescript-eslint/ban-types */
+// /* eslint-disable no-underscore-dangle */
+// /* eslint-disable max-lines */
+// // /* eslint-disable @typescript-eslint/no-non-null-assertion */
+// // /* eslint-disable prettier/prettier */
+// // /* eslint-disable max-len */
+// // /* eslint-disable max-lines */
+// // /* eslint-disable no-underscore-dangle */
+// // /* eslint-disable @typescript-eslint/ban-types */
+// // /* eslint-disable max-lines */
+// // /* eslint-disable @typescript-eslint/no-magic-numbers */
+// // /* eslint-disable @typescript-eslint/no-explicit-any */
 
 // import { HttpHeaders, HttpResponse } from '@angular/common/http';
 // import { ElementRef } from '@angular/core';
