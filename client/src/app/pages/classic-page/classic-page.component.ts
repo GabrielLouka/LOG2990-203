@@ -15,7 +15,7 @@ import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
-import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS, VOLUME_ADJUSTMENT } from '@common/utils/env';
 import { Buffer } from 'buffer';
 
 @Component({
@@ -40,7 +40,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     backgroundColor = '';
     intervalIDLeft: number | undefined;
     intervalIDRight: number | undefined;
-    timeInSeconds = 0;
+    timeInSeconds: number;
     matchId: string;
     currentGameId: string | null;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
@@ -92,6 +92,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        // this.disableClick();
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
@@ -109,7 +110,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     async playSound(isSuccessSound: boolean) {
         const audioSource = isSuccessSound ? this.successSound : this.errorSound;
         audioSource.nativeElement.currentTime = 0;
-        audioSource.nativeElement.volume = isSuccessSound ? 1 : 0.3;
+        audioSource.nativeElement.volume = isSuccessSound ? 1 : VOLUME_ADJUSTMENT;
         audioSource.nativeElement.play();
     }
 
@@ -158,6 +159,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
                     const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
                     this.loadImagesToCanvas(img1Source, img2Source);
+                    this.startTimer();
+                    // this.enableClick();
                     this.requestStartGame();
                     this.gameTitle = this.game.gameData.name;
                 }
@@ -178,6 +181,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
+    }
+
+    startTimer() {
+        this.timeInSeconds = 0;
     }
 
     onMouseDown(event: MouseEvent) {
