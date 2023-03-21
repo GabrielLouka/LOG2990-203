@@ -18,8 +18,6 @@ import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { ImageProcessingController } from './image-processing.controller';
 
-const HTTP_STATUS_CREATED = StatusCodes.CREATED;
-const HTTP_STATUS_BAD_REQUEST = StatusCodes.BAD_REQUEST;
 const API_URL = '/api/image_processing';
 
 describe('ImageProcessingController', () => {
@@ -96,7 +94,7 @@ describe('ImageProcessingController', () => {
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
             .set('Accept', 'application/json')
-            .expect(HTTP_STATUS_CREATED)
+            .expect(StatusCodes.CREATED)
             .then((res) => {
                 expect(res).to.deep.equal(expectedResult);
             });
@@ -109,7 +107,7 @@ describe('ImageProcessingController', () => {
         supertest(expressApp)
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
-            .expect(HTTP_STATUS_BAD_REQUEST)
+            .expect(StatusCodes.BAD_REQUEST)
             .catch((res) => {
                 assert.deepEqual(res.message, errorMessage);
             });
@@ -122,7 +120,7 @@ describe('ImageProcessingController', () => {
         supertest(expressApp)
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
-            .expect(HTTP_STATUS_BAD_REQUEST)
+            .expect(StatusCodes.BAD_REQUEST)
             .catch((res) => {
                 expect(res.message).to.deep.equal('' + errorMessage);
             });

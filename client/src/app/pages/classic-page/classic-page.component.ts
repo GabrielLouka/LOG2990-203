@@ -51,7 +51,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     player2: string = '';
     currentModifiedImage: Buffer;
     totalDifferences: number = 0;
-    differencesFound: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
     canvasIsClickable: boolean = false;
