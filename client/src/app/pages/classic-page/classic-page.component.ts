@@ -93,7 +93,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        // this.disableClick();
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
@@ -160,10 +159,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
                     const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
                     this.loadImagesToCanvas(img1Source, img2Source);
-                    this.startTimer();
-                    // this.enableClick();
                     this.requestStartGame();
                     this.canvasIsClickable = true;
+                    this.startTimer();
                     this.gameTitle = this.game.gameData.name;
                 }
             },
