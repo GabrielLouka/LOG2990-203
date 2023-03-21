@@ -7,7 +7,6 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { GameData } from '@common/interfaces/game-data';
 import { defaultRankings } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
-import { createServer } from 'http';
 import { of, throwError } from 'rxjs';
 import { GamesDisplayComponent } from './games-display.component';
 
@@ -153,7 +152,6 @@ describe('GamesDisplayComponent', () => {
         expect(socketClientService.on).toHaveBeenCalledWith('gameProgressUpdate', jasmine.any(Function));
         expect(socketClientService.on).toHaveBeenCalledWith('actionOnGameReloadingThePage', jasmine.any(Function));
     });
-
 
     it('should handle error response from the server', async () => {
         const error = new HttpErrorResponse({
