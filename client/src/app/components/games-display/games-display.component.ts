@@ -27,10 +27,10 @@ export class GamesDisplayComponent implements OnInit {
     }[];
     title: string;
     gamesNbr: number = 0;
-    showNextButton = true;
     isLoading = true;
 
     showPreviousButton = false;
+    showNextButton = false;
     constructor(
         private readonly communicationService: CommunicationService,
         private readonly matchmakingService: MatchmakingService,
@@ -44,6 +44,7 @@ export class GamesDisplayComponent implements OnInit {
     }
 
     async fetchGameDataFromServer(pageId: number): Promise<void> {
+        this.showNextButton = false;
         this.isLoading = true;
         const routeToSend = '/games/' + pageId.toString();
         const numberOfGamesInAPage = 4;
