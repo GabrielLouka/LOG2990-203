@@ -88,15 +88,11 @@ describe('ChatService', () => {
     it('should send a message if the text is valid', () => {
       const isPlayer1 = true;
       const newMessage = 'hello world';
-      chatService.sendMessage(isPlayer1, newMessage);
       const socketSpy = jasmine.createSpyObj('Socket', ['emit']);
       socketServiceSpy.socket = socketSpy;
+      chatService.sendMessage(isPlayer1, newMessage);
       
-      expect(socketSpy.emit).not.toHaveBeenCalledWith('sendingMessage', {
-        message: newMessage,
-        username: 'player1',
-        sentByPlayer1: true,
-      });
+      expect(socketSpy.emit).toHaveBeenCalled();
     });
     
 });
