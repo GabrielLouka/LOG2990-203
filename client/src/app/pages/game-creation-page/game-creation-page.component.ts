@@ -10,7 +10,7 @@ import { DifferenceImage } from '@common/interfaces/difference.image';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { ImageUploadForm } from '@common/interfaces/image.upload.form';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, PEN_WIDTH } from '@common/utils/env';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, PEN_WIDTH, ROUTE_TO_SENDING_IMAGE } from '@common/utils/env';
 import { Buffer } from 'buffer';
 
 @Component({
@@ -131,9 +131,6 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     async sendImageToServer(): Promise<void> {
         this.resultModal.showPopUp();
 
-        // TODO : store this value in a global constant file
-        const routeToSend = '/image_processing/send-image';
-
         if (this.originalImage && this.modifiedImage) {
             const buffer1 = await this.originalImage.arrayBuffer();
             const buffer2 = await this.modifiedImage.arrayBuffer();
@@ -151,7 +148,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
             const radius = this.enlargementRadius;
 
             const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
-            this.communicationService.post<ImageUploadForm>(imageUploadForm, routeToSend).subscribe({
+            this.communicationService.post<ImageUploadForm>(imageUploadForm, ROUTE_TO_SENDING_IMAGE).subscribe({
                 next: (response) => {
                     this.handleImageUploadResult(response, firstImage, secondImage);
                 },

@@ -113,7 +113,7 @@ describe('GameCreationPageComponent', () => {
             key: 'Z',
         });
         document.dispatchEvent(event);
-    
+
         expect(drawingService.redo).toHaveBeenCalled();
         expect(drawingService.undo).not.toHaveBeenCalled();
     });
@@ -241,7 +241,7 @@ describe('GameCreationPageComponent', () => {
         expect(component.resultModal.showGameNameForm).toHaveBeenCalledWith(0, component['formToSendAfterServerConfirmation']);
     });
 
-    //FUCKS UP EVERYTHING
+    // FUCKS UP EVERYTHING
 
     it('send an image to the server with hidden element ', async () => {
         const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
@@ -278,7 +278,6 @@ describe('GameCreationPageComponent', () => {
             }),
         );
         await component.sendImageToServer();
-        // expect(communicationService.post).toHaveBeenCalledWith(image, '/image_processing/send-image'); 
         expect(modalSpy.showPopUp).toHaveBeenCalled();
     });
 
@@ -307,7 +306,6 @@ describe('GameCreationPageComponent', () => {
         expect(window.alert).not.toHaveBeenCalled();
     });
 
-    
     it('should not process the image to the server with the wrong type of file', async () => {
         const byteArray = [1, 2, 3, 4];
         const buffer = component['convertToBuffer'](byteArray);
@@ -357,7 +355,7 @@ describe('GameCreationPageComponent', () => {
         onloadRef!();
         expect(returnValue).toEqual(undefined);
     });
-    
+
     it('should not draw the Image if the context is null in the processImage function', async () => {
         const byteArray = [1, 2, 3, 4];
         const buffer = component['convertToBuffer'](byteArray);

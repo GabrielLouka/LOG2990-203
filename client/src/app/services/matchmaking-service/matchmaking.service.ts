@@ -78,6 +78,9 @@ export class MatchmakingService {
             player,
         });
     }
+    set currentMatchGame(match: Match) {
+        this.currentMatch = match;
+    }
 
     isMatchAborted(match: Match): boolean {
         return match.matchStatus === MatchStatus.Aborted;
