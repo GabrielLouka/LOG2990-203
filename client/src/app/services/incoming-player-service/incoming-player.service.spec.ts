@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
+import { DO_YOU_WANT_TO_PLAY_WITH_MESSAGE, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
 import { IncomingPlayerService } from './incoming-player.service';
 
 describe('IncomingPlayerService', () => {
