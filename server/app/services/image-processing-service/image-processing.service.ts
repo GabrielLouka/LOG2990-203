@@ -3,13 +3,13 @@ import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { VisitData } from '@common/interfaces/visitData';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, MIN_DIFFERENCES, REQUIRED_SURFACE_PERCENTAGE } from '@common/utils/env';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, MIN_HARD_DIFFERENCES, REQUIRED_SURFACE_PERCENTAGE } from '@common/utils/env';
 import { Service } from 'typedi';
 @Service()
 export class ImageProcessingService {
     private static readonly requiredImageWidth = CANVAS_WIDTH;
     private static readonly requiredImageHeight = CANVAS_HEIGHT;
-    private static readonly minDifferencesForHardMode = MIN_DIFFERENCES;
+    private static readonly minDifferencesForHardMode = MIN_HARD_DIFFERENCES;
     private static readonly hardModeImageSurfaceRequiredPercentage = REQUIRED_SURFACE_PERCENTAGE;
 
     getDifferencesBlackAndWhiteImage = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): ImageUploadResult => {
