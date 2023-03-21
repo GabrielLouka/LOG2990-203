@@ -126,10 +126,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             const abortedGameMessage = ' a abandonné la partie';
 
             if (this.isPlayer2Win(match)) {
-                this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
+                this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
                 this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
             } else if (this.isPlayer1Win(match)) {
-                this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
+                this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
                 this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
             }
         }
