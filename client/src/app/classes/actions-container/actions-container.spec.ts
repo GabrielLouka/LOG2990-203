@@ -1,9 +1,13 @@
+/* eslint-disable no-restricted-imports */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef } from '@angular/core';
 import { CrayonElement } from '@app/classes/crayon-element/crayon-element';
 import { EraserElement } from '@app/classes/eraser-element/eraser-element';
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
 import { Vector2 } from '@common/classes/vector2';
+import { EraserTool } from '../eraser-tool/eraser.tool';
+import { PencilTool } from '../pencil-tool/pencil.tool';
+import { RectangleTool } from '../rectangle-tool/rectangle.tool';
 import { ActionsContainer, ToolType } from './actions-container';
 
 describe('ActionsContainer', () => {
@@ -21,10 +25,6 @@ describe('ActionsContainer', () => {
         it('should set the left context and right context properties', () => {
             expect(actionsContainer.leftContext).toBeDefined();
             expect(actionsContainer.rightContext).toBeDefined();
-        });
-
-        it('should set the selectedTool property to Tool.CRAYON', () => {
-            expect(actionsContainer.selectedToolType).toEqual(ToolType.CRAYON);
         });
     });
 
@@ -99,5 +99,33 @@ describe('ActionsContainer', () => {
             });
             actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
         });
+    });
+
+    it('should return the correct selected tool type', () => {
+        actionsContainer.currentToolObject = new PencilTool(actionsContainer);
+        expect(actionsContainer.selectedToolType).toBe(ToolType.CRAYON);
+
+        actionsContainer.currentToolObject = new RectangleTool(actionsContainer);
+        expect(actionsContainer.selectedToolType).toBe(ToolType.RECTANGLE);
+
+        actionsContainer.currentToolObject = new EraserTool(actionsContainer);
+        expect(actionsContainer.selectedToolType).toBe(ToolType.ERASER);
+
+        actionsContainer.currentToolObject = null;
+        expect(actionsContainer.selectedToolType).toBe(ToolType.NONE);
+    });
+
+    it('should select the correct tool', () => {
+        actionsContainer.selectTool(ToolType.CRAYON);
+        expect(actionsContainer.currentToolObject).toBeInstanceOf(PencilTool);
+
+        actionsContainer.selectTool(ToolType.RECTANGLE);
+        expect(actionsContainer.currentToolObject).toBeInstanceOf(RectangleTool);
+
+        actionsContainer.selectTool(ToolType.ERASER);
+        expect(actionsContainer.currentToolObject).toBeInstanceOf(EraserTool);
+
+        actionsContainer.selectTool(ToolType.NONE);
+        expect(actionsContainer.currentToolObject).toBeNull();
     });
 });
