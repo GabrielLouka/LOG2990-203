@@ -15,11 +15,7 @@ import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
-<<<<<<< HEAD
 import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
-=======
-import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS, VOLUME_ADJUSTMENT } from '@common/utils/env';
->>>>>>> c6afa82a03b342d65ecb472f5ce32ce7e46187b1
 import { Buffer } from 'buffer';
 
 @Component({
@@ -113,11 +109,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     async playSound(isSuccessSound: boolean) {
         const audioSource = isSuccessSound ? this.successSound : this.errorSound;
         audioSource.nativeElement.currentTime = 0;
-<<<<<<< HEAD
         audioSource.nativeElement.volume = isSuccessSound ? VOLUME_SUCCESS : VOLUME_ERROR;
-=======
-        audioSource.nativeElement.volume = isSuccessSound ? 1 : VOLUME_ADJUSTMENT;
->>>>>>> c6afa82a03b342d65ecb472f5ce32ce7e46187b1
         audioSource.nativeElement.play();
     }
 

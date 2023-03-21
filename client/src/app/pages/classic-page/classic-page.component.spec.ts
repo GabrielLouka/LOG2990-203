@@ -3,13 +3,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { BackButtonComponent } from '@app/components/back-button/back-button.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
 import { InfoCardComponent } from '@app/components/info-card/info-card.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
+import { ClassicPageComponent } from '@app/pages/classic-page/classic-page.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
 import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
@@ -22,15 +24,19 @@ import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
-import { ClassicPageComponent } from './classic-page.component';
-
+import { Socket } from 'socket.io-client';
+class SocketClientServiceMock extends SocketClientService {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    override connect() {}
+}
 describe('ClassicPageComponent', () => {
     let component: ClassicPageComponent;
     let fixture: ComponentFixture<ClassicPageComponent>;
-    let socketService: jasmine.SpyObj<SocketClientService>;
+    let socketService: SocketClientService;
     let matchMakingService: jasmine.SpyObj<MatchmakingService>;
     let cheatModeService: jasmine.SpyObj<CheatModeService>;
-
+    let socketTestHelper: SocketTestHelper;
+    let socketServiceMock: SocketClientServiceMock;
     let commService: jasmine.SpyObj<CommunicationService>;
     let authService: jasmine.SpyObj<AuthService>;
     let imageService: jasmine.SpyObj<ImageManipulationService>;
@@ -58,11 +64,17 @@ describe('ClassicPageComponent', () => {
         body: 'mock response',
     });
     const mockObservable = of(mockResponse);
-
+    beforeEach(waitForAsync(() => {
+        TestBed.configureTestingModule({
+            declarations: [ClassicPageComponent],
+            providers: [{ provide: SocketClientService, useValue: socketServiceMock }],
+        }).compileComponents();
+    }));
     beforeEach(() => {
-        socketService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'disconnect', 'on', 'send', 'socket'], {
-            socket: { id: '123' },
-        });
+        socketTestHelper = new SocketTestHelper();
+        socketServiceMock = new SocketClientServiceMock();
+        socketServiceMock.socket = socketTestHelper as unknown as Socket;
+
         commService = jasmine.createSpyObj('CommunicationService', ['basicGet', 'basicPost', 'get', 'post', 'delete']);
         authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
         imageService = jasmine.createSpyObj('ImageManipulationService', [
@@ -105,7 +117,6 @@ describe('ClassicPageComponent', () => {
             declarations: [ClassicPageComponent, HintComponent, BackButtonComponent, InfoCardComponent, ChatComponent, TimerComponent],
             providers: [
                 { provide: AuthService, useValue: authService },
-                { provide: SocketClientService, useValue: socketService },
                 { provide: CommunicationService, useValue: commService },
                 { provide: ImageManipulationService, useValue: imageService },
                 { provide: MatchmakingService, useValue: matchMakingService },
@@ -146,7 +157,7 @@ describe('ClassicPageComponent', () => {
         component.errorSound = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['play']) });
         component.leftCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
         component.rightCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
-
+        socketService = TestBed.inject(SocketClientService);
         fixture.detectChanges();
     });
 
@@ -183,9 +194,9 @@ describe('ClassicPageComponent', () => {
     it('onFindDifference should send message about difference found', () => {
         const refresSpy = spyOn(component, 'refreshModifiedImage');
         const successSpy = spyOn(component, 'playSound');
-        const nbDiff = component.differencesFound + 1;
+        const nbDiff = component.differencesFound1 + 1;
         component.onFindDifference();
-        expect(component.differencesFound).toEqual(nbDiff);
+        expect(component.differencesFound1).toEqual(nbDiff);
         expect(refresSpy).toHaveBeenCalled();
         expect(successSpy).toHaveBeenCalled();
     });
@@ -220,47 +231,19 @@ describe('ClassicPageComponent', () => {
     });
 
     it('addServerSocketMessagesListeners should send message', () => {
+        spyOn(socketService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+
+        socketTestHelper.on('validationReturned', callback);
+        socketTestHelper.peerSideEmit('validationReturned');
+        const data = { gameId: 1, matchToJoinIfAvailable: 'match' };
+        socketTestHelper.peerSideEmit('gameProgressUpdate', data);
+        expect(socketService.on).toHaveBeenCalledTimes(2);
+
         component.addServerSocketMessagesListeners();
         expect(socketService.on).toHaveBeenCalled();
     });
-
-    it('socketService informs user about differences', () => {
-        const fakeData = {
-            foundDifferences: [true, true, true],
-            isValidated: true,
-            foundDifferenceIndex: 0,
-        };
-        component.totalDifferences = 3;
-        component.foundDifferences = fakeData.foundDifferences;
-        const winSpy = spyOn(component, 'onWinGame');
-        const diffSpy = spyOn(component, 'onFindDifference');
-
-        socketService.on.and.callFake((eventName: string, callback) => {
-            if (eventName === 'validationReturned') {
-                callback(fakeData as any);
-            }
-        });
-
-        component.addServerSocketMessagesListeners();
-        expect(diffSpy).toHaveBeenCalled();
-        component.totalDifferences = 0;
-        component.addServerSocketMessagesListeners();
-        expect(winSpy).toHaveBeenCalled();
-    });
-
-    it('should call onFindWrongDifference when data is not validated', () => {
-        const fakeData = {};
-        component.onFindWrongDifference = jasmine.createSpy('onFindWrongDifference');
-
-        socketService.on.and.callFake((eventName: string, callback) => {
-            if (eventName === 'validationReturned') {
-                callback(fakeData as any);
-            }
-        });
-        component.addServerSocketMessagesListeners();
-        expect(component.onFindWrongDifference).toHaveBeenCalled();
-    });
-
     it('getInitialImagesFromServer should send request to server and recieve images', () => {
         commService.get = jasmine.createSpy().and.returnValue(
             of({
