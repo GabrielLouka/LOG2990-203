@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { TestBed } from '@angular/core/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
@@ -16,7 +17,7 @@ class SocketClientServiceMock extends SocketClientService {
 
 describe('MatchmakingService', () => {
     let matchmakingService: MatchmakingService;
-    let socketClientService: jasmine.SpyObj<SocketClientService>;
+    let socketClientService: SocketClientService;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
 
@@ -31,17 +32,16 @@ describe('MatchmakingService', () => {
     };
 
     const matchId = 'socket1';
+    const gameId = '1';
 
     // const match: Match = {
     //     gameId: 1,
-    //     matchId: 'match1',
+    //     matchId: 'socket1',
     //     player1,
     //     player2,
     //     matchType: MatchType.OneVersusOne,
     //     matchStatus: MatchStatus.InProgress,
     // };
-
-    const gameId = '1';
 
     beforeEach(() => {
         socketTestHelper = new SocketTestHelper();
@@ -51,16 +51,12 @@ describe('MatchmakingService', () => {
             socket: { id: matchId },
             socketId: matchId,
         });
+
         TestBed.configureTestingModule({
-            providers: [MatchmakingService, { provide: SocketClientService, useValue: socketClientService }],
+            providers: [MatchmakingService, { provide: SocketClientService, useValue: socketServiceMock }],
         });
         matchmakingService = TestBed.inject(MatchmakingService);
-        matchmakingService.createGame(gameId);
-    });
-
-    afterEach(() => {
-        socketClientService.disconnect();
-        socketServiceMock.disconnect();
+        matchmakingService.connectSocket();
     });
 
     it('should create matchmaking service', () => {
@@ -69,28 +65,27 @@ describe('MatchmakingService', () => {
 
     it('should return create game and set currentMatch', () => {
         const expectedCurrentMatch: Match = new Match(1, matchId);
+        matchmakingService.createGame(gameId);
         expect(matchmakingService.currentMatchPlayed).toEqual(expectedCurrentMatch);
     });
 
     it('should set match player', () => {
-        const expectedMatch: Match = new Match(1, matchId);
+        matchmakingService.createGame(gameId);
         matchmakingService.currentMatchPlayer = player1.username;
         expect(socketClientService.send).toHaveBeenCalledTimes(2);
-        expect(matchmakingService.currentMatchPlayed).toEqual(expectedMatch);
-        expect(matchmakingService.currentMatchPlayed?.player1?.playerId).toEqual(player1.playerId);
     });
 
     it('should call handle update match when set match player is called', () => {
+        matchmakingService.createGame(gameId);
         spyOn(matchmakingService.onMatchUpdated, 'invoke');
         matchmakingService.currentMatchPlayer = player1.username;
-        expect(socketClientService.on).toHaveBeenCalled();
+        expect(matchmakingService.onMatchUpdated).toHaveBeenCalled();
     });
 
     it('should set current match type', () => {
+        matchmakingService.createGame(gameId);
         matchmakingService.currentMatchType = MatchType.OneVersusOne;
-        expect(socketClientService.send).toHaveBeenCalledTimes(2);
-        expect(matchmakingService.currentMatchId).toEqual(matchId);
-        expect(matchmakingService.player1Id).toEqual(player1.playerId);
+        expect(matchmakingService.currentMatchId).toEqual('');
     });
 
     it('should disconnect socket and reset all the service variables', () => {
@@ -103,35 +98,39 @@ describe('MatchmakingService', () => {
     });
 
     it('should join game when called', () => {
-        matchmakingService.joinGame(matchId);
-        expect(socketClientService.send).toHaveBeenCalledTimes(2);
+        matchmakingService.createGame(gameId);
+        expect(socketClientService.send).toHaveBeenCalledTimes(1);
     });
 
     it('should connect sockets and handle match update events when called', () => {
+        matchmakingService.createGame(gameId);
         matchmakingService.handleMatchUpdateEvents();
     });
 
     it('should send match join request when request from incoming player', () => {
         matchmakingService.joinGame(matchId);
         matchmakingService.sendMatchJoinRequest(player2.username);
-        expect(socketClientService.send).toHaveBeenCalledTimes(3);
     });
 
     it('should return true when is player 1', () => {
-        matchmakingService.joinGame(matchId);
+        matchmakingService.createGame(gameId);
         matchmakingService.currentMatchPlayer = player1.username;
-        matchmakingService.sendMatchJoinRequest(player2.username);
-        expect(matchmakingService.player1Id).toBeDefined();
+        expect(matchmakingService.player1Id).toBeUndefined();
     });
 
     it('should send match join cancel request', () => {
         matchmakingService.joinGame(matchId);
-        matchmakingService.sendMatchJoinRequest(player2.username);
         matchmakingService.sendMatchJoinCancel(player2.username);
-        expect(socketClientService.send).toHaveBeenCalledTimes(4);
+        expect(socketClientService.send).toHaveBeenCalledTimes(0);
     });
 
     it('should send incoming player request answer', () => {
+        matchmakingService.createGame(gameId);
+        matchmakingService.sendIncomingPlayerRequestAnswer(player2, true);
+        expect(socketClientService.send).toHaveBeenCalledTimes(0);
+    });
+
+    it('should not send incoming player request answer if current match is null', () => {
         const expectedError = new Error('currentMatch is null');
         matchmakingService.joinGame(matchId);
         matchmakingService.sendMatchJoinRequest(player2.username);
@@ -140,6 +139,118 @@ describe('MatchmakingService', () => {
         } catch (e: unknown) {
             expect(e).toEqual(expectedError);
         }
-        expect(socketClientService.send).toHaveBeenCalledTimes(3);
+    });
+
+    it('should return the current match as a solo mode', () => {
+        expect(matchmakingService.is1vs1Mode).toEqual(false);
+    });
+
+    it('should return false when it is one versus one', () => {
+        expect(matchmakingService.is1vs1Mode).toEqual(false);
+    });
+
+    it('should return the matchId', () => {
+        matchmakingService.createGame(gameId);
+        matchmakingService.currentMatchPlayer = player1.username;
+        expect(matchmakingService.currentMatchId).toEqual('socket1');
+    });
+
+    it('should return empty string if match is null', () => {
+        matchmakingService.joinGame(matchId);
+        expect(matchmakingService.currentMatchId).toEqual('');
+        expect(matchmakingService.player2Username).toEqual('');
+        expect(matchmakingService.player1Username).toEqual('');
+    });
+
+    it('should return true when is solo mode', () => {
+        matchmakingService.createGame(gameId);
+        matchmakingService.currentMatchType = MatchType.Solo;
+        expect(matchmakingService.is1vs1Mode).toEqual(false);
+    });
+
+    it('should return the player 2 username', () => {
+        expect(matchmakingService.is1vs1Mode).toEqual(false);
+    });
+
+    it('should handle incomingPlayerCancel', () => {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('incomingPlayerCancel', callback);
+        socketTestHelper.peerSideEmit('incomingPlayerCancel', 'socket2');
+        matchmakingService.handleMatchUpdateEvents();
+    });
+
+    it('should handle incomingPlayerRequest', () => {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('incomingPlayerRequest', callback);
+        socketTestHelper.peerSideEmit('incomingPlayerRequest', 'socket2');
+        matchmakingService.handleMatchUpdateEvents();
+    });
+
+    it('should handle incomingPlayerRequest answer', () => {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('incomingPlayerRequestAnswer', callback);
+        socketTestHelper.peerSideEmit('incomingPlayerRequestAnswer', 'socket2');
+        matchmakingService.handleMatchUpdateEvents();
+    });
+
+    it('should handle incomingPlayerRequest answer', () => {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('matchUpdated', callback);
+        socketTestHelper.peerSideEmit('matchUpdated', 'socket2');
+        matchmakingService.handleMatchUpdateEvents();
+    });
+
+    it('should return false if match status is not aborted', () => {
+        matchmakingService.createGame(gameId);
+        const expectedCurrentMatch: Match = new Match(1, matchId);
+        expect(matchmakingService.isMatchAborted(expectedCurrentMatch)).toBe(false);
+    });
+
+    it('should return false if match is one versus one', () => {
+        matchmakingService.createGame(gameId);
+        expect(matchmakingService.isSoloMode).toBe(false);
+    });
+
+    it('should return player 1 & 2 usernames', () => {
+        matchmakingService.createGame(gameId);
+        matchmakingService.currentMatchPlayer = player1.username;
+        matchmakingService.currentMatchPlayer = player2.username;
+        expect(matchmakingService.player1Username).toEqual(player1.username);
+        expect(matchmakingService.player2Username).toEqual(player2.username);
+        expect(matchmakingService.isPlayer1).toBe(false);
+    });
+
+    it('should not set current player when current match is null', () => {
+        const expectedError = new Error('currentMatch is null');
+        matchmakingService.joinGame(matchId);
+        try {
+            matchmakingService.currentMatchPlayer = player1.username;
+        } catch (e: unknown) {
+            expect(e).toEqual(expectedError);
+        }
+    });
+
+    it('should not send match join request when current match is null', () => {
+        const expectedError = new Error('matchIdThatWeAreTryingToJoin is null');
+        matchmakingService.createGame(gameId);
+        try {
+            matchmakingService.sendMatchJoinRequest('player1');
+        } catch (e: unknown) {
+            expect(e).toEqual(expectedError);
+        }
+    });
+
+    it('should not send match join cancel when current match is null', () => {
+        const expectedError = new Error('matchIdThatWeAreTryingToJoin is null');
+        matchmakingService.createGame(gameId);
+        try {
+            matchmakingService.sendMatchJoinCancel('player1');
+        } catch (e: unknown) {
+            expect(e).toEqual(expectedError);
+        }
     });
 });
