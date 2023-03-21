@@ -1,63 +1,82 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameData } from '@common/interfaces/game-data';
-import { Buffer } from 'buffer';
-
-import { RouterTestingModule } from '@angular/router/testing';
-import { OverlayComponent } from '@app/components/overlay/overlay.component';
+import { defaultRankings } from '@common/interfaces/ranking';
 import { GameCardComponent } from './game-card.component';
-
+import { Buffer } from 'buffer';
 describe('GameCardComponent', () => {
     let component: GameCardComponent;
     let fixture: ComponentFixture<GameCardComponent>;
-    const gameTest: GameData = {
-        id: 0,
-        name: 'gametest',
-        isEasy: true,
-        nbrDifferences: 1,
-        differences: [[{ x: 0, y: 0 }]],
-        ranking: [[{ name: 'name', score: '1' }]],
-    };
-    const imageBuffer: Buffer = Buffer.alloc(3);
 
-    beforeEach(waitForAsync(() => {
-        TestBed.configureTestingModule({
-            declarations: [GameCardComponent, OverlayComponent, RouterTestingModule],
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            declarations: [GameCardComponent],
         }).compileComponents();
-    }));
+    });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(GameCardComponent);
         component = fixture.componentInstance;
-        fixture.componentInstance.game = { gameData: gameTest, originalImage: imageBuffer, matchToJoinIfAvailable: null };
+        const game: GameData = {
+            id: 1,
+            name: 'Test',
+            isEasy: true,
+            nbrDifferences: 4,
+            differences: [
+                [
+                    { x: 4, y: 0 },
+                    { x: 3, y: 0 },
+                    { x: 2, y: 0 },
+                    { x: 1, y: 0 },
+                    { x: 0, y: 0 },
+                ],
+            ],
+            ranking: defaultRankings,
+        };
+        component.game = { gameData: game, originalImage: Buffer.alloc(3), matchToJoinIfAvailable: '1' };
+        component.isPlayable = true;
         fixture.detectChanges();
     });
 
-    it('should create', () => {
+    it('should create the component', () => {
         expect(component).toBeTruthy();
     });
 
-    it('getDifficulty should return green if easy', () => {
-        component.game.gameData.isEasy = true;
-        const colour = component.getDifficultyColor();
-        expect(colour).toEqual('green');
+    it('should set the difficulty correctly', () => {
+        expect(component.difficulty).toEqual('Facile');
     });
 
-    it('getDifficulty should return red if difficult', () => {
-        component.game.gameData.isEasy = false;
-        const colour = component.getDifficultyColor();
-        expect(colour).toEqual('red');
+    it('should set the original image source correctly', () => {
+        expect(component.originalImageSrc).toContain('data:image/bmp;base64,');
+        expect(component.originalImageSrc).toContain(Buffer.alloc(3).toString('base64'));
     });
 
-    it('this.difficulty should be Difficile if easy is false', () => {
-        const test: GameData = {
-            id: 0,
-            name: 'gametest',
+    it('should return green if the game is easy', () => {
+        expect(component.getDifficultyColor()).toEqual('green');
+    });
+
+    
+    it('should return red if the game is not easy', () => {
+        
+        const game2: GameData = {
+            id: 1,
+            name: 'Test',
             isEasy: false,
-            nbrDifferences: 1,
-            differences: [[{ x: 0, y: 0 }]],
-            ranking: [[{ name: 'name', score: '1' }]],
+            nbrDifferences: 4,
+            differences: [
+                [
+                    { x: 4, y: 0 },
+                    { x: 3, y: 0 },
+                    { x: 2, y: 0 },
+                    { x: 1, y: 0 },
+                    { x: 0, y: 0 },
+                ],
+            ],
+            ranking: defaultRankings,
         };
-        const difficulty = test.isEasy ? 'Facile' : 'Difficile';
-        expect(difficulty).toEqual('Difficile');
+        component.game = { gameData: game2, originalImage: Buffer.alloc(3), matchToJoinIfAvailable: '1' };
+        component.isPlayable = true;
+        fixture.detectChanges();
+        //component.game.gameData.isEasy = false;
+        expect(component.getDifficultyColor()).toEqual('red');
     });
 });

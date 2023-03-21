@@ -57,7 +57,7 @@ export class MatchManagerService {
             }
         }
 
-        if (modifiedMatch != null) {
+        if (modifiedMatch) {
             if (modifiedMatch.player1 == null && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
             else modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
