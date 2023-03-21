@@ -1,6 +1,7 @@
 // import { MatchmakingService } from '../matchmaking-service/matchmaking.service';
 // import { SocketClientService } from '../socket-client-service/socket-client.service';
 
+import { ElementRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
@@ -34,11 +35,41 @@ describe('ChatService', () => {
         const message = 'hello';
         const isPlayer1 = true;
         service.sendMessage(isPlayer1, message);
-        // spyOn(socketService.socket, 'emit');
+        spyOn(socketService.socket, 'emit');
         expect(socketService.socket.emit).toHaveBeenCalled();
     });
 
     it('matchservice exists', () => {
         expect(matchService).toBeTruthy();
+    });
+
+    it("player1 getter should return if player1 from matchmaking", () => {
+        service.isPlayer1;
+        
+    });
+
+    it("isMode1v1", () => {
+        service.isMode1vs1;
+    });
+
+    it("sendMessageFromSystem", () => {
+        const chatElements = {
+            message: 'Hello world!',
+            chat: new ElementRef(document.createElement('div')),
+            newMessage: ''
+        };
+        const messages: string | any[] = [];
+        
+        service.sendMessageFromSystem(chatElements, messages);
+        
+        expect(messages.length).toBe(1);
+        expect(messages[0].text).toBe('Hello world!');
+        expect(messages[0].username).toBe('System');
+        expect(messages[0].sentBySystem).toBe(true);
+        expect(messages[0].sentByPlayer1).toBe(false);
+        expect(messages[0].sentByPlayer2).toBe(false);
+        expect(typeof messages[0].sentTime).toBe('number');
+
+
     });
 });
