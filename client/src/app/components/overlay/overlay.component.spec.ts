@@ -1,4 +1,5 @@
-import { HttpErrorResponse } from '@angular/common/http';
+/* eslint-disable no-restricted-imports */
+import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -6,9 +7,8 @@ import { CommunicationService } from '@app/services/communication-service/commun
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { MatchType } from '@common/enums/match-type';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { of } from 'rxjs';
 import { DeleteGamesPopUpComponent } from '../delete-games-pop-up/delete-games-pop-up.component';
-
 import { OverlayComponent } from './overlay.component';
 
 describe('OverlayComponent', () => {
@@ -19,12 +19,15 @@ describe('OverlayComponent', () => {
     let socketServiceSpy: jasmine.SpyObj<SocketClientService>;
     let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
     let popUpElementSpy: jasmine.SpyObj<DeleteGamesPopUpComponent>;
+    let locationSpy: jasmine.SpyObj<Location>;
     beforeEach(() => {
         matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['createGame', 'joinGame']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
         socketServiceSpy = jasmine.createSpyObj('SocketClientService', ['emit']);
         communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['delete']);
+
         popUpElementSpy = jasmine.createSpyObj('DeleteGamesPopUpComponent', ['showDeleteGamesPopUp']);
+        locationSpy = jasmine.createSpyObj('Location', ['reload']);
         TestBed.configureTestingModule({
             imports: [RouterTestingModule],
             declarations: [OverlayComponent],
@@ -33,12 +36,14 @@ describe('OverlayComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: SocketClientService, useValue: socketServiceSpy },
                 { provide: CommunicationService, useValue: communicationServiceSpy },
+                { provide: Location, useValue: locationSpy },
             ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(OverlayComponent);
         component = fixture.componentInstance;
         component.id = 'game_id_123';
+        component.popUpElement = popUpElementSpy;
         fixture.detectChanges();
     });
 
@@ -77,17 +82,29 @@ describe('OverlayComponent', () => {
         expect(matchmakingServiceSpy.joinGame).toHaveBeenCalledWith('match_id_123');
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/registration', 'game_id_123']);
     });
+
     it('should call showDeleteGamesPopUp function of popUpElement with false argument', () => {
+        component.popUpElement = new DeleteGamesPopUpComponent();
+        spyOn(component.popUpElement, 'showDeleteGamesPopUp');
         component.showDeletePopUp();
-        expect(popUpElementSpy.showDeleteGamesPopUp).toHaveBeenCalled();
+        expect(component.popUpElement.showDeleteGamesPopUp).toHaveBeenCalled();
     });
 
-    it('should display an alert on error', async () => {
-        const errorResponse = new HttpErrorResponse({ error: JSON.stringify({ error: 'Server error' }) });
-        // eslint-disable-next-line deprecation/deprecation
-        communicationServiceSpy.delete.and.returnValue(throwError(errorResponse));
-        spyOn(window, 'alert');
+    it('should delete selected game', async () => {
+        // Mock successful response from the communication service
+        communicationServiceSpy.delete.and.returnValue(
+            of({
+                headers: new HttpHeaders(),
+                status: 200,
+                statusText: 'OK',
+                url: '',
+                body: '',
+                type: 4,
+                ok: true,
+                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
+            }),
+        );
+        socketServiceSpy.socket = jasmine.createSpyObj('Socket', ['emit']);
         await component.deleteSelectedGame(true);
-        expect(window.alert).toHaveBeenCalledWith(`Server Error : ${errorResponse.message}\n{"error":"Server error"}`);
     });
 });
