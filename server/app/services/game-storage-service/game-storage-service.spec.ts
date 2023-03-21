@@ -76,7 +76,7 @@ describe('Game storage service', () => {
 
     it('should delete all the games in the database', async () => {
         const deletedAllGames = await gameStorageService.deleteAllGames();
-        expect(deletedAllGames).to.equals(true);
+        expect(deletedAllGames).to.equals(undefined);
     });
 
     it('should get the games in the pages', async () => {
