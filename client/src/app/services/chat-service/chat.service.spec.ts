@@ -8,49 +8,30 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { ChatService } from './chat.service';
 
 describe('ChatService', () => {
-    let service: ChatService;
-    let socketService: jasmine.SpyObj<SocketClientService>;
-    let matchService: jasmine.SpyObj<MatchmakingService>;
+    let chatService: ChatService;
+    let socketServiceSpy: jasmine.SpyObj<SocketClientService>;
+    let matchmakingService: MatchmakingService;
 
     beforeEach(() => {
-        const socketSpy = jasmine.createSpyObj('SocketClientService', ['emit']);
-        const matchSpy = jasmine.createSpyObj('MatchmakingService', ['player1SocketId', 'is1vs1Mode']);
+        const spy = jasmine.createSpyObj('SocketClientService', ['socket']);
+    
         TestBed.configureTestingModule({
-            providers: [
-                { provide: SocketClientService, useValue: socketSpy },
-                { provide: MatchmakingService, useValue: matchSpy },
-            ],
+          providers: [
+            ChatService,
+            {
+              provide: SocketClientService,
+              useValue: spy
+            },
+            {
+              provide: MatchmakingService,
+              useValue: jasmine.createSpyObj('MatchmakingService', ['player1Id', 'player1Username', 'player2Username', 'is1vs1Mode'])
+            }
+          ]
         });
-        service = TestBed.inject(ChatService);
-        socketService = TestBed.inject(SocketClientService) as jasmine.SpyObj<SocketClientService>;
-        matchService = TestBed.inject(MatchmakingService) as jasmine.SpyObj<MatchmakingService>;
-        service = new ChatService(socketService, matchService);
-    });
-
-    it('should be created', () => {
-        expect(service).toBeTruthy();
-    });
-
-    it('sendMessage should send message if valid', () => {
-        const message = 'hello';
-        const isPlayer1 = true;
-        service.sendMessage(isPlayer1, message);
-        spyOn(socketService.socket, 'emit');
-        expect(socketService.socket.emit).toHaveBeenCalled();
-    });
-
-    it('matchservice exists', () => {
-        expect(matchService).toBeTruthy();
-    });
-
-    it("player1 getter should return if player1 from matchmaking", () => {
-        service.isPlayer1;
-        
-    });
-
-    it("isMode1v1", () => {
-        service.isMode1vs1;
-    });
+        chatService = TestBed.inject(ChatService);
+        socketServiceSpy = TestBed.inject(SocketClientService) as jasmine.SpyObj<SocketClientService>;
+        matchmakingService = TestBed.inject(MatchmakingService) as jasmine.SpyObj<MatchmakingService>;
+      });
 
     it("sendMessageFromSystem", () => {
         const chatElements = {
@@ -60,7 +41,7 @@ describe('ChatService', () => {
         };
         const messages: string | any[] = [];
         
-        service.sendMessageFromSystem(chatElements, messages);
+        chatService.sendMessageFromSystem(chatElements, messages);
         
         expect(messages.length).toBe(1);
         expect(messages[0].text).toBe('Hello world!');
@@ -72,4 +53,42 @@ describe('ChatService', () => {
 
 
     });
+
+    it("isPlayer1 getter", () => {
+      chatService.isPlayer1;
+      matchmakingService.player1Id;
+      socketServiceSpy.socketId;
+      expect(chatService.isPlayer1)
+    });
+
+    it("is 1v1 getter", () => {
+      chatService.isMode1vs1;
+      matchmakingService.is1vs1Mode;
+      expect(chatService.isMode1vs1).toBeTruthy();
+    });
+
+    it('should return false when the message is empty', () => {
+      expect(chatService.isTextValid('')).toBe(false);
+    });
+
+    it('should return false when the message is only whitespace', () => {
+      expect(chatService.isTextValid('   ')).toBe(false);
+    });
+
+    it('should return true when the message contains non-whitespace characters', () => {
+      expect(chatService.isTextValid('Hello, world!')).toBe(true);
+    });
+
+    it('should send a message if the text is valid', () => {
+      const isPlayer1 = true;
+      const newMessage = 'hello world';
+      chatService.sendMessage(isPlayer1, newMessage);
+      
+      expect(socketServiceSpy.socket.emit).toHaveBeenCalledWith('sendingMessage', {
+        message: newMessage,
+        username: 'player1',
+        sentByPlayer1: true,
+      });
+    });
+    
 });
