@@ -24,37 +24,37 @@ describe('TimerComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    // it('getMinutes should return number of minutes', () => {
-    //     component.timeInSeconds = 60;
-    //     const expectedMinutes = 1;
-    //     const getMinutes = component.getMinutes();
-    //     expect(getMinutes).toEqual(expectedMinutes);
-    // });
+    it('should get actual minutes time', () => {
+        component.timeInSeconds = 60;
+        const expectedMinutes = 1;
+        const getMinutes = component.minutes;
+        expect(getMinutes).toEqual(expectedMinutes);
+    });
 
-    // it('getSeconds should return number of seconds', () => {
-    //     component.timeInSeconds = 120;
-    //     const expectedSeconds = 0;
-    //     const getMinutes = component.getSeconds();
-    //     expect(getMinutes).toEqual(expectedSeconds);
-    // });
+    it('should get seconds and return number of seconds', () => {
+        component.timeInSeconds = 120;
+        const expectedSeconds = 0;
+        const getMinutes = component.seconds;
+        expect(getMinutes).toEqual(expectedSeconds);
+    });
 
-    it('stopTimer should affect true to shouldStop proprety', () => {
+    it('stopTimer should affect true to shouldStop property', () => {
         component.stopTimer();
         expect(component['shouldStop']).toEqual(true);
     });
 
-    // it('ticktock should increment timeinsecods if game still running', () => {
-    //     const newTime = timeSeconds + 1;
-    //     component['shouldStop'] = true;
-    //     component.tickTock();
-    //     expect(timeSeconds + 1).toEqual(newTime);
-    // });
+    it('tictoc method should increment time in seconds if game still running', () => {
+        const newTime = timeSeconds + 1;
+        component['shouldStop'] = true;
+        component.ticToc();
+        expect(timeSeconds + 1).toEqual(newTime);
+    });
 
     it('should call the tickTock method every INTERVAL_VALUE milliseconds', fakeAsync(() => {
-        spyOn(component, 'tickTock');
+        spyOn(component, 'ticToc');
         component.ngAfterViewInit();
         tick(INTERVAL_VALUE);
-        expect(component.tickTock).toHaveBeenCalled();
+        expect(component.ticToc).toHaveBeenCalled();
         component.ngOnDestroy();
     }));
 
@@ -62,35 +62,35 @@ describe('TimerComponent', () => {
         component.shouldStop = false;
         component.timeInSeconds = 0;
 
-        component.tickTock();
+        component.ticToc();
 
         expect(component.timeInSeconds).toBe(1);
     });
 
-    // it('should add 0 to minutes if minutes is less than 10', () => {
-    //     component.timeInSeconds = 0;
+    it('should add 0 to minutes if minutes is less than 10', () => {
+        component.timeInSeconds = 0;
 
-    //     component.tickTock();
-    //     component.minutes.nativeElement.innerText = component.getMinutes() < MINUTE_LIMIT ? '0' + component.getMinutes() : component.getMinutes();
+        component.ticToc();
+        component.minute.nativeElement.innerText = component.minutes < MINUTE_LIMIT ? '0' + component.minutes : component.minutes;
 
-    //     expect(component.minutes.nativeElement.innerText).toBe('00');
-    // });
+        expect(component.minute.nativeElement.innerText).toBe('00');
+    });
 
     it('should not add 0 to minutes if minutes is more than 9', () => {
         component.timeInSeconds = 10;
 
-        component.tickTock();
-        component.seconds.nativeElement.innerText = component.getSeconds() < MINUTE_LIMIT ? '0' + component.getSeconds() : component.getSeconds();
+        component.ticToc();
+        component.second.nativeElement.innerText = component.seconds < MINUTE_LIMIT ? '0' + component.seconds : component.seconds;
 
-        expect(component.seconds.nativeElement.innerText).toBe('11');
+        expect(component.second.nativeElement.innerText).toBe('11');
     });
 
     it('should not add 0 to minutes if minutes is more than 9', () => {
         component.timeInSeconds = 600;
 
-        component.tickTock();
-        component.minutes.nativeElement.innerText = component.getMinutes() < MINUTE_LIMIT ? '0' + component.getMinutes() : component.getMinutes();
+        component.ticToc();
+        component.minute.nativeElement.innerText = component.minutes < MINUTE_LIMIT ? '0' + component.minutes : component.minutes;
 
-        expect(component.minutes.nativeElement.innerText).toBe('10');
+        expect(component.minute.nativeElement.innerText).toBe('10');
     });
 });

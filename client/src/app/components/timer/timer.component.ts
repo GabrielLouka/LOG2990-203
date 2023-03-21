@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { INTERVAL_VALUE, MINUTE, MINUTE_LIMIT } from '@common/pixel';
+import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 
 @Component({
     selector: 'app-timer',
@@ -8,36 +8,36 @@ import { INTERVAL_VALUE, MINUTE, MINUTE_LIMIT } from '@common/pixel';
 })
 export class TimerComponent implements AfterViewInit, OnDestroy {
     @Input() timeInSeconds: number;
-    @ViewChild('minutes', { static: true }) minutes: ElementRef;
-    @ViewChild('seconds', { static: true }) seconds: ElementRef;
+    @ViewChild('minute', { static: true }) minute: ElementRef;
+    @ViewChild('second', { static: true }) second: ElementRef;
 
     shouldStop = false;
     intervalId: number;
 
+    get minutes() {
+        return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
+    }
+
+    get seconds() {
+        return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
+    }
+
     ngAfterViewInit() {
         this.intervalId = window.setInterval(() => {
             if (this.timeInSeconds >= 0) {
-                this.tickTock();
+                this.ticToc();
             }
-        }, INTERVAL_VALUE);
+        }, MILLISECOND_TO_SECONDS);
     }
 
     ngOnDestroy() {
         window.clearInterval(this.intervalId);
     }
 
-    tickTock() {
+    ticToc() {
         if (!this.shouldStop) this.timeInSeconds++;
-        this.minutes.nativeElement.innerText = this.getMinutes() < MINUTE_LIMIT ? '0' + this.getMinutes() : this.getMinutes();
-        this.seconds.nativeElement.innerText = this.getSeconds() < MINUTE_LIMIT ? '0' + this.getSeconds() : this.getSeconds();
-    }
-
-    getMinutes() {
-        return Math.floor(this.timeInSeconds / MINUTE);
-    }
-
-    getSeconds() {
-        return Math.floor(this.timeInSeconds % MINUTE);
+        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
+        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
     }
 
     stopTimer() {

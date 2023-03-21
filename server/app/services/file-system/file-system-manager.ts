@@ -7,7 +7,7 @@ class FileSystemManager {
      * Lit et retourne le contenu d'un fichier
      *
      * @param path : le chemin qui correspond au fichier JSON
-     * @returns le cotenu du fichier sous la forme de Buffer
+     * @returns le contenu du fichier sous la forme de Buffer
      */
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

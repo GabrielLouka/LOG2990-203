@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormGroup } from '@angular/forms';
 
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
+import { AuthService } from '@app/services/auth-service/auth.service';
 import { RegistrationPageComponent } from './registration-page.component';
 
 describe('RegistrationPageComponent', () => {
@@ -11,7 +11,7 @@ describe('RegistrationPageComponent', () => {
     let authService: jasmine.SpyObj<AuthService>;
 
     beforeEach(() => {
-        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
+        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registeredUserName']);
     });
 
     beforeEach(async () => {
@@ -49,8 +49,10 @@ describe('RegistrationPageComponent', () => {
     });
 
     it('should get the registered user name from the auth service', () => {
-        authService.registerUserName.and.returnValue('testuser');
-        const result = component.getUser();
+        authService.registerUser.and.callThrough();
+        component.registrationForm.setValue({ username: 'testuser' });
+        component.registerUser();
+        const result = component.user;
         expect(result).toBe('testuser');
     });
 });

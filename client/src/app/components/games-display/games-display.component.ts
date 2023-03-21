@@ -1,12 +1,8 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
-import { CommunicationService } from '@app/services/communication.service';
-import { GameData } from '@common/game-data';
-import { ImageUploadResult } from '@common/image.upload.result';
-import { Buffer } from 'buffer';
-import { BehaviorSubject } from 'rxjs';
-
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
+import { GamesService } from '@app/services/games-service/games.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 @Component({
     selector: 'app-games-display',
     templateUrl: './games-display.component.html',
@@ -14,57 +10,48 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class GamesDisplayComponent implements OnInit {
     @Input() isSelection: boolean;
-    debugDisplayMessage: BehaviorSubject<string> = new BehaviorSubject<string>('');
-    currentPageNbr: number = 0;
-    games: {
-        gameData: GameData;
-        originalImage: Buffer;
-    }[];
+    @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
     title: string;
-    gamesNbr: number = 0;
-    justifyContent: string;
-    showNextButton = true;
 
-    showPreviousButton = false;
-    constructor(private readonly communicationService: CommunicationService) {}
-    ngOnInit() {
-        this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
-        this.justifyContent = this.isSelection ? 'center' : 'right';
-        this.fetchGameDataFromServer(this.currentPageNbr);
+    constructor(
+        private readonly gamesService: GamesService,
+        private readonly matchmakingService: MatchmakingService,
+        private readonly socketService: SocketClientService,
+    ) {}
+
+    get theGamesService(): GamesService {
+        return this.gamesService;
     }
 
-    async fetchGameDataFromServer(pageId: number): Promise<void> {
-        const routeToSend = '/games/' + pageId.toString();
-        this.communicationService.get(routeToSend).subscribe({
-            next: (response) => {
-                if (response.body !== null) {
-                    const serverResult = JSON.parse(response.body);
-                    this.games = serverResult.gameContent;
-                    this.gamesNbr = serverResult.nbrOfGame;
-                    this.showNextButton = this.gamesNbr - (this.currentPageNbr + 1) * 4 > 0;
-                }
-            },
-            error: (err: HttpErrorResponse) => {
-                const responseString = `Server Error : ${err.message}`;
-                const serverResult: ImageUploadResult = JSON.parse(err.error);
-                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
-            },
+    ngOnInit() {
+        this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
+        this.gamesService.fetchGameDataFromServer(this.gamesService.currentPageNbr);
+        this.matchmakingService.connectSocket();
+        this.addServerSocketMessagesListeners();
+    }
+
+    addServerSocketMessagesListeners() {
+        this.socketService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
+            this.updateGameAvailability(data.gameId, data.matchToJoinIfAvailable);
+        });
+        this.socketService.on('actionOnGameReloadingThePage', () => {
+            const pathSegments = window.location.href.split('/');
+            const pageName = pathSegments[pathSegments.length - 2];
+            if (pageName === 'selections' || pageName === 'config') {
+                this.reloadPage();
+            }
         });
     }
 
-    async goToNextSlide() {
-        this.currentPageNbr++;
-        if (this.currentPageNbr > 0) {
-            this.showPreviousButton = true;
+    updateGameAvailability(gameId: number, matchToJoinIfAvailable: string | null) {
+        for (const game of this.gamesService.games) {
+            if (game.gameData.id.toString() === gameId.toString()) {
+                game.matchToJoinIfAvailable = matchToJoinIfAvailable;
+                break;
+            }
         }
-        await this.fetchGameDataFromServer(this.currentPageNbr);
     }
-
-    async goToPreviousSlide() {
-        this.currentPageNbr--;
-        if (this.currentPageNbr <= 0) {
-            this.showPreviousButton = false;
-        }
-        await this.fetchGameDataFromServer(this.currentPageNbr);
+    reloadPage() {
+        window.location.reload();
     }
 }

@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { Pixel } from '@common/pixel';
+import { Pixel } from '@common/classes/pixel';
 import { expect } from 'chai';
 import { describe } from 'mocha';
 

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { GameData } from '@common/game-data';
+import { GameData } from '@common/interfaces/game-data';
 import { Buffer } from 'buffer';
 @Component({
     selector: 'app-game-card',
@@ -7,7 +7,7 @@ import { Buffer } from 'buffer';
     styleUrls: ['./game-card.component.scss'],
 })
 export class GameCardComponent implements OnInit {
-    @Input() game: { gameData: GameData; originalImage: Buffer };
+    @Input() game: { gameData: GameData; originalImage: Buffer; matchToJoinIfAvailable: string | null };
     @Input() isPlayable: boolean;
     difficulty: string;
     originalImageSrc: string;

@@ -35,6 +35,12 @@
     border:solid; 
 }
 
+.play-icon {
+    margin-top: 0.5vh;
+    scale: 1.75;
+    font-weight: 900;
+}
+
 .button-style #play-icon {
     width: 3vh;
     height: 3vh;
@@ -52,3 +58,21 @@ input.ng-valid {
     cursor: not-allowed;
     opacity: 0.7;
 }
+
+.message-container {
+    height: 25vh;
+    width: 35vw;
+    border: solid black;
+    border-radius: 2vh;
+    background-color: white;
+}
+
+.yesNo {
+    width: 15vw;
+}    
+
+
+
+
+
+

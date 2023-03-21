@@ -11,3 +11,5 @@ coverage/
 #Node Modules
 /node_modules
 *.bmp
+!/client/src/assets/img/image_empty.bmp
+server/storedData/lastGameId.txt
