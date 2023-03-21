@@ -58,7 +58,7 @@ export class OverlayComponent {
             this.communicationService.delete(routeToSend).subscribe({
                 next: (response) => {
                     if (response.body) {
-                        location.reload();
+                        this.reloadPage();
                     }
                 },
                 error: (err: HttpErrorResponse) => {
@@ -69,5 +69,8 @@ export class OverlayComponent {
             });
             this.socketService.socket.emit('deletedGame', { hasDeletedGame: true, id: this.id });
         }
+    }
+    reloadPage() {
+        window.location.reload();
     }
 }

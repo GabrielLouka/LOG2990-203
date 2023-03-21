@@ -7,6 +7,7 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { GameData } from '@common/interfaces/game-data';
 import { defaultRankings } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
+import { createServer } from 'http';
 import { of, throwError } from 'rxjs';
 import { GamesDisplayComponent } from './games-display.component';
 
@@ -130,18 +131,18 @@ describe('GamesDisplayComponent', () => {
                 status: 200,
                 statusText: 'OK',
                 url: '',
-                body: null,
+                body: 'test',
                 type: 4,
                 ok: true,
                 clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
             }),
         );
         spyOn(socketClientService.socket, 'emit');
-
+        spyOn(component, 'reloadPage').and.stub(); // Mock the reloadPage method
         await component.deleteAllGames(true);
-
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/deleteAllGames');
         expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames', { gameToDelete: true });
+        expect(component.reloadPage).toHaveBeenCalled(); // Check if the reloadPage method was called
     });
 
     it('should add server socket messages listeners', () => {
@@ -152,6 +153,7 @@ describe('GamesDisplayComponent', () => {
         expect(socketClientService.on).toHaveBeenCalledWith('gameProgressUpdate', jasmine.any(Function));
         expect(socketClientService.on).toHaveBeenCalledWith('actionOnGameReloadingThePage', jasmine.any(Function));
     });
+
 
     it('should handle error response from the server', async () => {
         const error = new HttpErrorResponse({

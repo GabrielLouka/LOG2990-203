@@ -72,7 +72,7 @@ export class GamesDisplayComponent implements OnInit {
                 next: (response) => {
                     if (response.body !== null) {
                         this.gamesNbr = 0;
-                        location.reload();
+                        this.reloadPage();
                     }
                 },
                 error: (err: HttpErrorResponse) => {
@@ -114,5 +114,8 @@ export class GamesDisplayComponent implements OnInit {
                 break;
             }
         }
+    }
+    reloadPage() {
+        window.location.reload();
     }
 }
