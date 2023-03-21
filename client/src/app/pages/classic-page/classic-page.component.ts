@@ -53,6 +53,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     totalDifferences: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
+    minDifferences: number = 0;
     canvasIsClickable: boolean = false;
 
     // eslint-disable-next-line max-params
@@ -180,6 +181,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
+        this.minDifferences = Math.ceil(this.totalDifferences / 2);
     }
 
     startTimer() {
@@ -235,9 +237,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.onFindDifference();
 
                     if (this.matchmakingService.is1vs1Mode) {
-                        if (this.differencesFound1 >= Math.ceil(this.totalDifferences / 2)) {
+                        if (this.differencesFound1 >= this.minDifferences) {
                             this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
-                        } else if (this.differencesFound2 >= Math.ceil(this.totalDifferences / 2))
+                        } else if (this.differencesFound2 >= this.minDifferences)
                             this.onWinGame(this.matchmakingService.player2Username, !this.isWinByDefault);
                     } else if (this.matchmakingService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
