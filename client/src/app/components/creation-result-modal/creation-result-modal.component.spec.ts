@@ -1,15 +1,14 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-// import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
-import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { Vector2 } from '@common/classes/vector2';
@@ -25,16 +24,6 @@ describe('CreationResultModalComponent', () => {
     let imageManipulationService: ImageManipulationService;
     let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
 
-    let onloadRef: Function | undefined;
-    Object.defineProperty(Image.prototype, 'onload', {
-        get() {
-            return this._onload;
-        },
-        set(onload: Function) {
-            onloadRef = onload;
-            this._onload = onload;
-        },
-    });
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',
@@ -52,11 +41,10 @@ describe('CreationResultModalComponent', () => {
 
     beforeEach(async () => {
         communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['post']);
-        // routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
         await TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
-            declarations: [CreationResultModalComponent, SpinnerComponent, GameCreationPageComponent],
+            declarations: [CreationResultModalComponent, SpinnerComponent],
             providers: [
                 { provide: CommunicationService, useValue: communicationServiceSpy },
                 {
@@ -142,7 +130,6 @@ describe('CreationResultModalComponent', () => {
         const img = new Image();
         img.src = URL.createObjectURL(new Blob([imgData]));
         component.updateImageDisplay(imgData);
-        onloadRef!();
         expect(component.imagePreview).toEqual({ nativeElement: canvas });
     });
 
