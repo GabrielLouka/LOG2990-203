@@ -309,7 +309,7 @@ describe('ClassicPageComponent', () => {
         expect(imageService.getImageSourceFromBuffer).toHaveBeenCalledTimes(2);
         expect(loadSpy).toHaveBeenCalled();
         expect(restartSpy).toHaveBeenCalled();
-    });
+    });    
 
     it('getInitialImagesFromServer should throw error', () => {
         const alertSpy = spyOn(window, 'alert');
