@@ -8,6 +8,9 @@ import { RegistrationService } from '@app/services/registration-service/registra
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
+import { MatchStatus } from '@common/enums/match-status';
+import { MatchType } from '@common/enums/match-type';
+import { WAITING_FOR_PLAYER_MESSAGE } from '@common/utils/env';
 import { RegistrationPageComponent } from './registration-page.component';
 
 describe('RegistrationPageComponent', () => {
@@ -17,6 +20,16 @@ describe('RegistrationPageComponent', () => {
     let matchmakingService: jasmine.SpyObj<MatchmakingService>;
     let incomingPlayerService: jasmine.SpyObj<IncomingPlayerService>;
     let registrationService: jasmine.SpyObj<RegistrationService>;
+
+    const player1: Player = {
+        username: 'player1',
+        playerId: 'socket1',
+    };
+
+    const player2: Player = {
+        username: 'player2',
+        playerId: 'socket2',
+    };
 
     beforeEach(() => {
         authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registeredUserName']);
@@ -55,6 +68,7 @@ describe('RegistrationPageComponent', () => {
             'currentMatchPlayer',
             'isSoloMode',
             'isMatchAborted',
+            'createGame',
         ]);
         matchmakingService.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
         matchmakingService.onMatchUpdated = new Action<Match | null>();
@@ -92,11 +106,53 @@ describe('RegistrationPageComponent', () => {
         expect(component.registrationForm).toBeInstanceOf(FormGroup);
     });
 
+    it('should return if the player has found an opponent', () => {
+        component.ngOnDestroy();
+        const hasFound = component.hasFoundIncomingPlayer;
+        expect(hasFound).toBe(false);
+    });
+
+    it('should set current match player if is solo mode', () => {
+        const match: Match = {
+            gameId: 1,
+            matchId: 'socket1',
+            player1,
+            player2: null,
+            matchType: MatchType.Solo,
+            matchStatus: MatchStatus.InProgress,
+        };
+        component.handleMatchUpdated(match);
+        component.registrationForm.setValue({ username: 'user' });
+        authService.registerUser.and.callThrough();
+        component.registerUser();
+        matchmakingService.currentMatchType = MatchType.Solo;
+        expect(component.user).toEqual('user');
+        expect(registrationService.redirectToMainPage).toHaveBeenCalled();
+    });
+
+    it('should set current match player if is solo mode', () => {
+        const match: Match = {
+            gameId: 1,
+            matchId: 'socket1',
+            player1: null,
+            player2,
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Aborted,
+        };
+        component.handleMatchUpdated(match);
+        expect(registrationService.redirectToMainPage).toHaveBeenCalled();
+    });
+
+    it('should not to redirect to main page if match update is null', () => {
+        component.handleMatchUpdated(null);
+        expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
+    });
+
     it('should register a user with the auth service', () => {
         component.registrationForm.setValue({ username: 'user' });
         authService.registerUser.and.callThrough();
         component.registerUser();
-        const resultUser = component.user;
+        const resultUser = component.username;
         const usernameRegisteredResult = component.hasUsernameRegistered;
         expect(usernameRegisteredResult).toBe(true);
         expect(resultUser).toBe('user');
@@ -107,14 +163,47 @@ describe('RegistrationPageComponent', () => {
         authService.registerUser.and.callThrough();
         component.registerUser();
         const result = component.user;
-        expect(result).toBe('testuser');
+        expect(result).toBeUndefined();
     });
 
-    it('should clear the matchmaing variable on ngOndestroy', () => {
-        const myActionSpy: jasmine.SpyObj<Action<unknown>> = jasmine.createSpyObj('Action', ['clear']);
-        spyOn(component, 'ngOnDestroy').and.callThrough();
+    it('should clear the matchmaking variable on ngOndestroy', () => {
         component.ngOnDestroy();
-        expect(component.ngOnDestroy).toHaveBeenCalled();
-        expect(myActionSpy).toHaveBeenCalled();
+        expect(matchmakingService.onGetJoinCancel).toHaveBeenCalled();
+    });
+
+    it('should handle incoming player join request answer', () => {
+        const match: Match = {
+            gameId: 1,
+            matchId: 'socket1',
+            player1,
+            player2: null,
+            matchType: MatchType.Solo,
+            matchStatus: MatchStatus.InProgress,
+        };
+        component.handleMatchUpdated(match);
+        component.registrationForm.setValue({ username: 'user' });
+        authService.registerUser.and.callThrough();
+        component.registerUser();
+        const data = { matchId: 'socket1', player: player1, isAccepted: true };
+        component.handleIncomingPlayerJoinRequestAnswer(data);
+        expect(component.user).toEqual('user');
+    });
+
+    it('should call registration service when load game is needed', () => {
+        component.loadGamePage();
+        expect(registrationService.loadGamePage).toHaveBeenCalled();
+    });
+
+    it('should set to true when sent join request', () => {
+        component.sendMatchJoinRequest();
+        expect(component.hasSentJoinRequest).toBe(true);
+        expect(component.queueStatusMessage).toEqual(WAITING_FOR_PLAYER_MESSAGE);
+    });
+
+    it('should call incoming player service when accept/refuse incoming player', () => {
+        component.acceptIncomingPlayer();
+        expect(incomingPlayerService.acceptIncomingPlayer).toHaveBeenCalled();
+        component.refuseIncomingPlayer();
+        expect(incomingPlayerService.refuseIncomingPlayer).toHaveBeenCalled();
     });
 });

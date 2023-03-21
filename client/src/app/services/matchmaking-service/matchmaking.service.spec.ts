@@ -34,15 +34,6 @@ describe('MatchmakingService', () => {
     const matchId = 'socket1';
     const gameId = '1';
 
-    // const match: Match = {
-    //     gameId: 1,
-    //     matchId: 'socket1',
-    //     player1,
-    //     player2,
-    //     matchType: MatchType.OneVersusOne,
-    //     matchStatus: MatchStatus.InProgress,
-    // };
-
     beforeEach(() => {
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
