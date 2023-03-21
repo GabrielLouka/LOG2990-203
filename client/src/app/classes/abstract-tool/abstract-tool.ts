@@ -3,6 +3,7 @@ import { Vector2 } from '@common/classes/vector2';
 
 export abstract class AbstractTool {
     actionsContainer: ActionsContainer;
+
     constructor(_actionsContainer: ActionsContainer) {
         this.actionsContainer = _actionsContainer;
     }

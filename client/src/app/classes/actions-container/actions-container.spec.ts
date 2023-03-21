@@ -6,8 +6,8 @@ import { EraserElement } from '@app/classes/eraser-element/eraser-element';
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
 import { Vector2 } from '@common/classes/vector2';
 import { EraserTool } from '../eraser-tool/eraser.tool';
-import { PencilTool } from '../pencil-tool/pencil.tool';
-import { RectangleTool } from '../rectangle-tool/rectangle.tool';
+import { PencilTool } from '../pencil-tool/pencil-tool';
+import { RectangleTool } from '../rectangle-tool/rectangle-tool';
 import { ActionsContainer, ToolType } from './actions-container';
 
 describe('ActionsContainer', () => {

@@ -17,14 +17,14 @@
                     class="hints-container"
                     [username]="this.getPlayerUsername(true)"
                     [differencesFound]="differencesFound1"
-                    [differencesNbr]="totalDifferences"
+                    [differencesNbr]="isOneVersusOne ? minDifferences : totalDifferences"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
                     class="hints-container"
                     *ngIf="isOneVersusOne"
                     [username]="this.getPlayerUsername(false)"
                     [differencesFound]="differencesFound2"
-                    [differencesNbr]="totalDifferences"
+                    [differencesNbr]="isOneVersusOne ? minDifferences : totalDifferences"
                 ></app-found-differences-counter>
             </div>
             <div class="timer-container">

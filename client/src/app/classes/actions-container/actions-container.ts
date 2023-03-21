@@ -1,8 +1,8 @@
 import { ElementRef } from '@angular/core';
 import { AbstractTool } from '@app/classes/abstract-tool/abstract-tool';
 import { EraserTool } from '@app/classes/eraser-tool/eraser.tool';
-import { PencilTool } from '@app/classes/pencil-tool/pencil.tool';
-import { RectangleTool } from '@app/classes/rectangle-tool/rectangle.tool';
+import { PencilTool } from '@app/classes/pencil-tool/pencil-tool';
+import { RectangleTool } from '@app/classes/rectangle-tool/rectangle-tool';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { Vector2 } from '@common/classes/vector2';

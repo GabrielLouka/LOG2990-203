@@ -9,7 +9,7 @@
 import Queue from '@app/classes/queue';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
-import { VisitData } from '@common/visitData';
+import { VisitData } from '@common/interfaces/visitData';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 import { ImageProcessingService } from './image-processing.service';
