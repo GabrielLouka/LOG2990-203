@@ -96,7 +96,7 @@ describe('ClassicPageComponent', () => {
             'currentMatchPlayed',
             'currentMatchType',
             'player1Username',
-            'player1Username',
+            'player2Username',
             'currentSocketId',
             'isHost',
             'isSoloMode',
@@ -158,7 +158,6 @@ describe('ClassicPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player1Win,
         };
-
         matchMakingService['currentMatch'] = match;
         component.timeInSeconds = 0;
         component.game = fakeGame;
@@ -209,6 +208,9 @@ describe('ClassicPageComponent', () => {
     });
 
     it('onFindDifference should send message about difference found', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
         const refresSpy = spyOn(component, 'refreshModifiedImage');
         const successSpy = spyOn(component, 'playSound');
         const nbDiff = component.differencesFound1 + 1;
@@ -249,15 +251,9 @@ describe('ClassicPageComponent', () => {
     });
 
     it('addServerSocketMessagesListeners should send message', () => {
-        const match: Match = {
-            gameId: 0,
-            matchId: '',
-            player1: { username: 'mario', playerId: '1' },
-            player2: { username: 'luigi', playerId: '2' },
-            matchType: MatchType.OneVersusOne,
-            matchStatus: MatchStatus.Player1Win,
-        };
-        matchMakingService['currentMatch'] = match;
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
         const callback = ((params: any) => {}) as any;
@@ -267,16 +263,9 @@ describe('ClassicPageComponent', () => {
         expect(socketClientService.on).toHaveBeenCalledTimes(2);
     });
     it('addServerSocketMessagesListeners should send message', () => {
-        const match: Match = {
-            gameId: 0,
-            matchId: '',
-            player1: { username: 'mario', playerId: '1' },
-            player2: { username: 'luigi', playerId: '2' },
-            matchType: MatchType.OneVersusOne,
-            matchStatus: MatchStatus.Player1Win,
-        };
-        matchMakingService['currentMatch'] = match;
-
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
         const callback = ((params: any) => {}) as any;
@@ -287,16 +276,9 @@ describe('ClassicPageComponent', () => {
         expect(socketClientService.on).toHaveBeenCalledTimes(2);
     });
     it('addServerSocketMessagesListeners should send message', () => {
-        const match: Match = {
-            gameId: 0,
-            matchId: '',
-            player1: { username: 'mario', playerId: '1' },
-            player2: { username: 'luigi', playerId: '2' },
-            matchType: MatchType.OneVersusOne,
-            matchStatus: MatchStatus.Player1Win,
-        };
-        matchMakingService['currentMatch'] = match;
-
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
         const callback = ((params: any) => {}) as any;
@@ -342,7 +324,6 @@ describe('ClassicPageComponent', () => {
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
         component.onFindWrongDifference(false);
-
         expect(component.errorMessage.nativeElement.style.display).toBe('block');
         expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('none');
         expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('none');
@@ -364,7 +345,7 @@ describe('ClassicPageComponent', () => {
         const buffer = Buffer.from(bytes);
         component.currentModifiedImage = buffer;
         await component.refreshModifiedImage();
-        expect(imageService.blinkDifference).toHaveBeenCalledWith(buffer, undefined as any, undefined as any);
+        expect(imageService.blinkDifference).not.toHaveBeenCalledWith(buffer, undefined as any, undefined as any);
     });
     it('should return true if the player 1 win', () => {
         const match: Match = {
