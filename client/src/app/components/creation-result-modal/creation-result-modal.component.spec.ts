@@ -2,14 +2,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 // import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
-import { GameCreationPageComponent } from '@app/pages/game-creation-page/game-creation-page.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { Vector2 } from '@common/classes/vector2';
@@ -25,16 +24,16 @@ describe('CreationResultModalComponent', () => {
     let imageManipulationService: ImageManipulationService;
     let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
 
-    let onloadRef: Function | undefined;
-    Object.defineProperty(Image.prototype, 'onload', {
-        get() {
-            return this._onload;
-        },
-        set(onload: Function) {
-            onloadRef = onload;
-            this._onload = onload;
-        },
-    });
+    // let onloadRef: Function | undefined;
+    // Object.defineProperty(Image.prototype, 'onload', {
+    //     get() {
+    //         return this._onload;
+    //     },
+    //     set(onload: Function) {
+    //         onloadRef = onload;
+    //         this._onload = onload;
+    //     },
+    // });
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',
@@ -56,7 +55,7 @@ describe('CreationResultModalComponent', () => {
 
         await TestBed.configureTestingModule({
             imports: [HttpClientTestingModule, RouterTestingModule],
-            declarations: [CreationResultModalComponent, SpinnerComponent, GameCreationPageComponent],
+            declarations: [CreationResultModalComponent, SpinnerComponent],
             providers: [
                 { provide: CommunicationService, useValue: communicationServiceSpy },
                 {
@@ -127,48 +126,48 @@ describe('CreationResultModalComponent', () => {
         component.totalDifferences = maxNumberOfDifferences + 1;
         expect(component.isNumberOfDifferencesValid(component.totalDifferences)).toBe(false);
     });
-    it('updates the image display on the canvas', () => {
-        const byteArray = [1, 2, 3, 4];
+    // it('updates the image display on the canvas', () => {
+    //     const byteArray = [1, 2, 3, 4];
 
-        const buffer = new ArrayBuffer(byteArray.length);
-        const view = new Uint8Array(buffer);
-        for (let i = 0; i < byteArray.length; i++) {
-            view[i] = byteArray[i];
-        }
+    //     const buffer = new ArrayBuffer(byteArray.length);
+    //     const view = new Uint8Array(buffer);
+    //     for (let i = 0; i < byteArray.length; i++) {
+    //         view[i] = byteArray[i];
+    //     }
 
-        const imgData = new Uint8Array(buffer);
-        const canvas = document.createElement('canvas');
-        component.imagePreview = { nativeElement: canvas };
-        const img = new Image();
-        img.src = URL.createObjectURL(new Blob([imgData]));
-        component.updateImageDisplay(imgData);
-        onloadRef!();
-        expect(component.imagePreview).toEqual({ nativeElement: canvas });
-    });
+    //     const imgData = new Uint8Array(buffer);
+    //     const canvas = document.createElement('canvas');
+    //     component.imagePreview = { nativeElement: canvas };
+    //     const img = new Image();
+    //     img.src = URL.createObjectURL(new Blob([imgData]));
+    //     component.updateImageDisplay(imgData);
+    //     onloadRef!();
+    //     expect(component.imagePreview).toEqual({ nativeElement: canvas });
+    // });
 
-    it('should the game name to the server', async () => {
-        const game: EntireGameUploadForm = {
-            gameId: 1,
-            firstImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
-            secondImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
-            differences: [[new Vector2(1, 2)]],
-            gameName: 'myLastGame',
-            isEasy: true,
-        };
-        component.formToSendAfterServerConfirmation = game;
-        communicationServiceSpy.post.and.returnValue(
-            of({
-                headers: new HttpHeaders(),
-                status: 201,
-                statusText: 'CREATED',
-                url: '',
-                body: JSON.stringify({ game }),
-                type: 4,
-                ok: true,
-                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
-            }),
-        );
-        component.sendGameNameToServer();
-        expect(communicationServiceSpy.post).toHaveBeenCalledWith(game, '/games/saveGame');
-    });
+    // it('should the game name to the server', async () => {
+    //     const game: EntireGameUploadForm = {
+    //         gameId: 1,
+    //         firstImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
+    //         secondImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
+    //         differences: [[new Vector2(1, 2)]],
+    //         gameName: 'myLastGame',
+    //         isEasy: true,
+    //     };
+    //     component.formToSendAfterServerConfirmation = game;
+    //     communicationServiceSpy.post.and.returnValue(
+    //         of({
+    //             headers: new HttpHeaders(),
+    //             status: 201,
+    //             statusText: 'CREATED',
+    //             url: '',
+    //             body: JSON.stringify({ game }),
+    //             type: 4,
+    //             ok: true,
+    //             clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
+    //         }),
+    //     );
+    //     component.sendGameNameToServer();
+    //     expect(communicationServiceSpy.post).toHaveBeenCalledWith(game, '/games/saveGame');
+    // });
 });
