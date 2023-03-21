@@ -79,7 +79,6 @@ describe('ClassicPageComponent', () => {
             'isHost',
             'isPlayer1',
             'isSoloMode',
-            'player1Username',
             'player1Id',
             'currentMatchType',
             'currentMatchPlayer',
@@ -129,7 +128,15 @@ describe('ClassicPageComponent', () => {
         component = fixture.componentInstance;
         component.timeInSeconds = 0;
         component.game = fakeGame;
-
+        const match: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: { username: '', playerId: '1' },
+            player2: { username: '', playerId: '2' },
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Player2Win,
+        };
+        matchMakingService['currentMatch'] = match;
         component.chat = jasmine.createSpyObj('ChatComponent', ['sendMessage', 'addMessage', 'isTextValid', 'scrollToBottom']);
         component.timerElement = jasmine.createSpyObj('TimerComponent', ['stopTimer']);
         component.errorMessage = jasmine.createSpyObj('ElementRef', [], {
@@ -342,7 +349,7 @@ describe('ClassicPageComponent', () => {
         const result = component.getPlayerUsername(false);
         expect(result).toEqual(undefined as any);
     });
-    it('should return the player2Username', () => {
+    it('should return the player2', () => {
         const match: Match = {
             gameId: 0,
             matchId: '',
@@ -354,35 +361,50 @@ describe('ClassicPageComponent', () => {
 
         component.handleMatchUpdate(match);
     });
-    it('should return the player2Username', () => {
+    it('should return the fff', () => {
         component.gameOver();
     });
-    it('should return the player2Username', () => {
+    it('should return the f', () => {
         component.onQuitGame();
     });
-    it('should return the player2Username', () => {
+    it('should return the fffff', () => {
         component.onWinGame('ibrahim', true);
     });
-    it('should return the player2Username', () => {
+    it('should returnehjdjd', () => {
         component.cheatMode();
     });
-    it('should return the player2Username', () => {
+    it('should return qqq', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
         component.showHiddenDifferences(Buffer.from([0]));
     });
-    it('should return the player2Username', () => {
+    it('should return eeeee', () => {
         component.stopCheating();
     });
-    it('should return the player2Username', () => {
+    it('should return put canvas', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
         component.putCanvasIntoInitialState();
     });
     it('should start the cheatmode', () => {
-        const event = new KeyboardEvent('KeyTDown');
+        const event = new KeyboardEvent('keydown', {
+            ctrlKey: true,
+            shiftKey: true,
+            key: 't',
+        });
+        document.dispatchEvent(event);
+        component.onCheatMode(event);
+    });
+    it('should start the cheatmode', () => {
+        const event = new KeyboardEvent('keydown', {
+            ctrlKey: true,
+            shiftKey: true,
+            key: 't',
+        });
+        document.dispatchEvent(event);
+        component.onCheatMode(event);
         component.onCheatMode(event);
     });
 });
