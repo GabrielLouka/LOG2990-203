@@ -98,13 +98,14 @@ describe('OverlayComponent', () => {
                 status: 200,
                 statusText: 'OK',
                 url: '',
-                body: '',
+                body: 'body',
                 type: 4,
                 ok: true,
                 clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
             }),
         );
         socketServiceSpy.socket = jasmine.createSpyObj('Socket', ['emit']);
+        spyOn(component, 'reloadPage').and.stub();
         await component.deleteSelectedGame(true);
     });
 });

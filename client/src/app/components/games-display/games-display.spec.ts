@@ -130,18 +130,18 @@ describe('GamesDisplayComponent', () => {
                 status: 200,
                 statusText: 'OK',
                 url: '',
-                body: null,
+                body: 'test',
                 type: 4,
                 ok: true,
                 clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
             }),
         );
         spyOn(socketClientService.socket, 'emit');
-
+        spyOn(component, 'reloadPage').and.stub(); // Mock the reloadPage method
         await component.deleteAllGames(true);
-
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/deleteAllGames');
         expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames', { gameToDelete: true });
+        expect(component.reloadPage).toHaveBeenCalled(); // Check if the reloadPage method was called
     });
 
     it('should add server socket messages listeners', () => {
