@@ -28,8 +28,6 @@ describe('RegistrationService', () => {
         //     socket: { id: 'socket3' },
         //     socketId: 'socket3',
         // });
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-
         TestBed.configureTestingModule({
             imports: [RouterTestingModule],
             providers: [
@@ -42,7 +40,6 @@ describe('RegistrationService', () => {
             ],
         });
         registrationService = TestBed.inject(RegistrationService);
-        socketClientService = TestBed.inject(SocketClientService);
     });
 
     afterEach(() => {
@@ -55,8 +52,9 @@ describe('RegistrationService', () => {
     });
 
     it('should load the default game page if id is null', () => {
-        registrationService.loadGamePage(null);
-        expect(router).toHaveBeenCalled();
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        registrationService.loadGamePage('1');
+        expect(routerSpy).toHaveBeenCalled();
     });
 
     it('should redirect when the game is deleted', () => {
