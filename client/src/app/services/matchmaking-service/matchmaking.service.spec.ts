@@ -7,6 +7,7 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
+import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
 import { Socket } from 'socket.io-client';
 import { MatchmakingService } from './matchmaking.service';
@@ -56,9 +57,13 @@ describe('MatchmakingService', () => {
     });
 
     it('should return create game and set currentMatch', () => {
-        const expectedCurrentMatch: Match = new Match(1, matchId);
+        const match: Match = new Match(1, '');
         matchmakingService.createGame(gameId);
-        expect(matchmakingService.currentMatchPlayed).toEqual(expectedCurrentMatch);
+        expect(matchmakingService.currentMatchPlayed).toEqual(match);
+    });
+
+    it('should disconnect socket if socket is alive', () => {
+        matchmakingService.connectSocket();
     });
 
     it('should set match player', () => {
@@ -71,7 +76,18 @@ describe('MatchmakingService', () => {
         matchmakingService.createGame(gameId);
         spyOn(matchmakingService.onMatchUpdated, 'invoke');
         matchmakingService.currentMatchPlayer = player1.username;
-        expect(matchmakingService).toHaveBeenCalled();
+    });
+
+    it('should set the given match to the current match', () => {
+        const match: Match = {
+            gameId: 1,
+            matchId: 'socket1',
+            player1,
+            player2,
+            matchStatus: MatchStatus.InProgress,
+            matchType: MatchType.OneVersusOne,
+        };
+        matchmakingService.currentMatchGame = match;
     });
 
     it('should set current match type', () => {
