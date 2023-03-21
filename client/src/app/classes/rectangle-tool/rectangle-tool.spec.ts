@@ -1,71 +1,57 @@
-// import { RectangleTool } from './rectangle-tool';
-
-// describe('RectangleTool', () => {
-//     // it('should create an instance', () => {
-//     //   expect(new RectangleTool()).toBeTruthy();
-//     // });
-
-//     it('should call use', () => {
-//         const rectangleTool = new RectangleTool();
-//         const context = new CanvasRenderingContext2D();
-//         const event = new MouseEvent('click');
-//         rectangleTool.use(context, event);
-//     });
-
-//     it('shoudl redo cleared pixels', () => {
-//         const rectangleTool = new RectangleTool();
-//         rectangleTool.redoClearedPixels();
-//     });
-// });
-
 /* eslint-disable no-restricted-imports */
-/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef } from '@angular/core';
 import { ActionsContainer } from '../actions-container/actions-container';
-import { RectangleTool } from './rectangle.tool';
+import { RectangleTool } from './rectangle-tool';
 
-describe('EraserTool', () => {
+describe('RectangleTool', () => {
     let actionsContainer: ActionsContainer;
     let leftCanvas: ElementRef<HTMLCanvasElement>;
     let rightCanvas: ElementRef<HTMLCanvasElement>;
-    let rectangle: RectangleTool;
-    // let contextMock: CanvasRenderingContext2D;
+    let rectangleTool: RectangleTool;
+    let contextMock: CanvasRenderingContext2D;
     beforeEach(() => {
         leftCanvas = { nativeElement: document.createElement('canvas') };
         rightCanvas = { nativeElement: document.createElement('canvas') };
         actionsContainer = new ActionsContainer(leftCanvas, rightCanvas);
-        rectangle = new RectangleTool(actionsContainer);
-        // contextMock = jasmine.createSpyObj('CanvasRenderingContext2D', ['beginPath', 'moveTo', 'lineTo', 'stroke']);
-        rectangle.actionsContainer.undoActions = [];
+        rectangleTool = new RectangleTool(actionsContainer);
+        contextMock = jasmine.createSpyObj('CanvasRenderingContext2D', ['beginPath', 'moveTo', 'lineTo', 'stroke']);
+        rectangleTool.actionsContainer.undoActions = [];
     });
 
-    it('should create', () => {
-        expect(rectangle).toBeTruthy();
+    it('should create an instance', () => {
+        expect(rectangleTool).toBeTruthy();
     });
 
-    it('should call use', () => {
-        const context = new CanvasRenderingContext2D();
-        const event = new MouseEvent('click');
-        rectangle.use(context, event);
-    });
-
-    it('should redo cleared pixels', () => {
-        rectangle.redoClearedPixels();
+    it('should add new Vector2 to the pixels array of the last action and apply the action', () => {
+        const eventMock = {
+            offsetX: 100,
+            offsetY: 200,
+        };
+        const lastAction = jasmine.createSpyObj('EraserElement', ['applyElementAction', 'pixels']);
+        rectangleTool.actionsContainer.undoActions.push(lastAction);
+        lastAction.pixels = [{ x: 100, y: 200 }];
+        lastAction.applyElementAction.and.callFake(() => {
+            return;
+        });
+        rectangleTool.use(contextMock, new MouseEvent('click'));
+        expect(lastAction.pixels[0].x).toEqual(eventMock.offsetX);
+        expect(lastAction.pixels[0].y).toEqual(eventMock.offsetY);
     });
 
     describe('addUndoElementToActionsContainer', () => {
         it('should add a new Rectangle to the undoActions array of the actionsContainer', () => {
             const modifiedPixelsMock = [jasmine.createSpyObj('Vector2', ['x', 'y'])];
             const isLeftCanvasMock = true;
-            rectangle.actionsContainer.undoActions = [];
+            rectangleTool.actionsContainer.undoActions = [];
 
-            rectangle.addUndoElementToActionsContainer(modifiedPixelsMock, isLeftCanvasMock);
+            rectangleTool.addUndoElementToActionsContainer(modifiedPixelsMock, isLeftCanvasMock);
         });
     });
 
     describe('redoClearedPixels', () => {
         it('should redo cleared pixels', () => {
-            rectangle.redoClearedPixels();
+            rectangleTool.redoClearedPixels();
         });
     });
 });
