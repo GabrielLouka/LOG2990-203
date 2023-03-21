@@ -15,7 +15,7 @@ import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
-import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS, VOLUME_ADJUSTMENT } from '@common/utils/env';
+import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
 
 @Component({
@@ -51,7 +51,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     player2: string = '';
     currentModifiedImage: Buffer;
     totalDifferences: number = 0;
-    differencesFound: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
     canvasIsClickable: boolean = false;
@@ -110,7 +109,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     async playSound(isSuccessSound: boolean) {
         const audioSource = isSuccessSound ? this.successSound : this.errorSound;
         audioSource.nativeElement.currentTime = 0;
-        audioSource.nativeElement.volume = isSuccessSound ? 1 : VOLUME_ADJUSTMENT;
+        audioSource.nativeElement.volume = isSuccessSound ? VOLUME_SUCCESS : VOLUME_ERROR;
         audioSource.nativeElement.play();
     }
 

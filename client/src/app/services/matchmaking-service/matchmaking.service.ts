@@ -29,7 +29,7 @@ export class MatchmakingService {
         return this.currentMatch?.matchId as string;
     }
 
-    get currentSocketId() {
+    get currentSocketId(): string {
         return this.socketService.socketId;
     }
 
@@ -71,7 +71,7 @@ export class MatchmakingService {
         if (!this.currentMatch) throw new Error('currentMatch is null');
 
         const matchId = this.currentMatch.matchId;
-        const player = new Player(playerName, this.currentSocketId.toString());
+        const player = new Player(playerName, this.currentSocketId);
 
         this.socketService.send<{ matchId: string; player: Player }>('setMatchPlayer', {
             matchId,
@@ -121,7 +121,7 @@ export class MatchmakingService {
 
     createGame(gameId: string) {
         this.socketService.send<{ gameId: string }>('createMatch', { gameId });
-        this.currentMatch = new Match(parseInt(gameId, 10), this.currentSocketId.toString());
+        this.currentMatch = new Match(parseInt(gameId, 10), this.currentSocketId);
         this.matchIdThatWeAreTryingToJoin = null; // Host doesn't need to join
     }
 
@@ -135,7 +135,7 @@ export class MatchmakingService {
         if (!this.matchIdThatWeAreTryingToJoin) throw new Error('matchIdThatWeAreTryingToJoin is null');
 
         const matchId = this.matchIdThatWeAreTryingToJoin;
-        const player = new Player(playerName, this.currentSocketId.toString());
+        const player = new Player(playerName, this.currentSocketId);
 
         this.socketService.send<{ matchId: string; player: Player }>('requestToJoinMatch', {
             matchId,
@@ -147,7 +147,7 @@ export class MatchmakingService {
         if (!this.matchIdThatWeAreTryingToJoin) throw new Error('matchIdThatWeAreTryingToJoin is null');
 
         const matchId = this.matchIdThatWeAreTryingToJoin;
-        const player = new Player(playerName, this.currentSocketId.toString());
+        const player = new Player(playerName, this.currentSocketId);
 
         this.socketService.send<{ matchId: string; player: Player }>('cancelJoinMatch', {
             matchId,

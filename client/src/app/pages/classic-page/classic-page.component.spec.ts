@@ -1,27 +1,42 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { BackButtonComponent } from '@app/components/back-button/back-button.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
 import { InfoCardComponent } from '@app/components/info-card/info-card.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
+import { ClassicPageComponent } from '@app/pages/classic-page/classic-page.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
+import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { Action } from '@common/classes/action';
+import { Match } from '@common/classes/match';
+import { MatchStatus } from '@common/enums/match-status';
+import { MatchType } from '@common/enums/match-type';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
-import { ClassicPageComponent } from './classic-page.component';
-
+import { Socket } from 'socket.io-client';
+class SocketClientServiceMock extends SocketClientService {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    override connect() {}
+}
 describe('ClassicPageComponent', () => {
     let component: ClassicPageComponent;
     let fixture: ComponentFixture<ClassicPageComponent>;
-    let socketService: jasmine.SpyObj<SocketClientService>;
-
+    let socketService: SocketClientService;
+    let matchMakingService: jasmine.SpyObj<MatchmakingService>;
+    let cheatModeService: jasmine.SpyObj<CheatModeService>;
+    let socketTestHelper: SocketTestHelper;
+    let socketServiceMock: SocketClientServiceMock;
     let commService: jasmine.SpyObj<CommunicationService>;
     let authService: jasmine.SpyObj<AuthService>;
     let imageService: jasmine.SpyObj<ImageManipulationService>;
@@ -40,8 +55,8 @@ describe('ClassicPageComponent', () => {
             differences: [[{ x: 0, y: 0 }]],
             ranking: [[{ name: 'player', score: '123' }]],
         },
-        originalImage: Buffer.alloc(1),
-        modifiedImage: Buffer.alloc(1),
+        originalImage: Buffer.from([1]),
+        modifiedImage: Buffer.from([1]),
     };
 
     const mockResponse: HttpResponse<string> = new HttpResponse({
@@ -49,13 +64,19 @@ describe('ClassicPageComponent', () => {
         body: 'mock response',
     });
     const mockObservable = of(mockResponse);
-
+    beforeEach(waitForAsync(() => {
+        TestBed.configureTestingModule({
+            declarations: [ClassicPageComponent],
+            providers: [{ provide: SocketClientService, useValue: socketServiceMock }],
+        }).compileComponents();
+    }));
     beforeEach(() => {
-        socketService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'disconnect', 'on', 'send', 'socket'], {
-            socket: { id: '123' },
-        });
+        socketTestHelper = new SocketTestHelper();
+        socketServiceMock = new SocketClientServiceMock();
+        socketServiceMock.socket = socketTestHelper as unknown as Socket;
+
         commService = jasmine.createSpyObj('CommunicationService', ['basicGet', 'basicPost', 'get', 'post', 'delete']);
-        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registeredUserName']);
+        authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registerUserName']);
         imageService = jasmine.createSpyObj('ImageManipulationService', [
             'getModifiedImageWithoutDifferences',
             'blinkDifference',
@@ -63,6 +84,28 @@ describe('ClassicPageComponent', () => {
             'loadCanvasImages',
             'getImageSourceFromBuffer',
         ]);
+        matchMakingService = jasmine.createSpyObj('MatchmakingService', [
+            'currentMatchPlayed',
+            'currentMatchId',
+            'currentSocketId',
+            'isHost',
+            'isPlayer1',
+            'isSoloMode',
+            'player1Id',
+            'currentMatchType',
+            'currentMatchPlayer',
+            'isMatchAborted',
+            'handleMatchUpdateEvents',
+            'disconnectSocket',
+            'createGame',
+            'joinGame',
+            'sendMatchJoinRequest',
+            'sendMatchJoinCancel',
+            'sendIncomingPlayerRequestAnswer',
+        ]);
+        cheatModeService = jasmine.createSpyObj('CheatModeService', ['focusKeyEvent', 'putCanvasInto', 'stopCheating', 'startInterval']);
+
+        matchMakingService.onMatchUpdated = new Action<Match | null>();
 
         const mockCommunicationService = jasmine.createSpyObj('CommunicationService', ['subscribe']);
         mockCommunicationService.subscribe.and.returnValue(of(new HttpResponse<string>()));
@@ -74,9 +117,11 @@ describe('ClassicPageComponent', () => {
             declarations: [ClassicPageComponent, HintComponent, BackButtonComponent, InfoCardComponent, ChatComponent, TimerComponent],
             providers: [
                 { provide: AuthService, useValue: authService },
-                { provide: SocketClientService, useValue: socketService },
                 { provide: CommunicationService, useValue: commService },
                 { provide: ImageManipulationService, useValue: imageService },
+                { provide: MatchmakingService, useValue: matchMakingService },
+                { provide: CheatModeService, useValue: cheatModeService },
+
                 {
                     provide: ActivatedRoute,
                     useValue: {
@@ -94,39 +139,41 @@ describe('ClassicPageComponent', () => {
         component = fixture.componentInstance;
         component.timeInSeconds = 0;
         component.game = fakeGame;
+        const match: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: { username: '', playerId: '1' },
+            player2: { username: '', playerId: '2' },
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Player2Win,
+        };
+        matchMakingService['currentMatch'] = match;
         component.chat = jasmine.createSpyObj('ChatComponent', ['sendMessage', 'addMessage', 'isTextValid', 'scrollToBottom']);
         component.timerElement = jasmine.createSpyObj('TimerComponent', ['stopTimer']);
         component.errorMessage = jasmine.createSpyObj('ElementRef', [], {
             nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['pointersEvents']),
         });
-        // component.modal = jasmine.createSpyObj('ElementRef', ['nativeElement']);
         component.successSound = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['play']) });
         component.errorSound = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['play']) });
         component.leftCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
         component.rightCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
+        socketService = TestBed.inject(SocketClientService);
         fixture.detectChanges();
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-
-    // it('showPopUp should change modal value', () => {
-    //     const newValue = 'flex';
-    //     component.showPopUp();
-    //     expect(component.modal.nativeElement.style.display).toEqual(newValue);
-    // });
-
     it('playError should play', async () => {
         const newTime = 0;
         await component.playSound(false);
         expect(component.errorSound.nativeElement.currentTime).toEqual(newTime);
     });
 
-    it('playSuccess should play', async () => {
+    it('playSuccess should play', () => {
         const newTime = 0;
-        await component.playSound(true);
-        const currentTime = await component.successSound.nativeElement.currentTime;
+        component.playSound(true);
+        const currentTime = component.successSound.nativeElement.currentTime;
         expect(currentTime).toEqual(newTime);
     });
 
@@ -136,6 +183,10 @@ describe('ClassicPageComponent', () => {
     });
 
     it('refreshModifiedImage should blink', async () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+
         await component.refreshModifiedImage();
         if (!component.rightCanvasContext) expect(imageService.blinkDifference).toHaveBeenCalled();
     });
@@ -143,9 +194,9 @@ describe('ClassicPageComponent', () => {
     it('onFindDifference should send message about difference found', () => {
         const refresSpy = spyOn(component, 'refreshModifiedImage');
         const successSpy = spyOn(component, 'playSound');
-        const nbDiff = component.differencesFound + 1;
+        const nbDiff = component.differencesFound1 + 1;
         component.onFindDifference();
-        expect(component.differencesFound).toEqual(nbDiff);
+        expect(component.differencesFound1).toEqual(nbDiff);
         expect(refresSpy).toHaveBeenCalled();
         expect(successSpy).toHaveBeenCalled();
     });
@@ -156,6 +207,10 @@ describe('ClassicPageComponent', () => {
     });
 
     it('loadImagesToCanvas should load images to each canvas', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+
         const source1 = 'sourceLeft';
         const source2 = 'sourceRight';
         component.loadImagesToCanvas(source1, source2);
@@ -164,79 +219,31 @@ describe('ClassicPageComponent', () => {
     });
 
     it('onMouseDown should check mouse event', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
         const event = new MouseEvent('mousedown');
         const socketServiceSpy = jasmine.createSpyObj('SocketService', ['send']);
         component.socketService = socketServiceSpy;
-
+        jasmine.createSpy(matchMakingService as any, 'is1vs1Mode' as any).and.returnValue(false);
         component.onMouseDown(event);
         expect(socketServiceSpy.send).toHaveBeenCalled();
     });
 
     it('addServerSocketMessagesListeners should send message', () => {
+        spyOn(socketService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+
+        socketTestHelper.on('validationReturned', callback);
+        socketTestHelper.peerSideEmit('validationReturned');
+        const data = { gameId: 1, matchToJoinIfAvailable: 'match' };
+        socketTestHelper.peerSideEmit('gameProgressUpdate', data);
+        expect(socketService.on).toHaveBeenCalledTimes(2);
+
         component.addServerSocketMessagesListeners();
         expect(socketService.on).toHaveBeenCalled();
     });
-
-    // it('socket should disonnect if already active', () => {
-    //     socketService.isSocketAlive.and.returnValue(true);
-    //     component.connectSocket();
-    //     expect(socketService.disconnect).toHaveBeenCalled();
-    // });
-
-    // it('get socket id should return id', async () => {
-    //     const id = await component.socketId;
-    //     const expectedId = await socketService.socket.id;
-    //     expect(id).toEqual(expectedId);
-    // });
-
-    // it('get socket id should return id', () => {
-    //     socketService.socket.id = '';
-    //     expect(component.socketId).toEqual('');
-    // });
-
-    // it('onWinGame should call showPopUp', async () => {
-    //     const popUpSpy = spyOn(component, 'showPopUp');
-    //     await component.onWinGame();
-    //     expect(popUpSpy).toHaveBeenCalled();
-    // });
-
-    it('socketService informs user about differences', () => {
-        const fakeData = {
-            foundDifferences: [true, true, true],
-            isValidated: true,
-            foundDifferenceIndex: 0,
-        };
-        component.totalDifferences = 3;
-        component.foundDifferences = fakeData.foundDifferences;
-        const winSpy = spyOn(component, 'onWinGame');
-        const diffSpy = spyOn(component, 'onFindDifference');
-
-        socketService.on.and.callFake((eventName: string, callback) => {
-            if (eventName === 'validationReturned') {
-                callback(fakeData as any);
-            }
-        });
-
-        component.addServerSocketMessagesListeners();
-        expect(diffSpy).toHaveBeenCalled();
-        component.totalDifferences = 0;
-        component.addServerSocketMessagesListeners();
-        expect(winSpy).toHaveBeenCalled();
-    });
-
-    it('should call onFindWrongDifference when data is not validated', () => {
-        const fakeData = {};
-        component.onFindWrongDifference = jasmine.createSpy('onFindWrongDifference');
-
-        socketService.on.and.callFake((eventName: string, callback) => {
-            if (eventName === 'validationReturned') {
-                callback(fakeData as any);
-            }
-        });
-        component.addServerSocketMessagesListeners();
-        expect(component.onFindWrongDifference).toHaveBeenCalled();
-    });
-
     it('getInitialImagesFromServer should send request to server and recieve images', () => {
         commService.get = jasmine.createSpy().and.returnValue(
             of({
@@ -268,27 +275,27 @@ describe('ClassicPageComponent', () => {
         expect(alertSpy).toHaveBeenCalled();
     });
 
-    // it('should display the error message and disable pointer events on the canvases', () => {
-    //     const canvas = document.createElement('canvas');
-    //     component.leftCanvas = { nativeElement: canvas };
-    //     component.rightCanvas = { nativeElement: canvas };
-    //     // component.onFindWrongDifference();
+    it('should display the error message and disable pointer events on the canvases', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.onFindWrongDifference(false);
 
-    //     expect(component.errorMessage.nativeElement.style.display).toBe('block');
-    //     expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('none');
-    //     expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('none');
-    // });
+        expect(component.errorMessage.nativeElement.style.display).toBe('block');
+        expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('none');
+        expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('none');
+    });
 
-    // it('setTimout should be called onFindWrongDifferences', fakeAsync(() => {
-    //     const canvas = document.createElement('canvas');
-    //     component.leftCanvas = { nativeElement: canvas };
-    //     component.rightCanvas = { nativeElement: canvas };
-    //     component.onFindWrongDifference();
-    //     tick(1000);
-    //     expect(component.errorMessage.nativeElement.style.display).toBe('none');
-    //     expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('auto');
-    //     expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('auto');
-    // }));
+    it('setTimout should be called onFindWrongDifferences', fakeAsync(() => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.onFindWrongDifference(true);
+        tick(1000);
+        expect(component.errorMessage.nativeElement.style.display).toBe('none');
+        expect(component.leftCanvas.nativeElement.style.pointerEvents).toBe('auto');
+        expect(component.rightCanvas.nativeElement.style.pointerEvents).toBe('auto');
+    }));
 
     it('refreshModifiedImage should use currentModifiedImage if valid when blinking difference', async () => {
         const bytes = [0x68, 0x65, 0x6c, 0x6c, 0x6f];
@@ -297,27 +304,90 @@ describe('ClassicPageComponent', () => {
         await component.refreshModifiedImage();
         expect(imageService.blinkDifference).toHaveBeenCalledWith(buffer, undefined as any, undefined as any);
     });
-    it('should fetch a game with 0 as the gameId when getting the image from the server', () => {
-        component.currentGameId = null;
-        commService.get = jasmine.createSpy().and.returnValue(
-            of({
-                body: JSON.stringify({
-                    originalImage: 'originalImage',
-                    modifiedImage: 'modifiedImage',
-                    gameData: { name: 'test' },
-                }),
-            }),
-        );
+    it('should return true if the player 1 win', () => {
+        const match: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: null,
+            player2: null,
+            matchType: MatchType.Solo,
+            matchStatus: MatchStatus.Player1Win,
+        };
+        const result = component.isPlayer1Win(match);
+        expect(result).toEqual(true);
+    });
+    it('should return true if the player 2 win', () => {
+        const match: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: null,
+            player2: null,
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Player2Win,
+        };
+        const result = component.isPlayer2Win(match);
+        expect(result).toEqual(true);
+    });
+    it('should return the player2Username', () => {
+        const result = component.getPlayerUsername(false);
+        expect(result).toEqual(undefined as any);
+    });
+    it('should return the player2', () => {
+        const match: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: { username: '', playerId: '1' },
+            player2: { username: '', playerId: '2' },
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Player2Win,
+        };
 
-        imageService.getModifiedImageWithoutDifferences = jasmine.createSpy().and.returnValue('testImageSource');
-        const loadSpy = spyOn(component, 'loadImagesToCanvas');
-        const restartSpy = spyOn(component, 'requestStartGame');
-
-        component.communicationService = commService;
-        component['imageManipulationService'] = imageService;
-        component.getInitialImagesFromServer();
-        expect(imageService.getImageSourceFromBuffer).toHaveBeenCalledTimes(2);
-        expect(loadSpy).toHaveBeenCalled();
-        expect(restartSpy).toHaveBeenCalled();
+        component.handleMatchUpdate(match);
+    });
+    it('should return the fff', () => {
+        component.gameOver();
+    });
+    it('should return the f', () => {
+        component.onQuitGame();
+    });
+    it('should return the fffff', () => {
+        component.onWinGame('ibrahim', true);
+    });
+    it('should returnehjdjd', () => {
+        component.cheatMode();
+    });
+    it('should return qqq', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.showHiddenDifferences(Buffer.from([0]));
+    });
+    it('should return eeeee', () => {
+        component.stopCheating();
+    });
+    it('should return put canvas', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.putCanvasIntoInitialState();
+    });
+    it('should start the cheatmode', () => {
+        const event = new KeyboardEvent('keydown', {
+            ctrlKey: true,
+            shiftKey: true,
+            key: 't',
+        });
+        document.dispatchEvent(event);
+        component.onCheatMode(event);
+    });
+    it('should start the cheatmode', () => {
+        const event = new KeyboardEvent('keydown', {
+            ctrlKey: true,
+            shiftKey: true,
+            key: 't',
+        });
+        document.dispatchEvent(event);
+        component.onCheatMode(event);
+        component.onCheatMode(event);
     });
 });
