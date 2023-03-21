@@ -22,12 +22,9 @@ const WAITING_FOR_PLAYER_MESSAGE = "En attente d'un adversaire...";
 const WAITING_PLAYER_ANSWER_MESSAGE = "En attente de la réponse de l'adversaire...";
 const SYSTEM_MESSAGE = 'System';
 const CHAT_TITLE = 'MANIA CHAT';
-<<<<<<< HEAD
 const VOLUME_ERROR = 0.3;
 const VOLUME_SUCCESS = 1 ;
-=======
 const VOLUME_ADJUSTMENT = 0.3;
->>>>>>> c6afa82a03b342d65ecb472f5ce32ce7e46187b1
 
 export { CHAT_TITLE };
 export { PEN_WIDTH };
@@ -41,11 +38,7 @@ export { BLINK_TIME, NUMBER_OF_BLINKS };
 export { SYSTEM_MESSAGE };
 export { MIN_NBR_OF_DIFFERENCES, MAX_NBR_OF_DIFFERENCES, MIN_HARD_DIFFERENCES };
 export { REQUIRED_SURFACE_PERCENTAGE, DEFAULT_ENLARGEMENT_RADIUS };
-<<<<<<< HEAD
 export { VOLUME_ERROR };
 export { VOLUME_SUCCESS, MAX_GAMES_PER_PAGE };
 
 
-=======
-export { MAX_GAMES_PER_PAGE };
->>>>>>> c6afa82a03b342d65ecb472f5ce32ce7e46187b1
