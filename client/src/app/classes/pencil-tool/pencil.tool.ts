@@ -1,4 +1,4 @@
-import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
+import { AbstractTool } from '@app/classes/abstract-tool/abstract-tool';
 import { CrayonElement } from '@app/classes/crayon-element/crayon-element';
 import { Vector2 } from '@common/classes/vector2';
 

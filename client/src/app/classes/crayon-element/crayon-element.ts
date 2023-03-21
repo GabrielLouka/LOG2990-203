@@ -21,7 +21,7 @@ export class CrayonElement extends UndoElement {
                 const prevPoint = stroke[i - 1];
                 const currentPoint = stroke[i];
                 const distance = pointDistance(prevPoint, currentPoint);
-                const subDivisions = Math.max(Math.round(distance / 5), 1);
+                const subDivisions = Math.max(Math.round(distance), 1);
                 for (let j = 0; j < subDivisions; j++) {
                     const point = {
                         x: prevPoint.x + (currentPoint.x - prevPoint.x) * (j / subDivisions),

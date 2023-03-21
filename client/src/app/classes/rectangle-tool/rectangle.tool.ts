@@ -1,4 +1,4 @@
-import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
+import { AbstractTool } from '@app/classes/abstract-tool/abstract-tool';
 import { RectangleElement } from '@app/classes/rectangle-element/rectangle-element';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
 import { Vector2 } from '@common/classes/vector2';

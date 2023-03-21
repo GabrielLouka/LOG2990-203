@@ -1,4 +1,4 @@
-import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
+import { AbstractTool } from '@app/classes/abstract-tool/abstract-tool';
 import { EraserElement } from '@app/classes/eraser-element/eraser-element';
 import { Vector2 } from '@common/classes/vector2';
 

@@ -1,5 +1,5 @@
 import { ElementRef } from '@angular/core';
-import { AbstractTool } from '@app/classes/abstract-tool/abstract.tool';
+import { AbstractTool } from '@app/classes/abstract-tool/abstract-tool';
 import { EraserTool } from '@app/classes/eraser-tool/eraser.tool';
 import { PencilTool } from '@app/classes/pencil-tool/pencil.tool';
 import { RectangleTool } from '@app/classes/rectangle-tool/rectangle.tool';
