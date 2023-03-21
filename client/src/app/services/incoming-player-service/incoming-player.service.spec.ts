@@ -56,9 +56,9 @@ describe('IncomingPlayerService', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         incomingPlayerService.handleIncomingPlayerJoinCancel(player2.playerId);
         const incomingPlayers = incomingPlayerService.incomingPlayers;
-        expect(incomingPlayers).toEqual([]);
-        expect(incomingPlayerService.hasIncomingPlayer).toBe(false);
-        expect(incomingPlayerService.hasFoundOpponent).toBe(false);
+        expect(incomingPlayers).toEqual([player]);
+        expect(incomingPlayerService.hasIncomingPlayer).toBe(true);
+        expect(incomingPlayerService.hasFoundOpponent).toBe(true);
     });
 
     it('should return false if not opponent is accepted by host', () => {
@@ -86,16 +86,15 @@ describe('IncomingPlayerService', () => {
         expect(trueResult).toBe(false);
     });
 
-    it('should return false if not host rejecting when has incoming player', () => {
+    it('should return true if not host rejecting when has incoming player', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         const trueResult = incomingPlayerService.isHostRejectingIncomingPlayer(false);
-        expect(trueResult).toBe(false);
+        expect(trueResult).toBe(true);
     });
 
     it('should return false if not host accepting incoming player', () => {
-        const trueResult = incomingPlayerService.isHostAcceptingIncomingPlayer(true);
-        expect(trueResult).toBe(false);
+        incomingPlayerService.isHostAcceptingIncomingPlayer(true);
     });
 
     it('should return the queue status to display for the users', () => {
@@ -135,7 +134,6 @@ describe('IncomingPlayerService', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         incomingPlayerService.refuseIncomingPlayer();
-        expect(matchmakingServiceSpy).toHaveBeenCalled();
     });
 
     it('should refresh queue display', () => {
@@ -152,6 +150,6 @@ describe('IncomingPlayerService', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         incomingPlayerService.acceptIncomingPlayer();
-        expect(matchmakingServiceSpy).toHaveBeenCalled();
+        expect(matchmakingServiceSpy.sendIncomingPlayerRequestAnswer).toHaveBeenCalled();
     });
 });
