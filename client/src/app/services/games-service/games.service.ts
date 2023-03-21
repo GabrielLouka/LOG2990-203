@@ -48,9 +48,9 @@ export class GamesService {
         });
     }
 
-    async deleteAllGames(isDeleteRequest: boolean): Promise<void> {
+    async allGames(isDeleteRequest: boolean): Promise<void> {
         if (isDeleteRequest) {
-            const routeToSend = '/games/deleteAllGames';
+            const routeToSend = '/games/allGames';
             this.communicationService.delete(routeToSend).subscribe({
                 next: (response) => {
                     if (response.body !== null) {
@@ -64,7 +64,7 @@ export class GamesService {
                     this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
-            this.socketService.socket.emit('deleteAllGames', { gameToDelete: true });
+            this.socketService.socket.emit('allGames', { gameToDelete: true });
         }
     }
 

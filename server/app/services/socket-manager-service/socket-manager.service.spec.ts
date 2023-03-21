@@ -323,7 +323,7 @@ describe('SocketManager', () => {
         const joinCallback = socket.on.getCall(11).args[1];
         joinCallback({ hasDeletedAllGames: true });
         setTimeout(() => {
-            assert(socket.on.calledWith('deleteAllGames'));
+            assert(socket.on.calledWith('allGames'));
             done();
         }, RESPONSE_DELAY * 5); // 1 seconde
     });

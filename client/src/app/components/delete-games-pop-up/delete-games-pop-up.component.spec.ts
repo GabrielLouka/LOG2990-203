@@ -51,7 +51,7 @@ describe('DeleteGamesPopUpComponent', () => {
         expect(component.modal.nativeElement.style.display).toBe('flex');
     });
 
-    it('should show the popUp when isDeleteAllGames is false', () => {
+    it('should show the popUp when isallGames is false', () => {
         component.modal = { nativeElement: { style: { display: 'none' } } };
         component.showDeleteGamesPopUp(false);
         expect(component.modal.nativeElement.style.display).toBe('flex');

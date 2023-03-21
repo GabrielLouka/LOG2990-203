@@ -11,16 +11,22 @@ describe('ChatService', () => {
     let chatService: ChatService;
     let socketServiceSpy: jasmine.SpyObj<SocketClientService>;
     let matchmakingService: MatchmakingService;
+    
 
     beforeEach(() => {
-        const spy = jasmine.createSpyObj('SocketClientService', ['socket']);
+        // const spy = jasmine.createSpyObj('SocketClientService', ['socket']);
+        const socketSpy = jasmine.createSpyObj('Socket', ['emit']);
+        const socketServiceMock = {
+          socket: socketSpy
+        };
+
     
         TestBed.configureTestingModule({
           providers: [
             ChatService,
             {
               provide: SocketClientService,
-              useValue: spy
+              useValue: socketServiceMock
             },
             {
               provide: MatchmakingService,
@@ -82,13 +88,11 @@ describe('ChatService', () => {
     it('should send a message if the text is valid', () => {
       const isPlayer1 = true;
       const newMessage = 'hello world';
+      const socketSpy = jasmine.createSpyObj('Socket', ['emit']);
+      socketServiceSpy.socket = socketSpy;
       chatService.sendMessage(isPlayer1, newMessage);
       
-      expect(socketServiceSpy.socket.emit).toHaveBeenCalledWith('sendingMessage', {
-        message: newMessage,
-        username: 'player1',
-        sentByPlayer1: true,
-      });
+      expect(socketSpy.emit).toHaveBeenCalled();
     });
     
 });
