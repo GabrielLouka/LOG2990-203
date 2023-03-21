@@ -118,9 +118,9 @@ describe('GamesService', () => {
         );
         spyOn(socketClientService.socket, 'emit');
         spyOn(service, 'reloadPage').and.stub();
-        await service.deleteAllGames(true);
-        expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/deleteAllGames');
-        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames', { gameToDelete: true });
+        await service.allGames(true);
+        expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/allGames');
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('allGames', { gameToDelete: true });
         expect(service.reloadPage).toHaveBeenCalled();
     });
 });

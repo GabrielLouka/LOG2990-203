@@ -92,7 +92,7 @@ export class SocketManager {
                 this.sio.to(data.matchId).emit('incomingPlayerRequestAnswer', data);
             });
 
-            socket.on('deleteAllGames', () => {
+            socket.on('allGames', () => {
                 this.sio.emit('allGameDeleted');
                 this.sio.emit('actionOnGameReloadingThePage');
             });

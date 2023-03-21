@@ -103,7 +103,7 @@ export class GameStorageService {
         await this.deleteStoredData(id);
     }
 
-    async deleteAllGames() {
+    async allGames() {
         await this.deleteStoredDataForAllTheGame();
         await this.collection.deleteMany({});
     }
