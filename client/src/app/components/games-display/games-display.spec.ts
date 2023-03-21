@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient } from '@angular/common/http';
@@ -65,6 +66,7 @@ describe('GamesDisplayComponent', () => {
     it('should add server socket messages listeners', () => {
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
+        // eslint-disable-next-line no-unused-vars
         const callback = ((params: any) => {}) as any;
         spyOn(component, 'reloadPage').and.stub();
         spyOn(component, 'updateGameAvailability').and.stub();
