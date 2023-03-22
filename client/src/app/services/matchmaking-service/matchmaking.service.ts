@@ -17,7 +17,7 @@ export class MatchmakingService {
     onGetJoinCancel = new Action<string>();
     onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
     matchIdThatWeAreTryingToJoin: string | null = null;
-    private currentMatch: Match | null;
+    currentMatch: Match | null;
 
     constructor(private readonly socketService: SocketClientService) {}
 

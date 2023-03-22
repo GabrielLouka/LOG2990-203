@@ -191,19 +191,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
         if (this.canvasIsClickable) {
-            if (this.matchmakingService.isSoloMode) {
-                this.socketService.send('validateDifference', {
-                    foundDifferences: this.foundDifferences,
-                    position: coordinateClick,
-                    isPlayer1: true,
-                });
-            } else if (this.matchmakingService.is1vs1Mode) {
-                this.socketService.send('validateDifference', {
-                    foundDifferences: this.foundDifferences,
-                    position: coordinateClick,
-                    isPlayer1: this.matchmakingService.isPlayer1,
-                });
-            }
+            this.socketService.send('validateDifference', {
+                foundDifferences: this.foundDifferences,
+                position: coordinateClick,
+                isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
+            });
             this.errorMessage.nativeElement.style.left = event.clientX + 'px';
             this.errorMessage.nativeElement.style.top = event.clientY + 'px';
             this.cheatModeService.focusKeyEvent(this.cheat);
@@ -226,10 +218,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     if (data.isPlayer1) {
                         this.differencesFound1++;
                         if (!this.matchmakingService.isSoloMode) {
-                            message += ' par ' + this.matchmakingService.player1Username.toUpperCase();
+                            message += ' par ' + this.player1.toUpperCase();
                         }
                     } else {
-                        message += ' par ' + this.matchmakingService.player2Username.toUpperCase();
+                        message += ' par ' + this.player2.toUpperCase();
                         this.differencesFound2++;
                     }
                     this.sendSystemMessageToChat(message);
