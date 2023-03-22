@@ -16,7 +16,6 @@ class SocketClientServiceMock extends SocketClientService {
 
 describe('RegistrationService', () => {
     let service: RegistrationService;
-    // let fixture: ComponentFixture<RegistrationService>;
     let registrationService: RegistrationService;
     let routerSpy: jasmine.SpyObj<RouterTestingModule>;
     let socketTestHelper: SocketTestHelper;
@@ -64,29 +63,47 @@ describe('RegistrationService', () => {
     it('should redirect when the game is deleted', () => {
         spyOn(socketClientService, 'on').and.callThrough();
         const callback = ((params: any) => {}) as any;
-        Object.defineProperty(window, 'location', {
-            value: {
-                href: 'http://example.com/some-page/gamePage1',
-            },
-            writable: true,
-        });
+        // Object.defineProperty(window, 'location', {
+        //     value: {
+        //         href: 'http://example.com/some-page/gamePage1',
+        //     },
+        //     writable: true,
+        // });
         socketTestHelper.on('gameDeleted', callback);
 
         const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: 'gamePage1' };
-
+        // spyOnProperty(window.location.href.split('/')[window.location.href.split('/').length - 2], ).and.returnValue(10);
         service.signalRedirectionOneGame();
         socketTestHelper.peerSideEmit('gameDeleted', data);
         expect(socketClientService.on).toHaveBeenCalledWith('gameDeleted', jasmine.any(Function));
     });
 
+    it('should redirect when the game is deleted', () => {
+        spyOn(socketClientService, 'on').and.callThrough();
+        const callback = ((params: any) => {}) as any;
+        // Object.defineProperty(window, 'location', {
+        //     value: {
+        //         href: 'http://example.com/some-page/gamePage1',
+        //     },
+        //     writable: true,
+        // });
+        socketTestHelper.on('allGameDeleted', callback);
+        const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: 'gamePage1' };
+        service.signalRedirection();
+        socketTestHelper.peerSideEmit('allGameDeleted', data);
+        expect(socketClientService.on).toHaveBeenCalledWith('allGameDeleted', jasmine.any(Function));
+    });
+
     it('should redirect to main page', () => {
-        registrationService.redirectToMainPage();
-        expect(router).toHaveBeenCalled();
+        service.redirectToMainPage();
+        spyOn(router, 'navigate');
+        expect(router.navigate).toHaveBeenCalled();
     });
 
     it('should load the game page', () => {
         const id = 'gamePage1';
-        registrationService.loadGamePage(id);
+        service.loadGamePage(id);
+        spyOn(router, 'navigate');
         expect(router.navigate).toHaveBeenCalled();
     });
 
