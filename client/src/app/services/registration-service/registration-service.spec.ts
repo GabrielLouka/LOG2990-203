@@ -72,7 +72,7 @@ describe('RegistrationService', () => {
         socketTestHelper.on('gameDeleted', callback);
 
         const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: 'gamePage1' };
-        //spyOnProperty(window.location.href.split('/')[window.location.href.split('/').length - 2], ).and.returnValue(10);
+        // spyOnProperty(window.location.href.split('/')[window.location.href.split('/').length - 2], ).and.returnValue(10);
         service.signalRedirectionOneGame();
         socketTestHelper.peerSideEmit('gameDeleted', data);
         expect(socketClientService.on).toHaveBeenCalledWith('gameDeleted', jasmine.any(Function));
@@ -95,13 +95,15 @@ describe('RegistrationService', () => {
     });
 
     it('should redirect to main page', () => {
-        registrationService.redirectToMainPage();
-        expect(router).toHaveBeenCalled();
+        service.redirectToMainPage();
+        spyOn(router, 'navigate');
+        expect(router.navigate).toHaveBeenCalled();
     });
 
     it('should load the game page', () => {
         const id = 'gamePage1';
-        registrationService.loadGamePage(id);
+        service.loadGamePage(id);
+        spyOn(router, 'navigate');
         expect(router.navigate).toHaveBeenCalled();
     });
 
