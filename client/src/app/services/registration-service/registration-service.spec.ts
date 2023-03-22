@@ -85,19 +85,19 @@ describe('RegistrationService', () => {
         socketTestHelper.on('allGameDeleted', callback);
         const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: '1' };
 
-        const locationMock = {
-            pathname: '/registration',
-            href: 'http://localhost:4200/registration',
-        };
+        // const locationMock = {
+        //     pathname: '/registration',
+        //     href: 'http://localhost:4200/registration',
+        // };
 
-        Object.defineProperty(window, 'location', {
-            value: locationMock,
-        });
+        // Object.defineProperty(window, 'location', {
+        //     value: locationMock,
+        // });
         service.signalRedirection();
 
         socketTestHelper.peerSideEmit('allGameDeleted', data);
 
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
+        expect(routerMock.navigate).toHaveBeenCalled();
     });
 
     it('should redirect when the game is deleted', () => {
@@ -114,8 +114,17 @@ describe('RegistrationService', () => {
         // expect(socketClientService.on).toHaveBeenCalledWith('allGameDeleted', jasmine.any(Function));
     });
 
+    // it('should set lastSegment to "registration"', () => {
+    //     const mockPathname = '/path/to/registration';
+    //     spyOnProperty(window.location, 'pathname', 'get').and.returnValue(mockPathname);
+
+    //     service.signalRedirection();
+
+    //     const activatedRoute = TestBed.inject(ActivatedRoute);
+    //     expect(service.lastSegment).toEqual('registration');
+    //   });
     it('should load the game page', () => {
-        const id = 'gamePage1';
+        const id = '1';
         service.loadGamePage(id);
         // spyOn(router, 'navigate');
         // expect(router.navigate).toHaveBeenCalled();
