@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
-import { TestBed } from '@angular/core/testing';
+import { TestBed, waitForAsync } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
@@ -13,6 +15,8 @@ class SocketClientServiceMock extends SocketClientService {
 }
 
 describe('RegistrationService', () => {
+    let service: RegistrationService;
+    // let fixture: ComponentFixture<RegistrationService>;
     let registrationService: RegistrationService;
     let routerSpy: jasmine.SpyObj<RouterTestingModule>;
     let socketTestHelper: SocketTestHelper;
@@ -24,10 +28,9 @@ describe('RegistrationService', () => {
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketTestHelper as unknown as Socket;
-        // socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['on', 'disconnect'], {
-        //     socket: { id: 'socket3' },
-        //     socketId: 'socket3',
-        // });
+    });
+
+    beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             imports: [RouterTestingModule],
             providers: [
@@ -38,9 +41,10 @@ describe('RegistrationService', () => {
                     useValue: routerSpy,
                 },
             ],
-        });
-        registrationService = TestBed.inject(RegistrationService);
-    });
+        }).compileComponents();
+        service = TestBed.inject(RegistrationService);
+        socketClientService = TestBed.inject(SocketClientService);
+    }));
 
     afterEach(() => {
         socketServiceMock.disconnect();
@@ -58,7 +62,7 @@ describe('RegistrationService', () => {
     });
 
     it('should redirect when the game is deleted', () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
+        spyOn(socketClientService, 'on').and.callThrough();
         const callback = ((params: any) => {}) as any;
         Object.defineProperty(window, 'location', {
             value: {
@@ -67,9 +71,11 @@ describe('RegistrationService', () => {
             writable: true,
         });
         socketTestHelper.on('gameDeleted', callback);
+
         const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: 'gamePage1' };
+
+        service.signalRedirectionOneGame();
         socketTestHelper.peerSideEmit('gameDeleted', data);
-        registrationService.signalRedirectionOneGame();
         expect(socketClientService.on).toHaveBeenCalledWith('gameDeleted', jasmine.any(Function));
     });
 
@@ -94,8 +100,9 @@ describe('RegistrationService', () => {
             writable: true,
         });
         socketTestHelper.on('allGameDeleted', callback);
-        socketTestHelper.peerSideEmit('allGameDeleted');
         registrationService.signalRedirection();
+
+        socketTestHelper.peerSideEmit('allGameDeleted');
         expect(socketClientService.on).toHaveBeenCalledWith('allGameDeleted', jasmine.any(Function));
     });
 
