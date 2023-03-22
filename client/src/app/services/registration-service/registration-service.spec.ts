@@ -17,7 +17,6 @@ describe('RegistrationService', () => {
     let service: RegistrationService;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
-    // let socketClientService: SocketClientService;
 
     const routerMock = {
         navigate: jasmine.createSpy('navigate'),
@@ -47,7 +46,6 @@ describe('RegistrationService', () => {
             ],
         }).compileComponents();
         service = TestBed.inject(RegistrationService);
-        // socketClientService = TestBed.inject(SocketClientService);
     }));
 
     afterEach(() => {
@@ -61,66 +59,20 @@ describe('RegistrationService', () => {
 
     it('should redirect to main page', () => {
         service.redirectToMainPage();
-        // // spyOn(service['router'], 'navigate');
-        // expect(service['router'].navigate).toHaveBeenCalled();
     });
-    it('should handle game deletion ', () => {
+
+    it('should handle game deletion', () => {
+        service.handleGameDeleted('1');
+    });
+
+    it('should handle game deletion for a null value ', () => {
         service.handleGameDeleted(null);
-        // // spyOn(service['router'], 'navigate');
-        // expect(service['router'].navigate).toHaveBeenCalled();
+        expect(routerMock.navigate).toHaveBeenCalled();
     });
-    // it('should redirect when the game is deleted', () => {
-    //     spyOn(socketClientService, 'on').and.callThrough();
-    //     const callback = ((params: any) => {}) as any;
-    //     socketTestHelper.on('gameDeleted', callback);
-
-    //     const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: '1' };
-    //     service.signalRedirectionOneGame();
-    //     socketTestHelper.peerSideEmit('gameDeleted', data);
-    //     // expect(socketClientService.on).toHaveBeenCalledWith('gameDeleted', jasmine.any(Function));
-    // });
-
-    // it('should signal redirection when all games are deleted', () => {
-    //     spyOn(socketClientService, 'on').and.callThrough();
-    //     const callback = ((params: any) => {}) as any;
-    //     socketTestHelper.on('allGameDeleted', callback);
-    //     const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: '1' };
-
-    //     service.signalRedirection();
-
-    //     socketTestHelper.peerSideEmit('allGameDeleted', data);
-
-    //     expect(routerMock.navigate).toHaveBeenCalled();
-    // });
-
-    // it('should redirect when the game is deleted', () => {
-    //     spyOn(socketClientService, 'on').and.callThrough();
-    //     const callback = ((params: any) => {}) as any;
-    //     socketTestHelper.on('allGameDeleted', callback);
-    //     const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: '1' };
-
-    //     service.signalRedirection();
-    //     socketTestHelper.peerSideEmit('allGameDeleted', data);
-    //     expect(routerMock.navigate).toHaveBeenCalled();
-    // });
 
     it('should load the game page', () => {
         const id = '1';
         service.loadGamePage(id);
-
         expect(routerMock.navigate).toHaveBeenCalled();
     });
-
-    // it('should signal redirection when all games are deleted', () => {
-    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
-    //     const callback = ((params: any) => {}) as any;
-    //     socketTestHelper.on('allGameDeleted', callback);
-    //     service.signalRedirection();
-
-    //     socketTestHelper.peerSideEmit('allGameDeleted');
-    // });
-
-    // it('should signal redirection when one game is deleted', () => {
-    //     service.signalRedirectionOneGame();
-    // });
 });
