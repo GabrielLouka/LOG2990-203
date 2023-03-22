@@ -65,14 +65,20 @@ describe('RegistrationService', () => {
         service.handleGameDeleted('1');
     });
 
-    it('should handle game deletion for a null value ', () => {
-        service.handleGameDeleted(null);
-        expect(routerMock.navigate).toHaveBeenCalled();
-    });
-
     it('should load the game page', () => {
         const id = '1';
         service.loadGamePage(id);
         expect(routerMock.navigate).toHaveBeenCalled();
+    });
+
+    it('should navigate to home page when no game is specified', async () => {
+        const HOME_PATH = '/home';
+        const gameIdThatWasDeleted = null;
+        spyOn(window, 'alert');
+
+        routerMock.navigate.and.returnValue(Promise.resolve(true));
+        service.handleGameDeleted(gameIdThatWasDeleted);
+
+        expect(routerMock.navigate).toHaveBeenCalledWith([HOME_PATH]);
     });
 });
