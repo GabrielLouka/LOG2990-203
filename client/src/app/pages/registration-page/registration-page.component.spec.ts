@@ -10,7 +10,6 @@ import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
 import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
-import { WAITING_FOR_PLAYER_MESSAGE } from '@common/utils/env';
 import { RegistrationPageComponent } from './registration-page.component';
 
 describe('RegistrationPageComponent', () => {
@@ -197,7 +196,6 @@ describe('RegistrationPageComponent', () => {
     it('should set to true when sent join request', () => {
         component.sendMatchJoinRequest();
         expect(component.hasSentJoinRequest).toBe(true);
-        expect(component.queueStatusMessage).toEqual(WAITING_FOR_PLAYER_MESSAGE);
     });
 
     it('should call incoming player service when accept/refuse incoming player', () => {

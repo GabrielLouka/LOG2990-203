@@ -1,9 +1,7 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/interfaces/game-data';
-import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { MAX_GAMES_PER_PAGE } from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
@@ -40,11 +38,6 @@ export class GamesService {
                     this.showNextButton = this.gamesNbr - (this.currentPageNbr + 1) * MAX_GAMES_PER_PAGE > 0;
                 }
             },
-            error: (err: HttpErrorResponse) => {
-                const responseString = `Server Error : ${err.message}`;
-                const serverResult: ImageUploadResult = JSON.parse(err.error);
-                this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
-            },
         });
     }
 
@@ -57,11 +50,6 @@ export class GamesService {
                         this.gamesNbr = 0;
                         this.reloadPage();
                     }
-                },
-                error: (err: HttpErrorResponse) => {
-                    const responseString = `Server Error : ${err.message}`;
-                    const serverResult = JSON.parse(err.error);
-                    this.debugDisplayMessage.next(responseString + '\n' + serverResult.message);
                 },
             });
             this.socketService.socket.emit('allGames', { gameToDelete: true });
