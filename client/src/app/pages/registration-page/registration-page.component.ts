@@ -51,8 +51,8 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
         this.matchmakingService.onGetJoinRequest.add(this.incomingPlayerService.handleIncomingPlayerJoinRequest.bind(this.incomingPlayerService));
         this.matchmakingService.onGetJoinCancel.add(this.incomingPlayerService.handleIncomingPlayerJoinCancel.bind(this.incomingPlayerService));
-        this.signalRedirection();
-        this.signalRedirectionOneGame();
+        this.matchmakingService.onAllGameDeleted.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
+        this.matchmakingService.onSingleGameDeleted.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
     }
 
     ngOnDestroy(): void {
@@ -62,6 +62,8 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchmakingService.onGetJoinCancel.clear();
         this.matchmakingService.onGetJoinRequestAnswer.clear();
         this.matchmakingService.onMatchUpdated.clear();
+        this.matchmakingService.onAllGameDeleted.clear();
+        this.matchmakingService.onSingleGameDeleted.clear();
         this.hasSentJoinRequest = false;
         this.incomingPlayerService.reset();
     }
@@ -127,13 +129,6 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         }
     }
 
-    signalRedirection() {
-        this.registrationService.signalRedirection();
-    }
-
-    signalRedirectionOneGame() {
-        this.registrationService.signalRedirectionOneGame();
-    }
     acceptIncomingPlayer() {
         this.incomingPlayerService.acceptIncomingPlayer();
     }

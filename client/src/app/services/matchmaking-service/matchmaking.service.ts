@@ -16,6 +16,8 @@ export class MatchmakingService {
     onGetJoinRequest = new Action<Player>();
     onGetJoinCancel = new Action<string>();
     onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
+    onAllGameDeleted = new Action<string | null>();
+    onSingleGameDeleted = new Action<string | null>();
     matchIdThatWeAreTryingToJoin: string | null = null;
     currentMatch: Match | null;
 
@@ -109,6 +111,14 @@ export class MatchmakingService {
 
         this.socketService.on('incomingPlayerRequestAnswer', (data: { matchId: string; player: Player; isAccepted: boolean }) => {
             this.onGetJoinRequestAnswer.invoke(data);
+        });
+
+        this.socketService.on('allGameDeleted', () => {
+            this.onAllGameDeleted.invoke(null);
+        });
+
+        this.socketService.on('gameDeleted', (data: { hasDeletedGame: boolean; id: string }) => {
+            this.onSingleGameDeleted.invoke(data.id);
         });
     }
 
