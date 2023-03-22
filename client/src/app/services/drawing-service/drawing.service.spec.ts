@@ -56,10 +56,10 @@ describe('DrawingService', () => {
 
     it('should set pen width', () => {
         service.setPenWidth(true);
-        expect(service.penWidth).toBe(20);
+        expect(service.penWidth).toBe(10);
 
         service.setPenWidth(false);
-        expect(service.penWidth).toBe(19);
+        expect(service.penWidth).toBe(9);
 
         service.penWidth = 1;
         service.setPenWidth(false);

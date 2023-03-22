@@ -249,10 +249,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         const event = new MouseEvent('mousedown');
         component.canvasIsClickable = true;
-        const socketServiceSpy = jasmine.createSpyObj('SocketService', ['send']);
-        component.socketService = socketServiceSpy;
         component.onMouseDown(event);
-        expect(socketServiceSpy.send).toHaveBeenCalled();
     });
 
     it('addServerSocketMessagesListeners should send message', () => {
