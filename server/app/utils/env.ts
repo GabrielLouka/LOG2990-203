@@ -7,19 +7,14 @@ const DB = {
 };
 
 const R_ONLY = {
-    persistentDataFolderPath: './stored data/',
+    persistentDataFolderPath: './storedData/',
     lastGameIdFileName: 'lastGameId.txt',
-    defaultImagesPath: './stored data/default-img.json',
+    defaultImagesPath: './storedData/default-img.json',
     gamesLimit: 4,
     originalImageFileName: '1.bmp',
     modifiedImageFileName: '2.bmp',
     REQUIRED_WIDTH: '640',
     REQUIRED_HEIGHT: '480',
 };
-
-const GAME_CONST = {
-    NOT_FOUND: -1,
-};
 export { DB };
 export { R_ONLY };
-export { GAME_CONST };

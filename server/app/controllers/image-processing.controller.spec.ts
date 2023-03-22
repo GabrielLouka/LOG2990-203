@@ -4,12 +4,12 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-unused-expressions */
 import { Application } from '@app/app';
-import { GameStorageService } from '@app/services/game-storage.service';
-import { ImageProcessingService } from '@app/services/image-processing.service';
-import { DifferenceImage } from '@common/difference.image';
-import { ImageUploadForm } from '@common/image.upload.form';
-import { ImageUploadResult } from '@common/image.upload.result';
-import { Vector2 } from '@common/vector2';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
+import { Vector2 } from '@common/classes/vector2';
+import { DifferenceImage } from '@common/interfaces/difference.image';
+import { ImageUploadForm } from '@common/interfaces/image.upload.form';
+import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { assert, expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';
@@ -18,8 +18,6 @@ import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { ImageProcessingController } from './image-processing.controller';
 
-const HTTP_STATUS_CREATED = StatusCodes.CREATED;
-const HTTP_STATUS_BAD_REQUEST = StatusCodes.BAD_REQUEST;
 const API_URL = '/api/image_processing';
 
 describe('ImageProcessingController', () => {
@@ -96,7 +94,10 @@ describe('ImageProcessingController', () => {
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
             .set('Accept', 'application/json')
-            .expect(HTTP_STATUS_CREATED);
+            .expect(StatusCodes.CREATED)
+            .then((res) => {
+                expect(res).to.deep.equal(expectedResult);
+            });
     });
 
     it('should return a response with status code 400 when getDifferencesBlackAndWhiteImage throws an error', async () => {
@@ -106,7 +107,7 @@ describe('ImageProcessingController', () => {
         supertest(expressApp)
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
-            .expect(HTTP_STATUS_BAD_REQUEST)
+            .expect(StatusCodes.BAD_REQUEST)
             .catch((res) => {
                 assert.deepEqual(res.message, errorMessage);
             });
@@ -119,7 +120,7 @@ describe('ImageProcessingController', () => {
         supertest(expressApp)
             .post(`${API_URL}/send-image`)
             .send(receivedDifferenceImages)
-            .expect(HTTP_STATUS_BAD_REQUEST)
+            .expect(StatusCodes.BAD_REQUEST)
             .catch((res) => {
                 expect(res.message).to.deep.equal('' + errorMessage);
             });

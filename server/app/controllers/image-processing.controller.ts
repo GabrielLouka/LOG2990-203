@@ -1,13 +1,11 @@
-import { GameStorageService } from '@app/services/game-storage.service';
-import { ImageProcessingService } from '@app/services/image-processing.service';
-import { GAME_CONST } from '@app/utils/env';
-import { ImageUploadForm } from '@common/image.upload.form';
-import { ImageUploadResult } from '@common/image.upload.result';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
+import { ImageUploadForm } from '@common/interfaces/image.upload.form';
+import { ImageUploadResult } from '@common/interfaces/image.upload.result';
+import { NOT_FOUND } from '@common/utils/env';
 import { Request, Response, Router } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
-
-const HTTP_STATUS_CREATED = 201;
-const HTTP_BAD_REQUEST = 400;
 
 @Service()
 export class ImageProcessingController {
@@ -25,12 +23,12 @@ export class ImageProcessingController {
             const buffer1 = Buffer.from(receivedDifferenceImages.firstImage.background);
             const buffer2 = Buffer.from(receivedDifferenceImages.secondImage.background);
 
-            let status = HTTP_STATUS_CREATED;
+            let status = StatusCodes.CREATED;
             let outputResultToSendToClient: ImageUploadResult = {
                 resultImageByteArray: Array.from(new Uint8Array(buffer1)),
                 numberOfDifferences: 0,
                 message: '',
-                generatedGameId: GAME_CONST.NOT_FOUND,
+                generatedGameId: NOT_FOUND,
                 differences: [],
                 isEasy: true,
             };
@@ -39,8 +37,7 @@ export class ImageProcessingController {
                 outputResultToSendToClient = out;
                 outputResultToSendToClient.generatedGameId = this.gameStorageService.getNextAvailableGameId();
             } catch (e) {
-                // eslint-disable-next-line no-console
-                status = HTTP_BAD_REQUEST;
+                status = StatusCodes.BAD_REQUEST;
                 outputResultToSendToClient.message = '' + e;
             }
 

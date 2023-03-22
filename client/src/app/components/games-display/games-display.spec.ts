@@ -1,194 +1,105 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { CommunicationService } from '@app/services/communication.service';
-import { GameData } from '@common/game-data';
-import { defaultRankings } from '@common/ranking';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
+import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { GameData } from '@common/interfaces/game-data';
+import { defaultRankings } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
-import { of, throwError } from 'rxjs';
+import { Socket } from 'socket.io-client';
 import { GamesDisplayComponent } from './games-display.component';
 import SpyObj = jasmine.SpyObj;
+
+class SocketClientServiceMock extends SocketClientService {
+    override connect() {}
+}
+
 describe('GamesDisplayComponent', () => {
     let component: GamesDisplayComponent;
     let fixture: ComponentFixture<GamesDisplayComponent>;
     let communicationServiceSpy: SpyObj<CommunicationService>;
+    let socketClientService: SocketClientService;
+    let socketTestHelper: SocketTestHelper;
+    let socketServiceMock: SocketClientServiceMock;
     beforeEach(() => {
+        socketTestHelper = new SocketTestHelper();
+        socketServiceMock = new SocketClientServiceMock();
+        socketServiceMock.socket = socketTestHelper as unknown as Socket;
         communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['get', 'post', 'delete', 'handleError']);
     });
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
             declarations: [GamesDisplayComponent],
-            providers: [{ provide: CommunicationService, useValue: communicationServiceSpy }, HttpClient],
+            providers: [
+                { provide: CommunicationService, useValue: communicationServiceSpy },
+                HttpClient,
+                { provide: SocketClientService, useValue: socketServiceMock },
+            ],
         }).compileComponents();
     }));
     beforeEach(() => {
         fixture = TestBed.createComponent(GamesDisplayComponent);
         component = fixture.componentInstance;
+        socketClientService = TestBed.inject(SocketClientService);
         fixture.detectChanges();
     });
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should set title and justifyContent based on isSelection (when true)', () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
+    it('should set title based on isSelection (when true)', () => {
+        spyOn(component.theGamesService, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
         component.isSelection = true;
         component.ngOnInit();
         expect(component.title).toEqual('Page de configuration');
-        expect(component.justifyContent).toEqual('center');
     });
-    it('should set title and justifyContent based on isSelection (when false)', () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
+
+    it('should set title based on isSelection (when false)', () => {
+        spyOn(component.theGamesService, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
         component.isSelection = false;
         component.ngOnInit();
         expect(component.title).toEqual('Page de selection');
-        expect(component.justifyContent).toEqual('right');
     });
-    it('should fetch game data from the server', () => {
-        const pageId = 0;
-        const gameContent: {
-            gameData: GameData;
-            originalImage: Buffer;
-        }[] = [];
-        const expectedGames: {
-            gameData: GameData;
-            originalImage: any;
-        }[] = [];
-        for (let i = 1; i <= 4; i++) {
-            const game: GameData = {
-                id: i,
-                name: `Game ${i}`,
-                isEasy: true,
-                nbrDifferences: 4,
-                differences: [
-                    [
-                        { x: 4, y: 0 },
-                        { x: 3, y: 0 },
-                        { x: 2, y: 0 },
-                        { x: 1, y: 0 },
-                        { x: 0, y: 0 },
-                    ],
+    it('should add server socket messages listeners', () => {
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        // eslint-disable-next-line no-unused-vars
+        const callback = ((params: any) => {}) as any;
+        spyOn(component, 'reloadPage').and.stub();
+        spyOn(component, 'updateGameAvailability').and.stub();
+        socketTestHelper.on('gameProgressUpdate', callback);
+        socketTestHelper.peerSideEmit('actionOnGameReloadingThePage');
+        const data = { gameId: 1, matchToJoinIfAvailable: 'match' };
+        socketTestHelper.peerSideEmit('gameProgressUpdate', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(2);
+        expect(socketClientService.on).toHaveBeenCalledWith('gameProgressUpdate', jasmine.any(Function));
+        expect(socketClientService.on).toHaveBeenCalledWith('actionOnGameReloadingThePage', jasmine.any(Function));
+    });
+    it('should update the game availability', () => {
+        const gameId = 1234;
+        const matchToJoinIfAvailable = 'match-1234';
+
+        const game: GameData = {
+            id: 1234,
+            name: 'test',
+            isEasy: true,
+            nbrDifferences: 4,
+            differences: [
+                [
+                    { x: 4, y: 0 },
+                    { x: 3, y: 0 },
+                    { x: 2, y: 0 },
+                    { x: 1, y: 0 },
+                    { x: 0, y: 0 },
                 ],
-                ranking: defaultRankings,
-            };
-            gameContent.push({ gameData: game, originalImage: Buffer.alloc(3) });
-            expectedGames.push({ gameData: game, originalImage: Object({ type: 'Buffer', data: [0, 0, 0] }) });
-        }
-
-        communicationServiceSpy.get.and.returnValue(
-            of({
-                headers: new HttpHeaders(),
-                status: 200,
-                statusText: 'OK',
-                url: '',
-                body: JSON.stringify({ gameContent, nbrOfGame: 4 }),
-                type: 4,
-                ok: true,
-                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
-            }),
-        );
-        component.fetchGameDataFromServer(pageId);
-
-        expect(communicationServiceSpy.get).toHaveBeenCalledWith(`/games/${pageId}`);
-
-        // expect(component.games).toEqual(Object.assign({}, gameContent, { originalImage: { type: 'Buffer', data: Buffer.alloc(3) } }));
-
-        expect(component.games).toEqual(expectedGames);
-        expect(component.gamesNbr).toEqual(4);
-        expect(component.showNextButton).toBeFalse();
+            ],
+            ranking: defaultRankings,
+        };
+        component.theGamesService.games = [{ gameData: game, originalImage: Buffer.alloc(3), matchToJoinIfAvailable }];
+        component.updateGameAvailability(gameId, matchToJoinIfAvailable);
+        expect(component.theGamesService.games[0].matchToJoinIfAvailable).toBe(matchToJoinIfAvailable);
     });
-
-    it('should handle error response from the server', async () => {
-        const error = new HttpErrorResponse({
-            error: JSON.stringify('Test error'),
-            status: 404,
-            statusText: 'Not Found',
-        });
-        spyOn(component.debugDisplayMessage, 'next');
-        communicationServiceSpy.get.and.returnValue(throwError(() => error));
-
-        await component.fetchGameDataFromServer(1);
-        expect(component.debugDisplayMessage.next).toHaveBeenCalled();
-    });
-
-    it('clicking on next button should increment page number', async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
-
-        component.currentPageNbr = 0;
-        await component.goToNextSlide();
-        expect(component.currentPageNbr).toEqual(1);
-    });
-    it('clicking on previous button should decrement page number', async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
-
-        component.isSelection = true;
-        component.currentPageNbr = 2;
-        await component.goToPreviousSlide();
-        expect(component.fetchGameDataFromServer).toHaveBeenCalled();
-        expect(component.currentPageNbr).toEqual(1);
-        expect(component.isSelection).toBeTruthy();
-    });
-
-    it("current page should stay the same if it's the last page", async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
-
-        component.currentPageNbr = 2;
-        await component.goToNextSlide();
-        expect(component.currentPageNbr).toEqual(3);
-        expect(component.showPreviousButton).toBeTruthy();
-    });
-    it("current page should stay the same if it's the last page", async () => {
-        spyOn(component, 'fetchGameDataFromServer').and.returnValue({
-            subscribe: () => {
-                return true;
-            },
-        } as any);
-        component.currentPageNbr = 0;
-        await component.goToPreviousSlide();
-        expect(component.currentPageNbr).toEqual(component.currentPageNbr);
-        expect(component.showPreviousButton).toBeFalsy();
-    });
-
-    // it('should fetch the games from the server', async () => {
-    //     // communicationServiceSpy.get.and.returnValue(
-    //     //     new Promise((resolve) => {
-    //     //         resolve({
-    //     //             subscribe: {
-    //     //                 body: {
-    //     //                     gameContent: [{ name: 'test', id: 'test' }],
-    //     //                     nbrOfGame: 2,
-    //     //                 },
-    //     //             },
-    //     //         });
-    //     //     }) as any,
-    //     // );
-
-    //     communicationServiceSpy.get.and.returnValue({
-    //         subscribe: async () => {
-    //             return new Promise((resolve) => {
-    //                 resolve({
-    //                     body: {
-    //                         gameContent: [{ name: 'test', id: 'test' }],
-    //                         nbrOfGame: 2,
-    //                     },
-    //                 });
-    //             });
-    //         },
-    //     } as any);
-
-    //     expect(component.gamesNbr).toEqual(2);
-    // });
 });

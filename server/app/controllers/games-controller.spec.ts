@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application } from '@app/app';
-import { GameStorageService } from '@app/services/game-storage.service';
-import { EntireGameUploadForm } from '@common/entire.game.upload.form';
-import { GameData } from '@common/game-data';
-import { Vector2 } from '@common/vector2';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { Vector2 } from '@common/classes/vector2';
+import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
+import { GameData } from '@common/interfaces/game-data';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';
@@ -48,12 +48,17 @@ describe('GamesController', () => {
     const gameInfo = {
         gameData: game as any,
         originalImage: images.originalImage,
-        isEasy: true,
+        matchToJoinIfAvailable: 'abcde',
     };
     describe('GET /fetchGame/:id', () => {
         it('GET should return game by id', async () => {
             gameStorageServiceStub.getGameById.returns(
-                Promise.resolve({ gameData: game, originalImage: images.originalImage, modifiedImage: images.modifiedImage }),
+                Promise.resolve({
+                    gameData: game,
+                    originalImage: images.originalImage,
+                    modifiedImage: images.modifiedImage,
+                    matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable,
+                }),
             );
             supertest(expressApp)
                 .get(`${API_URL}/fetchGame/0`)
@@ -77,7 +82,11 @@ describe('GamesController', () => {
     });
     describe('GET /:id', () => {
         it('GET should return games by page id', async () => {
-            gameStorageServiceStub.getGamesInPage.returns(Promise.resolve([{ gameData: gameInfo.gameData, originalImage: gameInfo.originalImage }]));
+            gameStorageServiceStub.getGamesInPage.returns(
+                Promise.resolve([
+                    { gameData: gameInfo.gameData, originalImage: gameInfo.originalImage, matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable },
+                ]),
+            );
             gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
             supertest(expressApp)
                 .get(`${API_URL}/0`)
@@ -146,21 +155,21 @@ describe('GamesController', () => {
             sinon.restore();
         });
     });
-    describe('DELETE /deleteAllGames', async () => {
+    describe('DELETE /allGames', async () => {
         it('DELETE request should delete all games from database', async () => {
-            gameStorageServiceStub.deleteAllGames.resolves();
+            gameStorageServiceStub.allGames.resolves();
             await supertest(expressApp)
-                .delete(`${API_URL}/deleteAllGames`)
+                .delete(`${API_URL}/allGames`)
                 .expect(HTTP_STATUS_OK)
                 .then((response) => {
                     expect(response.body).to.deep.equal({});
                 });
         });
-        it('DELETE /deleteAllGames should not delete when error occurs', async () => {
+        it('DELETE /allGames should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
-            gameStorageServiceStub.deleteAllGames.rejects(errorMessage);
+            gameStorageServiceStub.allGames.rejects(errorMessage);
             supertest(expressApp)
-                .delete(`${API_URL}/deleteAllGames`)
+                .delete(`${API_URL}/allGames`)
                 .expect(HTTP_STATUS_NOT_FOUND)
                 .then((response) => {
                     expect(response.text).to.equal(errorMessage);

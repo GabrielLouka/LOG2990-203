@@ -8,11 +8,6 @@ h1 {
     margin-right: 7vw;
 }
 
-.difference-container {
-    height: 100%;
-    width: 100%;
-}
-
 
 // Canvas CSS
 .canvas-container {
@@ -21,17 +16,24 @@ h1 {
 
 canvas {
     width: 640px;
-    height: 480px; 
+    height: 480px;
     background-color: whitesmoke;
-    border: solid; 
+    border: solid;
 }
 
 .data-container {
-    justify-content: space-around;
+    width: 66vw;
+    height: 15vh;
+    margin-right: 6vw;
+}
 
-    width: 50vw;
-    padding: 3vh;
-    margin-right: 7vw;
+.difference-container {
+    justify-content: space-between;
+    width: 60vw;
+}
+
+.timer-container {
+    margin-bottom: 1.5vw;
 }
 
 .error-message {
@@ -45,29 +47,24 @@ canvas {
 
 .chat-container {
     position: absolute;
-    bottom: 21vh;
+    bottom: 20vh;
     right: 0vw;
 }
 
+.cheat-mode {
+    position: absolute;
+    left: 2vw;
+    bottom: 30vh;
 
+    height: auto;
+    padding: 10px;
 
-// ---------------------
-.bgModal {
-	background-color: rgba(0, 0, 0, 0.8);
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	top: 0;
-	display: none;
-}
-
-.modal-contents {
-	height: 20vh;
-	width: 25vw;
-	background-color: lightblue;
+    border-radius: 10px;
     border: solid;
-	text-align: center;
-	padding: 20px;
-	position: relative;
-	border-radius: 15px;
+
+    background-color: whitesmoke;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+
+    font-size: 1.7vh;
+    letter-spacing: 0.1vw;
 }
