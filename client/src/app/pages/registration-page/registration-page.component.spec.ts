@@ -51,12 +51,7 @@ describe('RegistrationPageComponent', () => {
             'acceptIncomingPlayer',
             'refuseIncomingPlayer',
         ]);
-        registrationService = jasmine.createSpyObj('RegistrationService', [
-            'loadGamePage',
-            'signalRedirection',
-            'signalRedirectionOneGame',
-            'redirectToMainPage',
-        ]);
+        registrationService = jasmine.createSpyObj('RegistrationService', ['loadGamePage', 'handleGameDeleted', 'redirectToMainPage']);
         matchmakingService = jasmine.createSpyObj('MatchmakingService', [
             'onGetJoinRequestAnswer',
             'onMatchUpdated',
@@ -75,6 +70,8 @@ describe('RegistrationPageComponent', () => {
         matchmakingService.onMatchUpdated = new Action<Match | null>();
         matchmakingService.onGetJoinRequest = new Action<Player>();
         matchmakingService.onGetJoinCancel = new Action<string>();
+        matchmakingService.onAllGameDeleted = new Action<string | null>();
+        matchmakingService.onSingleGameDeleted = new Action<string | null>();
     });
 
     beforeEach(async () => {
