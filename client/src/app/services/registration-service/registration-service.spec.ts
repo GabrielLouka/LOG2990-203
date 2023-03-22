@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
@@ -13,20 +13,22 @@ class SocketClientServiceMock extends SocketClientService {
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     override connect() {}
 }
-
 describe('RegistrationService', () => {
     let service: RegistrationService;
-    let routerSpy: jasmine.SpyObj<RouterTestingModule>;
+    // let routerSpy: jasmine.SpyObj<RouterTestingModule>;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
     let socketClientService: SocketClientService;
     // let router: Router;
 
+    const routerMock = {
+        navigate: jasmine.createSpy('navigate'),
+    };
     beforeEach(() => {
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketTestHelper as unknown as Socket;
-        routerSpy = new RouterTestingModule();
+        // routerSpy = new RouterTestingModule();
     });
 
     beforeEach(waitForAsync(() => {
@@ -36,14 +38,20 @@ describe('RegistrationService', () => {
                 RegistrationService,
                 { provide: SocketClientService, useValue: socketServiceMock },
                 {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        snapshot: { paramMap: convertToParamMap({ id: '1' }) },
+                    },
+                },
+                {
                     provide: Router,
-                    useValue: routerSpy,
+                    useValue: routerMock,
                 },
             ],
         }).compileComponents();
         service = TestBed.inject(RegistrationService);
         socketClientService = TestBed.inject(SocketClientService);
-        routerSpy = TestBed.inject(RouterTestingModule);
+        // routerSpy = TestBed.inject(RouterTestingModule);
     }));
 
     afterEach(() => {
@@ -55,6 +63,11 @@ describe('RegistrationService', () => {
         expect(service).toBeTruthy();
     });
 
+    it('should redirect to main page', () => {
+        service.redirectToMainPage();
+        // // spyOn(service['router'], 'navigate');
+        // expect(service['router'].navigate).toHaveBeenCalled();
+    });
     it('should redirect when the game is deleted', () => {
         spyOn(socketClientService, 'on').and.callThrough();
         const callback = ((params: any) => {}) as any;
@@ -64,6 +77,27 @@ describe('RegistrationService', () => {
         service.signalRedirectionOneGame();
         socketTestHelper.peerSideEmit('gameDeleted', data);
         // expect(socketClientService.on).toHaveBeenCalledWith('gameDeleted', jasmine.any(Function));
+    });
+
+    it('should signal redirection when all games are deleted', () => {
+        spyOn(socketClientService, 'on').and.callThrough();
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('allGameDeleted', callback);
+        const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: '1' };
+
+        const locationMock = {
+            pathname: '/registration',
+            href: 'http://localhost:4200/registration',
+        };
+
+        Object.defineProperty(window, 'location', {
+            value: locationMock,
+        });
+        service.signalRedirection();
+
+        socketTestHelper.peerSideEmit('allGameDeleted', data);
+
+        expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
     });
 
     it('should redirect when the game is deleted', () => {
@@ -78,12 +112,6 @@ describe('RegistrationService', () => {
         service.signalRedirection();
         socketTestHelper.peerSideEmit('allGameDeleted', data);
         // expect(socketClientService.on).toHaveBeenCalledWith('allGameDeleted', jasmine.any(Function));
-    });
-
-    it('should redirect to main page', () => {
-        service.redirectToMainPage();
-        // spyOn(router, 'navigate');
-        // expect(service['router'].navigate).toHaveBeenCalled();
     });
 
     it('should load the game page', () => {
