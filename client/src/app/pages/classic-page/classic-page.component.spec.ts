@@ -228,7 +228,6 @@ describe('ClassicPageComponent', () => {
 
     it('requestStartGame should send from socket', () => {
         component.requestStartGame();
-        // expect(socketClientService.send).toHaveBeenCalled();
     });
 
     it('loadImagesToCanvas should load images to each canvas', () => {

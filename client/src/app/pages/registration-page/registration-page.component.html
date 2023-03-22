@@ -41,7 +41,7 @@
             <div class="flex-row center message-container">
                 <div *ngIf="queueStatusMessage[12] === 'e' || queueStatusMessage[13] === 'u'" class="flex-column center">
                     <h2>{{ queueStatusMessage }}</h2>
-                    <app-spinner #spinner class="spinner"></app-spinner>
+                    <app-spinner class="spinner"></app-spinner>
                 </div>
 
                 <div *ngIf="hasFoundIncomingPlayer" class="flex-column center">
