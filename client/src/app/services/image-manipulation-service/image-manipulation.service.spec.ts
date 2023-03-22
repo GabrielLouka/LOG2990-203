@@ -12,10 +12,19 @@ import { ImageManipulationService } from './image-manipulation.service';
 describe('ImageManipulationService', () => {
     // eslint-disable-next-line no-unused-vars
     let service: ImageManipulationService;
-
+    let canvas: HTMLCanvasElement;
     // We have no dependencies to other classes or Angular Components
     // but we can still let Angular handle the objet creation
     beforeEach(() => TestBed.configureTestingModule({}));
+    beforeEach(() => {
+        canvas = document.createElement('canvas');
+        canvas.width = 2;
+        canvas.height = 2;
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        const imageData = context.createImageData(2, 2);
+        imageData.data.set([255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 255]);
+        context.putImageData(imageData, 0, 0);
+    });
 
     // This runs before each test so we put variables we reuse here
     beforeEach(() => {
@@ -105,4 +114,21 @@ describe('ImageManipulationService', () => {
         tick(100 * 6);
         expect(mySpy).toHaveBeenCalled();
     }));
+
+    it("alternateOldNewImage should call loadCanvas", () => {
+        const imageOld: Buffer = Buffer.alloc(100, 1);
+        const imageNew: Buffer = Buffer.alloc(100, 0);
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        const loadSpy = spyOn(service, 'loadCanvasImages');
+        service.alternateOldNewImage(imageOld, imageNew, ctx);
+        expect(loadSpy).not.toHaveBeenCalled();
+    });
+
+
+
+
+
+
 });
