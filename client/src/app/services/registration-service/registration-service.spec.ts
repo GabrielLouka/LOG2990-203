@@ -112,6 +112,7 @@ describe('RegistrationService', () => {
         service.signalRedirection();
         socketTestHelper.peerSideEmit('allGameDeleted', data);
         // expect(socketClientService.on).toHaveBeenCalledWith('allGameDeleted', jasmine.any(Function));
+        expect(routerMock.navigate).toHaveBeenCalled();
     });
 
     // it('should set lastSegment to "registration"', () => {
@@ -128,6 +129,7 @@ describe('RegistrationService', () => {
         service.loadGamePage(id);
         // spyOn(router, 'navigate');
         // expect(router.navigate).toHaveBeenCalled();
+        expect(routerMock.navigate).toHaveBeenCalled();
     });
 
     it('should signal redirection when all games are deleted', () => {
@@ -141,6 +143,26 @@ describe('RegistrationService', () => {
 
     it('should signal redirection when one game is deleted', () => {
         service.signalRedirectionOneGame();
-        // expect(router.navigate).toHaveBeenCalled();
     });
+
+    // it('should redirect to home when lastSegment is "registration"', () => {
+    //     // Mock the window.location.href to include "/registration" as the last segment
+    //     spyOnProperty(window.location, 'href', 'get').and.returnValue('https://example.com/registration');
+
+    //     // Mock the socketService's "on" method to call the callback function
+    //     const callback = ((params: any) => {}) as any;
+    //     socketTestHelper.on('allGameDeleted', callback);
+
+    //     // Mock the router's "navigate" method to return a resolved promise
+    //     spyOn(service['router'], 'navigate').and.returnValue(Promise.resolve(true));
+
+    //     // Call the signalRedirection method
+    //     service.signalRedirection();
+
+    //     // Expect that the router's navigate method was called with the correct argument
+    //     //expect(service.router.navigate).toHaveBeenCalledWith([HOME_PATH]);
+
+    //     // Expect that an alert message was shown
+    //     expect(window.alert).toHaveBeenCalledWith("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
+    // });
 });
