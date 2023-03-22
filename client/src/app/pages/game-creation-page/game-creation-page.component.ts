@@ -41,7 +41,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
 
     private originalImage: File | null;
     private modifiedImage: File | null;
-    private defaultImagePath: string = '../../assets/img/image_empty.bmp';
+    private defaultImagePath: string = './assets/img/image_empty.bmp';
     private defaultImageFile: File;
 
     private formToSendAfterServerConfirmation: EntireGameUploadForm;
