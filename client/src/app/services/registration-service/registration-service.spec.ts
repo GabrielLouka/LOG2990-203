@@ -15,11 +15,9 @@ class SocketClientServiceMock extends SocketClientService {
 }
 describe('RegistrationService', () => {
     let service: RegistrationService;
-    // let routerSpy: jasmine.SpyObj<RouterTestingModule>;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
     let socketClientService: SocketClientService;
-    // let router: Router;
 
     const routerMock = {
         navigate: jasmine.createSpy('navigate'),
@@ -28,7 +26,6 @@ describe('RegistrationService', () => {
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketTestHelper as unknown as Socket;
-        // routerSpy = new RouterTestingModule();
     });
 
     beforeEach(waitForAsync(() => {
@@ -51,7 +48,6 @@ describe('RegistrationService', () => {
         }).compileComponents();
         service = TestBed.inject(RegistrationService);
         socketClientService = TestBed.inject(SocketClientService);
-        // routerSpy = TestBed.inject(RouterTestingModule);
     }));
 
     afterEach(() => {
@@ -85,14 +81,6 @@ describe('RegistrationService', () => {
         socketTestHelper.on('allGameDeleted', callback);
         const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: '1' };
 
-        // const locationMock = {
-        //     pathname: '/registration',
-        //     href: 'http://localhost:4200/registration',
-        // };
-
-        // Object.defineProperty(window, 'location', {
-        //     value: locationMock,
-        // });
         service.signalRedirection();
 
         socketTestHelper.peerSideEmit('allGameDeleted', data);
@@ -106,29 +94,15 @@ describe('RegistrationService', () => {
         socketTestHelper.on('allGameDeleted', callback);
         const data: { hasDeletedGame: boolean; id: string } = { hasDeletedGame: true, id: '1' };
 
-        // const mockPathSegments = ['registration', 'registration', 'registration'];
-        // spyOn(window.location.href, 'split').and.returnValue(mockPathSegments);
-
         service.signalRedirection();
         socketTestHelper.peerSideEmit('allGameDeleted', data);
-        // expect(socketClientService.on).toHaveBeenCalledWith('allGameDeleted', jasmine.any(Function));
         expect(routerMock.navigate).toHaveBeenCalled();
     });
 
-    // it('should set lastSegment to "registration"', () => {
-    //     const mockPathname = '/path/to/registration';
-    //     spyOnProperty(window.location, 'pathname', 'get').and.returnValue(mockPathname);
-
-    //     service.signalRedirection();
-
-    //     const activatedRoute = TestBed.inject(ActivatedRoute);
-    //     expect(service.lastSegment).toEqual('registration');
-    //   });
     it('should load the game page', () => {
         const id = '1';
         service.loadGamePage(id);
-        // spyOn(router, 'navigate');
-        // expect(router.navigate).toHaveBeenCalled();
+
         expect(routerMock.navigate).toHaveBeenCalled();
     });
 
@@ -145,24 +119,4 @@ describe('RegistrationService', () => {
         service.signalRedirectionOneGame();
     });
 
-    // it('should redirect to home when lastSegment is "registration"', () => {
-    //     // Mock the window.location.href to include "/registration" as the last segment
-    //     spyOnProperty(window.location, 'href', 'get').and.returnValue('https://example.com/registration');
-
-    //     // Mock the socketService's "on" method to call the callback function
-    //     const callback = ((params: any) => {}) as any;
-    //     socketTestHelper.on('allGameDeleted', callback);
-
-    //     // Mock the router's "navigate" method to return a resolved promise
-    //     spyOn(service['router'], 'navigate').and.returnValue(Promise.resolve(true));
-
-    //     // Call the signalRedirection method
-    //     service.signalRedirection();
-
-    //     // Expect that the router's navigate method was called with the correct argument
-    //     //expect(service.router.navigate).toHaveBeenCalledWith([HOME_PATH]);
-
-    //     // Expect that an alert message was shown
-    //     expect(window.alert).toHaveBeenCalledWith("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");
-    // });
 });
