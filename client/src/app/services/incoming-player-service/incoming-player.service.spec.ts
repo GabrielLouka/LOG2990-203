@@ -152,4 +152,10 @@ describe('IncomingPlayerService', () => {
         incomingPlayerService.acceptIncomingPlayer();
         expect(matchmakingServiceSpy.sendIncomingPlayerRequestAnswer).toHaveBeenCalled();
     });
+
+    it('should return if incoming player is null ', () => {
+        incomingPlayerService.reset();
+        incomingPlayerService.acceptIncomingPlayer();
+        expect(matchmakingServiceSpy.sendIncomingPlayerRequestAnswer).not.toHaveBeenCalled();
+    });
 });
