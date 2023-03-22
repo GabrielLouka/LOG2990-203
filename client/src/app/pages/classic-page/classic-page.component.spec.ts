@@ -436,31 +436,31 @@ describe('ClassicPageComponent', () => {
 
         component.handleMatchUpdate(null);
     });
-    it('should return the fff', () => {
+    it('should handle gameover', () => {
         component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
 
         component.gameOver();
     });
-    it('should return the f', () => {
+    it('should return appropriately on quit game', () => {
         component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
 
         component.onQuitGame();
     });
-    it('should return the fffff', () => {
+    it('should return the appropriate value on win game', () => {
         component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
 
         component.onWinGame('ibrahim', true);
     });
-    it('should returnehjdjd', () => {
+    it('should return the appropriate value', () => {
         component.cheatMode();
     });
-    it('should return qqq', () => {
+    it('should return appropriate value', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
         component.showHiddenDifferences(Buffer.from([0]));
     });
-    it('should return eeeee', () => {
+    it('should stop cheating', () => {
         component.stopCheating();
     });
     it('should return put canvas', () => {
