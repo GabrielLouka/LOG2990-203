@@ -175,7 +175,6 @@ export class GameCreationPageComponent {
                 next: (response) => {
                     const responseString = ` ${response.status} - 
                     ${response.statusText} \n`;
-                    console.log(responseString);
                     if (response.body !== null) {
                         const serverResult: ImageUploadResult = JSON.parse(response.body);
                         this.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
