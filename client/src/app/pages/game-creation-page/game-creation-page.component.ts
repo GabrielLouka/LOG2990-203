@@ -89,7 +89,6 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
         image.onload = () => {
             if (!this.is24BitDepthBMP(imageBuffer)) {
                 alert("L'image doit être en 24-bits");
-                image.src = URL.createObjectURL(this.defaultImageFile);
                 return;
             }
 
