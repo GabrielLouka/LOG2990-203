@@ -126,6 +126,18 @@ describe('ImageManipulationService', () => {
         expect(loadSpy).not.toHaveBeenCalled();
     });
 
+    it('returns correct dimensions for image with negative height', () => {
+        const imageWidth = 640;
+        const imageHeight = -480;
+        const buffer = Buffer.alloc(8);
+        buffer.writeInt32LE(imageWidth, 0);
+        buffer.writeInt32LE(imageHeight, 4);
+        const dimensions = service.getImageDimensions(buffer);
+        expect(dimensions.x).toBe(2);
+        expect(dimensions.y).toBe(3);
+        
+      });
+
 
 
 
