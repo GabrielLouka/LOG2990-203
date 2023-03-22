@@ -82,8 +82,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
                 this.matchmakingService.currentMatchPlayer = this.username;
             } else if (this.username && this.matchmakingService.isSoloMode) {
                 this.matchmakingService.currentMatchPlayer = this.username;
-            } else window.alert('Username to register is not valid !');
-
+            }
             if (this.matchmakingService.isSoloMode) {
                 this.loadGamePage();
             } else {
