@@ -7,24 +7,15 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
+import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET } from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { ImageManipulationService } from './image-manipulation.service';
 describe('ImageManipulationService', () => {
     // eslint-disable-next-line no-unused-vars
     let service: ImageManipulationService;
-    let canvas: HTMLCanvasElement;
     // We have no dependencies to other classes or Angular Components
     // but we can still let Angular handle the objet creation
     beforeEach(() => TestBed.configureTestingModule({}));
-    beforeEach(() => {
-        canvas = document.createElement('canvas');
-        canvas.width = 2;
-        canvas.height = 2;
-        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-        const imageData = context.createImageData(2, 2);
-        imageData.data.set([255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 0, 0, 0, 255]);
-        context.putImageData(imageData, 0, 0);
-    });
 
     // This runs before each test so we put variables we reuse here
     beforeEach(() => {
@@ -115,7 +106,18 @@ describe('ImageManipulationService', () => {
         expect(mySpy).toHaveBeenCalled();
     }));
 
-    it("alternateOldNewImage should call loadCanvas", () => {
+    it('alternateOldNewImage should call loadCanvas', () => {
+        const imageOld: Buffer = Buffer.alloc(100, 1);
+        const imageNew: Buffer = Buffer.alloc(100, 0);
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        const loadSpy = spyOn(service, 'loadCanvasImages');
+        service.alternateOldNewImage(imageOld, imageNew, ctx);
+        expect(loadSpy).not.toHaveBeenCalled();
+    });
+
+    it('alternateOldNewImage should call loadCanvas', () => {
         const imageOld: Buffer = Buffer.alloc(100, 1);
         const imageNew: Buffer = Buffer.alloc(100, 0);
 
@@ -127,20 +129,12 @@ describe('ImageManipulationService', () => {
     });
 
     it('returns correct dimensions for image with negative height', () => {
-        const imageWidth = 640;
-        const imageHeight = -480;
-        const buffer = Buffer.alloc(8);
-        buffer.writeInt32LE(imageWidth, 0);
-        buffer.writeInt32LE(imageHeight, 4);
-        const dimensions = service.getImageDimensions(buffer);
-        expect(dimensions.x).toBe(2);
-        expect(dimensions.y).toBe(3);
-        
-      });
-
-
-
-
-
-
+        const mockBuffer = Buffer.alloc(100, -1);
+        const dimensions = service.getImageDimensions(mockBuffer);
+        const imageWidthExpected = mockBuffer.readInt32LE(IMAGE_WIDTH_OFFSET);
+        let imageHeightExpected = mockBuffer.readInt32LE(IMAGE_HEIGHT_OFFSET);
+        imageHeightExpected = -imageHeightExpected;
+        expect(dimensions.x).toBe(imageWidthExpected);
+        expect(dimensions.y).toBe(imageHeightExpected);
+    });
 });

@@ -98,9 +98,9 @@ export class ImageManipulationService {
     }
 
     getColorIndicesForCoord(x: number, y: number, canvas: HTMLCanvasElement): Uint8ClampedArray {
-        const context = canvas.getContext('2d');
-        const imgd = context?.getImageData(x, canvas.height - y, 1, 1);
-        const pix = imgd?.data;
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        const imageData = context.getImageData(x, canvas.height - y, 1, 1) as ImageData;
+        const pix = imageData.data;
         return pix as Uint8ClampedArray;
     }
 
