@@ -6,7 +6,7 @@ import { io, Socket } from 'socket.io-client';
 })
 export class SocketClientService {
     socket: Socket;
-    serverAddress: string = 'http://ec2-35-183-125-86.ca-central-1.compute.amazonaws.com:3000';
+    serverAddress: string = 'http://ec2-35-183-125-86.ca-central-1.compute.amazonaws.com:3000/api';
 
     isSocketAlive() {
         return this.socket && this.socket.connected;
