@@ -10,15 +10,12 @@ describe('ChatComponent', () => {
 
     beforeEach(() => {
         chatService = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendMessageFromSystem', 'scrollToBottom']);
-        
     });
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [ChatComponent],
-            providers: [
-                {provide: ChatService, useValue: chatService}
-            ]
+            providers: [{ provide: ChatService, useValue: chatService }],
         }).compileComponents();
 
         fixture = TestBed.createComponent(ChatComponent);
@@ -52,7 +49,7 @@ describe('ChatComponent', () => {
         expect(component.messages.length).toBe(0);
     });
 
-    it("sendMessage should use service", () => {
+    it('sendMessage should use service', () => {
         spyOn(component, 'sendMessage');
         component.sendMessage();
         expect(chatService.sendMessage).not.toHaveBeenCalled();
