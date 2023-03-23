@@ -1,13 +1,17 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpException } from '@app/classes/http.exception';
 import * as cookieParser from 'cookie-parser';
 import * as cors from 'cors';
 import * as express from 'express';
+import * as fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
+import * as path from 'path';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
 import { GamesController } from './controllers/games.controller';
 import { ImageProcessingController } from './controllers/image-processing.controller';
+import { R_ONLY } from './utils/env';
 
 @Service()
 export class Application {
@@ -41,7 +45,30 @@ export class Application {
         this.app.use('/api/games', this.gamesController.router);
         this.app.use('/api/images/:gameId/:imgId', (req, res) => {
             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            res.status(200).send('test ' + req.params.gameId + ' / ' + req.params.imgId);
+            // res.status(200).send('test ' + req.params.gameId + ' / ' + req.params.imgId);
+
+            const imgPath = path.join(R_ONLY.persistentDataFolderPath, req.params.gameId, `${req.params.imgId}.bmp`);
+
+            // Check if the file exists
+            fs.access(imgPath, fs.constants.F_OK, (err) => {
+                if (err) {
+                    // If the file doesn't exist, send a 404 error
+                    res.status(404).send('Image not found at ' + imgPath + '');
+                } else {
+                    // If the file exists, read it and send it as the response
+                    fs.readFile(imgPath, (err2, data) => {
+                        if (err2) {
+                            // If there's an error reading the file, send a 500 error
+                            res.status(500).send('Internal server error');
+                        } else {
+                            // Set the Content-Type header to indicate that it's a BMP image
+                            res.setHeader('Content-Type', 'image/bmp');
+                            // Send the image data as the response
+                            res.send(data);
+                        }
+                    });
+                }
+            });
         });
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
