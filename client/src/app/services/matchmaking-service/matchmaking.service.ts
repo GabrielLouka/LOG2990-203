@@ -31,6 +31,10 @@ export class MatchmakingService {
         return this.currentMatch?.matchId as string;
     }
 
+    get currentGameId(): string | undefined {
+        return this.currentMatch?.gameId.toString();
+    }
+
     get currentSocketId(): string {
         return this.socketService.socketId;
     }
