@@ -23,7 +23,7 @@ export class MatchManagerService {
     setMatchType(matchId: string, matchType: MatchType) {
         const matchToChange = this.getMatchById(matchId);
 
-        if (matchToChange != null) {
+        if (matchToChange) {
             matchToChange.matchType = matchType;
         }
     }
@@ -31,8 +31,8 @@ export class MatchManagerService {
     setMatchPlayer(matchId: string, player: Player) {
         const matchToChange = this.getMatchById(matchId);
 
-        if (matchToChange != null) {
-            if (matchToChange.player1 == null) {
+        if (matchToChange) {
+            if (!matchToChange.player1) {
                 matchToChange.player1 = player;
                 if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer1) matchToChange.matchStatus = MatchStatus.WaitingForPlayer2;
             } else {
@@ -58,7 +58,7 @@ export class MatchManagerService {
         }
 
         if (modifiedMatch) {
-            if (modifiedMatch.player1 == null && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
+            if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
             else modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
         }

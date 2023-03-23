@@ -39,7 +39,6 @@ describe('SocketManager', () => {
         emitStub = sinon.stub(socketManager['sio'].sockets, <any>'emit');
         matchingDifferencesServiceStub = sinon.createStubInstance(MatchingDifferencesService);
         matchManagerServiceStub = sinon.createStubInstance(MatchManagerService);
-        matchManagerServiceStub.getMatchById.resolves(match);
         matchManagerServiceStub.getMatchAvailableForGame.resolves(match.matchId);
         roomEmitStub = sinon.stub(socketManager['sio'], <any>'to');
     });
@@ -54,15 +53,20 @@ describe('SocketManager', () => {
         sinon.restore();
     });
 
-    const matchPlayer = {
-        username: 'player',
+    const matchPlayer1 = {
+        username: 'player1',
         playerId: 'socket1',
+    };
+
+    const matchPlayer2 = {
+        username: 'player2',
+        playerId: 'socket2',
     };
     const match: Match = {
         gameId: 0,
         matchId: 'match1',
-        player1: matchPlayer,
-        player2: matchPlayer,
+        player1: matchPlayer1,
+        player2: matchPlayer2,
         matchType: MatchType.OneVersusOne,
         matchStatus: MatchStatus.InProgress,
     };
@@ -161,7 +165,6 @@ describe('SocketManager', () => {
         const fakeEmit = sinon.fake();
         roomEmitStub.returns({ emit: fakeEmit });
         validateSocket.rooms.has = sinon.stub().returns(true);
-
         const validateCallback = validateSocket.on.getCall(1).args[1];
         validateCallback({ foundDifferences: [false, false], position: differencePosition, isPlayer1: true });
         setTimeout(() => {
@@ -192,14 +195,11 @@ describe('SocketManager', () => {
     });
 
     it('should remove player from match when disconnect is called', (done) => {
+        matchManagerServiceStub['currentOnlinePlayedMatches'] = [match];
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
         connectionCallback(socket);
-        const fakeEmit = sinon.fake();
-        roomEmitStub.returns({ emit: fakeEmit });
-        socket.rooms.has = sinon.stub().returns(true);
         const disconnectCallback = socket.on.getCall(2).args[1];
-        matchManagerServiceStub.removePlayerFromMatch.withArgs('socket1').returns('match1');
         disconnectCallback();
         setTimeout(() => {
             assert(socket.on.calledWith('disconnect'));
@@ -221,6 +221,7 @@ describe('SocketManager', () => {
     });
 
     it('should set match type', (done) => {
+        matchManagerServiceStub.createMatch(match.gameId, match.matchId);
         matchManagerServiceStub.getMatchById.resolves(match);
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
@@ -234,11 +235,14 @@ describe('SocketManager', () => {
     });
 
     it('should set match player', (done) => {
+        matchManagerServiceStub.createMatch(match.gameId, match.matchId);
+        matchManagerServiceStub.getMatchById.resolves('match1');
+        matchManagerServiceStub.getMatchAvailableForGame.resolves('match1');
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
         connectionCallback(socket);
         const setMatchPlayerCallback = socket.on.getCall(5).args[1];
-        setMatchPlayerCallback({ matchId: match.matchId, player: matchPlayer });
+        setMatchPlayerCallback({ matchId: match.matchId, player: matchPlayer1 });
         setTimeout(() => {
             assert(socket.on.calledWith('setMatchPlayer'));
             done();
@@ -265,7 +269,7 @@ describe('SocketManager', () => {
         const fakeEmit = sinon.fake();
         socket.to.returns({ emit: fakeEmit });
         const joinCallback = socket.on.getCall(7).args[1];
-        joinCallback({ matchId: match.matchId, player: matchPlayer });
+        joinCallback({ matchId: match.matchId, player: matchPlayer1 });
         setTimeout(() => {
             assert(socket.on.calledWith('requestToJoinMatch'));
             assert(socket.to.called);
@@ -281,7 +285,7 @@ describe('SocketManager', () => {
         const fakeEmit = sinon.fake();
         socket.to.returns({ emit: fakeEmit });
         const joinCallback = socket.on.getCall(8).args[1];
-        joinCallback({ matchId: match.matchId, player: matchPlayer });
+        joinCallback({ matchId: match.matchId, player: matchPlayer1 });
         setTimeout(() => {
             assert(socket.on.calledWith('cancelJoinMatch'));
             done();
@@ -289,14 +293,16 @@ describe('SocketManager', () => {
     });
 
     it('should send request answer to incoming player', (done) => {
+        matchManagerServiceStub.getMatchAvailableForGame.resolves('match1');
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
         connectionCallback(socket);
         socket.rooms.has = sinon.stub().returns(true);
         const fakeEmit = sinon.fake();
         socket.to.returns({ emit: fakeEmit });
+        matchManagerServiceStub.getMatchAvailableForGame.resolves('match1');
         const joinCallback = socket.on.getCall(9).args[1];
-        joinCallback({ matchId: match.matchId, player: matchPlayer, isAccepted: true });
+        joinCallback({ matchId: match.matchId, player: matchPlayer1, isAccepted: true });
         setTimeout(() => {
             assert(socket.on.calledWith('sendIncomingPlayerRequestAnswer'));
             done();

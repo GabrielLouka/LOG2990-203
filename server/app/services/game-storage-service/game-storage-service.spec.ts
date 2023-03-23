@@ -106,6 +106,45 @@ describe('Game storage service', () => {
         sandbox.restore();
         sinon.restore();
     });
+
+    it('should throw an error if the deleted file is not good', () => {
+        const sandbox: sinon.SinonSandbox = sinon.createSandbox();
+        const readdirStub: sinon.SinonStub = sandbox.stub(fs, 'readdir');
+        const consoleStub = sandbox.stub(console, 'error');
+        const errorMessage = 'Error';
+        readdirStub.callsFake((path: any, options: any, callback: (arg0: Error) => void) => {
+            callback(new Error(errorMessage));
+        });
+        gameStorageService.deleteStoredData('gameId');
+        sinon.assert.called(consoleStub);
+        sandbox.restore();
+        sinon.restore();
+    });
+
+    it('should throw an error if delete data for all game has wrong file', () => {
+        const sandbox: sinon.SinonSandbox = sinon.createSandbox();
+        const readdirStub: sinon.SinonStub = sandbox.stub(fs, 'readdir');
+        const consoleStub = sandbox.stub(console, 'error');
+        const errorMessage = 'Error';
+        readdirStub.callsFake((path: any, options: any, callback: (arg0: Error) => void) => {
+            callback(new Error(errorMessage));
+        });
+        gameStorageService.deleteStoredDataForAllTheGame();
+        sinon.assert.called(consoleStub);
+        sandbox.restore();
+        sinon.restore();
+    });
+
+    it('should delete the stored data', () => {
+        const pathTest = R_ONLY.persistentDataFolderPath;
+        const sandbox: sinon.SinonSandbox = sinon.createSandbox();
+        const readdirStub: sinon.SinonStub = sandbox.stub(fs, 'readdir');
+        gameStorageService.deleteStoredData('5');
+        sinon.assert.calledWith(readdirStub, pathTest, { withFileTypes: true });
+        sandbox.restore();
+        sinon.restore();
+    });
+
     it('should throw an error if the path is not good when return the next available game id', () => {
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
         const readFileStub = sandbox.stub(fs, 'readFileSync');
@@ -117,6 +156,7 @@ describe('Game storage service', () => {
         sandbox.restore();
         sinon.restore();
     });
+
     it('should create a new folder', () => {
         const pathTest = './app/data';
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
@@ -126,6 +166,7 @@ describe('Game storage service', () => {
         sandbox.restore();
         sinon.restore();
     });
+
     it('should throw an error when creating the folder', () => {
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
         const pathTest = './app/data';
