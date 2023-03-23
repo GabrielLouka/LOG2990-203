@@ -16,18 +16,18 @@ export class DeleteGamesPopUpComponent {
         message: string;
         option1: string;
         option2: string;
-        isallGames: boolean;
+        isAllGames: boolean;
     }[] = [];
 
-    showDeleteGamesPopUp(isallGames: boolean) {
-        const message = isallGames ? this.allGamesMessage : this.deleteThisGame;
+    showDeleteGamesPopUp(isAllGames: boolean) {
+        const message = isAllGames ? this.allGamesMessage : this.deleteThisGame;
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: this.deleteMessage + message,
             message: '',
             option1: 'OUI',
             option2: 'NON',
-            isallGames,
+            isAllGames,
         });
 
         this.showPopUp();

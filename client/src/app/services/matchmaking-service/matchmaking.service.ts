@@ -117,7 +117,7 @@ export class MatchmakingService {
             this.onGetJoinRequestAnswer.invoke(data);
         });
 
-        this.socketService.on('allGameDeleted', () => {
+        this.socketService.on('allGamesDeleted', () => {
             this.onAllGameDeleted.invoke(null);
         });
 
@@ -133,6 +133,8 @@ export class MatchmakingService {
         this.onGetJoinRequest = new Action<Player>();
         this.onGetJoinCancel = new Action<string>();
         this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
+        this.onAllGameDeleted = new Action<string | null>();
+        this.onSingleGameDeleted = new Action<string | null>();
         this.matchIdThatWeAreTryingToJoin = null;
     }
 

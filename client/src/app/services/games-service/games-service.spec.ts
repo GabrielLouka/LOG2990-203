@@ -119,9 +119,30 @@ describe('GamesService', () => {
         );
         spyOn(socketClientService.socket, 'emit');
         spyOn(service, 'reloadPage').and.stub();
-        await service.allGames(true);
+        await service.deleteAllGames(true);
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/allGames');
-        expect(socketClientService.socket.emit).toHaveBeenCalledWith('allGames', { gameToDelete: true });
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames', { gameToDelete: true });
+        expect(service.reloadPage).toHaveBeenCalled();
+    });
+
+    it('should delete game', async () => {
+        communicationServiceSpy.delete.and.returnValue(
+            of({
+                headers: new HttpHeaders(),
+                status: 200,
+                statusText: 'OK',
+                url: '',
+                body: 'test',
+                type: 4,
+                ok: true,
+                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
+            }),
+        );
+        spyOn(socketClientService.socket, 'emit');
+        spyOn(service, 'reloadPage').and.stub();
+        await service.deleteSelectedGame(true, '3');
+        expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/3');
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteGame', { gameToDelete: true });
         expect(service.reloadPage).toHaveBeenCalled();
     });
 });

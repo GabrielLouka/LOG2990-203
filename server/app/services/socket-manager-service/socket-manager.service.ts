@@ -92,8 +92,8 @@ export class SocketManager {
                 this.sio.to(data.matchId).emit('incomingPlayerRequestAnswer', data);
             });
 
-            socket.on('allGames', () => {
-                this.sio.emit('allGameDeleted');
+            socket.on('deleteAllGames', () => {
+                this.sio.emit('allGamesDeleted');
                 this.sio.emit('actionOnGameReloadingThePage');
             });
 
@@ -126,7 +126,7 @@ export class SocketManager {
 
             const sendGameMatchProgressUpdate = (matchId: string) => {
                 const match = this.matchManagerService.getMatchById(matchId);
-                if (match === undefined || match == null) return;
+                if (!match) return;
                 const matchToJoinIfAvailable = this.matchManagerService.getMatchAvailableForGame(match.gameId);
                 this.sio.emit('gameProgressUpdate', {
                     gameId: match.gameId,
