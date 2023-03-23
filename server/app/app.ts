@@ -39,9 +39,14 @@ export class Application {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/image_processing', this.imageProcessingController.router);
         this.app.use('/api/games', this.gamesController.router);
+        this.app.use('/api/images/:gameId/:imgId', (req, res) => {
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            res.status(200).send('test ' + req.params.gameId + ' / ' + req.params.imgId);
+        });
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });
+
         this.errorHandling();
     }
 
