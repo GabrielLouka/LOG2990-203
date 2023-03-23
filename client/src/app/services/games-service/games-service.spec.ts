@@ -11,14 +11,13 @@ import { Buffer } from 'buffer';
 import { of } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { GamesService } from './games.service';
-import SpyObj = jasmine.SpyObj;
 
 class SocketClientServiceMock extends SocketClientService {
     override connect() {}
 }
 describe('GamesService', () => {
     let service: GamesService;
-    let communicationServiceSpy: SpyObj<CommunicationService>;
+    let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
     let socketServiceMock: SocketClientServiceMock;
     let socketClientService: SocketClientService;
     let socketTestHelper: SocketTestHelper;
@@ -119,9 +118,30 @@ describe('GamesService', () => {
         );
         spyOn(socketClientService.socket, 'emit');
         spyOn(service, 'reloadPage').and.stub();
-        await service.allGames(true);
+        await service.deleteAllGames(true);
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/allGames');
-        expect(socketClientService.socket.emit).toHaveBeenCalledWith('allGames', { gameToDelete: true });
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames');
+        expect(service.reloadPage).toHaveBeenCalled();
+    });
+
+    it('should delete game', async () => {
+        communicationServiceSpy.delete.and.returnValue(
+            of({
+                headers: new HttpHeaders(),
+                status: 200,
+                statusText: 'OK',
+                url: '',
+                body: 'test',
+                type: 4,
+                ok: true,
+                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
+            }),
+        );
+        spyOn(socketClientService.socket, 'emit');
+        spyOn(service, 'reloadPage').and.stub();
+        await service.deleteSelectedGame(true, '3');
+        expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/3');
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deletedGame', { hasDeletedGame: true, id: '3' });
         expect(service.reloadPage).toHaveBeenCalled();
     });
 });

@@ -1,11 +1,14 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
-import { TestBed, waitForAsync } from '@angular/core/testing';
+import { fakeAsync, TestBed, waitForAsync } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
+import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { CLASSIC_PATH, SELECTION_PATH } from '@common/utils/env.http';
 import { Socket } from 'socket.io-client';
 import { RegistrationService } from './registration.service';
 
@@ -14,13 +17,19 @@ class SocketClientServiceMock extends SocketClientService {
     override connect() {}
 }
 describe('RegistrationService', () => {
-    let service: RegistrationService;
+    let registrationService: RegistrationService;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
 
     const routerMock = {
         navigate: jasmine.createSpy('navigate'),
     };
+
+    const matchmakingMock = {
+        currentMatch: jasmine.createSpy('currentMatch'),
+        currentGameId: jasmine.createSpy('currentGameId'),
+    };
+
     beforeEach(() => {
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
@@ -43,9 +52,13 @@ describe('RegistrationService', () => {
                     provide: Router,
                     useValue: routerMock,
                 },
+                {
+                    provide: MatchmakingService,
+                    useValue: matchmakingMock,
+                },
             ],
         }).compileComponents();
-        service = TestBed.inject(RegistrationService);
+        registrationService = TestBed.inject(RegistrationService);
     }));
 
     afterEach(() => {
@@ -53,32 +66,39 @@ describe('RegistrationService', () => {
         socketTestHelper.disconnect();
     });
 
-    it('should create the service', () => {
-        expect(service).toBeTruthy();
+    it('should create the registrationService', () => {
+        expect(registrationService).toBeTruthy();
     });
 
     it('should redirect to main page', () => {
-        service.redirectToMainPage();
+        registrationService.redirectToMainPage();
     });
 
     it('should handle game deletion', () => {
-        service.handleGameDeleted('1');
+        registrationService.handleGameDeleted('1');
     });
 
-    it('should load the game page', () => {
+    it('should load the game page', fakeAsync(() => {
+        const routerSpy = (<jasmine.Spy>routerMock.navigate).and.returnValue(Promise.resolve());
         const id = '1';
-        service.loadGamePage(id);
-        expect(routerMock.navigate).toHaveBeenCalled();
-    });
+        registrationService.loadGamePage(id);
+        expect(routerSpy).toHaveBeenCalled();
+    }));
 
-    it('should navigate to home page when no game is specified', async () => {
-        const HOME_PATH = '/home';
+    it('should navigate to home page when no game is specified', fakeAsync(() => {
         const gameIdThatWasDeleted = null;
+        const routerSpy = (<jasmine.Spy>routerMock.navigate).and.returnValue(Promise.resolve(true));
         spyOn(window, 'alert');
 
-        routerMock.navigate.and.returnValue(Promise.resolve(true));
-        service.handleGameDeleted(gameIdThatWasDeleted);
+        registrationService.handleGameDeleted(gameIdThatWasDeleted);
 
-        expect(routerMock.navigate).toHaveBeenCalledWith([HOME_PATH]);
-    });
+        expect(routerSpy).toHaveBeenCalledWith([SELECTION_PATH]);
+    }));
+
+    it('should navigate to home page when game id that was deleted is the current match played', fakeAsync(() => {
+        const id = '1';
+        const routerSpy = (<jasmine.Spy>routerMock.navigate).and.returnValue(Promise.resolve());
+        registrationService.loadGamePage(id);
+        expect(routerSpy).toHaveBeenCalledWith([CLASSIC_PATH, id]);
+    }));
 });

@@ -170,7 +170,7 @@ describe('SocketManager', () => {
             roomEmitStub.restore();
             sinon.restore();
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
     it('should not validate difference when not found', (done) => {
         const differencePosition: Vector2 = new Vector2(300, 200);
@@ -188,10 +188,9 @@ describe('SocketManager', () => {
             roomEmitStub.restore();
             sinon.restore();
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
-    // TODO
     it('should remove player from match when disconnect is called', (done) => {
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
@@ -205,7 +204,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('disconnect'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should createMatch with matchId and call joinMatchRoom', (done) => {
@@ -218,7 +217,7 @@ describe('SocketManager', () => {
             assert(socket.on.calledWith('createMatch'));
             assert(socket.join.called);
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should set match type', (done) => {
@@ -231,7 +230,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('setMatchType'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should set match player', (done) => {
@@ -243,7 +242,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('setMatchPlayer'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should join match room', (done) => {
@@ -255,7 +254,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('joinRoom'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should request to join a match', (done) => {
@@ -271,7 +270,7 @@ describe('SocketManager', () => {
             assert(socket.on.calledWith('requestToJoinMatch'));
             assert(socket.to.called);
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should cancel join match', (done) => {
@@ -286,7 +285,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('cancelJoinMatch'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should send request answer to incoming player', (done) => {
@@ -301,7 +300,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('sendIncomingPlayerRequestAnswer'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should delete game', (done) => {
@@ -313,7 +312,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('deletedGame'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should delete all games', (done) => {
@@ -325,7 +324,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('allGames'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 
     it('should send a message in the chat', (done) => {
@@ -340,6 +339,6 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('sendingMessage'));
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY * 5);
     });
 });

@@ -32,6 +32,10 @@ export class MatchmakingService {
         return this.currentMatch?.matchId as string;
     }
 
+    get currentGameId(): string | undefined {
+        return this.currentMatch?.gameId.toString();
+    }
+
     get currentSocketId(): string {
         return this.socketService.socketId;
     }
@@ -114,7 +118,7 @@ export class MatchmakingService {
             this.onGetJoinRequestAnswer.invoke(data);
         });
 
-        this.socketService.on('allGameDeleted', () => {
+        this.socketService.on('allGamesDeleted', () => {
             this.onAllGameDeleted.invoke(null);
         });
 
@@ -130,6 +134,8 @@ export class MatchmakingService {
         this.onGetJoinRequest = new Action<Player>();
         this.onGetJoinCancel = new Action<string>();
         this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
+        this.onAllGameDeleted = new Action<string | null>();
+        this.onSingleGameDeleted = new Action<string | null>();
         this.matchIdThatWeAreTryingToJoin = null;
         this.gameIdThatWeAreTryingToJoin = null;
     }
