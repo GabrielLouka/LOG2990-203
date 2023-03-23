@@ -49,7 +49,7 @@ export class OverlayComponent {
     }
 
     async deleteSelectedGame(isDeleteRequest: boolean): Promise<void> {
-        this.gamesService.deleteSelectedGame(isDeleteRequest, this.id);
+        await this.gamesService.deleteSelectedGame(isDeleteRequest, this.id);
     }
 
     reloadPage() {

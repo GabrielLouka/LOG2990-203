@@ -11,14 +11,13 @@ import { Buffer } from 'buffer';
 import { of } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { GamesService } from './games.service';
-import SpyObj = jasmine.SpyObj;
 
 class SocketClientServiceMock extends SocketClientService {
     override connect() {}
 }
 describe('GamesService', () => {
     let service: GamesService;
-    let communicationServiceSpy: SpyObj<CommunicationService>;
+    let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
     let socketServiceMock: SocketClientServiceMock;
     let socketClientService: SocketClientService;
     let socketTestHelper: SocketTestHelper;
@@ -121,7 +120,7 @@ describe('GamesService', () => {
         spyOn(service, 'reloadPage').and.stub();
         await service.deleteAllGames(true);
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/allGames');
-        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames', { gameToDelete: true });
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames');
         expect(service.reloadPage).toHaveBeenCalled();
     });
 
@@ -142,7 +141,7 @@ describe('GamesService', () => {
         spyOn(service, 'reloadPage').and.stub();
         await service.deleteSelectedGame(true, '3');
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/3');
-        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteGame', { gameToDelete: true });
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deletedGame', { hasDeletedGame: true, id: '3' });
         expect(service.reloadPage).toHaveBeenCalled();
     });
 });

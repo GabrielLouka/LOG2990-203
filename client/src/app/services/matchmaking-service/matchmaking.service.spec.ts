@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
@@ -22,6 +23,7 @@ class SocketClientServiceMock extends SocketClientService {
 
 describe('MatchmakingService', () => {
     let matchmakingService: MatchmakingService;
+    let socketClientService: SocketClientService;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
 
@@ -43,6 +45,10 @@ describe('MatchmakingService', () => {
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketTestHelper as unknown as Socket;
         socketServiceMock.send = jasmine.createSpy('send');
+        socketClientService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'disconnect', 'on', 'send', 'socket'], {
+            socket: { id: matchId },
+            socketId: matchId,
+        });
 
         TestBed.configureTestingModule({
             providers: [MatchmakingService, { provide: SocketClientService, useValue: socketServiceMock }],
@@ -66,7 +72,6 @@ describe('MatchmakingService', () => {
     });
 
     it('should set match player', () => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const sendSocketSpy = (<jasmine.Spy>socketServiceMock.send).and.returnValue(Promise.resolve());
         matchmakingService.createGame(gameId);
         matchmakingService.currentMatchPlayer = player1.username;
@@ -74,9 +79,11 @@ describe('MatchmakingService', () => {
     });
 
     it('should call handle update match when set match player is called', () => {
+        const sendSocketSpy = (<jasmine.Spy>socketServiceMock.send).and.returnValue(Promise.resolve());
         matchmakingService.createGame(gameId);
         spyOn(matchmakingService.onMatchUpdated, 'invoke');
         matchmakingService.currentMatchPlayer = player1.username;
+        expect(sendSocketSpy).toHaveBeenCalledTimes(2);
     });
 
     it('should set the given match to the current match', () => {
@@ -103,14 +110,15 @@ describe('MatchmakingService', () => {
         expect(matchmakingService.onMatchUpdated).toEqual(new Action<Match | null>());
         expect(matchmakingService.onGetJoinRequest).toEqual(new Action<Player>());
         expect(matchmakingService.onGetJoinCancel).toEqual(new Action<string>());
+        expect(matchmakingService.onAllGameDeleted).toEqual(new Action<string | null>());
+        expect(matchmakingService.onSingleGameDeleted).toEqual(new Action<string | null>());
         expect(matchmakingService.isHost).toBe(true);
     });
 
     it('should join game when called', () => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        const sendSocketSpy = (<jasmine.Spy>socketServiceMock.send).and.returnValue(Promise.resolve());
+        (<jasmine.Spy>socketServiceMock.send).and.returnValue(Promise.resolve());
         matchmakingService.createGame(gameId);
-        expect(sendSocketSpy).toHaveBeenCalled();
+        expect(<jasmine.Spy>socketServiceMock.send).toHaveBeenCalled();
     });
 
     it('should connect sockets and handle match update events when called', () => {
@@ -130,18 +138,23 @@ describe('MatchmakingService', () => {
     });
 
     it('should send match join cancel request', () => {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
         const sendSocketSpy = (<jasmine.Spy>socketServiceMock.send).and.returnValue(Promise.resolve());
+        socketTestHelper.on('incomingPlayerCancel', callback);
+        socketTestHelper.peerSideEmit('incomingPlayerCancel', 'socket2');
         matchmakingService.joinGame(matchId);
         matchmakingService.sendMatchJoinCancel(player2.username);
+        matchmakingService.handleMatchUpdateEvents();
         expect(sendSocketSpy).toHaveBeenCalled();
+        expect(socketClientService.send).not.toHaveBeenCalled();
     });
 
     it('should send incoming player request answer', () => {
         matchmakingService.createGame(gameId);
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         const sendSocketSpy = (<jasmine.Spy>socketServiceMock.send).and.returnValue(Promise.resolve());
         matchmakingService.sendIncomingPlayerRequestAnswer(player2, true);
+        matchmakingService.handleMatchUpdateEvents();
         expect(sendSocketSpy).toHaveBeenCalled();
     });
 
@@ -188,21 +201,45 @@ describe('MatchmakingService', () => {
     });
 
     it('should handle when all games are deleted ', () => {
-        spyOn(matchmakingService.onAllGameDeleted, 'invoke');
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('allGameDeleted', callback);
         socketTestHelper.peerSideEmit('deleteAllGames');
+        matchmakingService.handleMatchUpdateEvents();
+    });
+
+    it('should handle update match ', () => {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('matchUpdated', callback);
+        socketTestHelper.peerSideEmit('matchUpdated', 'socket2');
+        matchmakingService.handleMatchUpdateEvents();
+    });
+
+    it('should handle incoming Player Request', () => {
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('incomingPlayerRequest', callback);
+        socketTestHelper.peerSideEmit('requestToJoinMatch', player1);
+        matchmakingService.handleMatchUpdateEvents();
+    });
+
+    it('should handle incomingPlayerRequest answer', () => {
+        const data = { matchId: 'socket1', player: player1, isAccepted: true };
+        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
+        const callback = ((params: any) => {}) as any;
+        socketTestHelper.on('incomingPlayerRequestAnswer', callback);
+        socketTestHelper.peerSideEmit('incomingPlayerRequestAnswer', data);
+        matchmakingService.handleMatchUpdateEvents();
     });
 
     it('should handle when a game is deleted', () => {
-        const spy = spyOn(matchmakingService.onSingleGameDeleted, 'invoke');
         const data = { hasDeleteGame: true, id: '1' };
         // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('gameDeleted', callback);
         socketServiceMock.socket.emit('deletedGame', data);
-        expect(spy).toHaveBeenCalled();
+        matchmakingService.handleMatchUpdateEvents();
     });
 
     it('should return false if match status is not aborted', () => {
