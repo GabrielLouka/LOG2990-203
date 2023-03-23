@@ -43,7 +43,7 @@ export class OverlayComponent {
 
     joinGame() {
         if (!this.matchToJoinIfAvailable) return;
-        this.matchmakingService.joinGame(this.matchToJoinIfAvailable);
+        this.matchmakingService.joinGame(this.matchToJoinIfAvailable, this.id);
         this.router.navigate([REGISTRATION_PATH, this.id]);
     }
 

@@ -20,7 +20,8 @@ export class RegistrationService {
     handleGameDeleted(gameIdThatWasDeleted: string | null) {
         if (
             !gameIdThatWasDeleted ||
-            (this.matchmakingService.currentMatch && gameIdThatWasDeleted === this.matchmakingService.currentMatch.gameId.toString())
+            (this.matchmakingService.currentMatch && gameIdThatWasDeleted === this.matchmakingService.currentMatch.gameId.toString()) ||
+            this.matchmakingService.gameIdThatWeAreTryingToJoin === gameIdThatWasDeleted
         )
             this.router.navigate([HOME_PATH]).then(() => {
                 alert("Le jeu a été supprimé, vous avez donc été redirigé à l'accueil");

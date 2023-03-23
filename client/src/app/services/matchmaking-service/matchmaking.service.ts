@@ -19,6 +19,7 @@ export class MatchmakingService {
     onAllGameDeleted = new Action<string | null>();
     onSingleGameDeleted = new Action<string | null>();
     matchIdThatWeAreTryingToJoin: string | null = null;
+    gameIdThatWeAreTryingToJoin: string | null = null;
     currentMatch: Match | null;
 
     constructor(private readonly socketService: SocketClientService) {}
@@ -130,17 +131,20 @@ export class MatchmakingService {
         this.onGetJoinCancel = new Action<string>();
         this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
         this.matchIdThatWeAreTryingToJoin = null;
+        this.gameIdThatWeAreTryingToJoin = null;
     }
 
     createGame(gameId: string) {
         this.socketService.send<{ gameId: string }>('createMatch', { gameId });
         this.currentMatch = new Match(parseInt(gameId, 10), this.currentSocketId);
         this.matchIdThatWeAreTryingToJoin = null; // Host doesn't need to join
+        this.gameIdThatWeAreTryingToJoin = null;
     }
 
-    joinGame(matchId: string) {
+    joinGame(matchId: string, gameId: string) {
         this.socketService.send<{ matchId: string }>('joinRoom', { matchId });
         this.matchIdThatWeAreTryingToJoin = matchId;
+        this.gameIdThatWeAreTryingToJoin = gameId;
         this.currentMatch = null;
     }
 
