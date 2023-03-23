@@ -111,7 +111,7 @@ export class GameStorageService {
     async getGamesInPage(pageNbr: number): Promise<
         {
             gameData: GameData;
-            originalImage: Buffer;
+            originalImage: string;
             matchToJoinIfAvailable: string | null;
         }[]
     > {
@@ -121,10 +121,10 @@ export class GameStorageService {
 
         const gamesToReturn = [];
         for (const game of nextGames) {
-            const images = this.getGameImages(game.id.toString());
+            // const images = this.getGameImages(game.id.toString());
             gamesToReturn.push({
                 gameData: game,
-                originalImage: images.originalImage,
+                originalImage: 'http://localhost:3000/api/images/' + game.id.toString() + '/1',
                 matchToJoinIfAvailable: null,
             });
         }
