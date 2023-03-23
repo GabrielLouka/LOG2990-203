@@ -108,4 +108,11 @@ export class CreationResultModalComponent {
             totalDifferences <= CreationResultModalComponent.maxNumberOfDifferences
         );
     }
+
+    resetBackgroundCanvas() {
+        const canvasSize: HTMLCanvasElement = this.imagePreview.nativeElement;
+
+        const context = canvasSize.getContext('2d');
+        context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
+    }
 }

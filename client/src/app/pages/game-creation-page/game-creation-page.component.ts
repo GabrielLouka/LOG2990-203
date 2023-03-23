@@ -128,6 +128,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     }
 
     async sendImageToServer(): Promise<void> {
+        this.resultModal.resetBackgroundCanvas();
         this.resultModal.showPopUp();
 
         if (this.originalImage && this.modifiedImage) {
