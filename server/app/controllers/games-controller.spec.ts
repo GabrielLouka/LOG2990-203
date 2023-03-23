@@ -155,7 +155,7 @@ describe('GamesController', () => {
             sinon.restore();
         });
     });
-    describe('DELETE /allGames', async () => {
+    describe('DELETE', async () => {
         it('DELETE request should delete all games from database', async () => {
             gameStorageServiceStub.allGames.resolves();
             await supertest(expressApp)
@@ -165,11 +165,33 @@ describe('GamesController', () => {
                     expect(response.body).to.deep.equal({});
                 });
         });
+
         it('DELETE /allGames should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.allGames.rejects(errorMessage);
             supertest(expressApp)
                 .delete(`${API_URL}/allGames`)
+                .expect(HTTP_STATUS_NOT_FOUND)
+                .then((response) => {
+                    expect(response.text).to.equal(errorMessage);
+                });
+        });
+
+        it('DELETE request should delete selected game from database', async () => {
+            gameStorageServiceStub.deleteGame.resolves();
+            await supertest(expressApp)
+                .delete(`${API_URL}/0`)
+                .expect(HTTP_STATUS_OK)
+                .then((response) => {
+                    expect(response.body).to.deep.equal({});
+                });
+        });
+
+        it('DELETE /:id should not delete when error occurs', async () => {
+            const errorMessage = 'Update failed';
+            gameStorageServiceStub.deleteGame.rejects(errorMessage);
+            supertest(expressApp)
+                .delete(`${API_URL}/0`)
                 .expect(HTTP_STATUS_NOT_FOUND)
                 .then((response) => {
                     expect(response.text).to.equal(errorMessage);

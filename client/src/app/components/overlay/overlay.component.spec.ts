@@ -75,7 +75,7 @@ describe('OverlayComponent', () => {
 
         component.joinGame();
 
-        expect(matchmakingServiceSpy.joinGame).toHaveBeenCalledWith('match_id_123');
+        expect(matchmakingServiceSpy.joinGame).toHaveBeenCalledWith('match_id_123', 'game_id_123');
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/registration', 'game_id_123']);
     });
 

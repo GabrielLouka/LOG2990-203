@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -14,7 +15,6 @@ import { Socket } from 'socket.io-client';
 import { MatchmakingService } from './matchmaking.service';
 
 class SocketClientServiceMock extends SocketClientService {
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     override get isSocketAlive() {
         return true;
     }
@@ -127,7 +127,7 @@ describe('MatchmakingService', () => {
     });
 
     it('should send match join request when request from incoming player', () => {
-        matchmakingService.joinGame(matchId);
+        matchmakingService.joinGame(matchId, gameId);
         matchmakingService.sendMatchJoinRequest(player2.username);
     });
 
@@ -138,12 +138,11 @@ describe('MatchmakingService', () => {
     });
 
     it('should send match join cancel request', () => {
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         const sendSocketSpy = (<jasmine.Spy>socketServiceMock.send).and.returnValue(Promise.resolve());
         socketTestHelper.on('incomingPlayerCancel', callback);
         socketTestHelper.peerSideEmit('incomingPlayerCancel', 'socket2');
-        matchmakingService.joinGame(matchId);
+        matchmakingService.joinGame(matchId, gameId);
         matchmakingService.sendMatchJoinCancel(player2.username);
         matchmakingService.handleMatchUpdateEvents();
         expect(sendSocketSpy).toHaveBeenCalled();
@@ -160,7 +159,7 @@ describe('MatchmakingService', () => {
 
     it('should not send incoming player request answer if current match is null', () => {
         const expectedError = new Error('currentMatch is null');
-        matchmakingService.joinGame(matchId);
+        matchmakingService.joinGame(matchId, gameId);
         matchmakingService.sendMatchJoinRequest(player2.username);
         try {
             matchmakingService.sendIncomingPlayerRequestAnswer(player2, true);
@@ -184,7 +183,7 @@ describe('MatchmakingService', () => {
     });
 
     it('should return empty string if match is null', () => {
-        matchmakingService.joinGame(matchId);
+        matchmakingService.joinGame(matchId, gameId);
         expect(matchmakingService.currentMatchId).toEqual(undefined as any);
         expect(matchmakingService.player2Username).toEqual(undefined as any);
         expect(matchmakingService.player1Username).toEqual(undefined as any);
@@ -201,7 +200,6 @@ describe('MatchmakingService', () => {
     });
 
     it('should handle when all games are deleted ', () => {
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('allGameDeleted', callback);
         socketTestHelper.peerSideEmit('deleteAllGames');
@@ -209,7 +207,6 @@ describe('MatchmakingService', () => {
     });
 
     it('should handle update match ', () => {
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('matchUpdated', callback);
         socketTestHelper.peerSideEmit('matchUpdated', 'socket2');
@@ -217,16 +214,14 @@ describe('MatchmakingService', () => {
     });
 
     it('should handle incoming Player Request', () => {
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('incomingPlayerRequest', callback);
-        socketTestHelper.peerSideEmit('requestToJoinMatch', player1);
+        socketServiceMock.socket.send('requestToJoinMatch', player1);
         matchmakingService.handleMatchUpdateEvents();
     });
 
     it('should handle incomingPlayerRequest answer', () => {
         const data = { matchId: 'socket1', player: player1, isAccepted: true };
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('incomingPlayerRequestAnswer', callback);
         socketTestHelper.peerSideEmit('incomingPlayerRequestAnswer', data);
@@ -235,10 +230,9 @@ describe('MatchmakingService', () => {
 
     it('should handle when a game is deleted', () => {
         const data = { hasDeleteGame: true, id: '1' };
-        // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-explicit-any
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('gameDeleted', callback);
-        socketServiceMock.socket.emit('deletedGame', data);
+        socketTestHelper.peerSideEmit('deletedGame', data);
         matchmakingService.handleMatchUpdateEvents();
     });
 
@@ -264,7 +258,7 @@ describe('MatchmakingService', () => {
 
     it('should not set current player when current match is null', () => {
         const expectedError = new Error('currentMatch is null');
-        matchmakingService.joinGame(matchId);
+        matchmakingService.joinGame(matchId, gameId);
         try {
             matchmakingService.currentMatchPlayer = player1.username;
         } catch (e: unknown) {
