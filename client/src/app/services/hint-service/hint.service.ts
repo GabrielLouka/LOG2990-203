@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
+import { NUMBER_HINTS } from '@common/utils/env';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HintService {
-  maxGivenHints = 3;
+  maxGivenHints = NUMBER_HINTS;
 
-  constructor(
-    ) { }
+  constructor() { }
 
   decrement(){
-      if (this.maxGivenHints !== 0) {
-        this.maxGivenHints--;
-    } else {
-        window.alert('Vous avez utilisé vos indices !');
-    }
-
+    if (this.maxGivenHints !== 0) {
+      this.maxGivenHints--;        
+    } 
+    // else {
+    //     window.alert('Vous avez utilisé vos indices !');
+    // }
   }
 
   reset(){
-    this.maxGivenHints = 3;
+    this.maxGivenHints = NUMBER_HINTS;
   }
 
 

@@ -3,11 +3,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { HintComponent } from '@app/components/hint/hint.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { HintService } from '@app/services/hint-service/hint.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
@@ -28,6 +30,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
     @ViewChild('timerElement') timerElement: TimerComponent;
+    @ViewChild('hintElement') hintElement: HintComponent;
     @ViewChild('popUpElement') popUpElement: PopUpComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
@@ -40,6 +43,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     backgroundColor = '';
     intervalIDLeft: number | undefined;
     intervalIDRight: number | undefined;
+    numberOfHints: number;
     timeInSeconds: number;
     matchId: string;
     currentGameId: string | null;
@@ -65,6 +69,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private matchmakingService: MatchmakingService,
         private cheatModeService: CheatModeService,
         private chatService: ChatService,
+        private hintService: HintService
     ) {}
 
     get leftCanvasContext() {
@@ -96,7 +101,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
-        window.addEventListener('keydown', this.onCheatMode.bind(this));
+        window.addEventListener('keydown', this.onCheatMode.bind(this));        
     }
 
     sendSystemMessageToChat(message: string) {
@@ -144,7 +149,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.getInitialImagesFromServer();
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
-        window.removeEventListener('keydown', this.onCheatMode.bind(this));
+        window.removeEventListener('keydown', this.onCheatMode.bind(this));        
     }
 
     getInitialImagesFromServer() {
@@ -339,6 +344,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.putCanvasIntoInitialState();
                 }
                 this.letterTPressed = !this.letterTPressed;
+            }
+            else if (event.key === 'i' && this.hintService.maxGivenHints != 0){
+                this.hintService.decrement();
+                const hintUsedMessage = Date.now() + ' - Indice utilisé';
+                this.chat.sendSystemMessage(hintUsedMessage);                
             }
         }
     }
