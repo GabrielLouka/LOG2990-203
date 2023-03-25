@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
@@ -8,6 +9,8 @@ import 'dotenv/config';
 import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
 import 'reflect-metadata';
 import { Service } from 'typedi';
+import { environment } from '../../../../client/src/environments/environment';
+
 @Service()
 export class GameStorageService {
     jsonPath: string;
@@ -124,7 +127,7 @@ export class GameStorageService {
             // const images = this.getGameImages(game.id.toString());
             gamesToReturn.push({
                 gameData: game,
-                originalImage: 'http://localhost:3000/api/images/' + game.id.toString() + '/1',
+                originalImage: environment.serverUrl + '/images/' + game.id.toString() + '/1',
                 matchToJoinIfAvailable: null,
             });
         }

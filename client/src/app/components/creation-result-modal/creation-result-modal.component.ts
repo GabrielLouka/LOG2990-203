@@ -90,15 +90,12 @@ export class CreationResultModalComponent {
         });
     }
 
-    updateImageDisplay(imgData: ArrayBuffer) {
+    async updateImageDisplay(imgData: ArrayBuffer) {
         const canvas: HTMLCanvasElement = this.imagePreview.nativeElement;
         const ctx = canvas.getContext('2d');
         if (ctx !== null) {
-            const img = new Image();
-            img.src = URL.createObjectURL(new Blob([imgData]));
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
-            };
+            const bitmap = await createImageBitmap(new Blob([imgData]));
+            ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, canvas.width, canvas.height);
         }
     }
 
