@@ -4,15 +4,24 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class HintService {
+  maxGivenHints = 3;
 
   constructor(
     ) { }
 
-  // method that handles 'i' event
+  decrement(){
+      if (this.maxGivenHints !== 0) {
+        this.maxGivenHints--;
+    } else {
+        window.alert('Vous avez utilisé vos indices !');
+    }
 
-  // method that 
+  }
+
+  reset(){
+    this.maxGivenHints = 3;
+  }
 
 
 }
 
-// HintService should depend of SocketService, TimerService to be implemented, ImageManipulationService
