@@ -35,4 +35,8 @@ export class ChatComponent {
     sendSystemMessage(textToSend: string) {
         this.chatService.sendMessageFromSystem(textToSend, this.newMessage, this);
     }
+
+    resetChat() {
+        this.messages = [];
+    }
 }

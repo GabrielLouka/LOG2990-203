@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Action } from '@common/classes/action';
+import { MILLISECOND_TO_SECONDS } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
@@ -28,9 +29,10 @@ export class ReplayModeService {
         this.pauseTimer();
     }
 
-    recordAction(action: () => void): void {
+    addMethodToReplay(action: () => void): void {
         if (this.isRecording) {
             this.recordedActions.push([action, this.elapsedTime]);
+            console.log('recorded action at: ', this.elapsedTime);
         }
     }
 
@@ -38,6 +40,10 @@ export class ReplayModeService {
         console.log('ReplayModeService.startReplayMode() elapsedTime: ', this.elapsedTime);
         this.recordedActions.forEach((recordedAction) => {
             console.log('recordedAction: ', recordedAction);
+            // call the action after the delay
+            setTimeout(() => {
+                recordedAction[0]();
+            }, recordedAction[1] * MILLISECOND_TO_SECONDS);
         });
     }
 

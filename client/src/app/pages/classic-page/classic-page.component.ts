@@ -228,8 +228,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         this.differencesFound2++;
                     }
                     this.sendSystemMessageToChat(message);
-                    this.foundDifferences = data.foundDifferences;
-                    this.onFindDifference();
+                    // this.foundDifferences = data.foundDifferences;
+                    // this.onFindDifference();
+                    this.refreshFoundDifferences(data.foundDifferences);
 
                     if (this.matchmakingService.is1vs1Mode) {
                         if (this.differencesFound1 >= this.minDifferences) {
@@ -259,6 +260,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.chat,
             );
         });
+    }
+
+    refreshFoundDifferences(foundDifferences: boolean[]) {
+        const refreshMethod = () => {
+            this.foundDifferences = foundDifferences;
+            this.onFindDifference();
+        };
+        refreshMethod();
+        this.replayModeService.addMethodToReplay(refreshMethod);
     }
 
     onFindWrongDifference(isPlayer1: boolean) {
@@ -331,12 +341,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
-        this.popUpElement.showGameOverPopUp(
-            winningPlayer,
-            isWinByDefault,
-            this.matchmakingService.isSoloMode,
-            this.replayModeService.startReplayModeAction,
-        );
+        const startReplayAction = this.replayModeService.startReplayModeAction;
+        startReplayAction.add(this.resetGame.bind(this));
+        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode, startReplayAction);
     }
 
     onCheatMode(event: KeyboardEvent) {
@@ -390,5 +397,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             { originalImage: this.game.originalImage, currentModifiedImage: this.currentModifiedImage },
             { leftContext: this.leftCanvasContext as CanvasRenderingContext2D, rightContext: this.rightCanvasContext as CanvasRenderingContext2D },
         );
+    }
+
+    resetGame() {
+        this.foundDifferences = [];
+        this.currentModifiedImage = Buffer.from(this.game.modifiedImage);
+        const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
+        const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
+        this.loadImagesToCanvas(img1Source, img2Source);
+        this.chat.resetChat();
     }
 }

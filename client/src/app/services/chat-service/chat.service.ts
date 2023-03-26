@@ -3,12 +3,17 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { SYSTEM_MESSAGE } from '@common/utils/env';
+import { ReplayModeService } from '../replay-mode-service/replay-mode.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ChatService {
-    constructor(private readonly socketService: SocketClientService, private matchmakingService: MatchmakingService) {}
+    constructor(
+        private readonly socketService: SocketClientService,
+        private matchmakingService: MatchmakingService,
+        private replayModeService: ReplayModeService,
+    ) {}
 
     get isPlayer1() {
         return this.socketService.socketId === this.matchmakingService.player1Id;
@@ -52,9 +57,14 @@ export class ChatService {
         },
         chatComponent: ChatComponent,
     ) {
-        chatComponent.messages.push(messageToPush);
-        this.scrollToBottom(chatComponent.chat);
-        chatComponent.newMessage = this.clearMessage();
+        const pushMethod = () => {
+            chatComponent.messages.push(messageToPush);
+            this.scrollToBottom(chatComponent.chat);
+            chatComponent.newMessage = this.clearMessage();
+        };
+
+        pushMethod();
+        this.replayModeService.addMethodToReplay(pushMethod);
     }
 
     clearMessage() {
