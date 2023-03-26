@@ -32,7 +32,7 @@ export class ChatComponent {
         this.chatService.sendMessage(this.chatService.isPlayer1, this.newMessage);
     }
 
-    sendSystemMessage(message: string) {
-        this.chatService.sendMessageFromSystem({ message, chat: this.chat, newMessage: this.newMessage }, this.messages);
+    sendSystemMessage(textToSend: string) {
+        this.chatService.sendMessageFromSystem(textToSend, this.newMessage, this);
     }
 }

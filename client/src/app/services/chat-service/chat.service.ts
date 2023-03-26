@@ -1,4 +1,5 @@
 import { ElementRef, Injectable } from '@angular/core';
+import { ChatComponent } from '@app/components/chat/chat.component';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { SYSTEM_MESSAGE } from '@common/utils/env';
@@ -28,27 +29,32 @@ export class ChatService {
         }
     }
 
-    sendMessageFromSystem(
-        chatELements: { message: string; chat: ElementRef; newMessage: string },
-        messages: {
+    sendMessageFromSystem(textToSend: string, newMessage: string, chatComponent: ChatComponent) {
+        const msg = {
+            text: textToSend,
+            username: SYSTEM_MESSAGE,
+            sentBySystem: true,
+            sentByPlayer1: false,
+            sentByPlayer2: false,
+            sentTime: Date.now(),
+        };
+        this.pushMessage(msg, chatComponent);
+    }
+
+    pushMessage(
+        messageToPush: {
             text: string;
             username: string;
             sentBySystem: boolean;
             sentByPlayer1: boolean;
             sentByPlayer2: boolean;
             sentTime: number;
-        }[],
+        },
+        chatComponent: ChatComponent,
     ) {
-        messages.push({
-            text: chatELements.message,
-            username: SYSTEM_MESSAGE,
-            sentBySystem: true,
-            sentByPlayer1: false,
-            sentByPlayer2: false,
-            sentTime: Date.now(),
-        });
-        this.scrollToBottom(chatELements.chat);
-        chatELements.newMessage = this.clearMessage();
+        chatComponent.messages.push(messageToPush);
+        this.scrollToBottom(chatComponent.chat);
+        chatComponent.newMessage = this.clearMessage();
     }
 
     clearMessage() {

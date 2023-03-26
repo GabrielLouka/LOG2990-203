@@ -10,6 +10,7 @@ import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.se
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { ReplayModeService } from '@app/services/replay-mode-service/replay-mode.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
@@ -65,6 +66,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private matchmakingService: MatchmakingService,
         private cheatModeService: CheatModeService,
         private chatService: ChatService,
+        private replayModeService: ReplayModeService,
     ) {}
 
     get leftCanvasContext() {
@@ -127,10 +129,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             const abortedGameMessage = ' a abandonné la partie';
 
             if (this.isPlayer2Win(match)) {
-                this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
+                this.sendSystemMessageToChat(this.player1.toUpperCase() + abortedGameMessage);
                 this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
             } else if (this.isPlayer1Win(match)) {
-                this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
+                this.sendSystemMessageToChat(this.player2.toUpperCase() + abortedGameMessage);
                 this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
             }
         }
@@ -162,6 +164,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.requestStartGame();
                     this.canvasIsClickable = true;
                     this.startTimer();
+                    this.replayModeService.startRecording();
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -244,16 +247,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             },
         );
         this.socketService.on('messageBetweenPlayers', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
-            this.chat.messages.push({
-                text: data.message,
-                username: data.username,
-                sentBySystem: false,
-                sentByPlayer1: data.sentByPlayer1,
-                sentByPlayer2: !data.sentByPlayer1,
-                sentTime: Date.now(),
-            });
-            this.chatService.scrollToBottom(this.chat.chat);
-            this.chat.newMessage = '';
+            this.chatService.pushMessage(
+                {
+                    text: data.message,
+                    username: data.username,
+                    sentBySystem: false,
+                    sentByPlayer1: data.sentByPlayer1,
+                    sentByPlayer2: !data.sentByPlayer1,
+                    sentTime: Date.now(),
+                },
+                this.chat,
+            );
         });
     }
 
@@ -314,6 +318,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     gameOver() {
         this.timerElement.stopTimer();
         this.socketService.disconnect();
+        this.replayModeService.stopRecording();
         this.socketService.send('gameFinished', {
             minutesElapsed: Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS),
             secondsElapsed: Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS),
@@ -326,7 +331,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
-        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
+        this.popUpElement.showGameOverPopUp(
+            winningPlayer,
+            isWinByDefault,
+            this.matchmakingService.isSoloMode,
+            this.replayModeService.startReplayModeAction,
+        );
     }
 
     onCheatMode(event: KeyboardEvent) {
