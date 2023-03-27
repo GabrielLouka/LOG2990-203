@@ -311,7 +311,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.refreshModifiedImage();
         if (this.isCheating) {
             this.stopCheating();
-            this.cheatMode();
+            this.startCheating();
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
     }
@@ -357,25 +357,41 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.matchmakingService.isSoloMode || (this.chat && document.activeElement !== this.chat.input.nativeElement)) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
-                    this.cheatMode();
+                    this.startCheating();
                 } else {
                     this.stopCheating();
-                    this.putCanvasIntoInitialState();
+                    // this.putCanvasIntoInitialState();
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
         }
     }
 
-    cheatMode() {
-        this.backgroundColor = '#66FF99';
-        const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
-            this.game.gameData,
-            { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
-            this.foundDifferences,
-        );
-        this.showHiddenDifferences(newImage);
-        this.isCheating = !this.isCheating;
+    startCheating() {
+        const startCheatingMethod = () => {
+            this.backgroundColor = '#66FF99';
+            const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
+                this.game.gameData,
+                { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
+                this.foundDifferences,
+            );
+            this.showHiddenDifferences(newImage);
+            this.isCheating = !this.isCheating;
+        };
+        startCheatingMethod();
+        this.replayModeService.addMethodToReplay(startCheatingMethod);
+    }
+
+    stopCheating() {
+        const stopCheatingMethod = () => {
+            this.backgroundColor = '';
+            this.cheatModeService.stopCheating(this.intervalIDLeft as number, this.intervalIDRight as number);
+            this.isCheating = !this.isCheating;
+
+            this.putCanvasIntoInitialState();
+        };
+        stopCheatingMethod();
+        this.replayModeService.addMethodToReplay(stopCheatingMethod);
     }
 
     showHiddenDifferences(newImage: Buffer) {
@@ -393,12 +409,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    stopCheating() {
-        this.backgroundColor = '';
-        this.cheatModeService.stopCheating(this.intervalIDLeft as number, this.intervalIDRight as number);
-        this.isCheating = !this.isCheating;
-    }
-
     putCanvasIntoInitialState() {
         this.cheatModeService.putCanvasIntoInitialState(
             { originalImage: this.game.originalImage, currentModifiedImage: this.currentModifiedImage },
@@ -412,6 +422,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
         const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
         this.loadImagesToCanvas(img1Source, img2Source);
+        this.stopCheating();
+        this.isCheating = false;
         this.chat.resetChat();
     }
 

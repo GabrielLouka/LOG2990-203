@@ -452,7 +452,7 @@ describe('ClassicPageComponent', () => {
         component.onWinGame('ibrahim', true);
     });
     it('should return the appropriate value', () => {
-        component.cheatMode();
+        component.startCheating();
     });
     it('should return appropriate value', () => {
         const canvas = document.createElement('canvas');
