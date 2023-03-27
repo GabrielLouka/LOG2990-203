@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { Action } from '@common/classes/action';
-import { ONE_HUNDRED_MILLISECONDS } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS, REPLAY_TIMER_DELAY } from '@common/utils/env';
 
 export enum ReplayModeState {
     Idle,
@@ -97,9 +97,10 @@ export class ReplayModeService {
 
     private startRecordingTimer() {
         this.currentState = ReplayModeState.Recording;
+        const timerIncreaseFactor = REPLAY_TIMER_DELAY / MILLISECOND_TO_SECONDS;
         this.timerId = window.setInterval(() => {
-            this.elapsedTime += 0.1;
-        }, ONE_HUNDRED_MILLISECONDS);
+            this.elapsedTime += timerIncreaseFactor;
+        }, REPLAY_TIMER_DELAY);
     }
 
     private stopRecordingTimer() {
@@ -109,11 +110,12 @@ export class ReplayModeService {
 
     private startReplayingTimer() {
         this.currentState = ReplayModeState.Replaying;
+        const timerIncreaseFactor = REPLAY_TIMER_DELAY / MILLISECOND_TO_SECONDS;
         this.timerId = window.setInterval(() => {
-            this.elapsedTime += 0.1;
+            this.elapsedTime += timerIncreaseFactor;
             this.visibleTimer.timeInSeconds = this.elapsedTime;
             this.invokeActionsAccordingToTime();
-        }, ONE_HUNDRED_MILLISECONDS / this.replaySpeed);
+        }, REPLAY_TIMER_DELAY / this.replaySpeed);
     }
 
     private pauseReplayingTimer() {
@@ -127,6 +129,7 @@ export class ReplayModeService {
             // check your condition here
             if (this.elapsedTime >= currentAction[1]) {
                 currentAction[0]();
+                console.log('invoked action at: ', this.elapsedTime, ' action: ', currentAction);
                 this.replayedActions.push(currentAction);
                 this.recordedActions.splice(i, 1);
                 i--; // decrement i to account for the removed element
@@ -138,5 +141,6 @@ export class ReplayModeService {
         this.elapsedTime = 0;
         clearInterval(this.timerId);
         this.recordedActions = [];
+        this.replayedActions = [];
     }
 }
