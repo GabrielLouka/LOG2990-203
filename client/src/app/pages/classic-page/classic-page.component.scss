@@ -45,6 +45,12 @@ canvas {
     cursor: default;
 }
 
+.penalty-message {
+    display: none;
+    color: red;
+    font-weight: 600;
+}
+
 .chat-container {
     position: absolute;
     bottom: 20vh;

@@ -33,6 +33,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('hintElement') hintElement: HintComponent;
     @ViewChild('popUpElement') popUpElement: PopUpComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
+    @ViewChild('penalty') penaltyMessage: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
@@ -149,6 +150,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.getInitialImagesFromServer();
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
+        this.cheatModeService.focusKeyEvent(this.penaltyMessage);
         window.removeEventListener('keydown', this.onCheatMode.bind(this));        
     }
 
@@ -204,6 +206,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.errorMessage.nativeElement.style.left = event.clientX + 'px';
             this.errorMessage.nativeElement.style.top = event.clientY + 'px';
             this.cheatModeService.focusKeyEvent(this.cheat);
+            this.cheatModeService.focusKeyEvent(this.penaltyMessage);
         }
     }
 
@@ -278,6 +281,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.showErrorText();
         this.playSound(false);
         this.cheatModeService.focusKeyEvent(this.cheat);
+        this.cheatModeService.focusKeyEvent(this.penaltyMessage);
         this.sendSystemMessageToChat(message);
     }
 
@@ -297,6 +301,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.cheatMode();
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
+        this.cheatModeService.focusKeyEvent(this.penaltyMessage);
     }
 
     async refreshModifiedImage() {
@@ -345,12 +350,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
-            else if (event.key === 'i' && this.hintService.maxGivenHints != 0){
-                this.hintService.decrement();
-                const hintUsedMessage = Date.now() + ' - Indice utilisé';
-                this.chat.sendSystemMessage(hintUsedMessage);                
+            else if (event.key === 'i'){ 
+                //issue when i click on difference first time before hint, then max becomes 1 and when cheat mode for first time
+                this.handleHintMode();
             }
         }
+    }
+
+    handleHintMode(){
+        if (this.hintService.maxGivenHints !== 0) {
+            this.hintService.decrement();                
+            this.timeInSeconds = this.hintService.handleHint(this.chat, this.timeInSeconds);
+            this.hintService.showMessage(this.penaltyMessage);}
     }
 
     cheatMode() {

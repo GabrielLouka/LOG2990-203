@@ -21,4 +21,5 @@ export class HintComponent implements OnInit {
         this.hintService.decrement();
         this.maxGivenHints = this.hintService.maxGivenHints;
     }
+    
 }
