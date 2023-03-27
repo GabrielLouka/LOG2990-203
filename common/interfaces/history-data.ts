@@ -4,4 +4,5 @@ export interface HistoryData {
     gameMode: string;
     player1: string;
     player2: string;
+    isWinByDefault: boolean;
 }

@@ -59,9 +59,24 @@
                     </div>
                     <div class="divider"></div>
                     <div class="flex-row center">
-                        <span>{{ history.player1 }}</span>
-                        <span *ngIf="history.player2 !== undefined">&nbsp;et&nbsp;</span>
-                        <span *ngIf="history.player2 !== undefined">{{ history.player2 }}</span>
+                        <span
+                            [ngClass]="{
+                                'crossed-out': history.gameMode === 'Classic - Solo' && history.isWinByDefault,
+                                'text-bold':
+                                    ((history.gameMode === 'Classic - Solo' || history.gameMode === 'Classic - 1vs1') && !history.isWinByDefault) ||
+                                    (history.gameMode === 'Classic - 1vs1' && history.isWinByDefault)
+                            }"
+                        >
+                            {{ history.player1 }}
+                        </span>
+                        <span *ngIf="history.player2 !== ''">&nbsp;VS&nbsp;</span>
+                        <span
+                            [ngClass]="{
+                                'crossed-out': history.gameMode === 'Classic - 1vs1' && history.isWinByDefault
+                            }"
+                        >
+                            {{ history.player2 }}
+                        </span>
                     </div>
                     <div class="divider"></div>
                     <div class="flex-row game-time space-around">

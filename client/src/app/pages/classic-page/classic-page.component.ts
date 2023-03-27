@@ -57,7 +57,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     minDifferences: number = 0;
     canvasIsClickable: boolean = false;
     startingTime: Date;
-    historyData: { startingTime: Date; gameMode: string; duration: string; player1: string; player2: string };
+    historyData: { startingTime: Date; gameMode: string; duration: string; player1: string; player2: string; isWinByDefault: boolean };
 
     // eslint-disable-next-line max-params
     constructor(
@@ -111,7 +111,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.socketService.disconnect();
-        if (this.matchmakingService.isSoloMode) this.historyService.addGameHistory(this.createHistoryData());
+        if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode)
+            this.historyService.addGameHistory(this.createHistoryData(this.player1, this.isWinByDefault));
     }
 
     async playSound(isSuccessSound: boolean) {
@@ -170,6 +171,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.canvasIsClickable = true;
                     this.startTimer();
                     this.startingTime = new Date();
+
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -244,6 +246,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     } else if (this.matchmakingService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
                             this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
+                            this.historyService.addGameHistory(this.createHistoryData(this.player1, !this.isWinByDefault));
                         }
                     }
                 } else {
@@ -336,23 +339,26 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
 
         if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.is1vs1Mode) {
-            this.historyService.addGameHistory(this.createHistoryData());
+            this.historyService.addGameHistory(this.createHistoryData(winningPlayer, isWinByDefault));
         } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
-            this.historyService.addGameHistory(this.createHistoryData());
+            this.historyService.addGameHistory(this.createHistoryData(winningPlayer, isWinByDefault));
         }
         this.gameOver();
     }
 
-    createHistoryData() {
-        const gameMode = this.matchmakingService.isSoloMode ? 'Solo' : '1vs1';
+    createHistoryData(winningPlayer: string, isWinByDefault: boolean) {
+        const gameMode = this.matchmakingService.isSoloMode ? 'Classic - Solo' : 'Classic - 1vs1';
         const time = this.timerElement.getTime();
 
+        const player1Username = this.matchmakingService.isSoloMode ? this.player1 : winningPlayer;
+        const player2Username = this.matchmakingService.isSoloMode ? '' : this.player2 === winningPlayer ? this.player1 : this.player2;
         this.historyData = {
             startingTime: this.startingTime,
             duration: time,
             gameMode,
-            player1: this.player1,
-            player2: this.player2,
+            player1: player1Username,
+            player2: player2Username,
+            isWinByDefault,
         };
 
         return this.historyData;

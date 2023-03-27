@@ -115,3 +115,13 @@ header {
 .not-allowed {
     cursor: not-allowed;
   }
+
+.text-bold {
+  font-weight: bold;
+  color: salmon;
+}
+
+.crossed-out {
+    text-decoration: line-through;
+    color: #a9a9a9;
+  }
