@@ -61,12 +61,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
+        public replayModeService: ReplayModeService,
         private route: ActivatedRoute,
         private imageManipulationService: ImageManipulationService,
         private matchmakingService: MatchmakingService,
         private cheatModeService: CheatModeService,
         private chatService: ChatService,
-        private replayModeService: ReplayModeService,
     ) {}
 
     get leftCanvasContext() {
@@ -98,6 +98,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
+
+        // Replay Mode Initialization
+        this.replayModeService.onStartReplayMode.add(this.resetGame.bind(this));
+        this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
+
         window.addEventListener('keydown', this.onCheatMode.bind(this));
     }
 
@@ -146,6 +151,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.getInitialImagesFromServer();
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
+        this.replayModeService.visibleTimer = this.timerElement;
         window.removeEventListener('keydown', this.onCheatMode.bind(this));
     }
 
@@ -189,6 +195,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     startTimer() {
         this.timeInSeconds = 0;
+        this.timerElement.resetTimer();
+        this.timerElement.startTimer();
     }
 
     onMouseDown(event: MouseEvent) {
@@ -342,7 +350,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.gameOver();
         const startReplayAction = this.replayModeService.startReplayModeAction;
-        startReplayAction.add(this.resetGame.bind(this));
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode, startReplayAction);
     }
 
@@ -406,5 +413,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
         this.loadImagesToCanvas(img1Source, img2Source);
         this.chat.resetChat();
+    }
+
+    finishReplay() {
+        this.timerElement.stopTimer();
     }
 }
