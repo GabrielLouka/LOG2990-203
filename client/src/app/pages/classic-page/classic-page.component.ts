@@ -201,14 +201,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
+        console.log('attempt at clicking', coordinateClick);
         if (this.canvasIsClickable) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
                 isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
             });
+            console.log('click');
             this.refreshErrorMessagePosition(event.clientX, event.clientY);
             this.cheatModeService.focusKeyEvent(this.cheat);
+        } else {
+            console.log('canvas is not clickable');
         }
     }
 
@@ -283,6 +287,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.foundDifferences = foundDifferences;
             this.onFindDifference();
         };
+        console.log('refresh found differences');
         refreshMethod();
         this.replayModeService.addMethodToReplay(refreshMethod);
     }
@@ -297,9 +302,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 message += ' par ' + this.matchmakingService.player2Username.toUpperCase();
             }
         }
-        this.leftCanvas.nativeElement.style.pointerEvents = 'none';
-        this.rightCanvas.nativeElement.style.pointerEvents = 'none';
-        this.showErrorText();
+        if (isPlayer1 === this.matchmakingService.isPlayer1) this.showErrorText();
         this.cheatModeService.focusKeyEvent(this.cheat);
         this.sendSystemMessageToChat(message);
     }
@@ -307,6 +310,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     showErrorText() {
         const showErrorMethod = () => {
             this.errorMessage.nativeElement.style.display = 'block';
+            this.leftCanvas.nativeElement.style.pointerEvents = 'none';
+            this.rightCanvas.nativeElement.style.pointerEvents = 'none';
             this.playSound(false);
 
             setTimeout(() => {
@@ -367,7 +372,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onCheatMode(event: KeyboardEvent) {
-        if (this.matchmakingService.isSoloMode || (this.chat && document.activeElement !== this.chat.input.nativeElement)) {
+        if (this.matchmakingService.isSoloMode || (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
                     this.startCheating();
