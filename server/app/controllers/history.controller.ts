@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { HistoryStorageService } from '@app/services/history-storage-service/history-storage.service';
+import { HistoryData } from '@common/interfaces/history-data';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -7,7 +8,7 @@ import { Service } from 'typedi';
 @Service()
 export class HistoryController {
     router: Router;
-    constructor(public historicStorageService: HistoryStorageService) {
+    constructor(public historyStorageService: HistoryStorageService) {
         this.configureRouter();
     }
 
@@ -16,46 +17,34 @@ export class HistoryController {
 
         this.router.get('/fetchHistory/', async (req: Request, res: Response) => {
             try {
-                const history = await this.historicStorageService.getAllHistory();
+                const history = await this.historyStorageService.getAllHistory();
                 res.send(JSON.stringify(history));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }
         });
 
-        // this.router.post('/saveGame', async (req: Request, res: Response) => {
-        //     const receivedNameForm: EntireGameUploadForm = req.body;
-        //     const buffer1 = Buffer.from(receivedNameForm.firstImage.background);
-        //     const buffer2 = Buffer.from(receivedNameForm.secondImage.background);
+        this.router.delete('/wipeHistory', async (req: Request, res: Response) => {
+            this.historyStorageService
+                .wipeHistory()
+                .then(() => {
+                    res.status(StatusCodes.OK);
+                })
+                .catch((error: Error) => {
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
+                });
+        });
 
-        //     this.gameStorageService.storeGameImages(receivedNameForm.gameId, buffer1, buffer2);
-        //     const newGameToAdd: GameData = {
-        //         id: receivedNameForm.gameId,
-        //         nbrDifferences: receivedNameForm.differences.length,
-        //         differences: receivedNameForm.differences,
-        //         name: receivedNameForm.gameName,
-        //         isEasy: receivedNameForm.isEasy,
-        //         ranking: defaultRankings,
-        //     };
-        //     this.gameStorageService
-        //         .storeGameResult(newGameToAdd)
-        //         .then(() => {
-        //             res.status(StatusCodes.CREATED).send({ body: receivedNameForm.gameName });
-        //         })
-        //         .catch((error: Error) => {
-        //             res.status(StatusCodes.NOT_FOUND).send(error.message);
-        //         });
-        // });
-
-        // this.router.delete('/allGames', async (req: Request, res: Response) => {
-        //     this.gameStorageService
-        //         .allGames()
-        //         .then(() => {
-        //             res.status(StatusCodes.OK).send({ body: this.gameStorageService.getGamesLength() });
-        //         })
-        //         .catch((error: Error) => {
-        //             res.status(StatusCodes.NOT_FOUND).send(error.message);
-        //         });
-        // });
+        this.router.post('/saveHistory', async (req: Request, res: Response) => {
+            const historyForm: HistoryData = req.body;
+            this.historyStorageService
+                .storeHistory(historyForm)
+                .then(() => {
+                    res.status(StatusCodes.CREATED);
+                })
+                .catch((error: Error) => {
+                    res.status(StatusCodes.NOT_FOUND).send(error.message);
+                });
+        });
     }
 }

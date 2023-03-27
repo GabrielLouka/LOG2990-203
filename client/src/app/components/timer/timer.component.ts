@@ -22,6 +22,10 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
         return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
     }
 
+    getTime(): string {
+        return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
+    }
+
     ngAfterViewInit() {
         this.intervalId = window.setInterval(() => {
             if (this.timeInSeconds >= 0) {
@@ -34,10 +38,14 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
         window.clearInterval(this.intervalId);
     }
 
+    displayTimeValue(value: number): string {
+        return value < MINUTE_LIMIT ? '0' + value : value.toString();
+    }
+
     ticToc() {
         if (!this.shouldStop) this.timeInSeconds++;
-        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
-        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
+        this.minute.nativeElement.innerText = this.displayTimeValue(this.minutes);
+        this.second.nativeElement.innerText = this.displayTimeValue(this.seconds);
     }
 
     stopTimer() {

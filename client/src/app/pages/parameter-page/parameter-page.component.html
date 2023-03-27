@@ -46,7 +46,7 @@
         <div class="history-container">
             <div class="flex-row center">
                 <p class="title"><b> Historique des parties jouées </b></p>
-                <button class="button-style delete-btn center not-allowed">
+                <button class="button-style delete-btn center" (click)="this.historyService.deleteHistory()">
                     <span class="material-symbols-outlined option-icon"> delete </span>
                 </button>
             </div>
@@ -60,8 +60,8 @@
                     <div class="divider"></div>
                     <div class="flex-row center">
                         <span>{{ history.player1 }}</span>
-                        <span *ngIf="history.player2 !== ''">&nbsp;et&nbsp;</span>
-                        <span *ngIf="history.player2 !== ''">{{ history.player2 }}</span>
+                        <span *ngIf="history.player2 !== undefined">&nbsp;et&nbsp;</span>
+                        <span *ngIf="history.player2 !== undefined">{{ history.player2 }}</span>
                     </div>
                     <div class="divider"></div>
                     <div class="flex-row game-time space-around">

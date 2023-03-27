@@ -8,6 +8,7 @@ import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { HistoryService } from '@app/services/history-service/history.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
@@ -55,6 +56,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound2: number = 0;
     minDifferences: number = 0;
     canvasIsClickable: boolean = false;
+    startingTime: Date;
+    historyData: { startingTime: Date; gameMode: string; duration: string; player1: string; player2: string };
 
     // eslint-disable-next-line max-params
     constructor(
@@ -65,7 +68,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private matchmakingService: MatchmakingService,
         private cheatModeService: CheatModeService,
         private chatService: ChatService,
+        private historyService: HistoryService,
     ) {}
+
+    // this.historyService.addGameHistory(this.createHistoryData());
 
     get leftCanvasContext() {
         return this.leftCanvas.nativeElement.getContext('2d');
@@ -105,6 +111,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.socketService.disconnect();
+        if (this.matchmakingService.isSoloMode) this.historyService.addGameHistory(this.createHistoryData());
     }
 
     async playSound(isSuccessSound: boolean) {
@@ -128,10 +135,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
             if (this.isPlayer2Win(match)) {
                 this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
+                this.onWinGame(this.player2, this.isWinByDefault);
             } else if (this.isPlayer1Win(match)) {
                 this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
+                this.onWinGame(this.player1, this.isWinByDefault);
             }
         }
     }
@@ -162,6 +169,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.requestStartGame();
                     this.canvasIsClickable = true;
                     this.startTimer();
+                    this.startingTime = new Date();
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -325,8 +333,29 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
-        this.gameOver();
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
+
+        if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.is1vs1Mode) {
+            this.historyService.addGameHistory(this.createHistoryData());
+        } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
+            this.historyService.addGameHistory(this.createHistoryData());
+        }
+        this.gameOver();
+    }
+
+    createHistoryData() {
+        const gameMode = this.matchmakingService.isSoloMode ? 'Solo' : '1vs1';
+        const time = this.timerElement.getTime();
+
+        this.historyData = {
+            startingTime: this.startingTime,
+            duration: time,
+            gameMode,
+            player1: this.player1,
+            player2: this.player2,
+        };
+
+        return this.historyData;
     }
 
     onCheatMode(event: KeyboardEvent) {

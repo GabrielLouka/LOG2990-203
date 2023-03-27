@@ -11,8 +11,12 @@ export class HistoryService {
 
     constructor(private readonly communicationService: CommunicationService) {}
 
+    getHistory(): HistoryData[] {
+        return this.history;
+    }
+
     fetchHistoryFromServer() {
-        const routeToSend = '/history/fetchHistory/';
+        const routeToSend = '/history/fetchHistory';
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 if (response.body !== null) {
@@ -22,7 +26,18 @@ export class HistoryService {
         });
     }
 
-    getHistory(): HistoryData[] {
-        return this.history;
+    deleteHistory() {
+        const routeToSend = '/history/wipeHistory';
+        this.communicationService.delete(routeToSend).subscribe({});
+        this.reloadPage();
+    }
+
+    addGameHistory(history: HistoryData) {
+        const routeToSend = '/history/saveHistory';
+        this.communicationService.post<HistoryData>(history, routeToSend).subscribe({});
+    }
+
+    reloadPage() {
+        window.location.reload();
     }
 }
