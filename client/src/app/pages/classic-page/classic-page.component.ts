@@ -207,10 +207,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 position: coordinateClick,
                 isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
             });
-            this.errorMessage.nativeElement.style.left = event.clientX + 'px';
-            this.errorMessage.nativeElement.style.top = event.clientY + 'px';
+            this.refreshErrorMessagePosition(event.clientX, event.clientY);
             this.cheatModeService.focusKeyEvent(this.cheat);
         }
+    }
+
+    refreshErrorMessagePosition(x: number, y: number) {
+        const refreshErrorMessagePositionMethod = () => {
+            this.errorMessage.nativeElement.style.left = x + 'px';
+            this.errorMessage.nativeElement.style.top = y + 'px';
+        };
+        refreshErrorMessagePositionMethod();
+        this.replayModeService.addMethodToReplay(refreshErrorMessagePositionMethod);
     }
 
     requestStartGame() {
@@ -289,21 +297,26 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 message += ' par ' + this.matchmakingService.player2Username.toUpperCase();
             }
         }
-        this.errorMessage.nativeElement.style.display = 'block';
         this.leftCanvas.nativeElement.style.pointerEvents = 'none';
         this.rightCanvas.nativeElement.style.pointerEvents = 'none';
         this.showErrorText();
-        this.playSound(false);
         this.cheatModeService.focusKeyEvent(this.cheat);
         this.sendSystemMessageToChat(message);
     }
 
     showErrorText() {
-        setTimeout(() => {
-            this.errorMessage.nativeElement.style.display = 'none';
-            this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
-            this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
-        }, MILLISECOND_TO_SECONDS);
+        const showErrorMethod = () => {
+            this.errorMessage.nativeElement.style.display = 'block';
+            this.playSound(false);
+
+            setTimeout(() => {
+                this.errorMessage.nativeElement.style.display = 'none';
+                this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
+                this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
+            }, MILLISECOND_TO_SECONDS);
+        };
+        showErrorMethod();
+        this.replayModeService.addMethodToReplay(showErrorMethod);
     }
 
     onFindDifference() {
