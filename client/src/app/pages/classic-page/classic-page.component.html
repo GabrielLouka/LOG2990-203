@@ -32,13 +32,7 @@
             </div>
         </div>
 
-        <app-info-card
-            class="info-card"
-            *ngIf="game"
-            [isEasy]="game.gameData.isEasy"
-            [is1vs1]="isOneVersusOne"
-            [isClassicMode]="true"
-        ></app-info-card>
+        <app-info-card class="info-card" *ngIf="game" [isEasy]="game.gameData.isEasy" [matchMode]="Classique"></app-info-card>
 
         <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': backgroundColor }" class="cheat-mode">Mode triche</div>
 

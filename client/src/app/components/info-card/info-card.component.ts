@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { MatchType } from '@common/enums/match-type';
 
 @Component({
     selector: 'app-info-card',
@@ -6,22 +7,30 @@ import { Component, Input } from '@angular/core';
     styleUrls: ['./info-card.component.scss'],
 })
 export class InfoCardComponent {
-    @Input() isEasy: boolean = true;
-    @Input() is1vs1: boolean = true;
-    @Input() isClassicMode: boolean = true;
+    @Input() isEasy: boolean;
+    @Input() matchType: MatchType | undefined;
 
     get difficulty() {
-        if (this.isEasy) return 'Facile';
-        return 'Difficile';
+        return this.isEasy ? 'Facile' : 'Difficile';
     }
 
-    get matchType() {
-        if (this.is1vs1) return '1 vs 1';
-        return 'Solo';
-    }
-
-    get matchMode() {
-        if (this.isClassicMode) return 'Classique';
-        return 'Temps limité';
+    get matchTypeToString(): string {
+        switch (this.matchType) {
+            case MatchType.Solo: {
+                return 'Classique solo';
+            }
+            case MatchType.OneVersusOne: {
+                return 'Classique une contre une';
+            }
+            case MatchType.LimitedCoop: {
+                return 'Limité corporatif';
+            }
+            case MatchType.LimitedVersus: {
+                return 'Limité une contre un';
+            }
+            default: {
+                return 'Indéterminé';
+            }
+        }
     }
 }

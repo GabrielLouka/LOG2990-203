@@ -70,7 +70,7 @@ export class MatchmakingService {
         return this.currentMatch?.player1?.playerId;
     }
 
-    set currentMatchType(matchType: MatchType) {
+    set currentMatchType(matchType: MatchType | undefined) {
         const matchId = this.currentSocketId;
 
         this.socketService.send<{ matchId: string; matchType: MatchType }>('setMatchType', { matchId, matchType });

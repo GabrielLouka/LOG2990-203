@@ -75,8 +75,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.rightCanvas.nativeElement.getContext('2d');
     }
 
-    get isOneVersusOne() {
-        return this.matchmakingService.is1vs1Mode;
+    get currentMatchType() {
+        return this.matchmakingService.currentMatchType;
     }
 
     getPlayerUsername(isPlayer1: boolean): string {
