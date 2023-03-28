@@ -8,8 +8,8 @@
         <app-back-button></app-back-button>
         <a class="projectLogo"><img src=".\assets\img\game-icon.png" alt="Logo Projet" width="180" height="180" /></a>
         <div *ngIf="!isSelection" class="btn-container">
-            <button class="button-style game-btn" (click)="this.popUpElement.showDeleteGamesPopUp(true)">Supprimer les jeux</button>
-            <button class="button-style game-btn not-allowed">Réinitialiser les jeux</button>
+            <button class="button-style game-btn" (click)="this.deletePopUpElement.showPopUp(true)">Supprimer les jeux</button>
+            <button class="button-style game-btn" (click)="this.resetPopUpElement.showPopUp(true)">Réinitialiser les jeux</button>
         </div>
     </Section>
     <app-spinner *ngIf="this.theGamesService.isLoading" class="spinner"></app-spinner>
@@ -24,5 +24,6 @@
         *ngIf="this.theGamesService.showPreviousButton"
         (click)="this.theGamesService.changeGamePages(false)"
     ></app-previous-page-button>
-    <app-delete-games-pop-up #popUpElement (isDeleteRequest)="this.theGamesService.deleteAllGames($event)"></app-delete-games-pop-up>
+    <app-delete-games-pop-up #deletePopUpElement (isDeleteRequest)="this.theGamesService.deleteAll($event)"></app-delete-games-pop-up>
+    <app-reset-pop-up #resetPopUpElement (isResetRequest)="this.theGamesService.resetAll($event)"></app-reset-pop-up>
 </body>

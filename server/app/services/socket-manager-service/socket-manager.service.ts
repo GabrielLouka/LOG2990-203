@@ -108,6 +108,20 @@ export class SocketManager {
                     .emit('messageBetweenPlayers', { username: data.username, message: data.message, sentByPlayer1: data.sentByPlayer1 });
             });
 
+            // socket.on('sendCurrentMatchWinningTime', (data: { newWinningTime: number; gameId: string; matchId: string }) => {
+
+            // });
+
+            socket.on('resetAllGames', () => {
+                this.sio.emit('allGamesReset');
+                this.sio.emit('actionOnGameReloadingThePage');
+            });
+
+            socket.on('resetGame', (data: { hasResetGame: boolean; id: string }) => {
+                this.sio.emit('gameReset', { gameReset: data.hasResetGame, id: data.id }, socket.id);
+                this.sio.emit('actionOnGameReloadingThePage');
+            });
+
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;
                 socket.join(joinedRoomName);

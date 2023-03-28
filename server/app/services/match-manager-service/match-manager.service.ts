@@ -21,25 +21,30 @@ export class MatchManagerService {
     }
 
     setMatchType(matchId: string, matchType: MatchType) {
-        const matchToChange = this.getMatchById(matchId);
+        const matchToUpdate = this.getMatchById(matchId);
 
-        if (matchToChange) {
-            matchToChange.matchType = matchType;
-        }
+        if (matchToUpdate) matchToUpdate.matchType = matchType;
     }
 
     setMatchPlayer(matchId: string, player: Player) {
-        const matchToChange = this.getMatchById(matchId);
+        const matchToUpdate = this.getMatchById(matchId);
 
-        if (matchToChange) {
-            if (!matchToChange.player1) {
-                matchToChange.player1 = player;
-                if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer1) matchToChange.matchStatus = MatchStatus.WaitingForPlayer2;
+        if (matchToUpdate) {
+            if (!matchToUpdate.player1) {
+                matchToUpdate.player1 = player;
+                if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer1) matchToUpdate.matchStatus = MatchStatus.WaitingForPlayer2;
             } else {
-                matchToChange.player2 = player;
-                if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer2) matchToChange.matchStatus = MatchStatus.InProgress;
+                matchToUpdate.player2 = player;
+                if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer2) matchToUpdate.matchStatus = MatchStatus.InProgress;
             }
         }
+    }
+
+    setMatchWinningTime(matchId: string, winningTime: number) {
+        const matchToUpdate = this.getMatchById(matchId);
+        const hasWonByDefault = matchToUpdate?.matchStatus === MatchStatus.Aborted;
+
+        if (matchToUpdate && !hasWonByDefault) matchToUpdate.gameWinTime = winningTime;
     }
 
     removePlayerFromMatch(playerId: string): string | null {

@@ -7,7 +7,8 @@
                 [ngClass]="{
                     'sent-by-system': message.sentBySystem,
                     'sent-by-player-1': message.sentByPlayer1,
-                    'sent-by-player-2': message.sentByPlayer2
+                    'sent-by-player-2': !message.sentByPlayer1,
+                    'sent-updated-score': message.sentUpdatedScore
                 }"
             >
                 <div class="font-size message-username">

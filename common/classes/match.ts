@@ -9,6 +9,7 @@ export class Match {
     player2: Player | null;
     matchType: MatchType;
     matchStatus: MatchStatus;
+    gameWinTime: number | null;
 
     constructor(gameId: number, matchId: string) {
         this.gameId = gameId;

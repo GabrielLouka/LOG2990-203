@@ -249,7 +249,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 username: data.username,
                 sentBySystem: false,
                 sentByPlayer1: data.sentByPlayer1,
-                sentByPlayer2: !data.sentByPlayer1,
+                sentUpdatedScore: false,
                 sentTime: Date.now(),
             });
             this.chatService.scrollToBottom(this.chat.chat);
