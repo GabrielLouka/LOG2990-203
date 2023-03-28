@@ -2,6 +2,10 @@
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <title>Page de Configurations</title>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 </head>
 
 <body>
@@ -18,21 +22,54 @@
         <div class="flex-column center const-container">
             <p class="title"><b> Constantes de jeu</b></p>
             <div class="input-container">
-                <div class="flex-row center">
-                    <p class="label-input">Temps initial du compte à rebours (minute)</p>
-                    <input type="number" step="1" value="5" min="0" max="60" />
-                </div>
-                <div class="flex-row center">
-                    <p class="label-input">Temps de pénalité par indice utilisé (seconde)</p>
-                    <input type="number" step="1" value="3" min="0" max="10" />
-                </div>
-                <div class="flex-row center">
-                    <p class="label-input">Temps bonus par différence trouvée (seconde)</p>
-                    <input type="number" step="1" value="2" min="0" max="10" />
+                <div class="flex-column">
+                    <div class="flex-row space-between">
+                        <p>Temps initial du compte à rebours (2s - 120s)</p>
+                        <div class="flex-column center slider">
+                            <div class="value">
+                                <b>{{ this.countdownValue }} secondes</b>
+                            </div>
+
+                            <input
+                                #rangeValue
+                                class="range-slider"
+                                type="range"
+                                [(ngModel)]="countdownValue"
+                                min="2"
+                                max="120"
+                                onmousemove="rangeSlide()"
+                            />
+                        </div>
+                    </div>
+                    <div class="flex-row space-between">
+                        <p>Temps de pénalité par indice utilisé (0s - 10s)</p>
+                        <div class="flex-row center counter space-around">
+                            <button class="counter-button" (click)="updateValue(true, true)">
+                                <span class="material-symbols-outlined"> remove </span>
+                            </button>
+                            <div class="value">{{ this.penaltyValue }}</div>
+                            <button class="counter-button" (click)="updateValue(true, false)">
+                                <span class="material-symbols-outlined"> add </span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-row space-between">
+                        <p>Temps bonus par différence trouvée (0s - 10s)</p>
+                        <div class="flex-row center counter space-around">
+                            <button class="counter-button" (click)="updateValue(false, true)">
+                                <span class="material-symbols-outlined"> remove </span>
+                            </button>
+                            <div class="value">{{ this.bonusValue }}</div>
+                            <button class="counter-button" (click)="updateValue(false, false)">
+                                <span class="material-symbols-outlined"> add </span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
             <div class="flex-row">
-                <button class="button-style flex-row center const-btn not-allowed">
+                <button class="button-style flex-row center const-btn not-allowed" (click)="resetValues()">
                     <span class="material-symbols-outlined option-icon"> device_reset </span>
                     Mettre à défault les constantes
                 </button>

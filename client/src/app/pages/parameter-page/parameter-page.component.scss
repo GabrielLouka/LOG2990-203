@@ -94,6 +94,72 @@ header {
     }
 }
 
-.not-allowed {
-    cursor: not-allowed;
-  }
+.counter {
+    border: solid 1px;
+    border-radius: 1vh;
+    height: 4vh;
+    width: 6vw;
+    //padding: 1vh;
+
+    background-color: white;
+}
+
+.counter-button {
+    border-radius: 1vh;
+    background-color: white;
+    border: none;
+
+    :hover {
+        cursor: pointer;
+        color: salmon;
+    }
+}
+
+.value {
+    //background-color: whitesmoke;
+    padding: 1vh;
+}
+
+.slider {
+    margin-bottom: 2vh;
+    position: absolute;
+
+    left: 30vw;
+    top: 44vh;
+}
+
+.range-slider {
+    color: salmon;
+}
+
+
+input[type="range"] {
+    -webkit-appearance: none;
+    margin: 10px 0;
+    width: 100%;
+}
+  
+input[type="range"]::-webkit-slider-runnable-track {
+    height: 0.5vh;
+    background: salmon;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1vw;
+    height: 2vh;
+    border-radius: 10vh;
+    background:white;
+    cursor: pointer;
+    margin-top: -8px;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    scale: 0.7;
+    background: salmon;
+    box-shadow: 0 0 0 0.5vh white;
+}
+
+  
+
