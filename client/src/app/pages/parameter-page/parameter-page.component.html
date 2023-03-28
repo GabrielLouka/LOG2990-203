@@ -21,59 +21,63 @@
     <div class="flex-row center main-container">
         <div class="flex-column center const-container">
             <p class="title"><b> Constantes de jeu</b></p>
-            <div class="input-container">
-                <div class="flex-column">
-                    <div class="flex-row space-between">
-                        <p>Temps initial du compte à rebours (2s - 120s)</p>
-                        <div class="flex-column center slider">
-                            <div class="value">
-                                <b>{{ this.countdownValue }} secondes</b>
-                            </div>
+            <div class="flex-row center">
+                <div class="flex-column const-input">
+                    <div><b>Temps initial du compte à rebours</b></div>
+                    <div><b>Temps de pénalité pour l’utilisation d’un indice</b></div>
+                    <div><b> Temps gagné avec la découverte d’une différence</b></div>
+                </div>
+                <div class="flex-column const-input">
+                    <div class="flex-column center">
+                        <div class="value">
+                            <b>{{ this.gameConstantsService.constants.countdownValue }} secondes</b>
+                        </div>
+                        <input
+                            #rangeValue
+                            class="range-slider"
+                            type="range"
+                            [(ngModel)]="this.gameConstantsService.constants.countdownValue"
+                            min="2"
+                            max="120"
+                        />
+                    </div>
 
-                            <input
-                                #rangeValue
-                                class="range-slider"
-                                type="range"
-                                [(ngModel)]="countdownValue"
-                                min="2"
-                                max="120"
-                                onmousemove="rangeSlide()"
-                            />
+                    <div class="flex-column center">
+                        <div class="value">
+                            <b>{{ this.gameConstantsService.constants.penaltyValue }} secondes</b>
                         </div>
+                        <input
+                            #rangeValue
+                            class="range-slider"
+                            type="range"
+                            [(ngModel)]="this.gameConstantsService.constants.penaltyValue"
+                            min="0"
+                            max="10"
+                        />
                     </div>
-                    <div class="flex-row space-between">
-                        <p>Temps de pénalité par indice utilisé (0s - 10s)</p>
-                        <div class="flex-row center counter space-around">
-                            <button class="counter-button" (click)="updateValue(true, true)">
-                                <span class="material-symbols-outlined"> remove </span>
-                            </button>
-                            <div class="value">{{ this.penaltyValue }}</div>
-                            <button class="counter-button" (click)="updateValue(true, false)">
-                                <span class="material-symbols-outlined"> add </span>
-                            </button>
+
+                    <div class="flex-column center">
+                        <div class="value">
+                            <b>{{ this.gameConstantsService.constants.bonusValue }} secondes</b>
                         </div>
-                    </div>
-                    <div class="flex-row space-between">
-                        <p>Temps bonus par différence trouvée (0s - 10s)</p>
-                        <div class="flex-row center counter space-around">
-                            <button class="counter-button" (click)="updateValue(false, true)">
-                                <span class="material-symbols-outlined"> remove </span>
-                            </button>
-                            <div class="value">{{ this.bonusValue }}</div>
-                            <button class="counter-button" (click)="updateValue(false, false)">
-                                <span class="material-symbols-outlined"> add </span>
-                            </button>
-                        </div>
+                        <input
+                            #rangeValue
+                            class="range-slider"
+                            type="range"
+                            [(ngModel)]="this.gameConstantsService.constants.bonusValue"
+                            min="0"
+                            max="10"
+                        />
                     </div>
                 </div>
             </div>
 
             <div class="flex-row">
-                <button class="button-style flex-row center const-btn not-allowed" (click)="resetValues()">
+                <button class="button-style flex-row center const-btn not-allowed" (click)="this.gameConstantsService.updateConstants(true)">
                     <span class="material-symbols-outlined option-icon"> device_reset </span>
-                    Mettre à défault les constantes
+                    Réinitialiser les constantes
                 </button>
-                <button class="button-style flex-row center const-btn not-allowed">
+                <button class="button-style flex-row center const-btn not-allowed" (click)="this.gameConstantsService.updateConstants(false)">
                     <span class="material-symbols-outlined option-icon"> save </span>
                     Sauvegarder les constantes
                 </button>
@@ -93,4 +97,5 @@
             </div>
         </div>
     </div>
+    <app-pop-up #popUpElement></app-pop-up>
 </body>

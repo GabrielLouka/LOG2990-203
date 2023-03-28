@@ -9,6 +9,7 @@ const DB = {
 const R_ONLY = {
     persistentDataFolderPath: './storedData/',
     lastGameIdFileName: 'lastGameId.txt',
+    gameConstantsFileName: 'gameConstants.json',
     defaultImagesPath: './storedData/default-img.json',
     gamesLimit: 4,
     originalImageFileName: '1.bmp',

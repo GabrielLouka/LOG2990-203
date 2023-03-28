@@ -6,9 +6,9 @@ import { StatusCodes } from 'http-status-codes';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
+import { GameConstantsController } from './controllers/game-constants.controller';
 import { GamesController } from './controllers/games.controller';
 import { ImageProcessingController } from './controllers/image-processing.controller';
-
 @Service()
 export class Application {
     app: express.Application;
@@ -16,7 +16,11 @@ export class Application {
     private readonly swaggerOptions: swaggerJSDoc.Options;
 
     // eslint-disable-next-line max-params
-    constructor(private readonly imageProcessingController: ImageProcessingController, readonly gamesController: GamesController) {
+    constructor(
+        private readonly imageProcessingController: ImageProcessingController,
+        readonly gamesController: GamesController,
+        readonly gameConstantsController: GameConstantsController,
+    ) {
         this.app = express();
 
         this.swaggerOptions = {
@@ -39,6 +43,7 @@ export class Application {
         this.app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSDoc(this.swaggerOptions)));
         this.app.use('/api/image_processing', this.imageProcessingController.router);
         this.app.use('/api/games', this.gamesController.router);
+        this.app.use('/api/game_constants', this.gameConstantsController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });

@@ -33,23 +33,22 @@ header {
 
 /* Constants */
 .const-container {
-    height: 40vh;
+    height: 55vh;
     width: 35vw;
 
     border: solid; 
     border-radius: 3vh;
 }
 
-.input-container {
-    width: 25vw;
+.value {
+    padding: 1vh;
+    font-size: smaller;
 }
 
-.label-input {
-    width: 18vw;
-    height: 2vh;
-    margin: 1vh;
-
+.const-input {
     justify-content: space-around;
+    height: 28vh;
+    margin-right: 2vw;
 }
 
 .const-btn {
@@ -81,84 +80,48 @@ header {
     overflow-y: scroll;
 }
 
-.history-card {
-    border: 2px solid black;
-    background-color: white;
-    border-radius: 10px;
 
-    margin: 1vh;
+// CSS FOR RANGE SLIDER
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    input[type='range'] {
+      -webkit-appearance: none;
 
-    &:hover {
-        transform: scale(0.97);
-        //cursor: pointer;
+      overflow: hidden;
+      border-radius: 2vh;
+      width: 7vw;
+      cursor: pointer;
+      background-color: whitesmoke;
     }
-}
+    
+    input[type='range']::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      
+      width: 1vw;
+      height: 1vh;
 
-.counter {
-    border: solid 1px;
-    border-radius: 1vh;
-    height: 4vh;
-    width: 6vw;
-    //padding: 1vh;
+      border-radius: 5vh;
 
-    background-color: white;
-}
-
-.counter-button {
-    border-radius: 1vh;
-    background-color: white;
-    border: none;
-
-    :hover {
-        cursor: pointer;
-        color: salmon;
+      background: #434343;
+      box-shadow: -5vw 0 0 80px salmon;
     }
-}
 
-.value {
-    //background-color: whitesmoke;
-    padding: 1vh;
-}
+    input[type="range"]::before {
+        display: flex;
+        margin-left: -1vw;
+        color: black;
+        content: attr(min);
+        position: absolute;
 
-.slider {
-    margin-bottom: 2vh;
-    position: absolute;
+    }
+      
+    input[type="range"]::after {
+        color: black;
+        content: attr(max);
+        position: absolute;
+        display: flex;
+        margin-left: 7.5vw;
+    }
 
-    left: 30vw;
-    top: 44vh;
-}
-
-.range-slider {
-    color: salmon;
-}
-
-
-input[type="range"] {
-    -webkit-appearance: none;
-    margin: 10px 0;
-    width: 100%;
-}
-  
-input[type="range"]::-webkit-slider-runnable-track {
-    height: 0.5vh;
-    background: salmon;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 1vw;
-    height: 2vh;
-    border-radius: 10vh;
-    background:white;
-    cursor: pointer;
-    margin-top: -8px;
-}
-
-input[type="range"]:focus::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    scale: 0.7;
-    background: salmon;
-    box-shadow: 0 0 0 0.5vh white;
 }
 
   
