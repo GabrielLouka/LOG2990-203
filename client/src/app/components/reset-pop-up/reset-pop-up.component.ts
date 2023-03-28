@@ -1,14 +1,14 @@
 import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
-import { ALL_GAMES_TEXT, DELETE_TEXT, NO_TEXT, THIS_GAME_TEXT, YES_TEXT } from '@common/utils/env';
+import { ALL_GAMES_TEXT, NO_TEXT, RESET_TEXT, THIS_GAME_TEXT, YES_TEXT } from '@common/utils/env';
 
 @Component({
-    selector: 'app-delete-games-pop-up',
-    templateUrl: './delete-games-pop-up.component.html',
-    styleUrls: ['./delete-games-pop-up.component.scss'],
+    selector: 'app-reset-pop-up',
+    templateUrl: './reset-pop-up.component.html',
+    styleUrls: ['./reset-pop-up.component.scss'],
 })
-export class DeleteGamesPopUpComponent {
+export class ResetPopUpComponent {
     @ViewChild('modal') modal!: ElementRef;
-    @Output() isDeleteRequest = new EventEmitter<boolean>();
+    @Output() isResetRequest = new EventEmitter<boolean>();
 
     popUpInfo: {
         title: string;
@@ -22,7 +22,7 @@ export class DeleteGamesPopUpComponent {
         const message = isAllGames ? ALL_GAMES_TEXT : THIS_GAME_TEXT;
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
-            title: DELETE_TEXT + message,
+            title: RESET_TEXT + message,
             message: '',
             option1: YES_TEXT,
             option2: NO_TEXT,
@@ -32,8 +32,8 @@ export class DeleteGamesPopUpComponent {
         this.displayPopUp();
     }
 
-    emitDeleteRequestConfirmation() {
-        this.isDeleteRequest.emit(true);
+    emitResetRequestConfirmation() {
+        this.isResetRequest.emit(true);
     }
 
     displayPopUp() {
@@ -41,7 +41,7 @@ export class DeleteGamesPopUpComponent {
     }
 
     closePopUp() {
-        this.isDeleteRequest.emit(false);
+        this.isResetRequest.emit(false);
         this.modal.nativeElement.style.display = 'none';
     }
 }

@@ -26,7 +26,7 @@ describe('OverlayComponent', () => {
         socketServiceSpy = jasmine.createSpyObj('SocketClientService', ['emit']);
         communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['delete']);
 
-        popUpElementSpy = jasmine.createSpyObj('DeleteGamesPopUpComponent', ['showDeleteGamesPopUp']);
+        popUpElementSpy = jasmine.createSpyObj('DeleteGamesPopUpComponent', ['showPopUp']);
         locationSpy = jasmine.createSpyObj('Location', ['reload']);
         TestBed.configureTestingModule({
             imports: [RouterTestingModule],
@@ -43,7 +43,7 @@ describe('OverlayComponent', () => {
         fixture = TestBed.createComponent(OverlayComponent);
         component = fixture.componentInstance;
         component.id = 'game_id_123';
-        component.popUpElement = popUpElementSpy;
+        component.deletePopUpElement = popUpElementSpy;
         fixture.detectChanges();
     });
 
@@ -84,10 +84,10 @@ describe('OverlayComponent', () => {
     });
 
     it('should call showDeleteGamesPopUp function of popUpElement with false argument', () => {
-        component.popUpElement = new DeleteGamesPopUpComponent();
-        spyOn(component.popUpElement, 'showDeleteGamesPopUp');
+        component.deletePopUpElement = new DeleteGamesPopUpComponent();
+        spyOn(component.deletePopUpElement, 'showPopUp');
         component.showDeletePopUp();
-        expect(component.popUpElement.showDeleteGamesPopUp).toHaveBeenCalled();
+        expect(component.deletePopUpElement.showPopUp).toHaveBeenCalled();
     });
 
     it('should delete selected game', async () => {

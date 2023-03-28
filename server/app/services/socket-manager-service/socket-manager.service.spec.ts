@@ -11,7 +11,7 @@ import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
@@ -99,7 +99,8 @@ describe('SocketManager', () => {
                         { x: 100, y: 200 },
                     ],
                 ],
-                ranking: defaultRankings,
+                oneVersusOneRanking: defaultRanking,
+                soloRanking: defaultRanking,
             };
             socketManager.handleSockets();
             matchManagerServiceStub.createMatch(match.gameId, match.matchId);
@@ -128,7 +129,8 @@ describe('SocketManager', () => {
                 { x: 100, y: 200 },
             ],
         ],
-        ranking: defaultRankings,
+        oneVersusOneRanking: defaultRanking,
+        soloRanking: defaultRanking,
     };
     const validateSocket = {
         id: 'socket1',
@@ -148,7 +150,8 @@ describe('SocketManager', () => {
                         { x: 100, y: 200 },
                     ],
                 ],
-                ranking: defaultRankings,
+                oneVersusOneRanking: defaultRanking,
+                soloRanking: defaultRanking,
             },
         },
     };

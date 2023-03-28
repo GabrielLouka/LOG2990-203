@@ -2,7 +2,7 @@ import { GameStorageService } from '@app/services/game-storage-service/game-stor
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -54,7 +54,8 @@ export class GamesController {
                 differences: receivedNameForm.differences,
                 name: receivedNameForm.gameName,
                 isEasy: receivedNameForm.isEasy,
-                ranking: defaultRankings,
+                oneVersusOneRanking: defaultRanking,
+                soloRanking: defaultRanking,
             };
             this.gameStorageService
                 .storeGameResult(newGameToAdd)
@@ -68,7 +69,7 @@ export class GamesController {
 
         this.router.delete('/allGames', async (req: Request, res: Response) => {
             this.gameStorageService
-                .allGames()
+                .deleteAll()
                 .then(() => {
                     res.status(StatusCodes.OK).send({ body: this.gameStorageService.getGamesLength() });
                 })
@@ -78,7 +79,7 @@ export class GamesController {
         });
         this.router.delete('/:id', async (req: Request, res: Response) => {
             this.gameStorageService
-                .deleteGame(req.params.id)
+                .deleteOneById(req.params.id)
                 .then(() => {
                     res.status(StatusCodes.OK).send({ body: this.gameStorageService.getGamesLength() });
                 })

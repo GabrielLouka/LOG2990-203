@@ -10,7 +10,8 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 })
 export class GamesDisplayComponent implements OnInit {
     @Input() isSelection: boolean;
-    @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
+    @ViewChild('deletePopUpElement') deletePopUpElement: DeleteGamesPopUpComponent;
+    @ViewChild('resetPopUpElement') resetPopUpElement: DeleteGamesPopUpComponent;
     title: string;
 
     constructor(
@@ -25,7 +26,7 @@ export class GamesDisplayComponent implements OnInit {
 
     ngOnInit() {
         this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
-        this.gamesService.fetchGameDataFromServer(this.gamesService.currentPageNbr);
+        this.gamesService.fetchGameDataFromServer(this.gamesService.currentPageNumber);
         this.matchmakingService.connectSocket();
         this.addServerSocketMessagesListeners();
     }

@@ -16,7 +16,7 @@ export class ChatComponent {
         username: string;
         sentBySystem: boolean;
         sentByPlayer1: boolean;
-        sentByPlayer2: boolean;
+        sentUpdatedScore: boolean;
         sentTime: number;
     }[] = [];
     newMessage = '';
@@ -31,6 +31,10 @@ export class ChatComponent {
     sendMessage() {
         this.chatService.sendMessage(this.chatService.isPlayer1, this.newMessage);
     }
+
+    // sendTimeScoreMessage(message: string) {
+    //     this.chatService.sendTimeScoreMessage({ message, chat: this.chat, newMessage: this.newMessage }, this.messages);
+    // }
 
     sendSystemMessage(message: string) {
         this.chatService.sendMessageFromSystem({ message, chat: this.chat, newMessage: this.newMessage }, this.messages);

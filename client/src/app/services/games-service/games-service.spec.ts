@@ -6,7 +6,7 @@ import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-he
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
 import { of } from 'rxjs';
 import { Socket } from 'socket.io-client';
@@ -71,7 +71,8 @@ describe('GamesService', () => {
                         { x: 0, y: 0 },
                     ],
                 ],
-                ranking: defaultRankings,
+                oneVersusOneRanking: defaultRanking,
+                soloRanking: defaultRanking,
             };
             const match = 'match1';
             gameContent.push({ gameData: game, originalImage: Buffer.alloc(3) });
@@ -92,19 +93,19 @@ describe('GamesService', () => {
         );
         service.fetchGameDataFromServer(pageId);
         expect(communicationServiceSpy.get).toHaveBeenCalledWith(`/games/${pageId}`);
-        expect(service.gamesNbr).toEqual(4);
+        expect(service.gamesNumber).toEqual(4);
         expect(service.showNextButton).toBeFalse();
     });
 
-    it('should change game pages (next/previous games)', async () => {
+    it('should change game pages (next/previous games)', () => {
         spyOn(service, 'fetchGameDataFromServer');
-        await service.changeGamePages(true);
-        expect(service.currentPageNbr).toBe(1);
-        await service.changeGamePages(false);
-        expect(service.currentPageNbr).toBe(0);
+        service.changeGamePages(true);
+        expect(service.currentPageNumber).toBe(1);
+        service.changeGamePages(false);
+        expect(service.currentPageNumber).toBe(0);
     });
 
-    it('should delete all games', async () => {
+    it('should delete all games', () => {
         communicationServiceSpy.delete.and.returnValue(
             of({
                 headers: new HttpHeaders(),
@@ -119,7 +120,7 @@ describe('GamesService', () => {
         );
         spyOn(socketClientService.socket, 'emit');
         spyOn(service, 'reloadPage').and.stub();
-        await service.allGames(true);
+        service.deleteAll(true);
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/allGames');
         expect(socketClientService.socket.emit).toHaveBeenCalledWith('allGames', { gameToDelete: true });
         expect(service.reloadPage).toHaveBeenCalled();

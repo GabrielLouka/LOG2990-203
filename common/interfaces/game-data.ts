@@ -7,5 +7,6 @@ export interface GameData {
     isEasy: boolean;
     nbrDifferences: number;
     differences: Vector2[][]; // array of all the pixels in a difference
-    ranking: Ranking[][];
+    oneVersusOneRanking: Ranking[];
+    soloRanking: Ranking[];
 }

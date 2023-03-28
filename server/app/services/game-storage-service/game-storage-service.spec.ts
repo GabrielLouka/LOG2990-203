@@ -30,17 +30,15 @@ describe('Game storage service', () => {
             isEasy: true,
             nbrDifferences: 5,
             differences: [[]],
-            ranking: [
-                [
-                    { name: 'Player 1', score: '10:00' },
-                    { name: 'Player 2', score: '10:00' },
-                    { name: 'Player 3', score: '10:00' },
-                ],
-                [
-                    { name: 'Player 1', score: '10:00' },
-                    { name: 'Player 2', score: '10:00' },
-                    { name: 'Player 3', score: '10:00' },
-                ],
+            oneVersusOneRanking: [
+                { name: 'Player 1', score: '10:00' },
+                { name: 'Player 2', score: '10:00' },
+                { name: 'Player 3', score: '10:00' },
+            ],
+            soloRanking: [
+                { name: 'Player 1', score: '10:00' },
+                { name: 'Player 2', score: '10:00' },
+                { name: 'Player 3', score: '10:00' },
             ],
         };
         await gameStorageService.collection.insertOne(gamePrototype);

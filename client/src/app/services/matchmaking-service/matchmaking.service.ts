@@ -16,8 +16,10 @@ export class MatchmakingService {
     onGetJoinRequest = new Action<Player>();
     onGetJoinCancel = new Action<string>();
     onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
-    onAllGameDeleted = new Action<string | null>();
-    onSingleGameDeleted = new Action<string | null>();
+    onDeletedAllGames = new Action<string | null>();
+    onDeletedSingleGame = new Action<string | null>();
+    onResetAllGames = new Action<string | null>();
+    onResetSingleGame = new Action<string | null>();
     matchIdThatWeAreTryingToJoin: string | null = null;
     currentMatch: Match | null;
 
@@ -113,12 +115,20 @@ export class MatchmakingService {
             this.onGetJoinRequestAnswer.invoke(data);
         });
 
-        this.socketService.on('allGameDeleted', () => {
-            this.onAllGameDeleted.invoke(null);
+        this.socketService.on('allGamesDeleted', () => {
+            this.onDeletedAllGames.invoke(null);
         });
 
         this.socketService.on('gameDeleted', (data: { hasDeletedGame: boolean; id: string }) => {
-            this.onSingleGameDeleted.invoke(data.id);
+            this.onDeletedSingleGame.invoke(data.id);
+        });
+
+        this.socketService.on('allGamesReset', () => {
+            this.onResetAllGames.invoke(null);
+        });
+
+        this.socketService.on('gameReset', (data: { hasResetGame: boolean; id: string }) => {
+            this.onResetSingleGame.invoke(data.id);
         });
     }
 
@@ -129,6 +139,10 @@ export class MatchmakingService {
         this.onGetJoinRequest = new Action<Player>();
         this.onGetJoinCancel = new Action<string>();
         this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
+        this.onDeletedAllGames = new Action<string | null>();
+        this.onDeletedSingleGame = new Action<string | null>();
+        this.onResetAllGames = new Action<string | null>();
+        this.onResetSingleGame = new Action<string | null>();
         this.matchIdThatWeAreTryingToJoin = null;
     }
 

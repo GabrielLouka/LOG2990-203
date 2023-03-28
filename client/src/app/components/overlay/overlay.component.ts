@@ -17,7 +17,7 @@ export class OverlayComponent {
     @Input() isPlayable: boolean;
     @Input() id: string;
     @Input() matchToJoinIfAvailable: string | null = null;
-    @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
+    @ViewChild('deletePopUpElement') deletePopUpElement: DeleteGamesPopUpComponent;
     // eslint-disable-next-line max-params
     constructor(
         private readonly matchmakingService: MatchmakingService,
@@ -48,7 +48,7 @@ export class OverlayComponent {
     }
 
     showDeletePopUp() {
-        this.popUpElement.showDeleteGamesPopUp(false);
+        this.deletePopUpElement.showPopUp(false);
     }
 
     async deleteSelectedGame(isDeleteRequest: boolean): Promise<void> {

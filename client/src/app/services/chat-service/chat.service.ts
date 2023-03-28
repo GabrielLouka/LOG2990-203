@@ -1,7 +1,8 @@
 import { ElementRef, Injectable } from '@angular/core';
+import { ChatMessage } from '@app/interfaces/chat-message';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { SYSTEM_MESSAGE } from '@common/utils/env';
+import { SYSTEM_NAME } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
@@ -28,23 +29,29 @@ export class ChatService {
         }
     }
 
-    sendMessageFromSystem(
-        chatELements: { message: string; chat: ElementRef; newMessage: string },
-        messages: {
-            text: string;
-            username: string;
-            sentBySystem: boolean;
-            sentByPlayer1: boolean;
-            sentByPlayer2: boolean;
-            sentTime: number;
-        }[],
+    sendRecordBreakingMessage(
+        chatELements: { message: string; chat: ElementRef; newMessage: string; recordPlayerUsername: string },
+        messages: ChatMessage[],
     ) {
         messages.push({
             text: chatELements.message,
-            username: SYSTEM_MESSAGE,
+            username: chatELements.recordPlayerUsername,
+            sentBySystem: false,
+            sentByPlayer1: false,
+            sentUpdatedScore: true,
+            sentTime: Date.now(),
+        });
+        this.scrollToBottom(chatELements.chat);
+        chatELements.newMessage = this.clearMessage();
+    }
+
+    sendMessageFromSystem(chatELements: { message: string; chat: ElementRef; newMessage: string }, messages: ChatMessage[]) {
+        messages.push({
+            text: chatELements.message,
+            username: SYSTEM_NAME,
             sentBySystem: true,
             sentByPlayer1: false,
-            sentByPlayer2: false,
+            sentUpdatedScore: false,
             sentTime: Date.now(),
         });
         this.scrollToBottom(chatELements.chat);
@@ -63,6 +70,6 @@ export class ChatService {
 
     isTextValid(newMessage: string) {
         newMessage = newMessage.replace(/\s/g, '');
-        return !(newMessage === '' || newMessage === ' ' || newMessage === null);
+        return !(newMessage === '' || newMessage === ' ' || !newMessage);
     }
 }

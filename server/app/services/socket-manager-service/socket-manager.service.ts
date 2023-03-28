@@ -92,8 +92,8 @@ export class SocketManager {
                 this.sio.to(data.matchId).emit('incomingPlayerRequestAnswer', data);
             });
 
-            socket.on('allGames', () => {
-                this.sio.emit('allGameDeleted');
+            socket.on('deleteAllGames', () => {
+                this.sio.emit('allGamesDeleted');
                 this.sio.emit('actionOnGameReloadingThePage');
             });
 
@@ -106,6 +106,20 @@ export class SocketManager {
                 this.sio
                     .to(joinedRoomName)
                     .emit('messageBetweenPlayers', { username: data.username, message: data.message, sentByPlayer1: data.sentByPlayer1 });
+            });
+
+            // socket.on('sendCurrentMatchWinningTime', (data: { newWinningTime: number; gameId: string; matchId: string }) => {
+
+            // });
+
+            socket.on('resetAllGames', () => {
+                this.sio.emit('allGamesReset');
+                this.sio.emit('actionOnGameReloadingThePage');
+            });
+
+            socket.on('resetGame', (data: { hasResetGame: boolean; id: string }) => {
+                this.sio.emit('gameReset', { gameReset: data.hasResetGame, id: data.id }, socket.id);
+                this.sio.emit('actionOnGameReloadingThePage');
             });
 
             const joinMatchRoom = (data: { matchId: string }) => {
@@ -126,7 +140,7 @@ export class SocketManager {
 
             const sendGameMatchProgressUpdate = (matchId: string) => {
                 const match = this.matchManagerService.getMatchById(matchId);
-                if (match === undefined || match == null) return;
+                if (!match) return;
                 const matchToJoinIfAvailable = this.matchManagerService.getMatchAvailableForGame(match.gameId);
                 this.sio.emit('gameProgressUpdate', {
                     gameId: match.gameId,

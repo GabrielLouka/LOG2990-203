@@ -2,8 +2,8 @@
     <div
         class="flex-column center modal"
         [ngClass]="{
-            'delete-game': !info.isAllGames,
-            'delete-all-games': info.isAllGames
+            'reset-game': !info.isAllGames,
+            'reset-all-games': info.isAllGames
         }"
     >
         <div class="flex-column center modal-contents">
@@ -12,7 +12,7 @@
                 <strong>{{ info.message }}</strong>
             </p>
             <div class="flex-row center">
-                <button #button1 class="button-style modal-btn" (click)="emitDeleteRequestConfirmation()">{{ info.option1 }}</button>
+                <button #button1 class="button-style modal-btn" (click)="emitResetRequestConfirmation()">{{ info.option1 }}</button>
                 <button #button2 class="button-style modal-btn" (click)="closePopUp()">{{ info.option2 }}</button>
             </div>
         </div>

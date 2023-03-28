@@ -1,26 +1,44 @@
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
-import { SocketManager } from '@app/services/socket-manager-service/socket-manager.service';
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
+import { defaultRanking, Ranking } from '@common/interfaces/ranking';
 import 'dotenv/config';
 import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
+import { InsertOneResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
+
 @Service()
 export class GameStorageService {
-    jsonPath: string;
-    fileSystemManager: FileSystemManager;
-    socketManager: SocketManager;
+    jsonPath: string = './app/data/default-games.json';
+    fileSystemManager: FileSystemManager = new FileSystemManager();
 
-    constructor(private databaseService: DatabaseService) {
-        this.jsonPath = './app/data/default-games.json';
-        this.fileSystemManager = new FileSystemManager();
-    }
+    constructor(private databaseService: DatabaseService) {}
+
     get collection() {
         return this.databaseService.database.collection(process.env.DATABASE_COLLECTION_GAMES as string);
     }
+
+    getNextAvailableGameId(): number {
+        let output = -1;
+        // read the next id from the file lastGameId.txt if it exists or create it with 0
+        try {
+            let lastGameId = 0;
+            const data = readFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName);
+            lastGameId = parseInt(data.toString(), 10);
+            const nextGameId = lastGameId + 1;
+            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, nextGameId.toString());
+            output = nextGameId;
+        } catch (err) {
+            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, '0');
+            output = 0;
+        }
+
+        return output;
+    }
+
     async deleteStoredDataForAllTheGame(): Promise<void> {
         readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
             if (err) {
@@ -41,6 +59,7 @@ export class GameStorageService {
             }
         });
     }
+
     async deleteStoredData(gameId: string): Promise<void> {
         readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
             if (err) {
@@ -97,18 +116,18 @@ export class GameStorageService {
      * @param id game identifier
      * @returns true if deleted, false if not
      */
-    async deleteGame(id: string) {
+    async deleteOneById(id: string): Promise<void> {
         const query = { id: parseInt(id, 10) };
         await this.collection.findOneAndDelete(query);
         await this.deleteStoredData(id);
     }
 
-    async allGames() {
+    async deleteAll(): Promise<void> {
         await this.deleteStoredDataForAllTheGame();
         await this.collection.deleteMany({});
     }
 
-    async getGamesInPage(pageNbr: number): Promise<
+    async getGamesInPage(pageNumber: number): Promise<
         {
             gameData: GameData;
             originalImage: Buffer;
@@ -116,8 +135,8 @@ export class GameStorageService {
         }[]
     > {
         // checks if the number of games available for one page is under four
-        const skipNbr = pageNbr * R_ONLY.gamesLimit;
-        const nextGames = await this.collection.find<GameData>({}).skip(skipNbr).limit(R_ONLY.gamesLimit).toArray();
+        const skipNumber = pageNumber * R_ONLY.gamesLimit;
+        const nextGames = await this.collection.find<GameData>({}).skip(skipNumber).limit(R_ONLY.gamesLimit).toArray();
 
         const gamesToReturn = [];
         for (const game of nextGames) {
@@ -156,22 +175,50 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES as string, games);
     }
 
-    getNextAvailableGameId(): number {
-        let output = -1;
-        // read the next id from the file lastGameId.txt if it exists or create it with 0
-        try {
-            let lastGameId = 0;
-            const data = readFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName);
-            lastGameId = parseInt(data.toString(), 10);
-            const nextGameId = lastGameId + 1;
-            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, nextGameId.toString());
-            output = nextGameId;
-        } catch (err) {
-            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, '0');
-            output = 0;
-        }
+    async updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
+        const gameQuery = { id: parseInt(id, 10) };
+        const oneVersusOneScore = { oneVersusOneRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
+        const replacement = { $set: { oneVersusOneRanking: newBreakingRanking } };
+        const query = { gameQuery, oneVersusOneScore };
+        await this.collection.findOneAndReplace(query, replacement);
+        this.collection.aggregate([
+            {
+                $set: {
+                    oneVersusOneRanking: {
+                        $sortArray: { input: '$ oneVersusOneRanking', sortBy: { score: -1 } },
+                    },
+                },
+            },
+        ]);
+    }
 
-        return output;
+    async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
+        const gameQuery = { id: parseInt(id, 10) };
+        const soloScore = { soloRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
+        const replacement = { $set: { soloRanking: newBreakingRanking } };
+        const query = { gameQuery, soloScore };
+        await this.collection.findOneAndReplace(query, replacement);
+        this.collection.aggregate([
+            {
+                $set: {
+                    soloRanking: {
+                        $sortArray: { input: '$soloRanking', sortBy: { score: -1 } },
+                    },
+                },
+            },
+        ]);
+    }
+
+    async resetGameRecordTimes(id: string) {
+        const gameToReset = await this.getGameById(id);
+        const filter = { id: gameToReset.gameData?.id };
+        const resetRanking = { $set: { oneVersusOneRanking: defaultRanking, soloRanking: defaultRanking } };
+        await this.collection.updateOne(filter, resetRanking);
+    }
+
+    async resetAllGamesRecordTimes() {
+        const resetRanking = { $set: { oneVersusOneRanking: defaultRanking, soloRanking: defaultRanking } };
+        await this.collection.updateMany({}, resetRanking);
     }
 
     createFolder(folderPath: string) {
@@ -184,8 +231,8 @@ export class GameStorageService {
         });
     }
 
-    storeGameImages(gameId: number, firstImage: Buffer, secondImage: Buffer): void {
-        const folderPath = R_ONLY.persistentDataFolderPath + gameId + '/';
+    storeGameImages(id: number, firstImage: Buffer, secondImage: Buffer): void {
+        const folderPath = R_ONLY.persistentDataFolderPath + id + '/';
         // Creates the subfolder for the game if it does not exist
         this.createFolder(folderPath);
 
@@ -206,7 +253,7 @@ export class GameStorageService {
         }
     };
 
-    async storeGameResult(newGameToAdd: GameData) {
-        return this.collection.insertOne(newGameToAdd);
+    async storeGameResult(newGameToAdd: GameData): Promise<InsertOneResult<Document>> {
+        return await this.collection.insertOne(newGameToAdd);
     }
 }

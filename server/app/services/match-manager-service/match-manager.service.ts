@@ -21,24 +21,33 @@ export class MatchManagerService {
     }
 
     setMatchType(matchId: string, matchType: MatchType) {
-        const matchToChange = this.getMatchById(matchId);
+        const matchToUpdate = this.getMatchById(matchId);
 
-        if (matchToChange != null) {
-            matchToChange.matchType = matchType;
+        if (matchToUpdate) {
+            matchToUpdate.matchType = matchType;
         }
     }
 
     setMatchPlayer(matchId: string, player: Player) {
-        const matchToChange = this.getMatchById(matchId);
+        const matchToUpdate = this.getMatchById(matchId);
 
-        if (matchToChange != null) {
-            if (matchToChange.player1 == null) {
-                matchToChange.player1 = player;
-                if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer1) matchToChange.matchStatus = MatchStatus.WaitingForPlayer2;
+        if (matchToUpdate) {
+            if (!matchToUpdate.player1) {
+                matchToUpdate.player1 = player;
+                if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer1) matchToUpdate.matchStatus = MatchStatus.WaitingForPlayer2;
             } else {
-                matchToChange.player2 = player;
-                if (matchToChange.matchStatus === MatchStatus.WaitingForPlayer2) matchToChange.matchStatus = MatchStatus.InProgress;
+                matchToUpdate.player2 = player;
+                if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer2) matchToUpdate.matchStatus = MatchStatus.InProgress;
             }
+        }
+    }
+
+    setMatchWinningTime(matchId: string, winningTime: number) {
+        const matchToUpdate = this.getMatchById(matchId);
+        const hasWonByDefault = matchToUpdate?.matchStatus === MatchStatus.Aborted;
+
+        if (matchToUpdate && !hasWonByDefault) {
+            matchToUpdate.gameWinTime = winningTime;
         }
     }
 
@@ -58,7 +67,7 @@ export class MatchManagerService {
         }
 
         if (modifiedMatch) {
-            if (modifiedMatch.player1 == null && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
+            if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
             else modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
         }
