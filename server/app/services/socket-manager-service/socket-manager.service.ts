@@ -1,3 +1,4 @@
+import { GameRankingService } from '@app/services/game-ranking-service/game-ranking-time.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { MatchingDifferencesService } from '@app/services/matching-difference-service/matching-differences.service';
 import { Player } from '@common/classes/player';
@@ -11,7 +12,11 @@ import * as io from 'socket.io';
 export class SocketManager {
     matchingDifferencesService: MatchingDifferencesService;
     private sio: io.Server;
-    constructor(server: http.Server, private matchManagerService: MatchManagerService) {
+    constructor(
+        server: http.Server,
+        private readonly matchManagerService: MatchManagerService,
+        private readonly gameRankingTimeService: GameRankingService,
+    ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
         this.matchingDifferencesService = new MatchingDifferencesService();
     }
@@ -108,10 +113,6 @@ export class SocketManager {
                     .emit('messageBetweenPlayers', { username: data.username, message: data.message, sentByPlayer1: data.sentByPlayer1 });
             });
 
-            // socket.on('sendCurrentMatchWinningTime', (data: { newWinningTime: number; gameId: string; matchId: string }) => {
-
-            // });
-
             socket.on('resetAllGames', () => {
                 this.sio.emit('allGamesReset');
                 this.sio.emit('actionOnGameReloadingThePage');
@@ -121,6 +122,20 @@ export class SocketManager {
                 this.sio.emit('gameReset', { gameReset: data.hasResetGame, id: data.id }, socket.id);
                 this.sio.emit('actionOnGameReloadingThePage');
             });
+
+            socket.on(
+                'gameOver',
+                (data: {
+                    gameId: string;
+                    isOneVersusOne: boolean;
+                    ranking: {
+                        name: string;
+                        score: number;
+                    };
+                }) => {
+                    sendNewWinningTime(data.gameId, data.isOneVersusOne, data.ranking);
+                },
+            );
 
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;
@@ -146,6 +161,22 @@ export class SocketManager {
                     gameId: match.gameId,
                     matchToJoinIfAvailable,
                 });
+            };
+
+            const sendNewWinningTime = async (
+                gameId: string,
+                isOneVersusOne: boolean,
+                ranking: {
+                    name: string;
+                    score: number;
+                },
+            ) => {
+                const rankingData = await this.gameRankingTimeService.handleNewScore(gameId, isOneVersusOne, ranking);
+                if (rankingData) {
+                    this.sio.emit('newBreakingScore', {
+                        rankingData,
+                    });
+                }
             };
         });
     }

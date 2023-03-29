@@ -16,6 +16,7 @@ import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
+import { RankingData } from '@common/interfaces/ranking.data';
 import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
 
@@ -55,6 +56,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound2: number = 0;
     minDifferences: number = 0;
     canvasIsClickable: boolean = false;
+    newRanking: { name: string; score: number };
 
     // eslint-disable-next-line max-params
     constructor(
@@ -167,6 +169,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.requestStartGame();
                     this.canvasIsClickable = true;
                     this.timerService.start();
+                    this.timerService.handleTickingTime(this.timerElement.minute, this.timerElement.second);
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -218,7 +221,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (data.isPlayer1) {
                         this.differencesFound1++;
-                        if (!this.matchmakingService.isSoloMode) {
+                        if (this.isOneVersusOne) {
                             message += ' par ' + this.player1.toUpperCase();
                         }
                     } else {
@@ -229,14 +232,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.foundDifferences = data.foundDifferences;
                     this.onFindDifference();
 
-                    if (this.matchmakingService.isOneVersusOne) {
+                    if (this.isOneVersusOne) {
                         if (this.differencesFound1 >= this.minDifferences) {
-                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
-                        } else if (this.differencesFound2 >= this.minDifferences)
-                            this.onWinGame(this.matchmakingService.player2Username, !this.isWinByDefault);
-                    } else if (this.matchmakingService.isSoloMode) {
+                            this.onWinGame(this.player2, !this.isWinByDefault);
+                        } else if (this.differencesFound2 >= this.minDifferences) this.onWinGame(this.player2, !this.isWinByDefault);
+                    } else if (!this.isOneVersusOne) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
+                            this.onWinGame(this.player1, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -255,6 +257,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             });
             this.chatService.scrollToBottom(this.chat.chat);
             this.chat.newMessage = '';
+        });
+
+        this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
+            this.chat.sendTimeScoreMessage(data.rankingData);
         });
     }
 
@@ -312,12 +318,24 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    gameOver() {
+    gameOver(isWinByDefault: boolean) {
         this.timerService.stop();
-        this.socketService.disconnect();
-        this.socketService.send('gameFinished', {
-            minutesElapsed: this.timerService.currentMinutes,
-            secondsElapsed: this.timerService.currentSeconds,
+        if (!isWinByDefault) {
+            this.sendNewTimeScoreToServer();
+        } else {
+            this.socketService.disconnect();
+        }
+        this.popUpElement.showGameOverPopUp(this.newRanking.name, isWinByDefault, this.matchmakingService.isSoloMode);
+    }
+
+    sendNewTimeScoreToServer() {
+        this.socketService.send('gameOver', {
+            gameId: this.game.gameData.id.toString(),
+            isOneVersusOne: this.isOneVersusOne,
+            ranking: {
+                name: this.newRanking.name,
+                score: this.newRanking.score,
+            },
         });
     }
 
@@ -326,8 +344,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
-        this.gameOver();
-        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
+        this.newRanking = { name: winningPlayer, score: this.timerService.winningTimeInSeconds };
+        this.gameOver(isWinByDefault);
     }
 
     onCheatMode(event: KeyboardEvent) {

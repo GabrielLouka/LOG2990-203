@@ -2,6 +2,7 @@ import { ElementRef, Injectable } from '@angular/core';
 import { ChatMessage } from '@app/interfaces/chat-message';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { RankingData } from '@common/interfaces/ranking.data';
 import { SYSTEM_NAME } from '@common/utils/env';
 
 @Injectable({
@@ -29,13 +30,13 @@ export class ChatService {
         }
     }
 
-    sendRecordBreakingMessage(
-        chatELements: { message: string; chat: ElementRef; newMessage: string; recordPlayerUsername: string },
-        messages: ChatMessage[],
-    ) {
+    sendRecordBreakingMessage(chatELements: { rankingData: RankingData; chat: ElementRef; newMessage: string }, messages: ChatMessage[]) {
+        const message = `${chatELements.rankingData.username} obtient la ${chatELements.rankingData.position} 
+        place dans les meilleurs temps du jeu ${chatELements.rankingData.gameName} en ${chatELements.rankingData.matchType}`;
+
         messages.push({
-            text: chatELements.message,
-            username: chatELements.recordPlayerUsername,
+            text: message,
+            username: '',
             sentBySystem: false,
             sentByPlayer1: false,
             sentUpdatedScore: true,

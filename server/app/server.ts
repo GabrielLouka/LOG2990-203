@@ -4,6 +4,7 @@ import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { DatabaseService } from './services/database-service/database.service';
+import { GameRankingService } from './services/game-ranking-service/game-ranking-time.service';
 import { GameStorageService } from './services/game-storage-service/game-storage.service';
 import { MatchManagerService } from './services/match-manager-service/match-manager.service';
 import { SocketManager } from './services/socket-manager-service/socket-manager.service';
@@ -15,7 +16,12 @@ export class Server {
     private static readonly baseDix: number = baseDix;
     private server: http.Server;
     private socketManager: SocketManager;
-    constructor(private application: Application, private databaseService: DatabaseService, public matchManagerService: MatchManagerService) {}
+    constructor(
+        private application: Application,
+        private databaseService: DatabaseService,
+        public matchManagerService: MatchManagerService,
+        public rankingService: GameRankingService,
+    ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
         const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
@@ -32,7 +38,7 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.socketManager = new SocketManager(this.server, this.matchManagerService);
+        this.socketManager = new SocketManager(this.server, this.matchManagerService, this.rankingService);
         this.socketManager.handleSockets();
 
         this.server.listen(Server.appPort);

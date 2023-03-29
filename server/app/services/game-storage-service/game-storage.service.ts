@@ -3,7 +3,7 @@ import { DatabaseService } from '@app/services/database-service/database.service
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRanking, Ranking } from '@common/interfaces/ranking';
+import { defaultRanking } from '@common/interfaces/ranking';
 import 'dotenv/config';
 import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
 import { InsertOneResult } from 'mongodb';
@@ -96,7 +96,7 @@ export class GameStorageService {
      * @returns the games list
      */
     async getGamesLength() {
-        return this.collection.countDocuments({});
+        return await this.collection.countDocuments({});
     }
 
     /**
@@ -175,39 +175,43 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES as string, games);
     }
 
-    async updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
-        const gameQuery = { id: parseInt(id, 10) };
-        const oneVersusOneScore = { oneVersusOneRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
-        const replacement = { $set: { oneVersusOneRanking: newBreakingRanking } };
-        const query = { gameQuery, oneVersusOneScore };
-        await this.collection.findOneAndReplace(query, replacement);
-        this.collection.aggregate([
-            {
-                $set: {
-                    oneVersusOneRanking: {
-                        $sortArray: { input: '$ oneVersusOneRanking', sortBy: { score: -1 } },
-                    },
-                },
-            },
-        ]);
-    }
+    // updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
+    //     const gameQuery = { id: parseInt(id, 10) };
+    //     const oneVersusOneScore = { oneVersusOneRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
+    //     // const replacement = { $set: { oneVersusOneRanking: newBreakingRanking } };
+    //     const query = { gameQuery, oneVersusOneScore };
+    //     const updatedScore = this.collection.find(query);
+    //     return updatedScore;
+    //     // await this.collection.findOneAndReplace(query, replacement);
+    //     // this.collection.aggregate([
+    //     //     {
+    //     //         $set: {
+    //     //             oneVersusOneRanking: {
+    //     //                 $sortArray: { input: '$ oneVersusOneRanking', sortBy: { score: -1 } },
+    //     //             },
+    //     //         },
+    //     //     },
+    //     // ]);
+    // }
 
-    async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
-        const gameQuery = { id: parseInt(id, 10) };
-        const soloScore = { soloRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
-        const replacement = { $set: { soloRanking: newBreakingRanking } };
-        const query = { gameQuery, soloScore };
-        await this.collection.findOneAndReplace(query, replacement);
-        this.collection.aggregate([
-            {
-                $set: {
-                    soloRanking: {
-                        $sortArray: { input: '$soloRanking', sortBy: { score: -1 } },
-                    },
-                },
-            },
-        ]);
-    }
+    // async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
+    //     const game = await this.getGameById(id);
+    //     const soloScore = { soloRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
+    //     // const replacement = { $set: { soloRanking: newBreakingRanking } };
+    //     const query = { gameQuery, soloScore };
+    //     const updatedScore = this.collection.find(query);
+    //     return updatedScore;
+    //     // await this.collection.findOneAndReplace(query, replacement);
+    //     // this.collection.aggregate([
+    //     //     {
+    //     //         $set: {
+    //     //             soloRanking: {
+    //     //                 $sortArray: { input: '$soloRanking', sortBy: { score: -1 } },
+    //     //             },
+    //     //         },
+    //     //     },
+    //     // ]);
+    // }
 
     async resetGameRecordTimes(id: string) {
         const gameToReset = await this.getGameById(id);
@@ -231,7 +235,7 @@ export class GameStorageService {
         });
     }
 
-    storeGameImages(id: number, firstImage: Buffer, secondImage: Buffer): void {
+    async storeGameImages(id: number, firstImage: Buffer, secondImage: Buffer): Promise<void> {
         const folderPath = R_ONLY.persistentDataFolderPath + id + '/';
         // Creates the subfolder for the game if it does not exist
         this.createFolder(folderPath);

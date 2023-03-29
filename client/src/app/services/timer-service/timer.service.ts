@@ -5,7 +5,7 @@ import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common
     providedIn: 'root',
 })
 export class TimerService implements OnDestroy {
-    private timeInSeconds: number = 0;
+    private timeInSeconds: number;
     private shouldStop = false;
     private interval: number;
 
