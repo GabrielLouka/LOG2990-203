@@ -15,7 +15,7 @@ export class HistoryController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/fetchHistory/', async (req: Request, res: Response) => {
+        this.router.get('/', async (req: Request, res: Response) => {
             try {
                 const history = await this.historyStorageService.getAllHistory();
                 res.send(JSON.stringify(history));
@@ -24,7 +24,7 @@ export class HistoryController {
             }
         });
 
-        this.router.delete('/wipeHistory', async (req: Request, res: Response) => {
+        this.router.delete('/', async (req: Request, res: Response) => {
             this.historyStorageService
                 .wipeHistory()
                 .then(() => {
@@ -35,7 +35,7 @@ export class HistoryController {
                 });
         });
 
-        this.router.post('/saveHistory', async (req: Request, res: Response) => {
+        this.router.post('/', async (req: Request, res: Response) => {
             const historyForm: HistoryData = req.body;
             this.historyStorageService
                 .storeHistory(historyForm)

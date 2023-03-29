@@ -15,7 +15,7 @@ export class GameConstantsService {
     constructor(public communicationService: CommunicationService) {}
 
     initGameConstants() {
-        const routeToSend = '/game_constants/fetchConstants';
+        const routeToSend = '/game_constants/';
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 if (response.body) {
@@ -29,7 +29,7 @@ export class GameConstantsService {
     }
 
     updateConstants(isReset: boolean) {
-        const routeToSend = '/game_constants/updateConstants';
+        const routeToSend = '/game_constants/';
         if (isReset) {
             this.constants.countdownValue = INITIAL_COUNTDOWN;
             this.constants.penaltyValue = INITIAL_PENALTY;

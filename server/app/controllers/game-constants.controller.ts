@@ -13,7 +13,7 @@ export class GameConstantsController {
     private configureRouter(): void {
         this.router = Router();
 
-        this.router.get('/fetchConstants', async (req: Request, res: Response) => {
+        this.router.get('/', async (req: Request, res: Response) => {
             try {
                 const constants = await this.gameConstantsService.getConstants();
                 res.send(JSON.stringify(constants));
@@ -22,7 +22,7 @@ export class GameConstantsController {
             }
         });
 
-        this.router.post('/updateConstants', (req: Request, res: Response) => {
+        this.router.post('/', (req: Request, res: Response) => {
             try {
                 const constants = this.gameConstantsService.updateConstants(req.body);
                 res.send(JSON.stringify(constants));

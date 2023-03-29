@@ -110,9 +110,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.socketService.disconnect();
         if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode)
             this.historyService.addGameHistory(this.createHistoryData(this.player1, this.isWinByDefault));
+        else if (this.matchmakingService.isSoloMode) this.historyService.addGameHistory(this.createHistoryData(this.player1, !this.isWinByDefault));
+        this.socketService.disconnect();
     }
 
     async playSound(isSuccessSound: boolean) {
@@ -246,7 +247,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     } else if (this.matchmakingService.isSoloMode) {
                         if (this.differencesFound1 >= this.totalDifferences) {
                             this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
-                            this.historyService.addGameHistory(this.createHistoryData(this.player1, !this.isWinByDefault));
                         }
                     }
                 } else {
