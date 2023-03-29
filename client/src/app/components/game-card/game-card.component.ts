@@ -12,16 +12,12 @@ export class GameCardComponent implements OnInit {
     difficulty: string;
     originalImageSrc: string;
 
+    get difficultyColor(): string {
+        return this.game.gameData.isEasy ? 'green' : 'red';
+    }
+
     ngOnInit() {
         this.difficulty = this.game.gameData.isEasy ? 'Facile' : 'Difficile';
         this.originalImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;
-    }
-
-    getDifficultyColor() {
-        if (this.game.gameData.isEasy) {
-            return 'green';
-        } else {
-            return 'red';
-        }
     }
 }

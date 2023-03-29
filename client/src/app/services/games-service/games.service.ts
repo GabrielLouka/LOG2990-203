@@ -56,7 +56,7 @@ export class GamesService {
         }
     }
 
-    async deleteSelectedGame(isDeleteRequest: boolean, id: string): Promise<void> {
+    deleteOneById(isDeleteRequest: boolean, id: string): void {
         if (isDeleteRequest) {
             const routeToSend = '/games/' + id;
 
@@ -86,7 +86,7 @@ export class GamesService {
         }
     }
 
-    resetSelectedGame(isDeleteRequest: boolean, id: string): void {
+    resetOneById(isDeleteRequest: boolean, id: string): void {
         if (isDeleteRequest) {
             const routeToSend = '/games/' + id;
 
