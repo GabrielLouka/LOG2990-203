@@ -40,13 +40,6 @@ export class MatchManagerService {
         }
     }
 
-    setMatchWinningTime(matchId: string, winningTime: number) {
-        const matchToUpdate = this.getMatchById(matchId);
-        const hasWonByDefault = matchToUpdate?.matchStatus === MatchStatus.Aborted;
-
-        if (matchToUpdate && !hasWonByDefault) matchToUpdate.gameWinTime = winningTime;
-    }
-
     removePlayerFromMatch(playerId: string): string | null {
         let modifiedMatch: Match | null = null;
         for (const match of this.currentOnlinePlayedMatches) {

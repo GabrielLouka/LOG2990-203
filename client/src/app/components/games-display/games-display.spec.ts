@@ -7,7 +7,7 @@ import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-he
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
 import { Socket } from 'socket.io-client';
 import { GamesDisplayComponent } from './games-display.component';
@@ -96,7 +96,8 @@ describe('GamesDisplayComponent', () => {
                     { x: 0, y: 0 },
                 ],
             ],
-            ranking: defaultRankings,
+            oneVersusOneRanking: defaultRanking,
+            soloRanking: defaultRanking,
         };
         component.theGamesService.games = [{ gameData: game, originalImage: Buffer.alloc(3), matchToJoinIfAvailable }];
         component.updateGameAvailability(gameId, matchToJoinIfAvailable);

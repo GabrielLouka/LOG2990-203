@@ -21,6 +21,14 @@ export class TimerService implements OnDestroy {
         return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
     }
 
+    get winningTimeInSeconds(): number {
+        return this.currentMinutes * MINUTE_TO_SECONDS + this.currentSeconds;
+    }
+
+    get winningTimeToString(): string {
+        return this.currentMinutes.toString() + ':' + this.currentSeconds.toString();
+    }
+
     handleTickingTime(minute: ElementRef, second: ElementRef) {
         this.interval = window.setInterval(() => {
             if (this.timeInSeconds >= 0) {
@@ -41,6 +49,18 @@ export class TimerService implements OnDestroy {
         if (!this.shouldStop) this.timeInSeconds++;
         minute.nativeElement.innerText = this.currentMinutes < MINUTE_LIMIT ? '0' + this.currentMinutes : this.currentMinutes;
         second.nativeElement.innerText = this.currentSeconds < MINUTE_LIMIT ? '0' + this.currentSeconds : this.currentSeconds;
+    }
+
+    convertScoreToString(scoreTime: number): string {
+        const formattedMinutes = Math.floor(scoreTime / MINUTE_TO_SECONDS).toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false,
+        });
+        const formattedSeconds = Math.floor(scoreTime % MINUTE_TO_SECONDS).toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false,
+        });
+        return formattedMinutes + ':' + formattedSeconds;
     }
 
     stop() {

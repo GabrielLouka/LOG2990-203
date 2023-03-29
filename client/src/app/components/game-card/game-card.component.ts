@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { TimerService } from '@app/services/timer-service/timer.service';
 import { GameData } from '@common/interfaces/game-data';
 import { Buffer } from 'buffer';
 @Component({
@@ -12,8 +13,14 @@ export class GameCardComponent implements OnInit {
     difficulty: string;
     originalImageSrc: string;
 
+    constructor(private readonly timerService: TimerService) {}
+
     get difficultyColor(): string {
         return this.game.gameData.isEasy ? 'green' : 'red';
+    }
+
+    scoreToString(timeInSeconds: number) {
+        return this.timerService.convertScoreToString(timeInSeconds);
     }
 
     ngOnInit() {
