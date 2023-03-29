@@ -8,9 +8,9 @@ import { Buffer } from 'buffer';
 export class CheatModeService {
     constructor(private imageManipulationService: ImageManipulationService) {}
 
-    focusKeyEvent(cheat: ElementRef | undefined) {
-        if (cheat) {
-            cheat.nativeElement.focus();
+    focusKeyEvent(element: ElementRef | undefined) {
+        if (element) {
+            element.nativeElement.focus();
         }
     }
 

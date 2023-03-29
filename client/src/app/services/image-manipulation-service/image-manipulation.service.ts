@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { ElementRef, Injectable } from '@angular/core';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
@@ -8,10 +8,9 @@ import {
     CANVAS_HEIGHT,
     CANVAS_WIDTH,
     IMAGE_HEIGHT_OFFSET,
-    IMAGE_WIDTH_OFFSET,
-    NUMBER_OF_BLINKS,
+    IMAGE_WIDTH_OFFSET, MILLISECOND_TO_SECONDS, NUMBER_OF_BLINKS,
     PIXEL_BYTES_LENGTH,
-    QUARTER_SECOND,
+    QUARTER_SECOND
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
 
@@ -55,6 +54,56 @@ export class ImageManipulationService {
         }
         return modifiedImageBuffer;
     }
+
+    showFirstHint(canvasContext :{context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>}, game: GameData, differences: boolean[]){
+        let randomIndex = Math.floor(Math.random() * game.differences.length)
+        let randomDifference = game.differences[randomIndex];
+        let randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        let diffFound = differences[randomIndex];
+        const width = canvasContext.canvas.nativeElement.width;
+        const height = canvasContext.canvas.nativeElement.height;
+        const quarterWidth = width / 2;
+        const quarterHeight = height / 2;
+        canvasContext.context.strokeStyle = "red";
+
+        let selectedRect: { x: number, y: number, width: number, height: number } | null = null;
+        const rects = [
+            { x: 0, y: 0, width: quarterWidth, height: quarterHeight },
+            { x: quarterWidth, y: 0, width: quarterWidth, height: quarterHeight },
+            { x: 0, y: quarterHeight, width: quarterWidth, height: quarterHeight },
+            { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight }
+          ];
+
+        for (let i = 0; i < rects.length; i++) {
+            const rect = rects[i];
+            if (!diffFound && (randomVector.x >= rect.x && randomVector.x <= rect.x  + rect.width) &&
+                (randomVector.y >= rect.y && randomVector.y <= rect.y + rect.height)) {
+                selectedRect = rect;
+                // canvasContext.context.beginPath();
+                canvasContext.context.strokeRect(selectedRect.x as number, 
+                selectedRect.y as number, 
+                selectedRect.width as number, 
+                selectedRect.height as number);
+                canvasContext.context.save();
+                setTimeout(() => {
+                    canvasContext.context.clearRect(selectedRect!.x as number, 
+                    selectedRect!.y as number, 
+                    selectedRect!.width as number, 
+                    selectedRect!.height as number);
+                }, 2 * MILLISECOND_TO_SECONDS, selectedRect);
+                canvasContext.context.restore();
+
+                break;
+            }
+        }
+        
+        
+        
+    }
+
+    
+
+
 
     async blinkDifference(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
         this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);

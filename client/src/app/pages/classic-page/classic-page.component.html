@@ -6,7 +6,7 @@
     <div class="flex-row center header">
         <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
-        <app-hint (click)="this.handleHintMode()"></app-hint>
+        <app-hint (click)="handleHintMode()"></app-hint>
         <app-hint #hintElement *ngIf="isOneVersusOne"></app-hint>
     </div>
 

@@ -102,7 +102,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
-        window.addEventListener('keydown', this.onCheatMode.bind(this));        
+        window.addEventListener('keydown', this.handleEvents.bind(this));        
     }
 
     sendSystemMessageToChat(message: string) {
@@ -151,7 +151,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
         this.cheatModeService.focusKeyEvent(this.penaltyMessage);
-        window.removeEventListener('keydown', this.onCheatMode.bind(this));        
+        window.removeEventListener('keydown', this.handleEvents.bind(this));        
     }
 
     getInitialImagesFromServer() {
@@ -339,7 +339,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
     }
 
-    onCheatMode(event: KeyboardEvent) {
+    handleEvents(event: KeyboardEvent) {
         if (this.matchmakingService.isSoloMode || (this.chat && document.activeElement !== this.chat.input.nativeElement)) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
@@ -350,15 +350,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
-            else if (event.key === 'i'){ 
-                //issue when i click on difference first time before hint, then max becomes 1 and when cheat mode for first time
-                this.handleHintMode();
-            }
+            // else if (event.key === 'i'){ 
+            //     this.handleHintMode();
+            // }
         }
     }
-
+    
     handleHintMode(){
         if (this.hintService.maxGivenHints !== 0) {
+            this.hintService.showHint(this.leftCanvas, 
+                this.leftCanvasContext as CanvasRenderingContext2D, 
+                {gameData: this.game.gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences});
             this.hintService.decrement();                
             this.timeInSeconds = this.hintService.handleHint(this.chat, this.timeInSeconds);
             this.hintService.showMessage(this.penaltyMessage);}
