@@ -66,8 +66,6 @@ header {
 
     border: solid; 
     border-radius: 3vh;
-
-    
 }
 
 .delete-btn {
@@ -82,6 +80,41 @@ header {
     overflow-y: scroll;
 }
 
+.history-card {
+    border: 2px solid;
+    background-color: white;
+    border-radius: 1vh;
+
+    margin: 1vh;
+    padding: 1vh;
+
+}
+
+.divider {
+    border: solid 1px;
+    height: 3vh;
+}
+
+.game-mode {
+    padding: 0.5vh;
+} 
+
+.game-time {
+    font-weight: 400;
+    font-size: medium;
+}
+
+
+.text-bold {
+    font-weight: bold;
+    color: salmon;
+}
+  
+.crossed-out {
+    text-decoration: line-through;
+    color: #a9a9a9;
+}
+  
 
 // CSS FOR RANGE SLIDER
 @media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -110,6 +143,7 @@ header {
     input[type="range"]::before {
         display: flex;
         margin-left: -1vw;
+        margin-top: -0.25vh;
         color: black;
         content: attr(min);
         position: absolute;
@@ -122,6 +156,7 @@ header {
         position: absolute;
         display: flex;
         margin-left: 7.5vw;
+        margin-top: -0.25vh;
     }
 
 }
