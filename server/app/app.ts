@@ -23,6 +23,7 @@ export class Application {
         private readonly imageProcessingController: ImageProcessingController,
         readonly gamesController: GamesController,
         readonly historyController: HistoryController,
+        readonly gameConstantsController: GameConstantsController,
     ) {
         this.app = express();
 
@@ -48,6 +49,7 @@ export class Application {
         this.app.use('/api/games', this.gamesController.router);
         this.app.use('/api/images', this.imageProviderController.router);
         this.app.use('/api/history', this.historyController.router);
+        this.app.use('/api/game_constants', this.gameConstantsController.router);
         this.app.use('/', (req, res) => {
             res.redirect('/api/docs');
         });
