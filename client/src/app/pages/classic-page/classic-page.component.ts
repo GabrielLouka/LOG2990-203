@@ -11,11 +11,12 @@ import { CommunicationService } from '@app/services/communication-service/commun
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { TimerService } from '@app/services/timer-service/timer.service';
 import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
-import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
+import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
 
 @Component({
@@ -40,7 +41,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     backgroundColor = '';
     intervalIDLeft: number | undefined;
     intervalIDRight: number | undefined;
-    timeInSeconds: number;
     matchId: string;
     currentGameId: string | null;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
@@ -65,6 +65,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private matchmakingService: MatchmakingService,
         private cheatModeService: CheatModeService,
         private chatService: ChatService,
+        private timerService: TimerService,
     ) {}
 
     get leftCanvasContext() {
@@ -73,6 +74,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     get rightCanvasContext() {
         return this.rightCanvas.nativeElement.getContext('2d');
+    }
+
+    get isOneVersusOne() {
+        return this.matchmakingService.isOneVersusOne;
     }
 
     get currentMatchType() {
@@ -161,7 +166,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.loadImagesToCanvas(img1Source, img2Source);
                     this.requestStartGame();
                     this.canvasIsClickable = true;
-                    this.startTimer();
+                    this.timerService.start();
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -182,10 +187,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
         this.minDifferences = Math.ceil(this.totalDifferences / 2);
-    }
-
-    startTimer() {
-        this.timeInSeconds = 0;
     }
 
     onMouseDown(event: MouseEvent) {
@@ -228,7 +229,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.foundDifferences = data.foundDifferences;
                     this.onFindDifference();
 
-                    if (this.matchmakingService.is1vs1Mode) {
+                    if (this.matchmakingService.isOneVersusOne) {
                         if (this.differencesFound1 >= this.minDifferences) {
                             this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
                         } else if (this.differencesFound2 >= this.minDifferences)
@@ -312,11 +313,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     gameOver() {
-        this.timerElement.stopTimer();
+        this.timerService.stop();
         this.socketService.disconnect();
         this.socketService.send('gameFinished', {
-            minutesElapsed: Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS),
-            secondsElapsed: Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS),
+            minutesElapsed: this.timerService.currentMinutes,
+            secondsElapsed: this.timerService.currentSeconds,
         });
     }
 

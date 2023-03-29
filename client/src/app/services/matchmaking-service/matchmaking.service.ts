@@ -43,14 +43,14 @@ export class MatchmakingService {
     }
 
     get isHost(): boolean {
-        return this.matchIdThatWeAreTryingToJoin == null;
+        return !this.matchIdThatWeAreTryingToJoin;
     }
 
     get isPlayer1(): boolean {
         return this.socketService.socketId === this.player1Id;
     }
 
-    get is1vs1Mode(): boolean {
+    get isOneVersusOne(): boolean {
         return this.currentMatch?.matchType === MatchType.OneVersusOne;
     }
 
@@ -70,7 +70,7 @@ export class MatchmakingService {
         return this.currentMatch?.player1?.playerId;
     }
 
-    set currentMatchType(matchType: MatchType | undefined) {
+    set currentMatchType(matchType: MatchType) {
         const matchId = this.currentSocketId;
 
         this.socketService.send<{ matchId: string; matchType: MatchType }>('setMatchType', { matchId, matchType });

@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { TimerService } from '@app/services/timer-service/timer.service';
 
 @Component({
     selector: 'app-timer',
@@ -7,40 +7,24 @@ import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements AfterViewInit, OnDestroy {
-    @Input() timeInSeconds: number;
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
 
-    shouldStop = false;
-    intervalId: number;
+    constructor(private readonly timerService: TimerService) {}
 
-    get minutes() {
-        return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
+    get minutes(): number {
+        return this.timerService.currentMinutes;
     }
 
     get seconds() {
-        return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
+        return this.timerService.currentSeconds;
     }
 
     ngAfterViewInit() {
-        this.intervalId = window.setInterval(() => {
-            if (this.timeInSeconds >= 0) {
-                this.ticToc();
-            }
-        }, MILLISECOND_TO_SECONDS);
+        this.timerService.handleTickingTime(this.minute, this.second);
     }
 
     ngOnDestroy() {
-        window.clearInterval(this.intervalId);
-    }
-
-    ticToc() {
-        if (!this.shouldStop) this.timeInSeconds++;
-        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
-        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
-    }
-
-    stopTimer() {
-        this.shouldStop = true;
+        this.timerService.ngOnDestroy();
     }
 }

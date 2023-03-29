@@ -82,7 +82,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.hasUsernameRegistered = true;
 
         if (this.matchmakingService.currentMatchPlayed) {
-            if (this.username && this.matchmakingService.is1vs1Mode) {
+            if (this.username && this.matchmakingService.isOneVersusOne) {
                 this.matchmakingService.currentMatchPlayer = this.username;
             } else if (this.username && this.matchmakingService.isSoloMode) {
                 this.matchmakingService.currentMatchPlayer = this.username;

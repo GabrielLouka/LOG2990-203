@@ -28,11 +28,11 @@
                 ></app-found-differences-counter>
             </div>
             <div class="timer-container">
-                <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
+                <app-timer #timerElement></app-timer>
             </div>
         </div>
 
-        <app-info-card class="info-card" *ngIf="game" [isEasy]="game.gameData.isEasy" [matchMode]="Classique"></app-info-card>
+        <app-info-card class="info-card" *ngIf="game" [isEasy]="game.gameData.isEasy" [matchType]="this.currentMatchType"></app-info-card>
 
         <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': backgroundColor }" class="cheat-mode">Mode triche</div>
 

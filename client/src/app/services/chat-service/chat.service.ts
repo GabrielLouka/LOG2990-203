@@ -15,7 +15,7 @@ export class ChatService {
     }
 
     get isMode1vs1() {
-        return this.matchmakingService.is1vs1Mode;
+        return this.matchmakingService.isOneVersusOne;
     }
 
     sendMessage(isPlayer1: boolean, newMessage: string) {
