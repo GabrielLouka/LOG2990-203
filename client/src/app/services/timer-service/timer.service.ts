@@ -5,7 +5,7 @@ import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common
     providedIn: 'root',
 })
 export class TimerService implements OnDestroy {
-    private timeInSeconds: number;
+    private timeInSeconds: number = 0;
     private shouldStop = false;
     private interval: number;
 
@@ -43,6 +43,8 @@ export class TimerService implements OnDestroy {
 
     ngOnDestroy(): void {
         window.clearInterval(this.interval);
+        this.shouldStop = false;
+        this.timeInSeconds = 0;
     }
 
     ticToc(minute: ElementRef, second: ElementRef) {

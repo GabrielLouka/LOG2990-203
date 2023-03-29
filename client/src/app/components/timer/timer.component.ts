@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { TimerService } from '@app/services/timer-service/timer.service';
 
 @Component({
@@ -6,7 +6,7 @@ import { TimerService } from '@app/services/timer-service/timer.service';
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
-export class TimerComponent implements AfterViewInit, OnDestroy {
+export class TimerComponent implements OnDestroy {
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
 
@@ -18,10 +18,6 @@ export class TimerComponent implements AfterViewInit, OnDestroy {
 
     get seconds() {
         return this.timerService.currentSeconds;
-    }
-
-    ngAfterViewInit() {
-        this.timerService.handleTickingTime(this.minute, this.second);
     }
 
     ngOnDestroy() {
