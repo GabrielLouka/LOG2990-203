@@ -25,12 +25,10 @@ describe('ImageProcessingController', () => {
 
     const image: DifferenceImage = {
         background: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        foreground: [],
     };
 
     const image2: DifferenceImage = {
         background: [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        foreground: [],
     };
 
     const imageBuffer1 = Buffer.alloc(3);

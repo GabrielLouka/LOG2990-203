@@ -19,15 +19,15 @@
             <p class="title"><b> Constantes de jeu</b></p>
             <div class="input-container">
                 <div class="flex-row center">
-                    <p class="label-input">Temps initial du compte à rebours (minute)</p>
-                    <input type="number" step="1" value="5" min="0" max="60" />
+                    <p class="label-input"><b>Temps initial du compte à rebours (seconde)</b></p>
+                    <input type="number" step="1" value="5" min="1" max="120" />
                 </div>
                 <div class="flex-row center">
-                    <p class="label-input">Temps de pénalité par indice utilisé (seconde)</p>
+                    <p class="label-input"><b>Temps de pénalité par indice utilisé (seconde)</b> min 1sec/max 30sec</p>
                     <input type="number" step="1" value="3" min="0" max="10" />
                 </div>
                 <div class="flex-row center">
-                    <p class="label-input">Temps bonus par différence trouvée (seconde)</p>
+                    <p class="label-input"><b>Temps bonus par différence trouvée (seconde)</b></p>
                     <input type="number" step="1" value="2" min="0" max="10" />
                 </div>
             </div>
@@ -46,13 +46,43 @@
         <div class="history-container">
             <div class="flex-row center">
                 <p class="title"><b> Historique des parties jouées </b></p>
-                <button class="button-style delete-btn center not-allowed">
+                <button class="button-style delete-btn center" (click)="this.historyService.deleteHistory()">
                     <span class="material-symbols-outlined option-icon"> delete </span>
                 </button>
             </div>
 
-            <div class="history-board flex-column center">
-                <p>Leaderboards will be here !</p>
+            <div class="history-board flex-column">
+                <div class="flex-row center history-card space-around" *ngFor="let history of this.historyService.history">
+                    <div class="flex-column center game-mode">
+                        <b>{{ history.gameMode }}</b>
+                        <div>{{ history.startingTime | date: 'dd.mm.yyyy - HH:mm' }}</div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex-row center">
+                        <span
+                            [ngClass]="{
+                                'crossed-out': history.gameMode === 'Classic - Solo' && history.isWinByDefault,
+                                'text-bold':
+                                    ((history.gameMode === 'Classic - Solo' || history.gameMode === 'Classic - 1vs1') && !history.isWinByDefault) ||
+                                    (history.gameMode === 'Classic - 1vs1' && history.isWinByDefault)
+                            }"
+                        >
+                            {{ history.player1 }}
+                        </span>
+                        <span *ngIf="history.player2 !== ''">&nbsp;VS&nbsp;</span>
+                        <span
+                            [ngClass]="{
+                                'crossed-out': history.gameMode === 'Classic - 1vs1' && history.isWinByDefault
+                            }"
+                        >
+                            {{ history.player2 }}
+                        </span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="flex-row game-time space-around">
+                        <div><b>Durée : </b> {{ history.duration }} minutes</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

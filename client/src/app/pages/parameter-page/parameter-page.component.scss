@@ -67,6 +67,8 @@ header {
 
     border: solid; 
     border-radius: 3vh;
+
+    
 }
 
 .delete-btn {
@@ -82,18 +84,44 @@ header {
 }
 
 .history-card {
-    border: 2px solid black;
+    border: 2px solid Black;
     background-color: white;
-    border-radius: 10px;
+    border-radius: 1vh;
 
     margin: 1vh;
+    padding: 1vh;
 
-    &:hover {
-        transform: scale(0.97);
-        //cursor: pointer;
-    }
 }
+
+.divider {
+    border: solid 1px;
+    height: 3vh;
+}
+
+.game-mode {
+    padding: 0.5vh;
+} 
+
+.game-time {
+    font-weight: 400;
+    font-size: medium;
+}
+
+
+
+
+
 
 .not-allowed {
     cursor: not-allowed;
+  }
+
+.text-bold {
+  font-weight: bold;
+  color: salmon;
+}
+
+.crossed-out {
+    text-decoration: line-through;
+    color: #a9a9a9;
   }

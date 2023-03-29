@@ -228,8 +228,8 @@ describe('GameCreationPageComponent', () => {
             }),
         });
 
-        const diffOne: DifferenceImage = { background: [1], foreground: [2] };
-        const diffTwo: DifferenceImage = { background: [3], foreground: [4] };
+        const diffOne: DifferenceImage = { background: [1] };
+        const diffTwo: DifferenceImage = { background: [3] };
 
         spyOn<any>(component, 'convertToBuffer').and.returnValue(new ArrayBuffer(0));
 
@@ -257,8 +257,8 @@ describe('GameCreationPageComponent', () => {
         const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
         const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
         const image: ImageUploadForm = {
-            firstImage: { background: byteArray1, foreground: [] },
-            secondImage: { background: byteArray2, foreground: [] },
+            firstImage: { background: byteArray1 },
+            secondImage: { background: byteArray2 },
             radius: 3,
         };
 

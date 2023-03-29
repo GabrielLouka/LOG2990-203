@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { Injectable } from '@angular/core';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
@@ -97,20 +98,18 @@ export class ImageManipulationService {
         };
     }
 
-    getColorIndicesForCoord(x: number, y: number, canvas: HTMLCanvasElement): Uint8ClampedArray {
-        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-        const imageData = context.getImageData(x, canvas.height - y, 1, 1) as ImageData;
-        const pix = imageData.data;
-        return pix as Uint8ClampedArray;
-    }
-
     combineImages(originalBuffer: Buffer, drawingCanvas: HTMLCanvasElement) {
-        for (let x = 0; x < drawingCanvas.width; x++) {
-            for (let y = 0; y < drawingCanvas.height; y++) {
-                const inspectedColor = this.getColorIndicesForCoord(x, y, drawingCanvas);
-                if (inspectedColor[3] !== 0) {
-                    this.setRGB(new Vector2(x, y), originalBuffer, new Pixel(inspectedColor[0], inspectedColor[1], inspectedColor[2]));
-                }
+        const context = drawingCanvas.getContext('2d') as CanvasRenderingContext2D;
+        const imageData = context.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
+        const pixels = imageData.data;
+
+        for (let i = 0; i < pixels.length; i += 4) {
+            const alpha = pixels[i + 3];
+            if (alpha !== 0) {
+                const x = (i / 4) % drawingCanvas.width;
+                let y = Math.floor(i / 4 / drawingCanvas.width);
+                y = drawingCanvas.height - y - 1;
+                this.setRGB(new Vector2(x, y), originalBuffer, new Pixel(pixels[i], pixels[i + 1], pixels[i + 2]));
             }
         }
     }
