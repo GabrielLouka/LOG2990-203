@@ -112,16 +112,17 @@ export class ReplayModeService {
     }
 
     stopAllPlayingActions() {
-        this.recordedActions.forEach((action) => {
-            action.pause(); // cancel it if it was already started
-        });
+        // this.recordedActions.forEach((action) => {
+        //     action.stop(); // cancel it if it was already started
+        // });
+        DelayedMethod.killAll();
     }
 
     private finishReplayMode() {
         this.onFinishReplayMode.invoke();
         this.pauseReplayingTimer();
         this.currentState = ReplayModeState.FinishedReplaying;
-        this.stopAllPlayingActions();
+        // this.stopAllPlayingActions();
     }
 
     private startRecordingTimer() {
