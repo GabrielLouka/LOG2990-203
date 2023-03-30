@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRanking } from '@common/interfaces/ranking';
+import { defaultRanking, Ranking } from '@common/interfaces/ranking';
 import 'dotenv/config';
 import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
 import { InsertOneResult } from 'mongodb';
@@ -194,30 +195,59 @@ export class GameStorageService {
     //     // ]);
     // }
 
-    // async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
+    async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number> {
+        const gameData = (await this.getGameById(id)).gameData;
+        const gameQuery = { id: parseInt(id, 10) };
+
+        if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
+
+        const existingRanking = gameData.soloRanking.find((ranking) => ranking.name === newBreakingRanking.name);
+        const updateScore = { 'soloRanking.$.score': newBreakingRanking.score };
+        const rankingName = { 'soloRanking.$.name': newBreakingRanking.name };
+
+        if (existingRanking) {
+            try {
+                await this.collection.updateOne({ gameQuery, rankingName }, { $set: { soloRanking: newBreakingRanking } });
+            } catch (e) {
+                console.error('IF ' + e);
+            }
+            return gameData.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
+        } else {
+            // const removeUpdate = { 'soloRanking.$.score': { $lt: newBreakingRanking.score } };
+            try {
+                await this.collection.updateOne({ gameQuery, rankingName }, { $set: updateScore });
+            } catch (e) {
+                console.error('ELSE' + e);
+            }
+            // await this.collection.aggregate([{ $match: gameQuery }, { $set: { 'soloRanking.$.score': { $sort: { score: -1 } } } }]).toArray();
+            console.log(gameData.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name));
+            return gameData.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
+        }
+    }
+
+    // async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): number | undefined {
     //     const game = await this.getGameById(id);
+    //     const gameQuery = { id: parseInt(id, 10) };
     //     const soloScore = { soloRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
-    //     // const replacement = { $set: { soloRanking: newBreakingRanking } };
+    //     const replacement = { $set: { soloRanking: newBreakingRanking } };
     //     const query = { gameQuery, soloScore };
-    //     const updatedScore = this.collection.find(query);
-    //     return updatedScore;
-    //     // await this.collection.findOneAndReplace(query, replacement);
-    //     // this.collection.aggregate([
-    //     //     {
-    //     //         $set: {
-    //     //             soloRanking: {
-    //     //                 $sortArray: { input: '$soloRanking', sortBy: { score: -1 } },
-    //     //             },
-    //     //         },
-    //     //     },
-    //     // ]);
+    //     await this.collection.findOneAndReplace(query, replacement);
+    //     this.collection.aggregate([
+    //         {
+    //             $set: {
+    //                 soloRanking: {
+    //                     $sortArray: { input: '$soloRanking', sortBy: { score: -1 } },
+    //                 },
+    //             },
+    //         },
+    //     ]);
+    //     return game.gameData ? game.gameData.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name) : undefined;
     // }
 
     async resetGameRecordTimes(id: string) {
-        const gameToReset = await this.getGameById(id);
-        const filter = { id: gameToReset.gameData?.id };
+        const query = { id: parseInt(id, 10) };
         const resetRanking = { $set: { oneVersusOneRanking: defaultRanking, soloRanking: defaultRanking } };
-        await this.collection.updateOne(filter, resetRanking);
+        await this.collection.updateOne(query, resetRanking);
     }
 
     async resetAllGamesRecordTimes() {
