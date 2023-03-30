@@ -55,11 +55,11 @@ export class ImageManipulationService {
         return modifiedImageBuffer;
     }
 
-    async showFirstHint(canvasContext : 
-        {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
+    async showFirstHint(
+        canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
         game: GameData, differences: boolean[]){
         
-            const width = canvasContext.canvas.nativeElement.width;
+        const width = canvasContext.canvas.nativeElement.width;
         const height = canvasContext.canvas.nativeElement.height;
         const quarterWidth = width / 2;
         const quarterHeight = height / 2;
@@ -72,11 +72,11 @@ export class ImageManipulationService {
             { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight }
         ];
         
+        let rect;
         let randomIndex = Math.floor(Math.random() * game.differences.length)
         let randomDifference = game.differences[randomIndex];
         let randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
         let diffFound = differences[randomIndex];
-        let rect;
         do {
             let randomSection = Math.floor(Math.random() * 4);
             randomIndex = Math.floor(Math.random() * game.differences.length)
@@ -90,24 +90,76 @@ export class ImageManipulationService {
                 (randomVector.y < rect.y && randomVector.y > rect.y + rect.height))
         );
         
+        await this.blinkQuadrant(canvasContext.context, rect);
+        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
+                    
+    }
+
+    async showSecondHint(
+        canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
+        game: GameData, differences: boolean[]
+    ){
+        const width = canvasContext.canvas.nativeElement.width;
+        const height = canvasContext.canvas.nativeElement.height;
+        const quarterWidth = width / 4;
+        const quarterHeight = height / 4;
+
+        const rects = [];
+
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                const quadrant = {
+                    x: i * quarterWidth,
+                    y: j * quarterHeight,
+                    width: quarterWidth,
+                    height: quarterHeight,
+                };
+                canvasContext.context.fillStyle = `rgb(${i * 50}, ${j * 50}, 0)`;
+                
+                rects.push(quadrant);
+              
+            }
+        }
+
+        let rect;
+        let randomIndex = Math.floor(Math.random() * game.differences.length)
+        let randomDifference = game.differences[randomIndex];
+        let randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        let diffFound = differences[randomIndex];
+        do {
+            let randomSection = Math.floor(Math.random() * 4);
+            randomIndex = Math.floor(Math.random() * game.differences.length)
+            randomDifference = game.differences[randomIndex];
+            randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+            diffFound = differences[randomIndex];
+            rect = rects[randomSection];            
+
+        } while(
+            (diffFound && (randomVector.x < rect.x && randomVector.x > rect.x  + rect.width) &&
+                (randomVector.y < rect.y && randomVector.y > rect.y + rect.height))
+        );
+
+        await this.blinkQuadrant(canvasContext.context, rect);
+        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
+        
+    }
+
+    async blinkQuadrant(context: CanvasRenderingContext2D, rect : {x: number, y: number, width: number, height: number}){
         for (let i = 0; i < NUMBER_OF_BLINKS; i++){
-            canvasContext.context.fillStyle = "#FF0000";
-            canvasContext.context.fillRect(rect.x as number, 
+            context.fillStyle = "#FF0000";
+            context.fillRect(rect.x as number, 
                 rect.y as number, 
                 rect.width as number, 
                 rect.height as number);
                 await this.sleep(QUARTER_SECOND);
-            canvasContext.context.fillStyle = "#0000FF";
-            canvasContext.context.fillRect(rect.x as number, 
+            context.fillStyle = "#0000FF";
+            context.fillRect(rect.x as number, 
                 rect.y as number, 
                 rect.width as number, 
                 rect.height as number);
                 await this.sleep(QUARTER_SECOND);            
         }
-        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
-        
-        
-        
+
     }
 
     
