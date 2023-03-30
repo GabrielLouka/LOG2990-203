@@ -241,14 +241,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     let message = 'Différence trouvée';
 
                     if (data.isPlayer1) {
-                        this.differencesFound1++;
+                        // this.differencesFound1++;
                         if (!this.matchmakingService.isSoloMode) {
                             message += ' par ' + this.player1.toUpperCase();
                         }
                     } else {
                         message += ' par ' + this.player2.toUpperCase();
-                        this.differencesFound2++;
+                        // this.differencesFound2++;
                     }
+                    this.increasePlayerScore(data.isPlayer1);
                     this.sendSystemMessageToChat(message);
                     // this.foundDifferences = data.foundDifferences;
                     // this.onFindDifference();
@@ -282,6 +283,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.chat,
             );
         });
+    }
+
+    increasePlayerScore(isPlayer1: boolean) {
+        const increaseScoreMethod = () => {
+            if (isPlayer1) this.differencesFound1++;
+            else this.differencesFound2++;
+        };
+        increaseScoreMethod();
+        this.replayModeService.addMethodToReplay(increaseScoreMethod);
     }
 
     refreshFoundDifferences(foundDifferences: boolean[]) {
@@ -451,6 +461,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.stopCheating();
         this.isCheating = false;
         this.chat.resetChat();
+        this.differencesFound1 = 0;
+        this.differencesFound2 = 0;
     }
 
     finishReplay() {
