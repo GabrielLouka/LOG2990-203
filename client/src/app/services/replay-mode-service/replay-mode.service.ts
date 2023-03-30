@@ -60,20 +60,10 @@ export class ReplayModeService {
         });
     }
 
-    // async test() {
-    //     const delayMehod = new DelayedMethod(() => console.log('test'), 4000);
-    //     delayMehod.start();
-    //     await new Promise((resolve) => setTimeout(resolve, 1000));
-    //     delayMehod.pause();
-    //     this.replaySpeed = 2;
-    //     delayMehod.resume();
-    // }
-
     startRecording(): void {
         console.log('ReplayModeService.startRecording()');
         this.resetTimer();
         this.startRecordingTimer();
-        // this.test();
     }
 
     stopRecording(): void {
@@ -92,9 +82,7 @@ export class ReplayModeService {
     launchReplayMode() {
         console.log('ReplayModeService.startReplayMode() elapsedTime: ', this.elapsedSeconds);
         this.currentState = ReplayModeState.Replaying;
-        this.recordedActions.forEach((action) => {
-            action.pause(); // cancel it if it was already started
-        });
+        this.stopAllPlayingActions();
         this.onStartReplayMode.invoke();
 
         this.pauseReplayingTimer();
@@ -102,8 +90,6 @@ export class ReplayModeService {
         this.visibleTimer.resetTimer();
 
         this.startReplayingTimer();
-        // this.recordedActions = this.recordedActions.concat(this.replayedActions);
-        // this.replayedActions.length = 0; // clear replayedActions array
 
         this.recordedActions.forEach((action) => {
             action.start();
@@ -122,14 +108,20 @@ export class ReplayModeService {
             this.recordedActions.forEach((action) => {
                 action.resume();
             });
-            this.currentState = ReplayModeState.Replaying;
         }
+    }
+
+    stopAllPlayingActions() {
+        this.recordedActions.forEach((action) => {
+            action.pause(); // cancel it if it was already started
+        });
     }
 
     private finishReplayMode() {
         this.onFinishReplayMode.invoke();
         this.pauseReplayingTimer();
         this.currentState = ReplayModeState.FinishedReplaying;
+        this.stopAllPlayingActions();
     }
 
     private startRecordingTimer() {
@@ -147,12 +139,6 @@ export class ReplayModeService {
 
     private startReplayingTimer() {
         this.currentState = ReplayModeState.Replaying;
-        // const timerIncreaseFactor = REPLAY_TIMER_DELAY / MILLISECOND_TO_SECONDS;
-        // this.timerId = window.setInterval(() => {
-        //     this.elapsedTime += timerIncreaseFactor;
-        //     this.visibleTimer.timeInSeconds = this.elapsedTime;
-        //     this.invokeActionsAccordingToTime();
-        // }, REPLAY_TIMER_DELAY / this.replaySpeed);
         this.visibleTimer.resetTimer();
         this.visibleTimer.startTimer();
     }
@@ -168,24 +154,9 @@ export class ReplayModeService {
         this.visibleTimer.resumeTimer();
     }
 
-    // private invokeActionsAccordingToTime() {
-    //     for (let i = 0; i < this.recordedActions.length; i++) {
-    //         const currentAction = this.recordedActions[i];
-    //         // check your condition here
-    //         if (this.elapsedTime >= currentAction[1]) {
-    //             currentAction[0]();
-    //             console.log('invoked action at: ', this.elapsedTime, ' action: ', currentAction);
-    //             this.replayedActions.push(currentAction);
-    //             this.recordedActions.splice(i, 1);
-    //             i--; // decrement i to account for the removed element
-    //         }
-    //     }
-    // }
-
     private resetTimer() {
         this.elapsedSeconds = 0;
         clearInterval(this.timerId);
         this.recordedActions = [];
-        // this.replayedActions = [];
     }
 }

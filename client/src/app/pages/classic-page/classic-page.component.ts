@@ -114,6 +114,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.socketService.disconnect();
+        this.replayModeService.stopAllPlayingActions();
     }
 
     async playSound(isSuccessSound: boolean) {
