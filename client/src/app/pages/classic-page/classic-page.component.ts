@@ -392,6 +392,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onCheatMode(event: KeyboardEvent) {
         if (this.matchmakingService.isSoloMode || (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)) {
+            if (this.replayModeService.shouldShowReplayModeGUI) return;
             if (event.key === 't') {
                 if (this.letterTPressed) {
                     this.startCheating();
