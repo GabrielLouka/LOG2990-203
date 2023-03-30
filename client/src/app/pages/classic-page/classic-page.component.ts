@@ -316,11 +316,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.rightCanvas.nativeElement.style.pointerEvents = 'none';
             this.playSound(false);
 
-            setTimeout(() => {
+            // setTimeout(() => {
+            //     this.errorMessage.nativeElement.style.display = 'none';
+            //     this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
+            //     this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
+            // }, MILLISECOND_TO_SECONDS);
+            const delayedHideError = new DelayedMethod(() => {
                 this.errorMessage.nativeElement.style.display = 'none';
                 this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
                 this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
             }, MILLISECOND_TO_SECONDS);
+            delayedHideError.start();
         };
         showErrorMethod();
         this.replayModeService.addMethodToReplay(showErrorMethod);

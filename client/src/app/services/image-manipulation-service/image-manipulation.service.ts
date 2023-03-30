@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
@@ -59,10 +60,21 @@ export class ImageManipulationService {
     async blinkDifference(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
         this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
         for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
-            await this.sleep(BLINK_TIME);
-            this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
-            await this.sleep(BLINK_TIME);
-            this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+            // await this.sleep(BLINK_TIME);
+            // this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
+
+            const blink1 = new DelayedMethod(() => {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
+            }, BLINK_TIME);
+            await blink1.start();
+
+            // await this.sleep(BLINK_TIME);
+            // this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+
+            const blink2 = new DelayedMethod(() => {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+            }, BLINK_TIME);
+            await blink2.start();
         }
     }
 
