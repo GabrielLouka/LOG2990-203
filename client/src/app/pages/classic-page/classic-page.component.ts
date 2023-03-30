@@ -2,6 +2,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
@@ -102,6 +103,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         // Replay Mode Initialization
         this.replayModeService.onStartReplayMode.add(this.resetGame.bind(this));
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
+        DelayedMethod.speed = 1;
 
         window.addEventListener('keydown', this.onCheatMode.bind(this));
     }
