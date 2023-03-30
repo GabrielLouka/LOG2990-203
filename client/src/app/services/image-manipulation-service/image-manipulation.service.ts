@@ -56,7 +56,7 @@ export class ImageManipulationService {
     }
 
     async showFirstHint(canvasContext : 
-        {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer}, 
+        {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
         game: GameData, differences: boolean[]){
         
             const width = canvasContext.canvas.nativeElement.width;
@@ -104,7 +104,7 @@ export class ImageManipulationService {
                 rect.height as number);
                 await this.sleep(QUARTER_SECOND);            
         }
-        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew), canvasContext.context);
+        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
         
         
         

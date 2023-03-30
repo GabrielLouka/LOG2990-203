@@ -359,7 +359,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     handleHintMode(){
         if (this.hintService.maxGivenHints !== 0) {
             this.hintService.showHint(this.rightCanvas, 
-                this.rightCanvasContext as CanvasRenderingContext2D, this.currentModifiedImage, 
+                this.rightCanvasContext as CanvasRenderingContext2D, this.currentModifiedImage, this.game.modifiedImage, 
                 {gameData: this.game.gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences});
             this.hintService.decrement();                
             this.timeInSeconds = this.hintService.handleHint(this.chat, this.timeInSeconds);

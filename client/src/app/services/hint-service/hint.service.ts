@@ -43,16 +43,17 @@ export class HintService {
     return display;
   }
 
-  showHint(canvas: ElementRef<HTMLCanvasElement>, context: CanvasRenderingContext2D, image: Buffer, gameInfo: {gameData: GameData, hints: number, diffs: boolean[]}){
+  showHint(canvas: ElementRef<HTMLCanvasElement>, context: CanvasRenderingContext2D, image: Buffer, otherImage: Buffer, 
+    gameInfo: {gameData: GameData, hints: number, diffs: boolean[]}){
     switch(gameInfo.hints){
       case 3:
-        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image}, gameInfo.gameData, gameInfo.diffs);
+        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);
         break;
       case 2:
-        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image}, gameInfo.gameData, gameInfo.diffs);
+        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);
         break;
       case 1: 
-        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image}, gameInfo.gameData, gameInfo.diffs);        
+        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);        
         break;
       default:
         break;
