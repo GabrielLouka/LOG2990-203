@@ -92,6 +92,9 @@ export class ReplayModeService {
     launchReplayMode() {
         console.log('ReplayModeService.startReplayMode() elapsedTime: ', this.elapsedSeconds);
         this.currentState = ReplayModeState.Replaying;
+        this.recordedActions.forEach((action) => {
+            action.pause(); // cancel it if it was already started
+        });
         this.onStartReplayMode.invoke();
 
         this.pauseReplayingTimer();
