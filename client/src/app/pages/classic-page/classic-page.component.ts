@@ -354,7 +354,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     gameOver() {
-        this.timerElement.stopTimer();
+        this.timerElement.pauseTimer();
         this.socketService.disconnect();
         this.replayModeService.stopRecording();
         this.socketService.send('gameFinished', {
@@ -448,6 +448,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     finishReplay() {
-        this.timerElement.stopTimer();
+        this.timerElement.pauseTimer();
     }
 }

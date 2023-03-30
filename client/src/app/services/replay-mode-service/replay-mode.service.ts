@@ -24,7 +24,7 @@ export class ReplayModeService {
     visibleTimer: TimerComponent;
     currentState: ReplayModeState = ReplayModeState.Idle;
 
-    replayedActions: [() => void, number][] = [];
+    // replayedActions: [() => void, number][] = [];
 
     get startReplayModeAction(): Action<void> {
         const output: Action<void> = new Action<void>();
@@ -54,6 +54,10 @@ export class ReplayModeService {
 
     set replaySpeed(speed: number) {
         DelayedMethod.speed = speed;
+        this.recordedActions.forEach((action) => {
+            action.pause();
+            if (this.currentState === ReplayModeState.Replaying) action.resume();
+        });
     }
 
     // async test() {
@@ -94,9 +98,9 @@ export class ReplayModeService {
         this.elapsedSeconds = 0;
         this.visibleTimer.resetTimer();
 
-        // this.startReplayingTimer();
+        this.startReplayingTimer();
         // this.recordedActions = this.recordedActions.concat(this.replayedActions);
-        this.replayedActions.length = 0; // clear replayedActions array
+        // this.replayedActions.length = 0; // clear replayedActions array
 
         this.recordedActions.forEach((action) => {
             action.start();
@@ -111,7 +115,7 @@ export class ReplayModeService {
                 action.pause();
             });
         } else if (this.currentState === ReplayModeState.Paused) {
-            // this.startReplayingTimer();
+            this.resumeReplayingTimer();
             this.recordedActions.forEach((action) => {
                 action.resume();
             });
@@ -138,19 +142,27 @@ export class ReplayModeService {
         clearInterval(this.timerId);
     }
 
-    // private startReplayingTimer() {
-    //     this.currentState = ReplayModeState.Replaying;
-    //     const timerIncreaseFactor = REPLAY_TIMER_DELAY / MILLISECOND_TO_SECONDS;
-    //     this.timerId = window.setInterval(() => {
-    //         this.elapsedTime += timerIncreaseFactor;
-    //         this.visibleTimer.timeInSeconds = this.elapsedTime;
-    //         this.invokeActionsAccordingToTime();
-    //     }, REPLAY_TIMER_DELAY / this.replaySpeed);
-    // }
+    private startReplayingTimer() {
+        this.currentState = ReplayModeState.Replaying;
+        // const timerIncreaseFactor = REPLAY_TIMER_DELAY / MILLISECOND_TO_SECONDS;
+        // this.timerId = window.setInterval(() => {
+        //     this.elapsedTime += timerIncreaseFactor;
+        //     this.visibleTimer.timeInSeconds = this.elapsedTime;
+        //     this.invokeActionsAccordingToTime();
+        // }, REPLAY_TIMER_DELAY / this.replaySpeed);
+        this.visibleTimer.resetTimer();
+        this.visibleTimer.startTimer();
+    }
 
     private pauseReplayingTimer() {
         this.currentState = ReplayModeState.Paused;
         clearInterval(this.timerId);
+        this.visibleTimer.pauseTimer();
+    }
+
+    private resumeReplayingTimer() {
+        this.currentState = ReplayModeState.Replaying;
+        this.visibleTimer.resumeTimer();
     }
 
     // private invokeActionsAccordingToTime() {
@@ -171,6 +183,6 @@ export class ReplayModeService {
         this.elapsedSeconds = 0;
         clearInterval(this.timerId);
         this.recordedActions = [];
-        this.replayedActions = [];
+        // this.replayedActions = [];
     }
 }

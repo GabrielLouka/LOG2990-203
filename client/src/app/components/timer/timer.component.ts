@@ -1,4 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 
 @Component({
@@ -13,6 +14,7 @@ export class TimerComponent implements OnDestroy {
 
     shouldStop = true;
     intervalId: number;
+    loopingMethod: DelayedMethod;
 
     get minutes() {
         return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
@@ -36,18 +38,37 @@ export class TimerComponent implements OnDestroy {
         this.timeInSeconds = 0;
         this.minute.nativeElement.innerText = '00';
         this.second.nativeElement.innerText = '00';
+        clearInterval(this.intervalId);
+        this.loopingMethod?.pause();
     }
 
     startTimer() {
         this.shouldStop = false;
-        this.intervalId = window.setInterval(() => {
-            if (this.timeInSeconds >= 0) {
-                this.ticToc();
-            }
-        }, MILLISECOND_TO_SECONDS);
+        // this.intervalId = window.setInterval(() => {
+        //     if (this.timeInSeconds >= 0) {
+        //         this.ticToc();
+        //     }
+        // }, MILLISECOND_TO_SECONDS);
+
+        this.loopingMethod = new DelayedMethod(
+            () => {
+                if (this.timeInSeconds >= 0) {
+                    this.ticToc();
+                }
+            },
+            MILLISECOND_TO_SECONDS,
+            true,
+        );
+        this.loopingMethod.start();
     }
 
-    stopTimer() {
+    pauseTimer() {
         this.shouldStop = true;
+        this.loopingMethod.pause();
+    }
+
+    resumeTimer() {
+        this.shouldStop = false;
+        this.loopingMethod.resume();
     }
 }
