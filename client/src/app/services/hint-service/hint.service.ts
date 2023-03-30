@@ -2,6 +2,7 @@ import { ElementRef, Injectable } from '@angular/core';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameData } from '@common/interfaces/game-data';
 import { MILLISECOND_TO_SECONDS, NUMBER_HINTS } from '@common/utils/env';
+import { Buffer } from 'buffer';
 import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 
 @Injectable({
@@ -42,16 +43,16 @@ export class HintService {
     return display;
   }
 
-  showHint(canvas: ElementRef<HTMLCanvasElement>, context: CanvasRenderingContext2D, gameInfo: {gameData: GameData, hints: number, diffs: boolean[]}){
+  showHint(canvas: ElementRef<HTMLCanvasElement>, context: CanvasRenderingContext2D, image: Buffer, gameInfo: {gameData: GameData, hints: number, diffs: boolean[]}){
     switch(gameInfo.hints){
       case 3:
-        this.imageManipulationService.showFirstHint({canvas: canvas, context: context}, gameInfo.gameData, gameInfo.diffs);
+        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image}, gameInfo.gameData, gameInfo.diffs);
         break;
       case 2:
-        this.imageManipulationService.showFirstHint({canvas: canvas, context: context}, gameInfo.gameData, gameInfo.diffs);
+        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image}, gameInfo.gameData, gameInfo.diffs);
         break;
       case 1: 
-        this.imageManipulationService.showFirstHint({canvas: canvas, context: context}, gameInfo.gameData, gameInfo.diffs);        
+        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image}, gameInfo.gameData, gameInfo.diffs);        
         break;
       default:
         break;

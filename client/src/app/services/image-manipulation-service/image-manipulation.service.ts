@@ -8,7 +8,7 @@ import {
     CANVAS_HEIGHT,
     CANVAS_WIDTH,
     IMAGE_HEIGHT_OFFSET,
-    IMAGE_WIDTH_OFFSET, MILLISECOND_TO_SECONDS, NUMBER_OF_BLINKS,
+    IMAGE_WIDTH_OFFSET, NUMBER_OF_BLINKS,
     PIXEL_BYTES_LENGTH,
     QUARTER_SECOND
 } from '@common/utils/env';
@@ -55,47 +55,56 @@ export class ImageManipulationService {
         return modifiedImageBuffer;
     }
 
-    showFirstHint(canvasContext :{context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>}, game: GameData, differences: boolean[]){
-        let randomIndex = Math.floor(Math.random() * game.differences.length)
-        let randomDifference = game.differences[randomIndex];
-        let randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
-        let diffFound = differences[randomIndex];
-        const width = canvasContext.canvas.nativeElement.width;
+    async showFirstHint(canvasContext : 
+        {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer}, 
+        game: GameData, differences: boolean[]){
+        
+            const width = canvasContext.canvas.nativeElement.width;
         const height = canvasContext.canvas.nativeElement.height;
         const quarterWidth = width / 2;
         const quarterHeight = height / 2;
-        canvasContext.context.strokeStyle = "red";
-
-        let selectedRect: { x: number, y: number, width: number, height: number } | null = null;
+        
+        
         const rects = [
             { x: 0, y: 0, width: quarterWidth, height: quarterHeight },
             { x: quarterWidth, y: 0, width: quarterWidth, height: quarterHeight },
             { x: 0, y: quarterHeight, width: quarterWidth, height: quarterHeight },
             { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight }
-          ];
+        ];
+        
+        let randomIndex = Math.floor(Math.random() * game.differences.length)
+        let randomDifference = game.differences[randomIndex];
+        let randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        let diffFound = differences[randomIndex];
+        let rect;
+        do {
+            let randomSection = Math.floor(Math.random() * 4);
+            randomIndex = Math.floor(Math.random() * game.differences.length)
+            randomDifference = game.differences[randomIndex];
+            randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+            diffFound = differences[randomIndex];
+            rect = rects[randomSection];            
 
-        for (let i = 0; i < rects.length; i++) {
-            const rect = rects[i];
-            if (!diffFound && (randomVector.x >= rect.x && randomVector.x <= rect.x  + rect.width) &&
-                (randomVector.y >= rect.y && randomVector.y <= rect.y + rect.height)) {
-                selectedRect = rect;
-                // canvasContext.context.beginPath();
-                canvasContext.context.strokeRect(selectedRect.x as number, 
-                selectedRect.y as number, 
-                selectedRect.width as number, 
-                selectedRect.height as number);
-                canvasContext.context.save();
-                setTimeout(() => {
-                    canvasContext.context.clearRect(selectedRect!.x as number, 
-                    selectedRect!.y as number, 
-                    selectedRect!.width as number, 
-                    selectedRect!.height as number);
-                }, 2 * MILLISECOND_TO_SECONDS, selectedRect);
-                canvasContext.context.restore();
-
-                break;
-            }
+        } while(
+            (diffFound && (randomVector.x < rect.x && randomVector.x > rect.x  + rect.width) &&
+                (randomVector.y < rect.y && randomVector.y > rect.y + rect.height))
+        );
+        
+        for (let i = 0; i < NUMBER_OF_BLINKS; i++){
+            canvasContext.context.fillStyle = "#FF0000";
+            canvasContext.context.fillRect(rect.x as number, 
+                rect.y as number, 
+                rect.width as number, 
+                rect.height as number);
+                await this.sleep(QUARTER_SECOND);
+            canvasContext.context.fillStyle = "#0000FF";
+            canvasContext.context.fillRect(rect.x as number, 
+                rect.y as number, 
+                rect.width as number, 
+                rect.height as number);
+                await this.sleep(QUARTER_SECOND);            
         }
+        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew), canvasContext.context);
         
         
         
