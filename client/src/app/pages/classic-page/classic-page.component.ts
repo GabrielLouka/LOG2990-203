@@ -57,7 +57,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     minDifferences: number = 0;
     canvasIsClickable: boolean = false;
     startingTime: Date;
+    activePlayer: boolean;
     historyData: { startingTime: Date; gameMode: string; duration: string; player1: string; player2: string; isWinByDefault: boolean };
+    hasAlreadyReceiveMatchData: boolean = false;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -83,6 +85,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     get isOneVersusOne() {
         return this.matchmakingService.is1vs1Mode;
+    }
+
+    get isPlayer1() {
+        return this.matchmakingService.isPlayer1;
     }
 
     getPlayerUsername(isPlayer1: boolean): string {
@@ -132,7 +138,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         if (match) {
             this.matchId = this.matchmakingService.currentMatchId as string;
-
+            this.onReceiveMatchData();
             const abortedGameMessage = ' a abandonné la partie';
 
             if (this.isPlayer2Win(match)) {
@@ -142,6 +148,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
                 this.onWinGame(this.player1, this.isWinByDefault);
             }
+        }
+    }
+
+    onReceiveMatchData() {
+        if (this.hasAlreadyReceiveMatchData) return;
+        this.hasAlreadyReceiveMatchData = true;
+        if (this.isPlayer1) {
+            this.activePlayer = true;
+        } else {
+            this.activePlayer = false;
         }
     }
 

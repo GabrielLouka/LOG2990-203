@@ -101,6 +101,12 @@
                     <div class="divider"></div>
                     <div class="flex-row center">
                         <span
+                            class="material-symbols-outlined"
+                            *ngIf="history.gameMode === 'Classic - 1vs1' || (history.gameMode === 'Classic - Solo' && !history.isWinByDefault)"
+                        >
+                            military_tech
+                        </span>
+                        <span
                             [ngClass]="{
                                 'crossed-out': history.gameMode === 'Classic - Solo' && history.isWinByDefault,
                                 'text-bold':
