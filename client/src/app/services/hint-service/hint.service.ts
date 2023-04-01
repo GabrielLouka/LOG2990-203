@@ -46,11 +46,10 @@ export class HintService {
   showHint(canvas: ElementRef<HTMLCanvasElement>, context: CanvasRenderingContext2D, image: Buffer, otherImage: Buffer, 
     gameInfo: {gameData: GameData, hints: number, diffs: boolean[]}){
     if (gameInfo.hints === 3){
-    this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);
+      this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);
     }      
     else if (gameInfo.hints === 2){
       this.imageManipulationService.showSecondHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);
-
     }
     else {
       this.imageManipulationService.showThirdHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);

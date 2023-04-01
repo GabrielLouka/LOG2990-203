@@ -91,7 +91,7 @@ export class ImageManipulationService {
             rect = rects[randomSection];            
 
         } while(
-            (diffFound && !(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
+            (!diffFound && !(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
                 (randomVector.y >= rect.y && randomVector.y < rect.y + rect.height))
         );
         
@@ -143,7 +143,7 @@ export class ImageManipulationService {
             rect = rects[randomSection];            
 
         } while(
-            (diffFound && !(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
+            (!diffFound && !(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
                 (randomVector.y >= rect.y && randomVector.y < rect.y + rect.height))
         );
 
