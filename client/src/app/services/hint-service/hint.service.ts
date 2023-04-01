@@ -53,7 +53,7 @@ export class HintService {
         this.imageManipulationService.showSecondHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);
         break;
       case 1: 
-        this.imageManipulationService.showFirstHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);        
+        this.imageManipulationService.showThirdHint({canvas: canvas, context: context, imageNew: image, original: otherImage}, gameInfo.gameData, gameInfo.diffs);
         break;
       default:
         break;
