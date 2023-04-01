@@ -73,10 +73,17 @@ export class ImageManipulationService {
         ];
         
         let rect;
-        let randomIndex = Math.floor(Math.random() * game.differences.length)
-        let randomDifference = game.differences[randomIndex];
-        let randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
-        let diffFound = differences[randomIndex];
+        let randomIndex;
+        let randomDifference;
+        let randomVector;     
+        let diffFound;
+        do {
+            randomIndex = Math.floor(Math.random() * game.differences.length);
+            randomDifference = game.differences[randomIndex];
+            randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+            diffFound = differences[randomIndex];
+
+        } while(diffFound);
 
         do {
             let randomSection = Math.floor(Math.random() * 4);
@@ -119,10 +126,17 @@ export class ImageManipulationService {
         }
 
         let rect;
-        let randomIndex = Math.floor(Math.random() * game.differences.length)
-        let randomDifference = game.differences[randomIndex];
-        let randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
-        let diffFound = differences[randomIndex];
+        let randomIndex;
+        let randomDifference;
+        let randomVector;     
+        let diffFound;
+        do {
+            randomIndex = Math.floor(Math.random() * game.differences.length);
+            randomDifference = game.differences[randomIndex];
+            randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+            diffFound = differences[randomIndex];
+
+        } while(diffFound);
         do {
             let randomSection = Math.floor(Math.random() * 4);
             
