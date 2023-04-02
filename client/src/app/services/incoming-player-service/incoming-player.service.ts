@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { DO_YOU_WANT_TO_PLAY_WITH_MESSAGE, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
+import { DO_YOU_WANT_TO_PLAY_WITH_TEXT, WAITING_FOR_PLAYER_TEXT, WAITING_PLAYER_ANSWER_TEXT } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
@@ -67,7 +67,7 @@ export class IncomingPlayerService {
     refreshQueueDisplay() {
         this.hasFoundIncomingPlayer = this.hasIncomingPlayer;
         if (this.hasFoundIncomingPlayer) {
-            const startingGameMessage = DO_YOU_WANT_TO_PLAY_WITH_MESSAGE;
+            const startingGameMessage = DO_YOU_WANT_TO_PLAY_WITH_TEXT;
 
             this.joiningStatusMessage = startingGameMessage + `${this.firstIncomingPlayer.username} ?\n`;
 
@@ -79,11 +79,11 @@ export class IncomingPlayerService {
     }
 
     updateWaitingForIncomingPlayerMessage() {
-        this.joiningStatusMessage = WAITING_FOR_PLAYER_MESSAGE;
+        this.joiningStatusMessage = WAITING_FOR_PLAYER_TEXT;
     }
 
     updateWaitingForIncomingPlayerAnswerMessage() {
-        this.joiningStatusMessage = WAITING_PLAYER_ANSWER_MESSAGE;
+        this.joiningStatusMessage = WAITING_PLAYER_ANSWER_TEXT;
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {

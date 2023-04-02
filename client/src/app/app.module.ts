@@ -24,6 +24,7 @@ import { ParameterButtonComponent } from './components/parameters-button/paramet
 import { PopUpComponent } from './components/pop-up/pop-up.component';
 import { PreviousPageButtonComponent } from './components/previous-page-button/previous-page-button.component';
 import { QuitButtonComponent } from './components/quit-button/quit-button.component';
+import { ResetPopUpComponent } from './components/reset-pop-up/reset-pop-up.component';
 import { SpinnerComponent } from './components/spinner/spinner.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { ClassicPageComponent } from './pages/classic-page/classic-page.component';
@@ -68,6 +69,7 @@ import { AuthService } from './services/auth-service/auth.service';
         DeleteGamesPopUpComponent,
         ParameterButtonComponent,
         SpinnerComponent,
+        ResetPopUpComponent,
     ],
     providers: [AuthService],
     bootstrap: [AppComponent],

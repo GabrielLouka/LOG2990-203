@@ -42,7 +42,8 @@ describe('GamesController', () => {
         nbrDifferences: 7,
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         differences: [[new Vector2(1, 2), new Vector2(5, 6)], [new Vector2(4, 3)]], // array of all the pixels in a difference
-        ranking: [[]],
+        oneVersusOneRanking: [],
+        soloRanking: [],
     };
     const images = { originalImage: Buffer.from(''), modifiedImage: Buffer.from('') };
     const gameInfo = {
@@ -157,7 +158,7 @@ describe('GamesController', () => {
     });
     describe('DELETE', async () => {
         it('DELETE request should delete all games from database', async () => {
-            gameStorageServiceStub.allGames.resolves();
+            gameStorageServiceStub.deleteAll.resolves();
             await supertest(expressApp)
                 .delete(`${API_URL}/allGames`)
                 .expect(HTTP_STATUS_OK)
@@ -168,7 +169,7 @@ describe('GamesController', () => {
 
         it('DELETE /allGames should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
-            gameStorageServiceStub.allGames.rejects(errorMessage);
+            gameStorageServiceStub.deleteAll.rejects(errorMessage);
             supertest(expressApp)
                 .delete(`${API_URL}/allGames`)
                 .expect(HTTP_STATUS_NOT_FOUND)
@@ -178,7 +179,7 @@ describe('GamesController', () => {
         });
 
         it('DELETE request should delete selected game from database', async () => {
-            gameStorageServiceStub.deleteGame.resolves();
+            gameStorageServiceStub.deleteOneById.resolves();
             await supertest(expressApp)
                 .delete(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)
@@ -189,7 +190,7 @@ describe('GamesController', () => {
 
         it('DELETE /:id should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
-            gameStorageServiceStub.deleteGame.rejects(errorMessage);
+            gameStorageServiceStub.deleteOneById.rejects(errorMessage);
             supertest(expressApp)
                 .delete(`${API_URL}/0`)
                 .expect(HTTP_STATUS_NOT_FOUND)

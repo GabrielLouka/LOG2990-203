@@ -4,7 +4,7 @@
             <div class="title">{{ game.gameData.name }}</div>
             <div class="flex-row font-size difficulty">
                 <div><strong> Difficulté :</strong></div>
-                <div [ngStyle]="{ color: getDifficultyColor() }">{{ '&nbsp;' + difficulty }}</div>
+                <div [ngStyle]="{ color: this.difficultyColor }">{{ '&nbsp;' + difficulty }}</div>
             </div>
         </div>
         <div class="flex-row center content-container">
@@ -19,18 +19,18 @@
                     </div>
                     <div class="flex-column center mode">
                         <p class="font-size">Solo</p>
-                        <!-- <div class="flex-row" *ngFor="let player of game.gameData.ranking[0]">
+                        <div class="flex-row" *ngFor="let player of game.gameData.soloRanking">
                             <p class="font-size pseudo" *ngIf="player.name && player.score">{{ player.name }} :</p>
-                            <p class="font-size" *ngIf="player.score">{{ player.score }}</p>
-                        </div> -->
+                            <p class="font-size" *ngIf="player.score">{{ this.scoreToString(player.score) }}</p>
+                        </div>
                     </div>
                     <div class="divider"></div>
                     <div class="flex-column center mode">
                         <p class="title-mode font-size">1 VS 1</p>
-                        <!-- <div class="flex-row" *ngFor="let player of game.gameData.ranking[1]">
+                        <div class="flex-row" *ngFor="let player of game.gameData.oneVersusOneRanking">
                             <p class="pseudo font-size" *ngIf="player.name && player.score">{{ player.name }} :</p>
-                            <p class="font-size">{{ player.score }}</p>
-                        </div>-->
+                            <p class="font-size">{{ this.scoreToString(player.score) }}</p>
+                        </div>
                     </div>
                 </div>
             </div>

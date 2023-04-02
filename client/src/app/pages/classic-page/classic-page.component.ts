@@ -14,11 +14,13 @@ import { HistoryService } from '@app/services/history-service/history.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
+import { TimerService } from '@app/services/timer-service/timer.service';
 import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
-import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
+import { RankingData } from '@common/interfaces/ranking.data';
+import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
 
 @Component({
@@ -45,8 +47,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     backgroundColor = '';
     intervalIDLeft: number | undefined;
     intervalIDRight: number | undefined;
-    numberOfHints: number;
-    timeInSeconds: number;
     matchId: string;
     currentGameId: string | null;
     game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
@@ -65,6 +65,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     activePlayer: boolean;
     historyData: { startingTime: Date; gameMode: string; duration: string; player1: string; player2: string; isWinByDefault: boolean };
     hasAlreadyReceiveMatchData: boolean = false;
+    newRanking: { name: string; score: number };
 
     // eslint-disable-next-line max-params
     constructor(
@@ -77,6 +78,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private chatService: ChatService,
         private hintService: HintService,
         private historyService: HistoryService,
+        private timerService: TimerService,
     ) {}
 
     // this.historyService.addGameHistory(this.createHistoryData());
@@ -90,7 +92,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     get isOneVersusOne() {
-        return this.matchmakingService.is1vs1Mode;
+        return this.matchmakingService.isOneVersusOne;
+    }
+
+    get currentMatchType() {
+        return this.matchmakingService.currentMatchType;
     }
 
     get isPlayer1() {
@@ -192,9 +198,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.loadImagesToCanvas(img1Source, img2Source);
                     this.requestStartGame();
                     this.canvasIsClickable = true;
-                    this.startTimer();
                     this.startingTime = new Date();
 
+                    this.timerService.start();
+                    this.timerService.handleTickingTime(this.timerElement.minute, this.timerElement.second);
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -215,10 +222,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
         this.totalDifferences = this.game.gameData.nbrDifferences;
         this.minDifferences = Math.ceil(this.totalDifferences / 2);
-    }
-
-    startTimer() {
-        this.timeInSeconds = 0;
     }
 
     onMouseDown(event: MouseEvent) {
@@ -250,7 +253,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (data.isPlayer1) {
                         this.differencesFound1++;
-                        if (!this.matchmakingService.isSoloMode) {
+                        if (this.isOneVersusOne) {
                             message += ' par ' + this.player1.toUpperCase();
                         }
                     } else {
@@ -261,14 +264,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.foundDifferences = data.foundDifferences;
                     this.onFindDifference();
 
-                    if (this.matchmakingService.is1vs1Mode) {
+                    if (this.isOneVersusOne) {
                         if (this.differencesFound1 >= this.minDifferences) {
-                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
-                        } else if (this.differencesFound2 >= this.minDifferences)
-                            this.onWinGame(this.matchmakingService.player2Username, !this.isWinByDefault);
-                    } else if (this.matchmakingService.isSoloMode) {
+                            this.onWinGame(this.player2, !this.isWinByDefault);
+                        } else if (this.differencesFound2 >= this.minDifferences) this.onWinGame(this.player2, !this.isWinByDefault);
+                    } else if (!this.isOneVersusOne) {
                         if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
+                            this.onWinGame(this.player1, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -282,11 +284,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 username: data.username,
                 sentBySystem: false,
                 sentByPlayer1: data.sentByPlayer1,
-                sentByPlayer2: !data.sentByPlayer1,
+                sentUpdatedScore: false,
                 sentTime: Date.now(),
             });
             this.chatService.scrollToBottom(this.chat.chat);
             this.chat.newMessage = '';
+        });
+
+        this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
+            this.chat.sendTimeScoreMessage(data.rankingData);
         });
     }
 
@@ -344,12 +350,24 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    gameOver() {
-        this.timerElement.stopTimer();
-        this.socketService.disconnect();
-        this.socketService.send('gameFinished', {
-            minutesElapsed: Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS),
-            secondsElapsed: Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS),
+    gameOver(isWinByDefault: boolean) {
+        this.timerService.stop();
+        if (!isWinByDefault) {
+            this.sendNewTimeScoreToServer();
+        } else {
+            this.socketService.disconnect();
+        }
+        this.popUpElement.showGameOverPopUp(this.newRanking.name, isWinByDefault, this.matchmakingService.isSoloMode);
+    }
+
+    sendNewTimeScoreToServer() {
+        this.socketService.send('gameOver', {
+            gameId: this.game.gameData.id.toString(),
+            isOneVersusOne: this.isOneVersusOne,
+            ranking: {
+                name: this.newRanking.name,
+                score: this.newRanking.score,
+            },
         });
     }
 
@@ -365,7 +383,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
             this.historyService.addGameHistory(this.createHistoryData(winningPlayer, isWinByDefault));
         }
-        this.gameOver();
+        this.newRanking = { name: winningPlayer, score: this.timerService.winningTimeInSeconds };
+        this.gameOver(isWinByDefault);
     }
 
     createHistoryData(winningPlayer: string, isWinByDefault: boolean) {

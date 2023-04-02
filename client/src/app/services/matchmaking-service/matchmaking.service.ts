@@ -16,8 +16,10 @@ export class MatchmakingService {
     onGetJoinRequest = new Action<Player>();
     onGetJoinCancel = new Action<string>();
     onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
-    onAllGameDeleted = new Action<string | null>();
-    onSingleGameDeleted = new Action<string | null>();
+    onDeletedAllGames = new Action<string | null>();
+    onDeletedSingleGame = new Action<string | null>();
+    onResetAllGames = new Action<string | null>();
+    onResetSingleGame = new Action<string | null>();
     matchIdThatWeAreTryingToJoin: string | null = null;
     gameIdThatWeAreTryingToJoin: string | null = null;
     currentMatch: Match | null;
@@ -41,14 +43,14 @@ export class MatchmakingService {
     }
 
     get isHost(): boolean {
-        return this.matchIdThatWeAreTryingToJoin == null;
+        return !this.matchIdThatWeAreTryingToJoin;
     }
 
     get isPlayer1(): boolean {
         return this.socketService.socketId === this.player1Id;
     }
 
-    get is1vs1Mode(): boolean {
+    get isOneVersusOne(): boolean {
         return this.currentMatch?.matchType === MatchType.OneVersusOne;
     }
 
@@ -119,11 +121,19 @@ export class MatchmakingService {
         });
 
         this.socketService.on('allGamesDeleted', () => {
-            this.onAllGameDeleted.invoke(null);
+            this.onDeletedAllGames.invoke(null);
         });
 
         this.socketService.on('gameDeleted', (data: { hasDeletedGame: boolean; id: string }) => {
-            this.onSingleGameDeleted.invoke(data.id);
+            this.onDeletedSingleGame.invoke(data.id);
+        });
+
+        this.socketService.on('allGamesReset', () => {
+            this.onResetAllGames.invoke(null);
+        });
+
+        this.socketService.on('gameReset', (data: { hasResetGame: boolean; id: string }) => {
+            this.onResetSingleGame.invoke(data.id);
         });
     }
 
@@ -134,8 +144,10 @@ export class MatchmakingService {
         this.onGetJoinRequest = new Action<Player>();
         this.onGetJoinCancel = new Action<string>();
         this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
-        this.onAllGameDeleted = new Action<string | null>();
-        this.onSingleGameDeleted = new Action<string | null>();
+        this.onDeletedAllGames = new Action<string | null>();
+        this.onDeletedSingleGame = new Action<string | null>();
+        this.onResetAllGames = new Action<string | null>();
+        this.onResetSingleGame = new Action<string | null>();
         this.matchIdThatWeAreTryingToJoin = null;
         this.gameIdThatWeAreTryingToJoin = null;
     }

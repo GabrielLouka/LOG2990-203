@@ -7,7 +7,7 @@ import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-he
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { Socket } from 'socket.io-client';
 import { GamesDisplayComponent } from './games-display.component';
 import SpyObj = jasmine.SpyObj;
@@ -95,7 +95,8 @@ describe('GamesDisplayComponent', () => {
                     { x: 0, y: 0 },
                 ],
             ],
-            ranking: defaultRankings,
+            oneVersusOneRanking: defaultRanking,
+            soloRanking: defaultRanking,
         };
         component.theGamesService.games = [{ gameData: game, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable }];
         component.updateGameAvailability(gameId, matchToJoinIfAvailable);

@@ -1,57 +1,71 @@
-import { ElementRef, Injectable } from '@angular/core';
+import { ElementRef, Injectable, OnDestroy } from '@angular/core';
 import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 
 @Injectable({
-  providedIn: 'root'
+    providedIn: 'root',
 })
-export class TimerService {
-  shouldStop: boolean = false;
+export class TimerService implements OnDestroy {
+    private timeInSeconds: number;
+    private shouldStop = false;
+    private interval: number;
 
-  constructor() { }
+    get intervalTime() {
+        return this.interval;
+    }
 
-  getMinutes(timeInSeconds: number){
-    return Math.floor(timeInSeconds / MINUTE_TO_SECONDS);
+    get currentMinutes() {
+        return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
+    }
 
-  }
+    get currentSeconds() {
+        return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
+    }
 
-  getSeconds(timeInSeconds: number){
-    return Math.floor(timeInSeconds % MINUTE_TO_SECONDS);
-  }
+    get winningTimeInSeconds(): number {
+        return this.currentMinutes * MINUTE_TO_SECONDS + this.currentSeconds;
+    }
 
-  endTimer(minute: ElementRef, second: ElementRef, timeInSeconds: number){
-    return this.setInterval(minute, second, timeInSeconds)
-  }
+    get winningTimeToString(): string {
+        return this.currentMinutes.toString() + ':' + this.currentSeconds.toString();
+    }
 
-  setInterval(minute: ElementRef, second: ElementRef, timeInSeconds: number){
-    const intervalId = window.setInterval(() => {
-      if (timeInSeconds >= 0){
-        this.ticToc(minute, second, timeInSeconds);
-      }
-    }, MILLISECOND_TO_SECONDS);
-    return intervalId;
-  }
+    handleTickingTime(minute: ElementRef, second: ElementRef) {
+        this.interval = window.setInterval(() => {
+            if (this.timeInSeconds >= 0) {
+                this.ticToc(minute, second);
+            }
+        }, MILLISECOND_TO_SECONDS);
+    }
 
-  clearInterval(intervalId: number){
-    window.clearInterval(intervalId);
-  }
+    start() {
+        this.timeInSeconds = 0;
+    }
 
-  ticToc(minute: ElementRef, second: ElementRef, timeInSeconds: number){
-    minute.nativeElement.innerText = this.returnNewMinutes(timeInSeconds);
-    second.nativeElement.innerText = this.returnNewSeconds(timeInSeconds);
-  }
+    ngOnDestroy(): void {
+        window.clearInterval(this.interval);
+        this.shouldStop = false;
+        this.timeInSeconds = 0;
+    }
 
-  returnNewMinutes(timeInSeconds: number){
-    this.getMinutes(timeInSeconds) < MINUTE_LIMIT ? 
-      '0' + this.getMinutes(timeInSeconds) : this.getMinutes(timeInSeconds);
-  }
+    ticToc(minute: ElementRef, second: ElementRef) {
+        if (!this.shouldStop) this.timeInSeconds++;
+        minute.nativeElement.innerText = this.currentMinutes < MINUTE_LIMIT ? '0' + this.currentMinutes : this.currentMinutes;
+        second.nativeElement.innerText = this.currentSeconds < MINUTE_LIMIT ? '0' + this.currentSeconds : this.currentSeconds;
+    }
 
-  returnNewSeconds(timeInSeconds: number){
-    return this.getSeconds(timeInSeconds) < MINUTE_LIMIT ? 
-    '0' + this.getSeconds(timeInSeconds) : this.getSeconds(timeInSeconds);
-  }
+    convertScoreToString(scoreTime: number): string {
+        const formattedMinutes = Math.floor(scoreTime / MINUTE_TO_SECONDS).toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false,
+        });
+        const formattedSeconds = Math.floor(scoreTime % MINUTE_TO_SECONDS).toLocaleString('en-US', {
+            minimumIntegerDigits: 2,
+            useGrouping: false,
+        });
+        return formattedMinutes + ':' + formattedSeconds;
+    }
 
-  stopTimer(){
-    this.shouldStop = true;
-  }
-
+    stop() {
+        this.shouldStop = true;
+    }
 }

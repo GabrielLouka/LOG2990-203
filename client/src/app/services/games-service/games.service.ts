@@ -8,14 +8,14 @@ import { MAX_GAMES_PER_PAGE } from '@common/utils/env';
     providedIn: 'root',
 })
 export class GamesService {
-    currentPageNbr: number = 0;
+    currentPageNumber: number = 0;
     games: {
         gameData: GameData;
         originalImage: string;
         matchToJoinIfAvailable: string | null;
     }[];
     title: string;
-    gamesNbr: number = 0;
+    gamesNumber: number = 0;
     showNextButton = false;
     isLoading = true;
 
@@ -23,7 +23,7 @@ export class GamesService {
 
     constructor(private readonly communicationService: CommunicationService, private readonly socketService: SocketClientService) {}
 
-    async fetchGameDataFromServer(pageId: number): Promise<void> {
+    fetchGameDataFromServer(pageId: number): void {
         this.showNextButton = false;
         this.isLoading = true;
         const routeToSend = '/games/' + pageId.toString();
@@ -33,20 +33,20 @@ export class GamesService {
                     this.isLoading = false;
                     const serverResult = JSON.parse(response.body);
                     this.games = serverResult.gameContent;
-                    this.gamesNbr = serverResult.nbrOfGame;
-                    this.showNextButton = this.gamesNbr - (this.currentPageNbr + 1) * MAX_GAMES_PER_PAGE > 0;
+                    this.gamesNumber = serverResult.nbrOfGame;
+                    this.showNextButton = this.gamesNumber - (this.currentPageNumber + 1) * MAX_GAMES_PER_PAGE > 0;
                 }
             },
         });
     }
 
-    async deleteAllGames(isDeleteRequest: boolean): Promise<void> {
+    deleteAll(isDeleteRequest: boolean): void {
         if (isDeleteRequest) {
             const routeToSend = '/games/allGames';
             this.communicationService.delete(routeToSend).subscribe({
                 next: (response) => {
                     if (response.body) {
-                        this.gamesNbr = 0;
+                        this.gamesNumber = 0;
                         this.reloadPage();
                     }
                 },
@@ -55,7 +55,7 @@ export class GamesService {
         }
     }
 
-    async deleteSelectedGame(isDeleteRequest: boolean, id: string): Promise<void> {
+    deleteOneById(isDeleteRequest: boolean, id: string): void {
         if (isDeleteRequest) {
             const routeToSend = '/games/' + id;
 
@@ -70,14 +70,44 @@ export class GamesService {
         }
     }
 
-    async changeGamePages(isNext: boolean) {
-        this.currentPageNbr = isNext ? this.currentPageNbr + 1 : this.currentPageNbr - 1;
-        if (this.currentPageNbr > 0) {
+    resetAll(isResetRequest: boolean): void {
+        if (isResetRequest) {
+            const routeToSend = '/games/allGames';
+            this.communicationService.get(routeToSend).subscribe({
+                next: (response) => {
+                    if (response.body) {
+                        this.gamesNumber = 0;
+                        this.reloadPage();
+                    }
+                },
+            });
+            this.socketService.socket.emit('resetAllGames');
+        }
+    }
+
+    resetOneById(isDeleteRequest: boolean, id: string): void {
+        if (isDeleteRequest) {
+            const routeToSend = '/games/' + id;
+
+            this.communicationService.get(routeToSend).subscribe({
+                next: (response) => {
+                    if (response.body) {
+                        this.reloadPage();
+                    }
+                },
+            });
+            this.socketService.socket.emit('resetGame', { hasResetGame: true, id });
+        }
+    }
+
+    changeGamePages(isNext: boolean): void {
+        this.currentPageNumber = isNext ? this.currentPageNumber + 1 : this.currentPageNumber - 1;
+        if (this.currentPageNumber > 0) {
             this.showPreviousButton = true;
         } else {
             this.showPreviousButton = false;
         }
-        await this.fetchGameDataFromServer(this.currentPageNbr);
+        this.fetchGameDataFromServer(this.currentPageNumber);
     }
 
     reloadPage() {
