@@ -68,7 +68,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     historyData: { startingTime: Date; gameMode: string; duration: string; player1: string; player2: string; isWinByDefault: boolean };
     hasAlreadyReceiveMatchData: boolean = false;
     newRanking: { name: string; score: number };
-    timeInSeconds: number;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -238,7 +237,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     startTimer() {
-        this.timeInSeconds = 0;
         this.timerElement.resetTimer();
         this.timerElement.startTimer();
     }
@@ -498,7 +496,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 { gameData: this.game.gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences },
             );
             this.hintService.decrement();
-            this.timeInSeconds = this.hintService.handleHint(this.chat, this.timeInSeconds);
+            this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds);
+            this.timerElement.refreshTimerDisplay();
             this.hintService.showMessage(this.penaltyMessage);
         }
     }

@@ -40,10 +40,14 @@ export class TimerComponent implements OnDestroy {
         window.clearInterval(this.intervalId);
     }
 
-    ticToc() {
-        this.timeInSeconds++;
+    refreshTimerDisplay() {
         this.minute.nativeElement.innerText = this.displayTimeValue(this.minutes);
         this.second.nativeElement.innerText = this.displayTimeValue(this.seconds);
+    }
+
+    ticToc() {
+        this.timeInSeconds++;
+        this.refreshTimerDisplay();
     }
 
     // stopTimer() {
