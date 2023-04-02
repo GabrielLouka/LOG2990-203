@@ -1,4 +1,6 @@
 import { ElementRef, Injectable } from '@angular/core';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
+import { Action } from '@common/classes/action';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
@@ -190,12 +192,23 @@ export class ImageManipulationService {
 
     async blinkDifference(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
         this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+        const wholeBlink = new Action<void>();
+        let blinkCount = 0;
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
-            await this.sleep(BLINK_TIME);
-            this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
-            await this.sleep(BLINK_TIME);
-            this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+            blinkCount++;
+            const blink1 = new DelayedMethod(() => {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageOld), context);
+            }, BLINK_TIME * blinkCount);
+            blinkCount++;
+            const blink2 = new DelayedMethod(() => {
+                this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
+            }, BLINK_TIME * blinkCount);
+            wholeBlink.add(async () => blink1.start());
+            wholeBlink.add(async () => blink2.start());
         }
+
+        wholeBlink.invoke();
     }
 
     alternateOldNewImage(oldImage: Buffer, newImage: Buffer, context: CanvasRenderingContext2D) {

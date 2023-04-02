@@ -39,7 +39,7 @@ describe('TimerComponent', () => {
     });
 
     it('stopTimer should affect true to shouldStop property', () => {
-        component.stopTimer();
+        component.pauseTimer();
         expect(component['shouldStop']).toEqual(true);
     });
 

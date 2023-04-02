@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Action } from '@common/classes/action';
 
 @Component({
     selector: 'app-pop-up',
@@ -15,6 +16,7 @@ export class PopUpComponent {
         option2: string;
         isConfirmation: boolean;
         isGameOver: boolean;
+        option2Action: Action<void> | null;
     }[] = [];
 
     showConfirmationPopUp() {
@@ -26,11 +28,12 @@ export class PopUpComponent {
             option2: 'NON',
             isConfirmation: true,
             isGameOver: false,
+            option2Action: null,
         });
         this.showPopUp();
     }
 
-    showGameOverPopUp(username: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
+    showGameOverPopUp(username: string | undefined, isWinByDefault: boolean, isSoloMode: boolean, startReplayAction: Action<void> | null) {
         const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
         const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
         const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
@@ -42,6 +45,7 @@ export class PopUpComponent {
             option2: 'Reprise Vidéo',
             isConfirmation: false,
             isGameOver: true,
+            option2Action: startReplayAction,
         });
         this.showPopUp();
     }
@@ -52,5 +56,6 @@ export class PopUpComponent {
 
     closePopUp() {
         this.modal.nativeElement.style.display = 'none';
+        this.popUpInfo[0]?.option2Action?.invoke();
     }
 }

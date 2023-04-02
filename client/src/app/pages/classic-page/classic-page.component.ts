@@ -2,6 +2,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
@@ -13,6 +14,7 @@ import { HintService } from '@app/services/hint-service/hint.service';
 import { HistoryService } from '@app/services/history-service/history.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
+import { ReplayModeService } from '@app/services/replay-mode-service/replay-mode.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { TimerService } from '@app/services/timer-service/timer.service';
 import { Match } from '@common/classes/match';
@@ -72,6 +74,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
+        public replayModeService: ReplayModeService,
         private route: ActivatedRoute,
         private imageManipulationService: ImageManipulationService,
         private matchmakingService: MatchmakingService,
@@ -122,6 +125,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
         window.addEventListener('keydown', this.handleEvents.bind(this));
+
+        // Replay Mode Initialization
+        this.replayModeService.onStartReplayMode.add(this.resetGame.bind(this));
+        this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
+        DelayedMethod.speed = 1;
     }
 
     sendSystemMessageToChat(message: string) {
@@ -133,6 +141,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.historyService.addGameHistory(this.createHistoryData(this.player1, this.isWinByDefault));
         else if (this.matchmakingService.isSoloMode) this.historyService.addGameHistory(this.createHistoryData(this.player1, !this.isWinByDefault));
         this.socketService.disconnect();
+        this.replayModeService.stopAllPlayingActions();
     }
 
     async playSound(isSuccessSound: boolean) {
@@ -155,11 +164,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             const abortedGameMessage = ' a abandonné la partie';
 
             if (this.isPlayer2Win(match)) {
-                this.chat.sendSystemMessage(this.player1.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player2, this.isWinByDefault);
+                this.sendSystemMessageToChat(this.player1.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
             } else if (this.isPlayer1Win(match)) {
-                this.chat.sendSystemMessage(this.player2.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player1, this.isWinByDefault);
+                this.sendSystemMessageToChat(this.player2.toUpperCase() + abortedGameMessage);
+                this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
             }
         }
     }
@@ -183,6 +192,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
         window.removeEventListener('keydown', this.handleEvents.bind(this));
+        this.replayModeService.visibleTimer = this.timerElement;
     }
 
     getInitialImagesFromServer() {
@@ -203,6 +213,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     this.timerService.start();
                     this.timerService.handleTickingTime(this.timerElement.minute, this.timerElement.second);
+                    this.replayModeService.startRecording();
                     this.gameTitle = this.game.gameData.name;
                 }
             },
@@ -225,18 +236,36 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.minDifferences = Math.ceil(this.totalDifferences / 2);
     }
 
+    startTimer() {
+        this.timeInSeconds = 0;
+        this.timerElement.resetTimer();
+        this.timerElement.startTimer();
+    }
+
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
+        console.log('attempt at clicking', coordinateClick);
         if (this.canvasIsClickable) {
             this.socketService.send('validateDifference', {
                 foundDifferences: this.foundDifferences,
                 position: coordinateClick,
                 isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
             });
-            this.errorMessage.nativeElement.style.left = event.clientX + 'px';
-            this.errorMessage.nativeElement.style.top = event.clientY + 'px';
+            console.log('click');
+            this.refreshErrorMessagePosition(event.clientX, event.clientY);
             this.cheatModeService.focusKeyEvent(this.cheat);
+        } else {
+            console.log('canvas is not clickable');
         }
+    }
+
+    refreshErrorMessagePosition(x: number, y: number) {
+        const refreshErrorMessagePositionMethod = () => {
+            this.errorMessage.nativeElement.style.left = x + 'px';
+            this.errorMessage.nativeElement.style.top = y + 'px';
+        };
+        refreshErrorMessagePositionMethod();
+        this.replayModeService.addMethodToReplay(refreshErrorMessagePositionMethod);
     }
 
     requestStartGame() {
@@ -253,17 +282,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     let message = 'Différence trouvée';
 
                     if (data.isPlayer1) {
-                        this.differencesFound1++;
+                        // this.differencesFound1++;
                         if (this.isOneVersusOne) {
                             message += ' par ' + this.player1.toUpperCase();
                         }
                     } else {
                         message += ' par ' + this.player2.toUpperCase();
-                        this.differencesFound2++;
+                        // this.differencesFound2++;
                     }
+                    this.increasePlayerScore(data.isPlayer1);
                     this.sendSystemMessageToChat(message);
-                    this.foundDifferences = data.foundDifferences;
-                    this.onFindDifference();
+                    // this.foundDifferences = data.foundDifferences;
+                    // this.onFindDifference();
+                    this.refreshFoundDifferences(data.foundDifferences);
 
                     if (this.isOneVersusOne) {
                         if (this.differencesFound1 >= this.minDifferences) {
@@ -280,21 +311,41 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             },
         );
         this.socketService.on('messageBetweenPlayers', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
-            this.chat.messages.push({
-                text: data.message,
-                username: data.username,
-                sentBySystem: false,
-                sentByPlayer1: data.sentByPlayer1,
-                sentUpdatedScore: false,
-                sentTime: Date.now(),
-            });
-            this.chatService.scrollToBottom(this.chat.chat);
-            this.chat.newMessage = '';
+            this.chatService.pushMessage(
+                {
+                    text: data.message,
+                    username: data.username,
+                    sentBySystem: false,
+                    sentByPlayer1: data.sentByPlayer1,
+                    sentUpdatedScore: false,
+                    sentTime: Date.now(),
+                },
+                this.chat,
+            );
         });
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
             this.chat.sendTimeScoreMessage(data.rankingData);
         });
+    }
+
+    increasePlayerScore(isPlayer1: boolean) {
+        const increaseScoreMethod = () => {
+            if (isPlayer1) this.differencesFound1++;
+            else this.differencesFound2++;
+        };
+        increaseScoreMethod();
+        this.replayModeService.addMethodToReplay(increaseScoreMethod);
+    }
+
+    refreshFoundDifferences(foundDifferences: boolean[]) {
+        const refreshMethod = () => {
+            this.foundDifferences = foundDifferences;
+            this.onFindDifference();
+        };
+        console.log('refresh found differences');
+        refreshMethod();
+        this.replayModeService.addMethodToReplay(refreshMethod);
     }
 
     onFindWrongDifference(isPlayer1: boolean) {
@@ -307,21 +358,32 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 message += ' par ' + this.matchmakingService.player2Username.toUpperCase();
             }
         }
-        this.errorMessage.nativeElement.style.display = 'block';
-        this.leftCanvas.nativeElement.style.pointerEvents = 'none';
-        this.rightCanvas.nativeElement.style.pointerEvents = 'none';
-        this.showErrorText();
-        this.playSound(false);
+        if (isPlayer1 === this.matchmakingService.isPlayer1) this.showErrorText();
         this.cheatModeService.focusKeyEvent(this.cheat);
         this.sendSystemMessageToChat(message);
     }
 
     showErrorText() {
-        setTimeout(() => {
-            this.errorMessage.nativeElement.style.display = 'none';
-            this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
-            this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
-        }, MILLISECOND_TO_SECONDS);
+        const showErrorMethod = () => {
+            this.errorMessage.nativeElement.style.display = 'block';
+            this.leftCanvas.nativeElement.style.pointerEvents = 'none';
+            this.rightCanvas.nativeElement.style.pointerEvents = 'none';
+            this.playSound(false);
+
+            // setTimeout(() => {
+            //     this.errorMessage.nativeElement.style.display = 'none';
+            //     this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
+            //     this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
+            // }, MILLISECOND_TO_SECONDS);
+            const delayedHideError = new DelayedMethod(() => {
+                this.errorMessage.nativeElement.style.display = 'none';
+                this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
+                this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
+            }, MILLISECOND_TO_SECONDS);
+            delayedHideError.start();
+        };
+        showErrorMethod();
+        this.replayModeService.addMethodToReplay(showErrorMethod);
     }
 
     onFindDifference() {
@@ -329,7 +391,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.refreshModifiedImage();
         if (this.isCheating) {
             this.stopCheating();
-            this.cheatMode();
+            this.startCheating();
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
     }
@@ -352,13 +414,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     gameOver(isWinByDefault: boolean) {
-        this.timerService.stop();
+        this.timerElement.pauseTimer();
+        this.replayModeService.stopRecording();
         if (!isWinByDefault) {
             // this.sendNewTimeScoreToServer();
         } else {
             this.socketService.disconnect();
         }
-        this.popUpElement.showGameOverPopUp(this.newRanking.name, isWinByDefault, this.matchmakingService.isSoloMode);
     }
 
     sendNewTimeScoreToServer() {
@@ -377,15 +439,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
-        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
-
         if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.isOneVersusOne) {
             this.historyService.addGameHistory(this.createHistoryData(winningPlayer, isWinByDefault));
         } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
             this.historyService.addGameHistory(this.createHistoryData(winningPlayer, isWinByDefault));
         }
         this.newRanking = { name: winningPlayer, score: this.timerService.winningTimeInSeconds };
+
         this.gameOver(isWinByDefault);
+        const startReplayAction = this.replayModeService.startReplayModeAction;
+        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode, startReplayAction);
     }
 
     createHistoryData(winningPlayer: string, isWinByDefault: boolean) {
@@ -407,13 +470,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleEvents(event: KeyboardEvent) {
-        if (this.matchmakingService.isSoloMode || (this.chat && document.activeElement !== this.chat.input.nativeElement)) {
+        if (this.matchmakingService.isSoloMode || (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)) {
+            if (this.replayModeService.shouldShowReplayModeGUI) return;
             if (event.key === 't') {
                 if (this.letterTPressed) {
-                    this.cheatMode();
+                    this.startCheating();
                 } else {
                     this.stopCheating();
-                    this.putCanvasIntoInitialState();
+                    // this.putCanvasIntoInitialState();
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
@@ -438,15 +502,31 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    cheatMode() {
-        this.backgroundColor = '#66FF99';
-        const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
-            this.game.gameData,
-            { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
-            this.foundDifferences,
-        );
-        this.showHiddenDifferences(newImage);
-        this.isCheating = !this.isCheating;
+    startCheating() {
+        const startCheatingMethod = () => {
+            this.backgroundColor = '#66FF99';
+            const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
+                this.game.gameData,
+                { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
+                this.foundDifferences,
+            );
+            this.showHiddenDifferences(newImage);
+            this.isCheating = !this.isCheating;
+        };
+        startCheatingMethod();
+        this.replayModeService.addMethodToReplay(startCheatingMethod);
+    }
+
+    stopCheating() {
+        const stopCheatingMethod = () => {
+            this.backgroundColor = '';
+            this.cheatModeService.stopCheating(this.intervalIDLeft as number, this.intervalIDRight as number);
+            this.isCheating = !this.isCheating;
+
+            this.putCanvasIntoInitialState();
+        };
+        stopCheatingMethod();
+        this.replayModeService.addMethodToReplay(stopCheatingMethod);
     }
 
     showHiddenDifferences(newImage: Buffer) {
@@ -464,16 +544,27 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    stopCheating() {
-        this.backgroundColor = '';
-        this.cheatModeService.stopCheating(this.intervalIDLeft as number, this.intervalIDRight as number);
-        this.isCheating = !this.isCheating;
-    }
-
     putCanvasIntoInitialState() {
         this.cheatModeService.putCanvasIntoInitialState(
             { originalImage: this.game.originalImage, currentModifiedImage: this.currentModifiedImage },
             { leftContext: this.leftCanvasContext as CanvasRenderingContext2D, rightContext: this.rightCanvasContext as CanvasRenderingContext2D },
         );
+    }
+
+    resetGame() {
+        this.foundDifferences = [];
+        this.currentModifiedImage = Buffer.from(this.game.modifiedImage);
+        const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
+        const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
+        this.loadImagesToCanvas(img1Source, img2Source);
+        this.stopCheating();
+        this.isCheating = false;
+        this.chat.resetChat();
+        this.differencesFound1 = 0;
+        this.differencesFound2 = 0;
+    }
+
+    finishReplay() {
+        this.timerElement.pauseTimer();
     }
 }

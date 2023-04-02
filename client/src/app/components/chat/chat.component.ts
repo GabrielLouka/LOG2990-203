@@ -37,7 +37,11 @@ export class ChatComponent {
         this.chatService.sendRecordBreakingMessage({ rankingData, chat: this.chat, newMessage: this.newMessage }, this.messages);
     }
 
-    sendSystemMessage(message: string) {
-        this.chatService.sendMessageFromSystem({ message: message, chat: this.chat, newMessage: this.newMessage }, this.messages);
+    sendSystemMessage(textToSend: string) {
+        this.chatService.sendMessageFromSystem(textToSend, this.newMessage, this);
+    }
+
+    resetChat() {
+        this.messages = [];
     }
 }
