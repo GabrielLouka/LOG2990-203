@@ -6,7 +6,7 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular
     styleUrls: ['./delete-games-pop-up.component.scss'],
 })
 export class DeleteGamesPopUpComponent {
-    @ViewChild('modal') modal!: ElementRef;
+    @ViewChild('modal') modal: ElementRef;
     @Output() isDeleteRequest = new EventEmitter<boolean>();
     allGamesMessage = 'TOUS LES JEUX ?';
     deleteThisGame = 'CE JEU ?';
@@ -18,7 +18,6 @@ export class DeleteGamesPopUpComponent {
         option2: string;
         isAllGames: boolean;
     }[] = [];
-
     showDeleteGamesPopUp(isAllGames: boolean) {
         const message = isAllGames ? this.allGamesMessage : this.deleteThisGame;
         this.popUpInfo.splice(0, this.popUpInfo.length);
@@ -38,7 +37,9 @@ export class DeleteGamesPopUpComponent {
     }
 
     showPopUp() {
-        this.modal.nativeElement.style.display = 'flex';
+        if (this.modal && this.modal.nativeElement) {
+            this.modal.nativeElement.style.display = 'flex';
+        }
     }
 
     closePopUp() {

@@ -3,7 +3,6 @@ import { CommunicationService } from '@app/services/communication-service/commun
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/interfaces/game-data';
 import { MAX_GAMES_PER_PAGE } from '@common/utils/env';
-import { Buffer } from 'buffer';
 
 @Injectable({
     providedIn: 'root',
@@ -12,7 +11,7 @@ export class GamesService {
     currentPageNbr: number = 0;
     games: {
         gameData: GameData;
-        originalImage: Buffer;
+        originalImage: string;
         matchToJoinIfAvailable: string | null;
     }[];
     title: string;

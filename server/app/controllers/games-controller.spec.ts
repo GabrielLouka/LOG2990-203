@@ -117,8 +117,8 @@ describe('GamesController', () => {
             gameStorageServiceStub.storeGameResult.resolves();
             const newGameToAdd: EntireGameUploadForm = {
                 gameId: 2,
-                firstImage: { background: [], foreground: [] },
-                secondImage: { background: [], foreground: [] },
+                firstImage: { background: [] },
+                secondImage: { background: [] },
                 differences: [[{ x: 100, y: 100 }]],
                 gameName: 'saveGame test',
                 isEasy: true,
@@ -139,8 +139,8 @@ describe('GamesController', () => {
             gameStorageServiceStub.storeGameResult.rejects(errorMessage);
             const newGameToAdd: EntireGameUploadForm = {
                 gameId: 2,
-                firstImage: { background: [], foreground: [] },
-                secondImage: { background: [], foreground: [] },
+                firstImage: { background: [] },
+                secondImage: { background: [] },
                 differences: [[{ x: 100, y: 100 }]],
                 gameName: 'saveGame test',
                 isEasy: true,

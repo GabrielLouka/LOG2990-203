@@ -32,7 +32,7 @@ describe('GameCardComponent', () => {
             ],
             ranking: defaultRankings,
         };
-        component.game = { gameData: game, originalImage: Buffer.alloc(3), matchToJoinIfAvailable: '1' };
+        component.game = { gameData: game, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable: '1' };
         component.isPlayable = true;
         fixture.detectChanges();
     });
@@ -71,7 +71,7 @@ describe('GameCardComponent', () => {
             ],
             ranking: defaultRankings,
         };
-        component.game = { gameData: game2, originalImage: Buffer.alloc(3), matchToJoinIfAvailable: '1' };
+        component.game = { gameData: game2, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable: '1' };
         component.ngOnInit();
         fixture.detectChanges();
         expect(component.getDifficultyColor()).toEqual('red');

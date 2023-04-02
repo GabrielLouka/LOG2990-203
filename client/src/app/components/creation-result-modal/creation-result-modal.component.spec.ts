@@ -93,8 +93,8 @@ describe('CreationResultModalComponent', () => {
     it('should show the game name form', () => {
         const game: EntireGameUploadForm = {
             gameId: 1,
-            firstImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
-            secondImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
+            firstImage: { background: [1, 2, 3, 4, 5, 6, 7] },
+            secondImage: { background: [1, 2, 3, 4, 5, 6, 7] },
             differences: [[new Vector2(1, 2)], [new Vector2(1, 2)], [new Vector2(1, 2)]],
             gameName: 'myLastGame',
             isEasy: true,
@@ -136,8 +136,8 @@ describe('CreationResultModalComponent', () => {
     it('should the game name to the server', async () => {
         const game: EntireGameUploadForm = {
             gameId: 1,
-            firstImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
-            secondImage: { background: [1, 2, 3, 4, 5, 6, 7], foreground: [5, 7, 8, 9, 7, 2, 4] },
+            firstImage: { background: [1, 2, 3, 4, 5, 6, 7] },
+            secondImage: { background: [1, 2, 3, 4, 5, 6, 7] },
             differences: [[new Vector2(1, 2)]],
             gameName: 'myLastGame',
             isEasy: true,

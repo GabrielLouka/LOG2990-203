@@ -128,22 +128,23 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     }
 
     async sendImageToServer(): Promise<void> {
+        this.resultModal.resetBackgroundCanvas();
         this.resultModal.showPopUp();
 
         if (this.originalImage && this.modifiedImage) {
-            const buffer1 = await this.originalImage.arrayBuffer();
-            const buffer2 = await this.modifiedImage.arrayBuffer();
+            const [buffer1, buffer2] = await Promise.all([this.originalImage.arrayBuffer(), this.modifiedImage.arrayBuffer()]);
 
             this.imageManipulationService.combineImages(Buffer.from(buffer1), this.drawingCanvasOne.nativeElement);
             this.imageManipulationService.combineImages(Buffer.from(buffer2), this.drawingCanvasTwo.nativeElement);
+
             // convert buffer to int array
             const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
             const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
 
             this.resultModal.updateImageDisplay(new ArrayBuffer(0));
 
-            const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
-            const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
+            const firstImage: DifferenceImage = { background: byteArray1 };
+            const secondImage: DifferenceImage = { background: byteArray2 };
             const radius = this.enlargementRadius;
 
             const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };

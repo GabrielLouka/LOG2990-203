@@ -8,7 +8,6 @@ import { CommunicationService } from '@app/services/communication-service/commun
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { GameData } from '@common/interfaces/game-data';
 import { defaultRankings } from '@common/interfaces/ranking';
-import { Buffer } from 'buffer';
 import { Socket } from 'socket.io-client';
 import { GamesDisplayComponent } from './games-display.component';
 import SpyObj = jasmine.SpyObj;
@@ -98,7 +97,7 @@ describe('GamesDisplayComponent', () => {
             ],
             ranking: defaultRankings,
         };
-        component.theGamesService.games = [{ gameData: game, originalImage: Buffer.alloc(3), matchToJoinIfAvailable }];
+        component.theGamesService.games = [{ gameData: game, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable }];
         component.updateGameAvailability(gameId, matchToJoinIfAvailable);
         expect(component.theGamesService.games[0].matchToJoinIfAvailable).toBe(matchToJoinIfAvailable);
     });
