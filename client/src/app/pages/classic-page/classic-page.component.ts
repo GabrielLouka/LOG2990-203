@@ -66,6 +66,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     historyData: { startingTime: Date; gameMode: string; duration: string; player1: string; player2: string; isWinByDefault: boolean };
     hasAlreadyReceiveMatchData: boolean = false;
     newRanking: { name: string; score: number };
+    timeInSeconds: number;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -353,7 +354,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     gameOver(isWinByDefault: boolean) {
         this.timerService.stop();
         if (!isWinByDefault) {
-            this.sendNewTimeScoreToServer();
+            // this.sendNewTimeScoreToServer();
         } else {
             this.socketService.disconnect();
         }
@@ -378,7 +379,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
 
-        if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.is1vs1Mode) {
+        if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.isOneVersusOne) {
             this.historyService.addGameHistory(this.createHistoryData(winningPlayer, isWinByDefault));
         } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
             this.historyService.addGameHistory(this.createHistoryData(winningPlayer, isWinByDefault));
