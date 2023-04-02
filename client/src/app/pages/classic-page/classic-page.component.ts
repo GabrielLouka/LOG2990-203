@@ -346,9 +346,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
-            else if (event.key === 'i'){ 
-                this.handleHintMode();
-            }
+            // if (event.key === 'i'){ 
+            //     this.handleHintMode();
+            // }
         }
     }
     

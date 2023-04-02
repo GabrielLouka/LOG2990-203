@@ -71,7 +71,6 @@ export class ImageManipulationService {
             { x: 0, y: quarterHeight, width: quarterWidth, height: quarterHeight },
             { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight }
         ];
-        
         let rect;
         let randomIndex;
         let randomDifference;
@@ -79,22 +78,23 @@ export class ImageManipulationService {
         let diffFound;
         do {
             randomIndex = Math.floor(Math.random() * game.differences.length);
-            randomDifference = game.differences[randomIndex];
-            randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
             diffFound = differences[randomIndex];
-
+            
         } while(diffFound);
-
+        randomDifference = game.differences[randomIndex];
+        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        
         do {
             let randomSection = Math.floor(Math.random() * 4);
 
             rect = rects[randomSection];            
 
         } while(
-            (!diffFound && !(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
+            (!(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
                 (randomVector.y >= rect.y && randomVector.y < rect.y + rect.height))
         );
         
+        console.log('randomVector:', randomVector);
         await this.blinkQuadrant(canvasContext.context, rect);
         this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
                     
@@ -132,18 +132,18 @@ export class ImageManipulationService {
         let diffFound;
         do {
             randomIndex = Math.floor(Math.random() * game.differences.length);
-            randomDifference = game.differences[randomIndex];
-            randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
             diffFound = differences[randomIndex];
-
+            
         } while(diffFound);
+        randomDifference = game.differences[randomIndex];
+        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
         do {
             let randomSection = Math.floor(Math.random() * 4);
             
             rect = rects[randomSection];            
 
         } while(
-            (!diffFound && !(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
+            (!(randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
                 (randomVector.y >= rect.y && randomVector.y < rect.y + rect.height))
         );
 
@@ -162,11 +162,11 @@ export class ImageManipulationService {
         let diffFound;
         do {
             randomIndex = Math.floor(Math.random() * game.differences.length);
-            randomDifference = game.differences[randomIndex];
-            randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
             diffFound = differences[randomIndex];
-
+            
         } while(diffFound);
+        randomDifference = game.differences[randomIndex];
+        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
 
         await this.blinkQuadrant(canvasContext.context, {x: randomVector.x, y: randomVector.y, width: 20, height: 20});
 
