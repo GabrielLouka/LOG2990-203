@@ -112,9 +112,9 @@ export class ReplayModeService {
     }
 
     stopAllPlayingActions() {
-        // this.recordedActions.forEach((action) => {
-        //     action.stop(); // cancel it if it was already started
-        // });
+        this.recordedActions.forEach((action) => {
+            action.stop(); // cancel it if it was already started
+        });
         DelayedMethod.killAll();
     }
 
