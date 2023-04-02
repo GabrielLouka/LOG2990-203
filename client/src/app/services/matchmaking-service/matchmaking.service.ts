@@ -70,13 +70,19 @@ export class MatchmakingService {
         return this.currentMatch?.player1?.playerId;
     }
 
-    set currentMatchType(matchType: MatchType) {
+    set currentMatchGame(match: Match) {
+        this.currentMatch = match;
+    }
+
+    // This is NOT supposed to be a setter because it communicates with the server!
+    // :)
+    setCurrentMatchType(matchType: MatchType) {
         const matchId = this.currentSocketId;
 
         this.socketService.send<{ matchId: string; matchType: MatchType }>('setMatchType', { matchId, matchType });
     }
 
-    set currentMatchPlayer(playerName: string) {
+    setCurrentMatchPlayer(playerName: string) {
         if (!this.currentMatch) throw new Error('currentMatch is null');
 
         const matchId = this.currentMatch.matchId;
@@ -86,9 +92,6 @@ export class MatchmakingService {
             matchId,
             player,
         });
-    }
-    set currentMatchGame(match: Match) {
-        this.currentMatch = match;
     }
 
     isMatchAborted(match: Match): boolean {

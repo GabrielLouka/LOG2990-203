@@ -27,7 +27,7 @@ export class OverlayComponent {
 
     requestGameCreationToServer(matchType: MatchType): void {
         this.matchmakingService.createGame(this.id);
-        this.matchmakingService.currentMatchType = matchType;
+        this.matchmakingService.setCurrentMatchType(matchType);
     }
 
     createOneVersusOneGame(): void {

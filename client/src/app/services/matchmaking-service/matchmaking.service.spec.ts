@@ -191,12 +191,12 @@ describe('MatchmakingService', () => {
 
     it('should return true when is solo mode', () => {
         matchmakingService.createGame(gameId);
-        matchmakingService.currentMatchType = MatchType.Solo;
-        expect(matchmakingService.is1vs1Mode).toEqual(false);
+        matchmakingService.setCurrentMatchType(MatchType.Solo);
+        expect(matchmakingService.isOneVersusOne).toEqual(false);
     });
 
     it('should return the player 2 username', () => {
-        expect(matchmakingService.is1vs1Mode).toEqual(false);
+        expect(matchmakingService.isOneVersusOne).toEqual(false);
     });
 
     it('should handle when all games are deleted ', () => {

@@ -124,7 +124,7 @@ describe('RegistrationPageComponent', () => {
         component.username = 'naruto';
         authService.registerUser.and.callThrough();
         component.registerUser();
-        matchmakingService.currentMatchType = MatchType.Solo;
+        matchmakingService.setCurrentMatchType(MatchType.Solo);
         expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
     });
 
