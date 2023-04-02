@@ -6,8 +6,8 @@
     <div class="flex-row center header">
         <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
-        <app-hint></app-hint>
-        <app-hint *ngIf="isOneVersusOne"></app-hint>
+        <app-hint (click)="handleHintMode()"></app-hint>
+        <app-hint #hintElement *ngIf="isOneVersusOne"></app-hint>
     </div>
 
     <div class="flex-column center">
@@ -29,6 +29,7 @@
             </div>
             <div class="timer-container">
                 <app-timer #timerElement [timeInSeconds]="timeInSeconds"></app-timer>
+                <div #penalty class="penalty-message">Penalité : +10s</div>
             </div>
         </div>
 

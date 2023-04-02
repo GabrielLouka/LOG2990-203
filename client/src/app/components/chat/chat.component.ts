@@ -33,6 +33,6 @@ export class ChatComponent {
     }
 
     sendSystemMessage(message: string) {
-        this.chatService.sendMessageFromSystem({ message, chat: this.chat, newMessage: this.newMessage }, this.messages);
+        this.chatService.sendMessageFromSystem({ message: message, chat: this.chat, newMessage: this.newMessage }, this.messages);
     }
 }

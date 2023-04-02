@@ -478,7 +478,7 @@ describe('ClassicPageComponent', () => {
             key: 't',
         });
         document.dispatchEvent(event);
-        component.onCheatMode(event);
+        component.handleEvents(event);
     });
     it('should start the cheatmode', () => {
         const event = new KeyboardEvent('keydown', {
@@ -487,8 +487,8 @@ describe('ClassicPageComponent', () => {
             key: 't',
         });
         document.dispatchEvent(event);
-        component.onCheatMode(event);
-        component.onCheatMode(event);
+        component.handleEvents(event);
+        component.handleEvents(event);
     });
     it('should call getInitialImagesFromServer() when both canvas contexts are defined', () => {
         const spy = spyOn(component, 'getInitialImagesFromServer');

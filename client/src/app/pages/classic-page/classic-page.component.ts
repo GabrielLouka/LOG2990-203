@@ -3,11 +3,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { HintComponent } from '@app/components/hint/hint.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { HintService } from '@app/services/hint-service/hint.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
@@ -28,8 +30,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('modifiedImage', { static: true }) rightCanvas: ElementRef<HTMLCanvasElement>;
     @ViewChild('chat') chat: ChatComponent;
     @ViewChild('timerElement') timerElement: TimerComponent;
+    @ViewChild('hintElement') hintElement: HintComponent;
     @ViewChild('popUpElement') popUpElement: PopUpComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
+    @ViewChild('penalty') penaltyMessage: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
@@ -40,6 +44,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     backgroundColor = '';
     intervalIDLeft: number | undefined;
     intervalIDRight: number | undefined;
+    numberOfHints: number;
     timeInSeconds: number;
     matchId: string;
     currentGameId: string | null;
@@ -65,6 +70,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private matchmakingService: MatchmakingService,
         private cheatModeService: CheatModeService,
         private chatService: ChatService,
+        private hintService: HintService
     ) {}
 
     get leftCanvasContext() {
@@ -96,7 +102,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
-        window.addEventListener('keydown', this.onCheatMode.bind(this));
+        window.addEventListener('keydown', this.handleEvents.bind(this));        
     }
 
     sendSystemMessageToChat(message: string) {
@@ -144,7 +150,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.getInitialImagesFromServer();
         }
         this.cheatModeService.focusKeyEvent(this.cheat);
-        window.removeEventListener('keydown', this.onCheatMode.bind(this));
+        window.removeEventListener('keydown', this.handleEvents.bind(this));        
     }
 
     getInitialImagesFromServer() {
@@ -329,7 +335,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode);
     }
 
-    onCheatMode(event: KeyboardEvent) {
+    handleEvents(event: KeyboardEvent) {
         if (this.matchmakingService.isSoloMode || (this.chat && document.activeElement !== this.chat.input.nativeElement)) {
             if (event.key === 't') {
                 if (this.letterTPressed) {
@@ -340,7 +346,20 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
+            // if (event.key === 'i'){ 
+            //     this.handleHintMode();
+            // }
         }
+    }
+    
+    handleHintMode(){
+        if (this.hintService.maxGivenHints !== 0) {
+            this.hintService.showHint(this.rightCanvas, 
+                this.rightCanvasContext as CanvasRenderingContext2D, this.currentModifiedImage, this.game.modifiedImage, 
+                {gameData: this.game.gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences});
+            this.hintService.decrement();    
+            this.timeInSeconds = this.hintService.handleHint(this.chat, this.timeInSeconds);
+            this.hintService.showMessage(this.penaltyMessage);}
     }
 
     cheatMode() {
