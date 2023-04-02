@@ -100,7 +100,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     get currentMatchType() {
-        return this.matchmakingService.currentMatchType;
+        return this.matchmakingService.currentMatchPlayed?.matchType;
     }
 
     get isPlayer1() {
@@ -137,11 +137,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.replayModeService.stopAllPlayingActions();
         if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode)
             this.historyService.addGameHistory(this.createHistoryData(this.player1, this.isWinByDefault));
         else if (this.matchmakingService.isSoloMode) this.historyService.addGameHistory(this.createHistoryData(this.player1, !this.isWinByDefault));
         this.socketService.disconnect();
-        this.replayModeService.stopAllPlayingActions();
     }
 
     async playSound(isSuccessSound: boolean) {
@@ -211,8 +211,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.canvasIsClickable = true;
                     this.startingTime = new Date();
 
-                    this.timerService.start();
-                    this.timerService.handleTickingTime(this.timerElement.minute, this.timerElement.second);
+                    // this.timerService.start();
+                    // this.timerService.handleTickingTime(this.timerElement.minute, this.timerElement.second);
+                    this.startTimer();
                     this.replayModeService.startRecording();
                     this.gameTitle = this.game.gameData.name;
                 }

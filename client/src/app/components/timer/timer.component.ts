@@ -1,6 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
-import { TimerService } from '@app/services/timer-service/timer.service';
 import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 
 @Component({
@@ -15,11 +14,10 @@ export class TimerComponent implements OnDestroy {
     intervalId: number;
     loopingMethod: DelayedMethod;
 
-    constructor(private readonly timerService: TimerService) {}
-    // shouldStop = true;
+    // constructor(private readonly timerService: TimerService) {}
 
-    get minutes(): number {
-        return this.timerService.currentMinutes;
+    get minutes() {
+        return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
     }
 
     get seconds() {
@@ -29,14 +27,6 @@ export class TimerComponent implements OnDestroy {
     getTime(): string {
         return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
     }
-
-    // ngAfterViewInit() {
-    //     this.intervalId = window.setInterval(() => {
-    //         if (this.timeInSeconds >= 0) {
-    //             this.ticToc();
-    //         }
-    //     }, MILLISECOND_TO_SECONDS);
-    // }
 
     // ngOnDestroy() {
     //     window.clearInterval(this.intervalId);
@@ -50,11 +40,11 @@ export class TimerComponent implements OnDestroy {
         window.clearInterval(this.intervalId);
     }
 
-    // ticToc() {
-    //     if (!this.shouldStop) this.timeInSeconds++;
-    //     this.minute.nativeElement.innerText = this.displayTimeValue(this.minutes);
-    //     this.second.nativeElement.innerText = this.displayTimeValue(this.seconds);
-    // }
+    ticToc() {
+        this.timeInSeconds++;
+        this.minute.nativeElement.innerText = this.displayTimeValue(this.minutes);
+        this.second.nativeElement.innerText = this.displayTimeValue(this.seconds);
+    }
 
     // stopTimer() {
     //     this.shouldStop = true;
@@ -83,7 +73,7 @@ export class TimerComponent implements OnDestroy {
         this.loopingMethod = new DelayedMethod(
             () => {
                 if (this.timeInSeconds >= 0) {
-                    this.timerService.ticToc(this.minute, this.second);
+                    this.ticToc();
                 }
             },
             MILLISECOND_TO_SECONDS,
@@ -93,12 +83,10 @@ export class TimerComponent implements OnDestroy {
     }
 
     pauseTimer() {
-        // this.shouldStop = true;
         this.loopingMethod.pause();
     }
 
     resumeTimer() {
-        // this.shouldStop = false;
         this.loopingMethod.resume();
     }
 }

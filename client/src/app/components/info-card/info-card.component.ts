@@ -17,19 +17,19 @@ export class InfoCardComponent {
     get matchTypeToString(): string {
         switch (this.matchType) {
             case MatchType.Solo: {
-                return 'Classique solo';
+                return 'Classique Solo';
             }
             case MatchType.OneVersusOne: {
-                return 'Classique une contre une';
+                return 'Classique 1v1';
             }
             case MatchType.LimitedCoop: {
-                return 'Limité corporatif';
+                return 'Temps Limité coop';
             }
             case MatchType.LimitedVersus: {
-                return 'Limité une contre un';
+                return 'Temps Limité 1v1';
             }
             default: {
-                return 'Indéterminé';
+                return 'sus';
             }
         }
     }
