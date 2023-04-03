@@ -42,7 +42,7 @@
                 ></app-timer>
             </div>
         </div>
-
+        <app-info-card class="info-card" *ngIf="games" [isEasy]="false" [matchType]="this.currentMatchType"></app-info-card>
         <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': this.canvasHandlingService.backgroundColor }" class="cheat-mode">
             Mode triche
         </div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
 import { GamesService } from '@app/services/games-service/games.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
@@ -8,7 +8,7 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
     templateUrl: './games-display.component.html',
     styleUrls: ['./games-display.component.scss'],
 })
-export class GamesDisplayComponent implements OnInit {
+export class GamesDisplayComponent implements OnInit, OnDestroy {
     @Input() isSelection: boolean;
     @ViewChild('deletePopUpElement') deletePopUpElement: DeleteGamesPopUpComponent;
     @ViewChild('resetPopUpElement') resetPopUpElement: DeleteGamesPopUpComponent;
@@ -29,6 +29,12 @@ export class GamesDisplayComponent implements OnInit {
         this.gamesService.fetchGameDataFromServer(this.gamesService.currentPageNumber);
         this.matchmakingService.connectSocket();
         this.addServerSocketMessagesListeners();
+    }
+
+    ngOnDestroy() {
+        this.gamesService.currentPageNumber = 0;
+        this.gamesService.showNextButton = false;
+        this.gamesService.showPreviousButton = false;
     }
 
     addServerSocketMessagesListeners() {
