@@ -1,5 +1,5 @@
 export interface HistoryData {
-    startingTime: Date;
+    startingTime: string |null;
     duration: string;
     gameMode: string;
     player1: string;

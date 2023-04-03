@@ -96,7 +96,7 @@
                 <div class="flex-row center history-card space-around" *ngFor="let history of this.historyService.history">
                     <div class="flex-column center game-mode">
                         <b>{{ history.gameMode }}</b>
-                        <div>{{ history.startingTime | date: 'dd.mm.yyyy - HH:mm' }}</div>
+                        <div>{{ history.startingTime }}</div>
                     </div>
                     <div class="divider"></div>
                     <div class="flex-row center">
