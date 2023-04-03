@@ -23,7 +23,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { Observable, catchError, map, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -207,7 +207,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.visibleTimer = this.timerElement;
         window.removeEventListener('keydown', this.handleEvents.bind(this));
     }
-
 
     async getInitialImagesFromServer() {
         if (this.currentGameIndex === 0) {
@@ -396,7 +395,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             }
         }
         if (isPlayer1 === this.matchmakingService.isPlayer1) this.showErrorText();
-        this.showErrorText();
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.sendSystemMessageToChat(message);
     }
