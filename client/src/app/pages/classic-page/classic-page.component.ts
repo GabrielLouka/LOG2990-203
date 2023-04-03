@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 /* eslint-disable max-lines */
-import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
@@ -9,8 +8,8 @@ import { HintComponent } from '@app/components/hint/hint.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
-import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { CanvasHandlingService } from '@app/services/gameplay-service/canvas-handling.service';
 import { HintService } from '@app/services/hint-service/hint.service';
 import { HistoryService } from '@app/services/history-service/history.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -23,8 +22,9 @@ import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
-import { CANVAS_HEIGHT, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
+import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -46,19 +46,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isWinByDefault: boolean = true;
     foundDifferences: boolean[];
     letterTPressed: boolean = true;
-    isCheating: boolean = false;
-    backgroundColor = '';
-    intervalIDLeft: number | undefined;
-    intervalIDRight: number | undefined;
-    matchId: string;
     currentGameId: string | null;
-    game: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer };
-    originalImage: File | null;
-    modifiedImage: File | null;
     gameTitle: string = '';
     player1: string = '';
     player2: string = '';
-    currentModifiedImage: Buffer;
     totalDifferences: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
@@ -70,15 +61,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     hasAlreadyReceiveMatchData: boolean = false;
     newRanking: { name: string; score: number };
 
+    games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
+    currentGameIndex: number = 0;
+    canvasHandlingService: CanvasHandlingService;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
         public replayModeService: ReplayModeService,
         private route: ActivatedRoute,
-        private imageManipulationService: ImageManipulationService,
         private matchmakingService: MatchmakingService,
-        private cheatModeService: CheatModeService,
         private chatService: ChatService,
         private hintService: HintService,
         private historyService: HistoryService,
@@ -95,16 +87,27 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.rightCanvas.nativeElement.getContext('2d');
     }
 
+    get isSolo() {
+        return this.matchmakingService.isSoloMode;
+    }
     get isOneVersusOne() {
         return this.matchmakingService.isOneVersusOne;
     }
-
+    get isLimitedTimeSolo() {
+        return this.matchmakingService.isLimitedTimeSolo;
+    }
     get currentMatchType() {
         return this.matchmakingService.currentMatchPlayed?.matchType;
     }
 
     get isPlayer1() {
         return this.matchmakingService.isPlayer1;
+    }
+    get isCoop() {
+        return this.matchmakingService.isCoopMode;
+    }
+    get isCheating() {
+        return this.canvasHandlingService.isCheating;
     }
 
     getPlayerUsername(isPlayer1: boolean): string {
@@ -124,12 +127,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.currentGameId = this.route.snapshot.paramMap.get('id');
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
-        window.addEventListener('keydown', this.handleEvents.bind(this));
-
+        this.canvasHandlingService = new CanvasHandlingService(this.leftCanvas, this.rightCanvas, new ImageManipulationService());
         // Replay Mode Initialization
         this.replayModeService.onStartReplayMode.add(this.resetGame.bind(this));
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
         DelayedMethod.speed = 1;
+
+        console.log(this.currentGameId);
+        console.log(this.matchmakingService.currentMatchId);
+        window.addEventListener('keydown', this.handleEvents.bind(this));
     }
 
     sendSystemMessageToChat(message: string) {
@@ -159,16 +165,23 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.player2 = this.matchmakingService.player2Username;
         }
         if (match) {
-            this.matchId = this.matchmakingService.currentMatchId as string;
             this.onReceiveMatchData();
-            const abortedGameMessage = ' a abandonné la partie';
-
-            if (this.isPlayer2Win(match)) {
-                this.sendSystemMessageToChat(this.player1.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
-            } else if (this.isPlayer1Win(match)) {
-                this.sendSystemMessageToChat(this.player2.toUpperCase() + abortedGameMessage);
-                this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
+            if (this.isSolo || this.isOneVersusOne) {
+                if (this.isPlayer2Win(match)) {
+                    this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
+                    this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
+                } else if (this.isPlayer1Win(match)) {
+                    this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
+                    this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
+                }
+            } else {
+                if ((this.isPlayer2Win(match) || this.isPlayer1Win(match)) && this.isCoop) {
+                    this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
+                    this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+                } else if (this.isPlayer1Win(match)) {
+                    this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
+                    this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+                }
             }
         }
     }
@@ -190,58 +203,80 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (leftCanvasContext && rightCanvasContext) {
             this.getInitialImagesFromServer();
         }
-        this.cheatModeService.focusKeyEvent(this.cheat);
-        window.removeEventListener('keydown', this.handleEvents.bind(this));
+        this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
+        window.removeEventListener('keydown', this.handleEvents.bind(this));
     }
 
-    getInitialImagesFromServer() {
-        const gameId: string = this.currentGameId ? this.currentGameId : '0';
-        const routeToSend = '/games/fetchGame/' + gameId;
+    async getInitialImagesFromServer() {
+        if (this.currentGameIndex === 0) {
+            this.fetchGames().subscribe(async (games) => {
+                if (games) {
+                    this.games = games;
+                }
+                await this.canvasHandlingService.updateCanvas(
+                    this.games[this.currentGameIndex].originalImage,
+                    this.games[this.currentGameIndex].modifiedImage,
+                );
+                await this.updateGameInfo();
+            });
+        } else {
+            await this.canvasHandlingService.updateCanvas(
+                this.games[this.currentGameIndex].originalImage,
+                this.games[this.currentGameIndex].modifiedImage,
+            );
+            await this.updateGameInfo();
+        }
+    }
 
-        this.communicationService.get(routeToSend).subscribe({
-            next: (response) => {
+    fetchGames(): Observable<
+        | {
+              gameData: GameData;
+              originalImage: Buffer;
+              modifiedImage: Buffer;
+          }[]
+        | null
+    > {
+        const gameId: string = this.currentGameId ? this.currentGameId : '0';
+        const routeToSend = this.currentGameId !== '-1' ? '/games/fetchGame/' + gameId : '/games/fetchAllGames';
+
+        return this.communicationService.get(routeToSend).pipe(
+            map((response) => {
                 if (response.body) {
                     const serverResult = JSON.parse(response.body);
-                    this.game = serverResult;
-                    const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
-                    const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
-                    this.loadImagesToCanvas(img1Source, img2Source);
-                    this.requestStartGame();
-                    this.canvasIsClickable = true;
-                    this.startingTime = new Date();
-
-                    // this.timerService.start();
-                    // this.timerService.handleTickingTime(this.timerElement.minute, this.timerElement.second);
-                    this.startTimer();
-                    this.replayModeService.startRecording();
-                    this.gameTitle = this.game.gameData.name;
+                    this.games = serverResult;
+                    return this.games;
+                } else {
+                    return null;
                 }
-            },
-            error: (err: HttpErrorResponse) => {
+            }),
+            catchError((err) => {
                 const responseString = `Server Error : ${err.message}`;
                 alert(responseString);
-            },
-        });
+                return of(null);
+            }),
+        );
     }
 
-    loadImagesToCanvas(imgSource1: string, imgSource2: string) {
-        const leftCanvasContext = this.leftCanvasContext;
-        const rightCanvasContext = this.rightCanvasContext;
-        if (leftCanvasContext && rightCanvasContext) {
-            this.imageManipulationService.loadCanvasImages(imgSource1, leftCanvasContext);
-            this.imageManipulationService.loadCanvasImages(imgSource2, rightCanvasContext);
+    updateGameInfo() {
+        this.foundDifferences = new Array(this.games[this.currentGameIndex].gameData.nbrDifferences).fill(false);
+        if (this.currentGameId !== '-1') {
+            this.totalDifferences = this.games[this.currentGameIndex].gameData.nbrDifferences;
+            this.minDifferences = Math.ceil(this.totalDifferences / 2);
         }
-        this.foundDifferences = new Array(this.game.gameData.nbrDifferences).fill(false);
-        this.totalDifferences = this.game.gameData.nbrDifferences;
-        this.minDifferences = Math.ceil(this.totalDifferences / 2);
+        this.requestStartGame();
+        this.canvasIsClickable = true;
+        if (this.currentGameIndex === 0) {
+            this.startTimer();
+            this.replayModeService.startRecording();
+        }
+        this.gameTitle = this.games[this.currentGameIndex].gameData.name;
     }
 
     startTimer() {
         this.timerElement.resetTimer();
         this.timerElement.startTimer();
     }
-
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
         console.log('attempt at clicking', coordinateClick);
@@ -253,7 +288,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             });
             console.log('click');
             this.refreshErrorMessagePosition(event.clientX, event.clientY);
-            this.cheatModeService.focusKeyEvent(this.cheat);
+            this.canvasHandlingService.focusKeyEvent(this.cheat);
         } else {
             console.log('canvas is not clickable');
         }
@@ -269,7 +304,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     requestStartGame() {
-        this.socketService.send('registerGameData', { gameData: this.game.gameData });
+        this.socketService.send('registerGameData', { gameData: this.games[this.currentGameIndex].gameData });
     }
 
     addServerSocketMessagesListeners() {
@@ -279,28 +314,31 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             'validationReturned',
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
                 if (data.isValidated) {
-                    let message = 'Différence trouvée';
-
-                    if (data.isPlayer1) {
-                        // this.differencesFound1++;
-                        if (this.isOneVersusOne) {
-                            message += ' par ' + this.player1.toUpperCase();
-                        }
-                    } else {
-                        message += ' par ' + this.player2.toUpperCase();
-                        // this.differencesFound2++;
-                    }
-                    this.increasePlayerScore(data.isPlayer1);
+                    const message = 'Différence trouvée par ' + this.getPlayerUsername(data.isPlayer1).toUpperCase();
                     this.sendSystemMessageToChat(message);
-                    // this.foundDifferences = data.foundDifferences;
-                    // this.onFindDifference();
+                    this.increasePlayerScore(data.isPlayer1);
                     this.refreshFoundDifferences(data.foundDifferences);
+                    // this.onFindDifference();
 
-                    if (this.isOneVersusOne) {
+                    if (this.matchmakingService.isLimitedTimeSolo || this.matchmakingService.isCoopMode) {
+                        if (this.currentGameIndex === this.games.length - 1) {
+                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
+                        } else {
+                            this.currentGameIndex++;
+                            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+                            this.timerElement.timeInSeconds = Math.min(LIMITED_TIME_DURATION, this.timerElement.timeInSeconds + 20);
+                            if (this.isCheating) {
+                                this.stopCheating();
+                                this.foundDifferences = new Array(this.games[this.currentGameIndex].gameData.nbrDifferences).fill(false);
+                                this.startCheating();
+                            }
+                            this.getInitialImagesFromServer();
+                        }
+                    } else if (this.matchmakingService.isOneVersusOne) {
                         if (this.differencesFound1 >= this.minDifferences) {
                             this.onWinGame(this.player2, !this.isWinByDefault);
                         } else if (this.differencesFound2 >= this.minDifferences) this.onWinGame(this.player2, !this.isWinByDefault);
-                    } else if (!this.isOneVersusOne) {
+                    } else if (this.isSolo) {
                         if (this.differencesFound1 >= this.totalDifferences) {
                             this.onWinGame(this.player1, !this.isWinByDefault);
                         }
@@ -352,14 +390,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         let message = 'Erreur';
 
         if (!this.matchmakingService.isSoloMode) {
-            if (isPlayer1) {
-                message += ' par ' + this.matchmakingService.player1Username.toUpperCase();
-            } else {
-                message += ' par ' + this.matchmakingService.player2Username.toUpperCase();
-            }
+            message += ' par ' + this.getPlayerUsername(isPlayer1).toUpperCase();
         }
         if (isPlayer1 === this.matchmakingService.isPlayer1) this.showErrorText();
-        this.cheatModeService.focusKeyEvent(this.cheat);
+        this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.sendSystemMessageToChat(message);
     }
 
@@ -370,11 +404,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.rightCanvas.nativeElement.style.pointerEvents = 'none';
             this.playSound(false);
 
-            // setTimeout(() => {
-            //     this.errorMessage.nativeElement.style.display = 'none';
-            //     this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
-            //     this.rightCanvas.nativeElement.style.pointerEvents = 'auto';
-            // }, MILLISECOND_TO_SECONDS);
             const delayedHideError = new DelayedMethod(() => {
                 this.errorMessage.nativeElement.style.display = 'none';
                 this.leftCanvas.nativeElement.style.pointerEvents = 'auto';
@@ -388,33 +417,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onFindDifference() {
         this.playSound(true);
-        this.refreshModifiedImage();
+        if (this.currentGameId !== '-1') {
+            this.canvasHandlingService.refreshModifiedImage(this.games[this.currentGameIndex].gameData, this.foundDifferences);
+        }
         if (this.isCheating) {
             this.stopCheating();
             this.startCheating();
         }
-        this.cheatModeService.focusKeyEvent(this.cheat);
-    }
-
-    async refreshModifiedImage() {
-        const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
-            this.game.gameData,
-            { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
-            this.foundDifferences,
-        );
-
-        if (this.rightCanvasContext) {
-            await this.imageManipulationService.blinkDifference(
-                this.currentModifiedImage ? this.currentModifiedImage : this.game.modifiedImage,
-                newImage,
-                this.rightCanvasContext,
-            );
-            this.currentModifiedImage = newImage;
-        }
+        this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
 
     gameOver(isWinByDefault: boolean) {
         this.timerElement.pauseTimer();
+        this.socketService.disconnect();
         this.replayModeService.stopRecording();
         if (!isWinByDefault) {
             // this.sendNewTimeScoreToServer();
@@ -425,7 +440,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     sendNewTimeScoreToServer() {
         this.socketService.send('gameOver', {
-            gameId: this.game.gameData.id.toString(),
+            gameId: this.games[this.currentGameIndex].gameData.id.toString(),
             isOneVersusOne: this.isOneVersusOne,
             ranking: {
                 name: this.newRanking.name,
@@ -470,21 +485,30 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleEvents(event: KeyboardEvent) {
-        if (this.matchmakingService.isSoloMode || (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)) {
+        if (
+            this.matchmakingService.isSoloMode ||
+            this.matchmakingService.isLimitedTimeSolo ||
+            this.matchmakingService.isOneVersusOne ||
+            this.isCoop ||
+            (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
+        ) {
             if (this.replayModeService.shouldShowReplayModeGUI) return;
             if (event.key === 't') {
                 if (this.letterTPressed) {
                     this.startCheating();
                 } else {
                     this.stopCheating();
-                    // this.putCanvasIntoInitialState();
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
-            // if (event.key === 'i'){
-            //     this.handleHintMode();
-            // }
+            if (event.key === 'i') {
+                this.handleHintMode();
+            }
         }
+    }
+    onWinGameLimited(winningPlayer1: string, winningPlayer2: string, isWinByDefault: boolean) {
+        this.gameOver(isWinByDefault);
+        this.popUpElement.showGameOverPopUpLimited(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
     }
 
     handleHintMode() {
@@ -492,9 +516,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.hintService.showHint(
                 this.rightCanvas,
                 this.rightCanvasContext as CanvasRenderingContext2D,
-                this.currentModifiedImage,
-                this.game.modifiedImage,
-                { gameData: this.game.gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences },
+                this.canvasHandlingService.currentModifiedImage,
+                this.games[this.currentGameIndex].modifiedImage,
+                { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences },
             );
             this.hintService.decrement();
             this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds);
@@ -505,14 +529,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     startCheating() {
         const startCheatingMethod = () => {
-            this.backgroundColor = '#66FF99';
-            const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(
-                this.game.gameData,
-                { originalImage: this.game.originalImage, modifiedImage: this.game.modifiedImage },
+            this.canvasHandlingService.initializeCheatMode(
+                this.games[this.currentGameIndex].gameData,
+                {
+                    originalImage: this.games[this.currentGameIndex].originalImage,
+                    modifiedImage: this.games[this.currentGameIndex].modifiedImage,
+                },
                 this.foundDifferences,
             );
-            this.showHiddenDifferences(newImage);
-            this.isCheating = !this.isCheating;
         };
         startCheatingMethod();
         this.replayModeService.addMethodToReplay(startCheatingMethod);
@@ -520,46 +544,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     stopCheating() {
         const stopCheatingMethod = () => {
-            this.backgroundColor = '';
-            this.cheatModeService.stopCheating(this.intervalIDLeft as number, this.intervalIDRight as number);
-            this.isCheating = !this.isCheating;
-
-            this.putCanvasIntoInitialState();
+            this.canvasHandlingService.stopCheating();
         };
         stopCheatingMethod();
         this.replayModeService.addMethodToReplay(stopCheatingMethod);
     }
 
-    showHiddenDifferences(newImage: Buffer) {
-        if (this.leftCanvasContext && this.rightCanvasContext) {
-            this.intervalIDLeft = this.cheatModeService.startInterval(
-                { originalImage: this.game.originalImage, newImage },
-                this.leftCanvasContext as CanvasRenderingContext2D,
-            );
-
-            this.intervalIDRight = this.cheatModeService.startInterval(
-                { originalImage: this.game.originalImage, newImage },
-                this.rightCanvasContext as CanvasRenderingContext2D,
-            );
-            this.currentModifiedImage = newImage;
-        }
-    }
-
-    putCanvasIntoInitialState() {
-        this.cheatModeService.putCanvasIntoInitialState(
-            { originalImage: this.game.originalImage, currentModifiedImage: this.currentModifiedImage },
-            { leftContext: this.leftCanvasContext as CanvasRenderingContext2D, rightContext: this.rightCanvasContext as CanvasRenderingContext2D },
-        );
-    }
-
     resetGame() {
         this.foundDifferences = [];
-        this.currentModifiedImage = Buffer.from(this.game.modifiedImage);
-        const img1Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.originalImage);
-        const img2Source = this.imageManipulationService.getImageSourceFromBuffer(this.game.modifiedImage);
-        this.loadImagesToCanvas(img1Source, img2Source);
+        this.canvasHandlingService.stopCheating();
+        this.canvasHandlingService.currentModifiedImage = Buffer.from(this.games[this.currentGameIndex].modifiedImage);
+        this.canvasHandlingService.updateCanvas(this.games[this.currentGameIndex].originalImage, this.games[this.currentGameIndex].modifiedImage);
         this.stopCheating();
-        this.isCheating = false;
+        this.canvasHandlingService.isCheating = false;
         this.chat.resetChat();
         this.differencesFound1 = 0;
         this.differencesFound2 = 0;

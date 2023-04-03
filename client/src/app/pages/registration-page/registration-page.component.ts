@@ -7,6 +7,8 @@ import { MatchmakingService } from '@app/services/matchmaking-service/matchmakin
 import { RegistrationService } from '@app/services/registration-service/registration.service';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
+import { MatchType } from '@common/enums/match-type';
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-registration-page',
@@ -19,11 +21,13 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     // used to determine if we should display the username field in the html page
     hasUsernameRegistered: boolean = false;
     hasSentJoinRequest: boolean;
-
+    coopMatchToJoinIfAvailable: string = '';
     registrationForm = new FormGroup({
         username: new FormControl('', Validators.compose([Validators.required, Validators.pattern('^[a-zA-Z0-9]{3,15}$')])),
     });
-
+    limitedTimeMatchId: string | null;
+    showButtons: boolean = true;
+    myObservable = new BehaviorSubject<string>('');
     // eslint-disable-next-line max-params
     constructor(
         private auth: AuthService,
@@ -46,7 +50,14 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        // this.myObservable.subscribe({
+        //     next: (value: string) => (this.limitedTimeMatchId = value),
+        // });
         this.id = this.route.snapshot.paramMap.get('id');
+        if (this.id === '-1') {
+            this.matchmakingService.connectSocket();
+        }
+        this.addServerSocketMessagesListeners();
         this.matchmakingService.onGetJoinRequestAnswer.add(this.handleIncomingPlayerJoinRequestAnswer.bind(this));
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdated.bind(this));
         this.matchmakingService.onGetJoinRequest.add(this.incomingPlayerService.handleIncomingPlayerJoinRequest.bind(this.incomingPlayerService));
@@ -56,7 +67,12 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchmakingService.onResetAllGames.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
         this.matchmakingService.onResetSingleGame.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
     }
-
+    createSoloLimitedTimeGame() {
+        this.matchmakingService.createGame('-1');
+        this.matchmakingService.setCurrentMatchType(MatchType.LimitedSolo);
+        this.matchmakingService.setCurrentMatchPlayer(this.username as string);
+        this.registrationService.loadGamePage(this.id);
+    }
     ngOnDestroy(): void {
         if (this.username && this.hasSentJoinRequest) this.matchmakingService.sendMatchJoinCancel(this.username);
 
@@ -76,23 +92,67 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.registrationService.loadGamePage(this.id);
     }
 
+    createCoopGame() {
+        if (!this.limitedTimeMatchId) {
+            this.matchmakingService.createGame('-1');
+            this.matchmakingService.setCurrentMatchType(MatchType.LimitedCoop);
+            this.matchmakingService.setCurrentMatchPlayer(this.username as string);
+            this.limitedTimeMatchId = this.matchmakingService.currentMatchId;
+            this.myObservable.next(this.limitedTimeMatchId);
+            this.showButtons = false;
+            this.incomingPlayerService.updateWaitingForIncomingPlayerMessage();
+            // this.myObservable.next(this.limitedTimeMatchId);
+        }
+    }
+    addServerSocketMessagesListeners() {
+        this.matchmakingService.socketClientService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
+            if (data.gameId.toString() === '-1') {
+                this.limitedTimeMatchId = data.matchToJoinIfAvailable as string;
+                console.log('update match id to join in limited time to ', data.matchToJoinIfAvailable as string);
+            } else {
+                console.log('not our game id ', data.matchToJoinIfAvailable as string);
+            }
+            console.log('gameProgressUpdate registration page ', data);
+        });
+
+        this.matchmakingService.socketClientService.socket.emit('requestRefreshGameMatchProgress', { gameId: -1 });
+    }
+    joinLimitedTimeGame() {
+        if (!this.limitedTimeMatchId) return;
+        this.showButtons = false;
+        this.incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage();
+        this.matchmakingService.joinGame(this.limitedTimeMatchId, this.id as string);
+        this.limitedTimeMatchId = null;
+        if (this.username) {
+            this.matchmakingService.sendMatchJoinRequest(this.username);
+        }
+    }
+
     registerUser() {
         this.auth.registerUser(this.registrationForm.value.username as string);
         this.username = this.registrationForm.value.username;
         this.hasUsernameRegistered = true;
-
         if (this.matchmakingService.currentMatchPlayed) {
-            if (this.username && (this.matchmakingService.isOneVersusOne || this.matchmakingService.isSoloMode)) {
+            if (
+                this.username &&
+                (this.matchmakingService.isOneVersusOne || this.matchmakingService.isSoloMode || this.matchmakingService.isCoopMode)
+            ) {
                 this.matchmakingService.setCurrentMatchPlayer(this.username);
             }
 
             if (this.matchmakingService.isSoloMode) {
                 this.loadGamePage();
             } else {
-                this.incomingPlayerService.updateWaitingForIncomingPlayerMessage();
+                if (this.id !== '-1') {
+                    this.incomingPlayerService.updateWaitingForIncomingPlayerMessage();
+                }
             }
         } else {
-            this.sendMatchJoinRequest();
+            if (this.id !== '-1') {
+                this.sendMatchJoinRequest();
+            } else {
+                this.incomingPlayerService.updateLimitedTimeNameEntered();
+            }
         }
     }
 

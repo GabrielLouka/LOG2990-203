@@ -9,7 +9,6 @@ import { MatchType } from '@common/enums/match-type';
 export class InfoCardComponent {
     @Input() isEasy: boolean;
     @Input() matchType: MatchType | undefined;
-
     get difficulty() {
         return this.isEasy ? 'Facile' : 'Difficile';
     }
@@ -23,14 +22,25 @@ export class InfoCardComponent {
                 return 'Classique 1v1';
             }
             case MatchType.LimitedCoop: {
-                return 'Temps Limité coop';
+                return 'Temps Limité Coop';
             }
-            case MatchType.LimitedVersus: {
-                return 'Temps Limité 1v1';
+            case MatchType.LimitedSolo: {
+                return 'Temps Limité Solo';
             }
             default: {
                 return 'sus';
             }
         }
+    }
+
+    get isClassicMode() {
+        return this.matchType === MatchType.Solo || this.matchType === MatchType.LimitedSolo;
+    }
+    get is1v1() {
+        return this.matchType === MatchType.OneVersusOne;
+    }
+    get matchMode() {
+        if (this.isClassicMode) return 'Classique';
+        return 'Temps limité';
     }
 }

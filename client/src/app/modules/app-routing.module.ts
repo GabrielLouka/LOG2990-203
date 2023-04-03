@@ -7,7 +7,6 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { ParameterPageComponent } from '@app/pages/parameter-page/parameter-page.component';
 import { RegistrationPageComponent } from '@app/pages/registration-page/registration-page.component';
 import { SelectionsPageComponent } from '@app/pages/selections-page/selections-page.component';
-
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
     { path: 'home', component: MainPageComponent },
