@@ -95,28 +95,31 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     createCoopGame() {
         if (!this.limitedTimeMatchId) {
             this.matchmakingService.createGame('-1');
+            this.matchmakingService.setCurrentMatchType(MatchType.LimitedCoop);
             this.matchmakingService.setCurrentMatchPlayer(this.username as string);
             this.limitedTimeMatchId = this.matchmakingService.currentMatchId;
             this.myObservable.next(this.limitedTimeMatchId);
             this.showButtons = false;
-            this.matchmakingService.setCurrentMatchType(MatchType.LimitedCoop);
             this.incomingPlayerService.updateWaitingForIncomingPlayerMessage();
             // this.myObservable.next(this.limitedTimeMatchId);
-            this.matchmakingService.socketClientService.socket.emit('chargementDuJeu', this.limitedTimeMatchId);
         }
     }
     addServerSocketMessagesListeners() {
-        this.matchmakingService.socketClientService.on('transferDuMatchId', (data: string) => {
-            this.limitedTimeMatchId = data;
+        this.matchmakingService.socketClientService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
+            if (data.gameId.toString() === '-1') {
+                this.limitedTimeMatchId = data.matchToJoinIfAvailable as string;
+                console.log('update match id to join in limited time to ', data.matchToJoinIfAvailable as string);
+            } else {
+                console.log('not our game id ', data.matchToJoinIfAvailable as string);
+            }
+            console.log('gameProgressUpdate registration page ', data);
         });
-        this.matchmakingService.socketClientService.on('currentMAtchCreate', (data: Match) => {
-            this.matchmakingService.currentMatch = data;
-        });
+
+        this.matchmakingService.socketClientService.socket.emit('requestRefreshGameMatchProgress', { gameId: -1 });
     }
     joinLimitedTimeGame() {
         if (!this.limitedTimeMatchId) return;
         this.showButtons = false;
-        this.matchmakingService.setCurrentMatchPlayer(this.username as string);
         this.incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage();
         this.matchmakingService.joinGame(this.limitedTimeMatchId, this.id as string);
         this.limitedTimeMatchId = null;

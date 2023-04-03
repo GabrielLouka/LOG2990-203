@@ -123,6 +123,7 @@ export class MatchmakingService {
         this.socketService.on('matchUpdated', (data: Match) => {
             this.currentMatch = data;
             this.onMatchUpdated.invoke(this.currentMatch);
+            console.log('matchUpdated ', data);
         });
 
         this.socketService.on('incomingPlayerRequest', (data: Player) => {

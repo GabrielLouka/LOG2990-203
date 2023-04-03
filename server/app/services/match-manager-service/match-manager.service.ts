@@ -74,8 +74,13 @@ export class MatchManagerService {
 
     getMatchAvailableForGame(gameId: number): string | null {
         for (const match of this.currentOnlinePlayedMatches) {
-            if (match.gameId.toString() === gameId.toString() && match.matchType === MatchType.OneVersusOne) {
-                if (match.matchStatus === MatchStatus.WaitingForPlayer2) return match.matchId;
+            if (
+                match.gameId.toString() === gameId.toString() &&
+                (match.matchType === MatchType.OneVersusOne || match.matchType === MatchType.LimitedCoop)
+            ) {
+                if (match.matchStatus === MatchStatus.WaitingForPlayer2) {
+                    return match.matchId;
+                }
             }
         }
         return null;
