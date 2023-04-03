@@ -390,9 +390,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         let message = 'Erreur';
 
         if (!this.matchmakingService.isSoloMode) {
-            if (isPlayer1) {
-                message += ' par ' + this.getPlayerUsername(isPlayer1).toUpperCase();
-            }
+            message += ' par ' + this.getPlayerUsername(isPlayer1).toUpperCase();
         }
         if (isPlayer1 === this.matchmakingService.isPlayer1) this.showErrorText();
         this.canvasHandlingService.focusKeyEvent(this.cheat);
