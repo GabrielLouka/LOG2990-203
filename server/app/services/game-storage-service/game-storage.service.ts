@@ -90,8 +90,26 @@ export class GameStorageService {
      *
      * @returns the games list
      */
-    async getAllGames(): Promise<unknown[]> {
-        return await this.collection.find({}).toArray();
+    async getAllGames(): Promise<
+        {
+            gameData: GameData;
+            originalImage: Buffer;
+            modifiedImage: Buffer;
+        }[]
+    > {
+        const allGames = await this.collection.find<GameData>({}).toArray();
+
+        const gamesToReturn = [];
+        for (const game of allGames) {
+            const images = this.getGameImages(game.id.toString());
+            gamesToReturn.push({
+                gameData: game,
+                originalImage: images.originalImage,
+                modifiedImage: images.modifiedImage,
+            });
+        }
+        gamesToReturn.sort(() => Math.random() - 1 / 2);
+        return gamesToReturn;
     }
     /**
      * Returns the number of games

@@ -7,24 +7,24 @@
         <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
         <app-hint (click)="handleHintMode()"></app-hint>
-        <app-hint #hintElement *ngIf="isOneVersusOne"></app-hint>
+        <app-hint (click)="handleHintMode()" #hintElement *ngIf="isSolo || isLimitedTimeSolo"></app-hint>
     </div>
 
     <div class="flex-column center">
         <div class="flex-row center data-container">
             <div class="flex-row difference-container">
                 <app-found-differences-counter
-                    class="currentPlayer"
-                    [username]="this.getPlayerUsername(true)"
+                    class="hints-container"
+                    [username]="isCoop ? this.getPlayerUsername(true) + ' et ' + this.getPlayerUsername(false) : this.getPlayerUsername(true)"
                     [differencesFound]="differencesFound1"
-                    [differencesNbr]="isOneVersusOne ? minDifferences : totalDifferences"
+                    [differencesNbr]="currentGameId !== '-1' ? (isOneVersusOne ? minDifferences : totalDifferences) : -1"
                     [ngClass]="{
                         currentPlayer: activePlayer
                     }"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
-                    class="currentPlayer"
-                    *ngIf="isOneVersusOne"
+                    class="hints-container"
+                    *ngIf="isOneVersusOne && currentGameId !== '-1'"
                     [username]="this.getPlayerUsername(false)"
                     [differencesFound]="differencesFound2"
                     [differencesNbr]="isOneVersusOne ? minDifferences : totalDifferences"
@@ -34,14 +34,15 @@
                 ></app-found-differences-counter>
             </div>
             <div class="timer-container">
-                <div #penalty class="penalty-message">Penalité : +10s</div>
-                <app-timer #timerElement></app-timer>
+                <app-timer
+                    #timerElement
+                    [incrementTime]="currentGameId !== '-1'"
+                    (timeReachedZero)="onWinGame(getPlayerUsername(true), !this.isWinByDefault)"
+                ></app-timer>
             </div>
         </div>
 
-        <app-info-card class="info-card" *ngIf="game" [isEasy]="game.gameData.isEasy" [matchType]="this.currentMatchType"></app-info-card>
-
-        <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': backgroundColor }" class="cheat-mode">Mode triche</div>
+        <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': this.canvasHandlingService.backgroundColor}" class="cheat-mode">Mode triche</div>
 
         <div class="flex-row center canvas-container">
             <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>

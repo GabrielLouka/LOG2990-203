@@ -4,10 +4,10 @@
     </div>
     <div class="flex-row center text">
         <p>
-            : {{ differencesFound }} sur {{ differencesNbr }} différence{{ differencesFound > 1 ? 's' : '' }} trouvée{{
-                differencesFound > 1 ? 's' : ''
-            }}
-            !
+            :
+            {{ differencesNbr === -1 ? differencesFound + ' différence' + (differencesFound > 1 ? 's' : '') + ' trouvée' + (differencesFound > 1 ? 's' : '')
+            ! : differencesFound + ' sur ' + differencesNbr + ' différence' + (differencesFound > 1 ? 's' : '') + ' trouvée' + (differencesFound > 1 ?
+            's' : '') }} !
         </p>
     </div>
 </div>

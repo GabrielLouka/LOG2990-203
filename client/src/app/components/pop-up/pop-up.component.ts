@@ -18,6 +18,7 @@ export class PopUpComponent {
         isGameOver: boolean;
         option2Action: Action<void> | null;
     }[] = [];
+    isLimitedTime: boolean = false;
 
     showConfirmationPopUp() {
         this.popUpInfo.splice(0, this.popUpInfo.length);
@@ -46,6 +47,24 @@ export class PopUpComponent {
             isConfirmation: false,
             isGameOver: true,
             option2Action: startReplayAction,
+        });
+        this.showPopUp();
+    }
+    // eslint-disable-next-line max-params
+    showGameOverPopUpLimited(username1: string | undefined, username2: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
+        this.isLimitedTime = true;
+        const soloMessage = `Félicitations ${username1?.toUpperCase()} vous avez remporté !`;
+        const multiPlayerMessage = `Félicitations ${username1?.toUpperCase() + ' ' + username2?.toUpperCase()} vous avez remporté !`;
+        const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
+        this.popUpInfo.splice(0, this.popUpInfo.length);
+        this.popUpInfo.push({
+            title: isWinByDefault ? soloMessage : titleMessage,
+            message: isWinByDefault ? 'Votre partenaire a quitté la partie...' : 'Excellente partie !',
+            option1: 'Menu Principal',
+            option2: '',
+            isConfirmation: false,
+            isGameOver: true,
+            option2Action: null,
         });
         this.showPopUp();
     }

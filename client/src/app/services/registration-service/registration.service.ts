@@ -10,10 +10,17 @@ import { CLASSIC_PATH, HOME_PATH, SELECTION_PATH } from '@common/utils/env.http'
 export class RegistrationService {
     constructor(private readonly router: Router, private readonly matchmakingService: MatchmakingService) {}
 
+    // loadGamePage(id: string | null) {
+    //     if (id !== '-1') {
+    //         this.router.navigate([CLASSIC_PATH, id]);
+    //     } else {
+    //         this.router.navigate([LIMITED_TIME_PATH]);
+    //     }
+    // }
+
     loadGamePage(id: string | null) {
         this.router.navigate([CLASSIC_PATH, id]);
     }
-
     redirectToMainPage() {
         this.router.navigate([HOME_PATH]);
     }

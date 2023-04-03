@@ -23,9 +23,14 @@ export class MatchmakingService {
     matchIdThatWeAreTryingToJoin: string | null = null;
     gameIdThatWeAreTryingToJoin: string | null = null;
     currentMatch: Match | null;
+    onSingleGameDeleted: Action<string | null>;
+    onAllGameDeleted: Action<string | null>;
 
     constructor(private readonly socketService: SocketClientService) {}
 
+    get socketClientService() {
+        return this.socketService;
+    }
     get currentMatchPlayed() {
         return this.currentMatch;
     }
@@ -52,6 +57,13 @@ export class MatchmakingService {
 
     get isOneVersusOne(): boolean {
         return this.currentMatch?.matchType === MatchType.OneVersusOne;
+    }
+
+    get isCoopMode(): boolean {
+        return this.currentMatch?.matchType === MatchType.LimitedCoop;
+    }
+    get isLimitedTimeSolo() {
+        return this.currentMatch?.matchType === MatchType.LimitedSolo;
     }
 
     get isSoloMode(): boolean {
@@ -99,7 +111,9 @@ export class MatchmakingService {
     }
 
     connectSocket() {
-        if (this.socketService.isSocketAlive) this.disconnectSocket();
+        if (this.socketService.isSocketAlive) {
+            this.disconnectSocket();
+        }
 
         this.socketService.connect();
         this.handleMatchUpdateEvents();
@@ -151,6 +165,8 @@ export class MatchmakingService {
         this.onDeletedSingleGame = new Action<string | null>();
         this.onResetAllGames = new Action<string | null>();
         this.onResetSingleGame = new Action<string | null>();
+        this.onAllGameDeleted = new Action<string | null>();
+        this.onSingleGameDeleted = new Action<string | null>();
         this.matchIdThatWeAreTryingToJoin = null;
         this.gameIdThatWeAreTryingToJoin = null;
     }
@@ -158,6 +174,7 @@ export class MatchmakingService {
     createGame(gameId: string) {
         this.socketService.send<{ gameId: string }>('createMatch', { gameId });
         this.currentMatch = new Match(parseInt(gameId, 10), this.currentSocketId);
+        console.log(this.currentMatch);
         this.matchIdThatWeAreTryingToJoin = null; // Host doesn't need to join
         this.gameIdThatWeAreTryingToJoin = null;
     }

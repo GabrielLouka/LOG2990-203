@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { DO_YOU_WANT_TO_PLAY_WITH_TEXT, WAITING_FOR_PLAYER_TEXT, WAITING_PLAYER_ANSWER_TEXT } from '@common/utils/env';
+import { DO_YOU_WANT_TO_PLAY_WITH_TEXT, LIMITED_TIME_USER_ENTERED, WAITING_FOR_PLAYER_TEXT, WAITING_PLAYER_ANSWER_TEXT } from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
@@ -78,6 +78,9 @@ export class IncomingPlayerService {
         }
     }
 
+    updateLimitedTimeNameEntered() {
+        this.joiningStatusMessage = LIMITED_TIME_USER_ENTERED;
+    }
     updateWaitingForIncomingPlayerMessage() {
         this.joiningStatusMessage = WAITING_FOR_PLAYER_TEXT;
     }

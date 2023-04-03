@@ -59,9 +59,14 @@ export class SocketManager {
                     sendJoinMatchCancel(match.matchId, socket.id);
                 });
             });
+            socket.on('chargementDuJeu', (data: string) => {
+                this.sio.emit('transferDuMatchId', data);
+            });
 
             socket.on('createMatch', (data) => {
                 const newMatchId = this.matchManagerService.createMatch(data.gameId, socket.id).matchId;
+                this.sio.emit('currentMAtchCreate', this.matchManagerService.getMatchById(newMatchId));
+                console.log(this.matchManagerService.getMatchById(newMatchId));
                 joinMatchRoom({ matchId: newMatchId });
             });
 
@@ -74,6 +79,7 @@ export class SocketManager {
             socket.on('setMatchPlayer', (data: { matchId: string; player: Player }) => {
                 this.matchManagerService.setMatchPlayer(data.matchId, data.player);
                 sendMatchUpdate({ matchId: data.matchId });
+
                 sendGameMatchProgressUpdate(data.matchId);
             });
 

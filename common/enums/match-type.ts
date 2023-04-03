@@ -1,6 +1,6 @@
 export enum MatchType {
     Solo,
     OneVersusOne,
-    LimitedVersus,
+    LimitedSolo,
     LimitedCoop,
 }

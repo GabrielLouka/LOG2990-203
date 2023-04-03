@@ -16,7 +16,6 @@ export class MatchManagerService {
         const matchToCreate = new Match(gameId, matchId);
         matchToCreate.matchStatus = MatchStatus.WaitingForPlayer1;
         this.currentOnlinePlayedMatches.push(matchToCreate);
-
         return matchToCreate;
     }
 

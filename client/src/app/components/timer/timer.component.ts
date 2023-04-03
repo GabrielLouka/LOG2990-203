@@ -1,6 +1,6 @@
-import { Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
-import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 
 @Component({
     selector: 'app-timer',
@@ -8,9 +8,12 @@ import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements OnDestroy {
-    @Input() timeInSeconds: number = 0;
+    @Input() incrementTime: boolean = true;
+    @Output() timeReachedZero: EventEmitter<void> = new EventEmitter();
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
+    timeInSeconds: number;
+    shouldStop = false;
     intervalId: number;
     loopingMethod: DelayedMethod;
 
@@ -46,7 +49,18 @@ export class TimerComponent implements OnDestroy {
     }
 
     ticToc() {
-        this.timeInSeconds++;
+        if (!this.shouldStop) {
+            if (this.incrementTime) {
+                this.timeInSeconds++;
+            } else {
+                this.timeInSeconds--;
+                if (this.timeInSeconds <= 0) {
+                    this.timeReachedZero.emit();
+                }
+            }
+        }
+        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
+        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
         this.refreshTimerDisplay();
     }
 
@@ -59,7 +73,7 @@ export class TimerComponent implements OnDestroy {
     //     this.timerService.ngOnDestroy();
     // }
     resetTimer() {
-        this.timeInSeconds = 0;
+        this.timeInSeconds = this.incrementTime ? 0 : LIMITED_TIME_DURATION;
         this.minute.nativeElement.innerText = '00';
         this.second.nativeElement.innerText = '00';
         clearInterval(this.intervalId);
