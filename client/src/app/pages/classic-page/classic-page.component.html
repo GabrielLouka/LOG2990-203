@@ -34,6 +34,7 @@
                 ></app-found-differences-counter>
             </div>
             <div class="timer-container">
+                <div #penalty class="penalty-message">Penalité : +10s</div>
                 <app-timer
                     #timerElement
                     [incrementTime]="currentGameId !== '-1'"
@@ -42,7 +43,9 @@
             </div>
         </div>
 
-        <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': this.canvasHandlingService.backgroundColor}" class="cheat-mode">Mode triche</div>
+        <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': this.canvasHandlingService.backgroundColor }" class="cheat-mode">
+            Mode triche
+        </div>
 
         <div class="flex-row center canvas-container">
             <canvas #originalImage width="640px" height="480px" (mousedown)="this.onMouseDown($event)"></canvas>
