@@ -59,17 +59,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     activePlayer: boolean;
     hasAlreadyReceiveMatchData: boolean = false;
     newRanking: { name: string; score: number };
-
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
+
+    replaySpeedOptions: number[] = [1, 2, 4];
+    currentReplaySpeedIndex = 0;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
         public replayModeService: ReplayModeService,
         private route: ActivatedRoute,
-        private matchmakingService: MatchmakingService,
+        public matchmakingService: MatchmakingService,
         private chatService: ChatService,
         private hintService: HintService,
         private historyService: HistoryService,
@@ -105,6 +107,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     get isCheating() {
         return this.canvasHandlingService.isCheating;
+    }
+
+    get currentReplaySpeed(): number {
+        return this.replaySpeedOptions[this.currentReplaySpeedIndex];
     }
 
     getPlayerUsername(isPlayer1: boolean): string {
@@ -512,7 +518,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
                 this.letterTPressed = !this.letterTPressed;
             }
-            if (event.key === 'i') {
+            if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
                 this.handleHintMode();
             }
         }
@@ -571,6 +577,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.chat.resetChat();
         this.differencesFound1 = 0;
         this.differencesFound2 = 0;
+    }
+
+    onReplaySpeedButtonClick(): void {
+        this.currentReplaySpeedIndex = (this.currentReplaySpeedIndex + 1) % this.replaySpeedOptions.length;
+        DelayedMethod.speed = this.currentReplaySpeed;
     }
 
     finishReplay() {

@@ -6,8 +6,11 @@
     <div class="flex-row center header">
         <app-quit-button (click)="onQuitGame()"></app-quit-button>
         <h1 class="titre">{{ this.gameTitle }}</h1>
-        <app-hint (click)="handleHintMode()"></app-hint>
-        <app-hint (click)="handleHintMode()" #hintElement *ngIf="isSolo || isLimitedTimeSolo"></app-hint>
+        <app-hint
+            *ngIf="this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo"
+            (click)="handleHintMode()"
+            #hintElement
+        ></app-hint>
     </div>
 
     <div class="flex-column center">
@@ -53,23 +56,29 @@
         </div>
 
         <app-chat #chat class="chat-container"></app-chat>
-        <div *ngIf="replayModeService.shouldShowReplayModeGUI">
-            <p>REPLAY {{ replayModeService.currentStatus }} | Speed: {{ replayModeService.replaySpeed }}</p>
-
-            <button class="button-style center" title="Restart Replay" (click)="this.replayModeService.togglePauseReplayMode()">
-                <p>{{ replayModeService.isReplayModePaused ? 'Play' : 'Pause' }}</p>
-            </button>
-
-            <button class="button-style center" title="Restart Replay" (click)="this.replayModeService.launchReplayMode()">
-                <p>Restart Replay</p>
-            </button>
-
-            <p>Speed</p>
-            <select #radiusInput class="button-style" [(ngModel)]="replayModeService.replaySpeed">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="4">4</option>
-            </select>
+        <div *ngIf="replayModeService.shouldShowReplayModeGUI" class="flex-column space-around replay-mode">
+            <h2>REPLAY MODE</h2>
+            <div class="flex-row space-around">
+                <button class="button-style replay-button" title="Restart Replay" (click)="this.replayModeService.launchReplayMode()">
+                    <span class="material-symbols-outlined replay-icon"> replay </span>
+                </button>
+                <button class="flex-row center button-style" title="Play Replay" (click)="this.replayModeService.togglePauseReplayMode()">
+                    <span
+                        *ngIf="replayModeService.isReplayModePaused && !replayModeService.isReplayModeFinished"
+                        class="material-symbols-outlined replay-icon"
+                    >
+                        play_arrow
+                    </span>
+                    <span
+                        *ngIf="!replayModeService.isReplayModePaused && !replayModeService.isReplayModeFinished"
+                        class="material-symbols-outlined replay-icon"
+                    >
+                        pause
+                    </span>
+                    <span *ngIf="replayModeService.isReplayModeFinished" class="material-symbols-outlined replay-icon not-allowed"> stop </span>
+                </button>
+                <button class="button-style replay-button" (click)="onReplaySpeedButtonClick()">x{{ currentReplaySpeed }}</button>
+            </div>
         </div>
     </div>
 

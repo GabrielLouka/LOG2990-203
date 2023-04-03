@@ -21,13 +21,6 @@ export class GamesService {
 
     showPreviousButton = false;
 
-    // ngOnInit() {
-    //     this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
-    //     this.gamesService.fetchGameDataFromServer(this.gamesService.currentPageNumber);
-    //     this.matchmakingService.connectSocket();
-    //     this.addServerSocketMessagesListeners();
-    // }
-
     constructor(private readonly communicationService: CommunicationService, private readonly socketService: SocketClientService) {}
 
     fetchGameDataFromServer(pageId: number): void {

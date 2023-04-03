@@ -44,6 +44,10 @@ export class ReplayModeService {
         return this.currentState === ReplayModeState.Paused;
     }
 
+    get isReplayModeFinished(): boolean {
+        return this.currentState === ReplayModeState.FinishedReplaying;
+    }
+
     get currentStatus(): string {
         return ReplayModeState[this.currentState];
     }

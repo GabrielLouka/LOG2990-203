@@ -78,5 +78,22 @@ canvas {
 .currentPlayer {
     border: solid 0.75vh salmon;
     border-radius: 1.75vh;
+}
 
+
+.replay-mode {
+    margin-top:  3vh;
+    margin-right: 6vw;
+    border: solid;
+    border-radius: 1.75vh;
+    background-color: rgba(0, 0, 0, 0.308);
+}
+
+.replay-button {
+    scale: 0.7;
+}
+
+.replay-icon {
+    scale: 1.2;
+    font-weight: 700;
 }
