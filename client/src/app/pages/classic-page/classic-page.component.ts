@@ -49,7 +49,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     gameTitle: string = '';
     player1: string = '';
     player2: string = '';
-    currentModifiedImage: Buffer;
     totalDifferences: number = 0;
     differencesFound1: number = 0;
     differencesFound2: number = 0;
@@ -516,7 +515,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.hintService.showHint(
                 this.rightCanvas,
                 this.rightCanvasContext as CanvasRenderingContext2D,
-                this.currentModifiedImage,
+                this.canvasHandlingService.currentModifiedImage,
                 this.games[this.currentGameIndex].modifiedImage,
                 { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences },
             );
