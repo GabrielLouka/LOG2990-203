@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable max-lines */
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
