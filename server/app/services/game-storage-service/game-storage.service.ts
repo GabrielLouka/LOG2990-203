@@ -196,73 +196,45 @@ export class GameStorageService {
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES as string, games);
     }
 
-    // updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking) {
-    //     const gameQuery = { id: parseInt(id, 10) };
-    //     const oneVersusOneScore = { oneVersusOneRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
-    //     // const replacement = { $set: { oneVersusOneRanking: newBreakingRanking } };
-    //     const query = { gameQuery, oneVersusOneScore };
-    //     const updatedScore = this.collection.find(query);
-    //     return updatedScore;
-    //     // await this.collection.findOneAndReplace(query, replacement);
-    //     // this.collection.aggregate([
-    //     //     {
-    //     //         $set: {
-    //     //             oneVersusOneRanking: {
-    //     //                 $sortArray: { input: '$ oneVersusOneRanking', sortBy: { score: -1 } },
-    //     //             },
-    //     //         },
-    //     //     },
-    //     // ]);
-    // }
-
-    async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number> {
+    async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
         const gameData = (await this.getGameById(id)).gameData;
-        const gameQuery = { id: parseInt(id, 10) };
-
+        const query = { id: parseInt(id, 10) };
+        const update = { $set: { 'soloRanking.$[elem]': newBreakingRanking } };
+        const scoreUpdate = { $push: { soloRanking: { $each: [], $sort: { score: 1 } } } };
         if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
-
-        const existingRanking = gameData.soloRanking.find((ranking) => ranking.name === newBreakingRanking.name);
-        const updateScore = { 'soloRanking.$.score': newBreakingRanking.score };
-        const rankingName = { 'soloRanking.$.name': newBreakingRanking.name };
-
-        if (existingRanking) {
-            try {
-                await this.collection.updateOne({ gameQuery, rankingName }, { $set: { soloRanking: newBreakingRanking } });
-            } catch (e) {
-                console.error('IF ' + e);
-            }
-            return gameData.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
-        } else {
-            // const removeUpdate = { 'soloRanking.$.score': { $lt: newBreakingRanking.score } };
-            try {
-                await this.collection.updateOne({ gameQuery, rankingName }, { $set: updateScore });
-            } catch (e) {
-                console.error('ELSE' + e);
-            }
-            // await this.collection.aggregate([{ $match: gameQuery }, { $set: { 'soloRanking.$.score': { $sort: { score: -1 } } } }]).toArray();
-            console.log(gameData.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name));
-            return gameData.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
+        const options = {
+            multi: false,
+            arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.soloRanking[2].name }],
+        };
+        try {
+            await this.collection.findOneAndUpdate(query, update, options);
+            await this.collection.updateOne(query, scoreUpdate);
+        } catch (e) {
+            console.error('update error : ' + e);
         }
+        return (await this.getGameById(id)).gameData?.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
 
-    // async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): number | undefined {
-    //     const game = await this.getGameById(id);
-    //     const gameQuery = { id: parseInt(id, 10) };
-    //     const soloScore = { soloRanking: { $elemMatch: { score: { $lt: newBreakingRanking.score } } } };
-    //     const replacement = { $set: { soloRanking: newBreakingRanking } };
-    //     const query = { gameQuery, soloScore };
-    //     await this.collection.findOneAndReplace(query, replacement);
-    //     this.collection.aggregate([
-    //         {
-    //             $set: {
-    //                 soloRanking: {
-    //                     $sortArray: { input: '$soloRanking', sortBy: { score: -1 } },
-    //                 },
-    //             },
-    //         },
-    //     ]);
-    //     return game.gameData ? game.gameData.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name) : undefined;
-    // }
+    async updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
+        const gameData = (await this.getGameById(id)).gameData;
+        const query = { id: parseInt(id, 10) };
+        const update = { $set: { 'oneVersusOneRanking.$[elem]': newBreakingRanking } };
+        const scoreUpdate = { $push: { oneVersusOneRanking: { $each: [], $sort: { score: 1 } } } };
+        if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
+
+        const options = {
+            multi: false,
+            arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.oneVersusOneRanking[2].name }],
+        };
+
+        try {
+            await this.collection.findOneAndUpdate(query, update, options);
+            await this.collection.updateOne(query, scoreUpdate);
+        } catch (e) {
+            console.error('update error : ' + e);
+        }
+        return (await this.getGameById(id)).gameData?.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
+    }
 
     async resetGameRecordTimes(id: string) {
         const query = { id: parseInt(id, 10) };

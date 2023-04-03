@@ -13,27 +13,25 @@ export class TimerComponent implements OnDestroy {
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
     timeInSeconds: number;
-    shouldStop = false;
     intervalId: number;
     loopingMethod: DelayedMethod;
+    shouldStop = false;
 
-    // constructor(private readonly timerService: TimerService) {}
-
-    get minutes() {
+    get minutes(): number {
         return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
     }
 
-    get seconds() {
+    get seconds(): number {
         return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
+    }
+
+    get currentTimeInSeconds(): number {
+        return this.timeInSeconds;
     }
 
     getTime(): string {
         return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
     }
-
-    // ngOnDestroy() {
-    //     window.clearInterval(this.intervalId);
-    // }
 
     displayTimeValue(value: number): string {
         return value < MINUTE_LIMIT ? '0' + value : value.toString();
@@ -61,17 +59,10 @@ export class TimerComponent implements OnDestroy {
         }
         this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
         this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
+        this.timeInSeconds++;
         this.refreshTimerDisplay();
     }
 
-    // stopTimer() {
-    //     this.shouldStop = true;
-    //     return this.timerService.currentSeconds;
-    // }
-
-    // ngOnDestroy() {
-    //     this.timerService.ngOnDestroy();
-    // }
     resetTimer() {
         this.timeInSeconds = this.incrementTime ? 0 : LIMITED_TIME_DURATION;
         this.minute.nativeElement.innerText = '00';
@@ -81,13 +72,6 @@ export class TimerComponent implements OnDestroy {
     }
 
     startTimer() {
-        // this.shouldStop = false;
-        // this.intervalId = window.setInterval(() => {
-        //     if (this.timeInSeconds >= 0) {
-        //         this.ticToc();
-        //     }
-        // }, MILLISECOND_TO_SECONDS);
-
         this.loopingMethod = new DelayedMethod(
             () => {
                 if (this.timeInSeconds >= 0) {
