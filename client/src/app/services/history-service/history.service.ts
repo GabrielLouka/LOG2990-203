@@ -61,8 +61,6 @@ export class HistoryService {
             isWinByDefault,
         };
 
-        console.log(this.historyToSave);
         this.addGameHistory(this.historyToSave);
-        // return this.historyToSave;
     }
 }
