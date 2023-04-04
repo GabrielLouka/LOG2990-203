@@ -25,8 +25,9 @@ export class GameRankingService {
         return await this.updateRanking(gameId, isOneVersusOne);
     }
 
-    private async updateRanking(gameId: string, isOneVersusOne: boolean): Promise<RankingData | void> {
+    async updateRanking(gameId: string, isOneVersusOne: boolean): Promise<RankingData | void> {
         try {
+            console.log('ICI tabarnak');
             const updateRankingIndex = isOneVersusOne
                 ? await this.gameStorageService.updateGameOneVersusOneNewBreakingRecord(gameId, this.newRanking)
                 : await this.gameStorageService.updateGameSoloNewBreakingRecord(gameId, this.newRanking);

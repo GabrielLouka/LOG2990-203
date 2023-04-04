@@ -16,7 +16,6 @@ import { ImageManipulationService } from '@app/services/image-manipulation-servi
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { ReplayModeService } from '@app/services/replay-mode-service/replay-mode.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { TimerService } from '@app/services/timer-service/timer.service';
 import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
@@ -24,7 +23,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { catchError, map, Observable, of } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -75,7 +74,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private chatService: ChatService,
         private hintService: HintService,
         private historyService: HistoryService,
-        private timerService: TimerService,
     ) {}
 
     get leftCanvasContext() {
@@ -451,7 +449,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.disconnect();
         this.replayModeService.stopRecording();
         if (!isWinByDefault) {
-            // this.sendNewTimeScoreToServer();
+            this.sendNewTimeScoreToServer();
         } else {
             this.socketService.disconnect();
         }
@@ -464,6 +462,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             ranking: {
                 name: this.newRanking.name,
                 score: this.newRanking.score,
+                gameName: this.games[this.currentGameIndex].gameData.name,
             },
         });
     }
@@ -494,8 +493,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.timerElement.getTime(),
             );
         }
-        this.newRanking = { name: winningPlayer, score: this.timerService.winningTimeInSeconds };
-
+        this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode, startReplayAction);
