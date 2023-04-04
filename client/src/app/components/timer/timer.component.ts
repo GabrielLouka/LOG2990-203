@@ -59,7 +59,6 @@ export class TimerComponent implements OnDestroy {
         }
         this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
         this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
-        this.timeInSeconds++;
         this.refreshTimerDisplay();
     }
 
