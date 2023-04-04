@@ -17,7 +17,7 @@ export class SocketManager {
         private readonly matchManagerService: MatchManagerService,
         private readonly gameRankingTimeService: GameRankingService,
     ) {
-        this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
+        this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] }, maxHttpBufferSize: 1e8 });
         this.matchingDifferencesService = new MatchingDifferencesService();
     }
 
