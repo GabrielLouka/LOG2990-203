@@ -10,6 +10,9 @@ import { HistoryService } from '@app/services/history-service/history.service';
     styleUrls: ['./parameter-page.component.scss'],
 })
 export class ParameterPageComponent implements OnInit {
+    confirmation: boolean = false;
+    isReset: boolean = false;
+
     constructor(readonly historyService: HistoryService, public gameConstantsService: GameConstantsService) {}
 
     ngOnInit(): void {

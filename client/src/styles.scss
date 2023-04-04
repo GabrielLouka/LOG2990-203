@@ -79,5 +79,12 @@ body {
     }
 }
 
+.no-hover {
+    &:hover {
+      transform: scale(1);
+      background-color: white;
+    }
+}
+
 
 

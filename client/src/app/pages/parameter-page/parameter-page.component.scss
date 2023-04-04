@@ -56,6 +56,28 @@ header {
     scale: 0.8;
 }
 
+.confirmation-container {
+    height: 55vh;
+    width: 35vw;
+
+    border-radius: 2.5vh;
+    background-color: rgba(0, 0, 0, 0.274);
+}
+
+.confirmation-message {
+    text-align: center;
+}
+
+.confirmation-btn {
+    margin-top: 5vh;
+}
+
+.cadre {
+    height: 35vh;
+    width: 25vw;
+    background-color: lightcoral;
+}
+
 
 /* History */
 .history-container {
@@ -103,7 +125,6 @@ header {
     font-weight: 400;
     font-size: medium;
 }
-
 
 .text-bold {
     font-weight: bold;
@@ -161,9 +182,6 @@ header {
 
 }
 
-.cadre {
-    border: solid red;
-}
 
   
 
