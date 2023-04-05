@@ -23,7 +23,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { Observable, catchError, map, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -453,7 +453,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     gameOver(isWinByDefault: boolean) {
         this.timerElement.pauseTimer();
-        this.socketService.disconnect();
         this.replayModeService.stopRecording();
         if (!isWinByDefault) {
             this.sendNewTimeScoreToServer();
