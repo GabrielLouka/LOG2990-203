@@ -3,22 +3,26 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameData } from '@common/interfaces/game-data';
 import { MILLISECOND_TO_SECONDS, NUMBER_HINTS } from '@common/utils/env';
 import { Buffer } from 'buffer';
+import { BehaviorSubject } from 'rxjs';
 import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class HintService {
-    maxGivenHints = NUMBER_HINTS;
+    maxGivenHints = new BehaviorSubject<number>(NUMBER_HINTS);
+    counter$ = this.maxGivenHints.asObservable();
 
     constructor(private imageManipulationService: ImageManipulationService) {}
 
-    decrement() {
-        this.maxGivenHints--;
-    }
 
     reset() {
-        this.maxGivenHints = NUMBER_HINTS;
+        this.maxGivenHints.next(NUMBER_HINTS);
+    }
+
+    decrement() {
+        const currentValue = this.maxGivenHints.value;
+        this.maxGivenHints.next(currentValue - 1);
     }
 
     handleHint(chat: ChatComponent, time: number) {
