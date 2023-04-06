@@ -22,6 +22,7 @@ import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
+import { QUADRANTS, SUB_QUADRANTS } from "@common/utils/env.quadrants";
 import { Buffer } from 'buffer';
 import { Observable, catchError, map, of } from 'rxjs';
 
@@ -29,6 +30,7 @@ import { Observable, catchError, map, of } from 'rxjs';
     selector: 'app-classic-page',
     templateUrl: './classic-page.component.html',
     styleUrls: ['./classic-page.component.scss'],
+    
 })
 export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('originalImage', { static: true }) leftCanvas: ElementRef<HTMLCanvasElement>;
@@ -59,7 +61,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     newRanking: { name: string; score: number };
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
     currentGameIndex: number = 0;
-    canvasHandlingService: CanvasHandlingService;
+    canvasHandlingService: CanvasHandlingService;    
+    randomQuadrant: {x: number; y: number; width: number; height: number;
+    };
+    randomSubQuadrant: {x: number; y: number; width: number; height: number;
+    };
+    randomCircle: Vector2;
 
     replaySpeedOptions: number[] = [1, 2, 4];
     currentReplaySpeedIndex = 0;
@@ -70,9 +77,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         public replayModeService: ReplayModeService,
         private route: ActivatedRoute,
         public matchmakingService: MatchmakingService,
-        private chatService: ChatService,
-        private hintService: HintService,
+        private chatService: ChatService,        
         private historyService: HistoryService,
+        private hintService: HintService
     ) {}
 
     get leftCanvasContext() {
@@ -128,6 +135,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
         this.canvasHandlingService = new CanvasHandlingService(this.leftCanvas, this.rightCanvas, new ImageManipulationService());
+        
         // Replay Mode Initialization
         this.replayModeService.onStartReplayMode.add(this.resetGame.bind(this));
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
@@ -142,6 +150,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         //         this.handleHintMode();
         //     }
         // });
+
+        this.randomQuadrant = this.generateRandomQuadrant(QUADRANTS);
+        this.randomSubQuadrant = this.generateRandomQuadrant(SUB_QUADRANTS);
+        this.randomCircle = this.generateRandomDifference();
+        
         this.hintService.reset();
     }
 
@@ -226,7 +239,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.getInitialImagesFromServer();
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
-        this.replayModeService.visibleTimer = this.timerElement;
+        this.replayModeService.visibleTimer = this.timerElement;        
+        
         window.removeEventListener('keydown', this.handleEvents.bind(this));
     }
 
@@ -294,6 +308,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.replayModeService.startRecording();
         }
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
+        this.hintService.initialzeGame({game: this.games[this.currentGameIndex].gameData, foundDifferences: this.foundDifferences});
     }
 
     startTimer() {
@@ -543,16 +558,49 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onWinGameLimited(winningPlayer1: string, winningPlayer2: string, isWinByDefault: boolean) {
         this.gameOver(isWinByDefault);
         this.popUpElement.showGameOverPopUpLimited(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
+    }    
+
+    generateRandomDifference(){
+        let randomIndex;
+        let randomDifference;
+        let randomVector;     
+        let diffFound;
+        do {
+            randomIndex = Math.floor(Math.random() * this.games[this.currentGameIndex].gameData.differences.length);
+            diffFound = this.foundDifferences[randomIndex];
+            
+        } while(diffFound);
+        randomDifference = this.games[this.currentGameIndex].gameData.differences[randomIndex];
+        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];
+        return randomVector;
     }
 
+    generateRandomQuadrant(quadrants: { x: number; y: number; width: number; height: number}[]){
+        const randomVector = this.generateRandomDifference();
+        let rect;
+        do {
+            let randomSection = Math.floor(Math.random() * quadrants.length);
+
+            rect = quadrants[randomSection];            
+
+        } while(
+            !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
+                ((CANVAS_HEIGHT - randomVector.y >= rect.y) && 
+                (CANVAS_HEIGHT - randomVector.y < rect.y + rect.height)))
+        );
+        return rect;
+    }
+    
     handleHintMode() {
+
         if (this.hintService.maxGivenHints.getValue() > 0) {
             this.hintService.showHint(
                 this.rightCanvas,
                 this.rightCanvasContext as CanvasRenderingContext2D,
                 this.canvasHandlingService.currentModifiedImage,
                 this.games[this.currentGameIndex].modifiedImage,
-                { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints.getValue(), diffs: this.foundDifferences },
+                { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints.getValue(), 
+                    diffs: this.foundDifferences},
             );
             this.hintService.decrement();
             this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds, this.isLimitedTimeSolo);

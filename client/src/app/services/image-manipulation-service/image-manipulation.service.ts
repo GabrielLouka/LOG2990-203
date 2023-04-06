@@ -21,6 +21,7 @@ import { Buffer } from 'buffer';
     providedIn: 'root',
 })
 export class ImageManipulationService {
+
     // can be used on a canvas from a buffer
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
@@ -60,42 +61,42 @@ export class ImageManipulationService {
 
     async showFirstHint(
         canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
-        game: GameData, differences: boolean[]){
+        game: GameData, differences: boolean[], rect: { x: number; y: number; width: number; height: number}){
         
-        const width = canvasContext.canvas.nativeElement.width;
-        const height = canvasContext.canvas.nativeElement.height;
-        const quarterWidth = width / 2;
-        const quarterHeight = height / 2;
+        // const width = canvasContext.canvas.nativeElement.width;
+        // const height = canvasContext.canvas.nativeElement.height;
+        // const quarterWidth = width / 2;
+        // const quarterHeight = height / 2;
         
         
-        const quadrants = [
-            { x: 0, y: 0, width: quarterWidth, height: quarterHeight },
-            { x: quarterWidth, y: 0, width: quarterWidth, height: quarterHeight },
-            { x: 0, y: quarterHeight, width: quarterWidth, height: quarterHeight },
-            { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight }
-        ];
-        let rect;
-        let randomIndex;
-        let randomDifference;
-        let randomVector;     
-        let diffFound;
-        do {
-            randomIndex = Math.floor(Math.random() * game.differences.length);
-            diffFound = differences[randomIndex];
+        // const quadrants = [
+        //     { x: 0, y: 0, width: quarterWidth, height: quarterHeight },
+        //     { x: quarterWidth, y: 0, width: quarterWidth, height: quarterHeight },
+        //     { x: 0, y: quarterHeight, width: quarterWidth, height: quarterHeight },
+        //     { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight }
+        // ];
+        // let rect;
+        // let randomIndex;
+        // let randomDifference;
+        // let randomVector;     
+        // let diffFound;
+        // do {
+        //     randomIndex = Math.floor(Math.random() * game.differences.length);
+        //     diffFound = differences[randomIndex];
             
-        } while(diffFound);
-        randomDifference = game.differences[randomIndex];
-        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        // } while(diffFound);
+        // randomDifference = game.differences[randomIndex];
+        // randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
         
-        do {
-            let randomSection = Math.floor(Math.random() * quadrants.length);
+        // do {
+        //     let randomSection = Math.floor(Math.random() * quadrants.length);
 
-            rect = quadrants[randomSection];            
+        //     rect = quadrants[randomSection];            
 
-        } while(
-            !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
-                ((height - randomVector.y >= rect.y) && (height - randomVector.y < rect.y + rect.height)))
-        );
+        // } while(
+        //     !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
+        //         ((height - randomVector.y >= rect.y) && (height - randomVector.y < rect.y + rect.height)))
+        // );
         await this.blinkQuadrant(canvasContext.context, rect);
         this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
                     
@@ -103,49 +104,49 @@ export class ImageManipulationService {
 
     async showSecondHint(
         canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
-        game: GameData, differences: boolean[]
+        game: GameData, differences: boolean[], rect: { x: number; y: number; width: number; height: number}
     ){
-        const width = canvasContext.canvas.nativeElement.width;
-        const height = canvasContext.canvas.nativeElement.height;
-        const quarterWidth = width / 4;
-        const quarterHeight = height / 4;
+        // const width = canvasContext.canvas.nativeElement.width;
+        // const height = canvasContext.canvas.nativeElement.height;
+        // const quarterWidth = width / 4;
+        // const quarterHeight = height / 4;
 
-        const subQuadrants = [];
+        // const subQuadrants = [];
 
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
-                const quadrant = {
-                    x: i * quarterWidth,
-                    y: j * quarterHeight,
-                    width: quarterWidth,
-                    height: quarterHeight,
-                };                
-                subQuadrants.push(quadrant);              
-            }
-        }
+        // for (let i = 0; i < 4; i++) {
+        //     for (let j = 0; j < 4; j++) {
+        //         const quadrant = {
+        //             x: i * quarterWidth,
+        //             y: j * quarterHeight,
+        //             width: quarterWidth,
+        //             height: quarterHeight,
+        //         };                
+        //         subQuadrants.push(quadrant);              
+        //     }
+        // }
 
-        let rect;
-        let randomIndex;
-        let randomDifference;
-        let randomVector;     
-        let diffFound;
-        do {
-            randomIndex = Math.floor(Math.random() * game.differences.length);
-            diffFound = differences[randomIndex];
+        // let rect;
+        // let randomIndex;
+        // let randomDifference;
+        // let randomVector;     
+        // let diffFound;
+        // do {
+        //     randomIndex = Math.floor(Math.random() * game.differences.length);
+        //     diffFound = differences[randomIndex];
             
-        } while(diffFound);
-        randomDifference = game.differences[randomIndex];
-        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        // } while(diffFound);
+        // randomDifference = game.differences[randomIndex];
+        // randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
         
-        do {
-            let randomSection = Math.floor(Math.random() * subQuadrants.length);
+        // do {
+        //     let randomSection = Math.floor(Math.random() * subQuadrants.length);
 
-            rect = subQuadrants[randomSection];            
+        //     rect = subQuadrants[randomSection];            
 
-        } while(
-            !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
-                ((height - randomVector.y >= rect.y) && (height - randomVector.y < rect.y + rect.height)))
-        );
+        // } while(
+        //     !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
+        //         ((height - randomVector.y >= rect.y) && (height - randomVector.y < rect.y + rect.height)))
+        // );
 
 
         await this.blinkQuadrant(canvasContext.context, rect);
@@ -155,22 +156,22 @@ export class ImageManipulationService {
 
     async showThirdHint(
         canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
-        game: GameData, differences: boolean[]
+        game: GameData, differences: boolean[], randomVector: {x: number, y: number}
     ){
-        const height = canvasContext.canvas.nativeElement.height;
-        let randomIndex;
-        let randomDifference;
-        let randomVector;     
-        let diffFound;
-        do {
-            randomIndex = Math.floor(Math.random() * game.differences.length);
-            diffFound = differences[randomIndex];
+        // const height = canvasContext.canvas.nativeElement.height;
+        // let randomIndex;
+        // let randomDifference;
+        // let randomVector;     
+        // let diffFound;
+        // do {
+        //     randomIndex = Math.floor(Math.random() * game.differences.length);
+        //     diffFound = differences[randomIndex];
             
-        } while(diffFound);
-        randomDifference = game.differences[randomIndex];
-        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        // } while(diffFound);
+        // randomDifference = game.differences[randomIndex];
+        // randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
 
-        await this.blinkDisk(canvasContext.context, randomVector.x, height - randomVector.y);
+        await this.blinkDisk(canvasContext.context, randomVector.x, CANVAS_HEIGHT - randomVector.y);
 
         this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
 
