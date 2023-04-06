@@ -5,7 +5,6 @@ import { DatabaseService } from '@app/services/database-service/database.service
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
-import { Images } from '@common/interfaces/images;';
 import { defaultRanking, Ranking } from '@common/interfaces/ranking';
 import 'dotenv/config';
 import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
@@ -130,8 +129,8 @@ export class GameStorageService {
     async getGameById(id: string) {
         const query = { id: parseInt(id, 10) };
         const game = await this.collection.findOne<GameData>(query);
-        const images: Images = this.getGameImages(id);
-        return { gameData: game, images };
+        const images = this.getGameImages(id);
+        return { gameData: game, originalImage: images.originalImage, modifiedImage: images.modifiedImage };
     }
 
     /**
@@ -172,7 +171,7 @@ export class GameStorageService {
         return gamesToReturn;
     }
 
-    async getGameImages(id: string): Promise<Images> {
+    getGameImages(id: string) {
         const folderPath = R_ONLY.persistentDataFolderPath + id + '/';
         let firstImage = Buffer.from([0]);
         let secondImage = Buffer.from([0]);
@@ -180,15 +179,16 @@ export class GameStorageService {
         try {
             firstImage = readFileSync(folderPath + R_ONLY.originalImageFileName);
         } catch (error) {
-            return Promise.reject('error reading first image');
+            console.log('error reading first image');
         }
 
         try {
             secondImage = readFileSync(folderPath + R_ONLY.modifiedImageFileName);
-            return { originalImage: firstImage, modifiedImage: secondImage } as Images;
         } catch (error) {
-            return Promise.reject('error reading second image');
+            console.log('error reading second image');
         }
+
+        return { originalImage: firstImage, modifiedImage: secondImage };
     }
 
     async storeDefaultGames() {
@@ -201,7 +201,6 @@ export class GameStorageService {
         const query = { id: parseInt(id, 10) };
         const update = { $set: { 'soloRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { soloRanking: { $each: [], $sort: { score: 1 } } } };
-
         if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
         const options = {
             multi: false,
@@ -210,10 +209,10 @@ export class GameStorageService {
         try {
             await this.collection.findOneAndUpdate(query, update, options);
             await this.collection.updateOne(query, scoreUpdate);
-            return (await this.getGameById(id)).gameData?.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
         } catch (e) {
-            return Promise.reject('update error : ' + e);
+            console.error('update error : ' + e);
         }
+        return (await this.getGameById(id)).gameData?.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
 
     async updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
@@ -231,10 +230,10 @@ export class GameStorageService {
         try {
             await this.collection.findOneAndUpdate(query, update, options);
             await this.collection.updateOne(query, scoreUpdate);
-            return (await this.getGameById(id)).gameData?.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
         } catch (e) {
-            return Promise.reject('update error : ' + e);
+            console.error('update error : ' + e);
         }
+        return (await this.getGameById(id)).gameData?.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
 
     async resetGameRecordTimes(id: string) {
