@@ -33,7 +33,7 @@ import {
     VOLUME_SUCCESS,
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { catchError, map, Observable, of } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -262,6 +262,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
+    hashCode(str: string): number {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const chr = str.charCodeAt(i);
+            hash = (hash << 5) - hash + chr;
+            hash |= 0;
+        }
+        const maxHash = Number.MAX_SAFE_INTEGER;
+        return Math.abs(((hash % maxHash) / (maxHash + 1)) * 100000000);
+    }
+
     fetchGames(): Observable<
         | {
               gameData: GameData;
@@ -278,6 +289,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 if (response.body) {
                     const serverResult = JSON.parse(response.body);
                     this.games = serverResult;
+                    const randomArray: number[] = [];
+                    const sectionSize = Math.ceil((this.matchmakingService.player1Id as string).length / this.games.length);
+                    const idSection = [];
+
+                    for (let i = 0; i < (this.matchmakingService.player1Id as string).length; i += sectionSize) {
+                        idSection.push((this.matchmakingService.player1Id as string).substring(i, i + sectionSize));
+                    }
+
+                    for (let j = 0; j < this.games.length; j++) {
+                        randomArray.push(this.hashCode(idSection[j]));
+                    }
+                    let k = 0;
+                    this.games.sort(() => randomArray[k++] - 1);
                     return this.games;
                 } else {
                     return null;
@@ -606,7 +630,5 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     finishReplay() {
         this.timerElement.pauseTimer();
-
-        
     }
 }
