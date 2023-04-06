@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-restricted-imports */
+/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
-import { Images } from '@common/interfaces/images';
+import { Images } from '@common/interfaces/images;';
 import { defaultRanking, Ranking } from '@common/interfaces/ranking';
 import 'dotenv/config';
 import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
@@ -102,7 +102,7 @@ export class GameStorageService {
 
         const gamesToReturn = [];
         for (const game of allGames) {
-            const images = await this.getGameImages(game.id.toString());
+            const images = this.getGameImages(game.id.toString());
             gamesToReturn.push({
                 gameData: game,
                 originalImage: images.originalImage,
@@ -130,7 +130,7 @@ export class GameStorageService {
     async getGameById(id: string) {
         const query = { id: parseInt(id, 10) };
         const game = await this.collection.findOne<GameData>(query);
-        const images: Images = await this.getGameImages(id);
+        const images: Images = this.getGameImages(id);
         return { gameData: game, images };
     }
 

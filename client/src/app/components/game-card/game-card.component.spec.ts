@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRanking } from '@common/interfaces/ranking';
+import { defaultRankings } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
 import { GameCardComponent } from './game-card.component';
 describe('GameCardComponent', () => {
@@ -30,8 +30,7 @@ describe('GameCardComponent', () => {
                     { x: 0, y: 0 },
                 ],
             ],
-            soloRanking: defaultRanking,
-            oneVersusOneRanking: defaultRanking,
+            ranking: defaultRankings,
         };
         component.game = { gameData: game, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable: '1' };
         component.isPlayable = true;
