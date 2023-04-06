@@ -40,8 +40,7 @@ export class GameRankingService {
                 } as RankingData;
             }
         } catch (e) {
-            // eslint-disable-next-line no-console
-            console.error(e);
+            return Promise.reject('The game is null');
         }
     }
 }

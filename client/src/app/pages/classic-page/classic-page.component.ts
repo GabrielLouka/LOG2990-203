@@ -136,6 +136,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         // console.log(this.currentGameId);
         // console.log(this.matchmakingService.currentMatchId);
         window.addEventListener('keydown', this.handleEvents.bind(this));
+        window.addEventListener('keydown', this.handleKeyUpEvent.bind(this));
+        // document.addEventListener('keydown', (event: KeyboardEvent) => { //will cause crash if first using button, then 'i'
+        //     if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
+        //         this.handleHintMode();
+        //     }
+        // });
+        this.hintService.reset();
     }
 
     sendSystemMessageToChat(message: string) {
@@ -443,7 +450,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     gameOver(isWinByDefault: boolean) {
         this.timerElement.pauseTimer();
-        this.socketService.disconnect();
         this.replayModeService.stopRecording();
         if (!isWinByDefault) {
             this.sendNewTimeScoreToServer();
@@ -496,7 +502,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode, startReplayAction);
     }
 
-    handleEvents(event: KeyboardEvent) {
+    handleEvents(event: KeyboardEvent | MouseEvent) {
         if (
             this.matchmakingService.isSoloMode ||
             this.matchmakingService.isLimitedTimeSolo ||
@@ -505,32 +511,48 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
         ) {
             if (this.replayModeService.shouldShowReplayModeGUI) return;
-            if (event.key === 't') {
-                if (this.letterTPressed) {
-                    this.startCheating();
-                } else {
-                    this.stopCheating();
+            if (event instanceof KeyboardEvent)
+            {
+                if (event.key === 't') {
+                    if (this.letterTPressed) {
+                        this.startCheating();
+                    } else {
+                        this.stopCheating();
+                    }
+                    this.letterTPressed = !this.letterTPressed;
                 }
-                this.letterTPressed = !this.letterTPressed;
-            }
-            if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
-                this.handleHintMode();
+                // else if (event.key === 'i'){
+                //     this.handleHintMode();
+                // }
+            } else if (event instanceof MouseEvent) {
+                const element = this.hintElement.div.nativeElement;
+                if (element && element.contains(event.target as HTMLElement)) {
+                  this.handleHintMode();
+                }
             }
         }
     }
+
+    handleKeyUpEvent(event: KeyboardEvent){
+        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)){
+            this.handleHintMode();
+            this.canvasHandlingService.focusKeyEvent(this.hintElement.div);
+        }
+    }
+
     onWinGameLimited(winningPlayer1: string, winningPlayer2: string, isWinByDefault: boolean) {
         this.gameOver(isWinByDefault);
         this.popUpElement.showGameOverPopUpLimited(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
     }
 
     handleHintMode() {
-        if (this.hintService.maxGivenHints !== 0) {
+        if (this.hintService.maxGivenHints.getValue() > 0) {
             this.hintService.showHint(
                 this.rightCanvas,
                 this.rightCanvasContext as CanvasRenderingContext2D,
                 this.canvasHandlingService.currentModifiedImage,
                 this.games[this.currentGameIndex].modifiedImage,
-                { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints, diffs: this.foundDifferences },
+                { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints.getValue(), diffs: this.foundDifferences },
             );
             this.hintService.decrement();
             this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds);
@@ -576,7 +598,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onReplaySpeedButtonClick(): void {
         this.currentReplaySpeedIndex = (this.currentReplaySpeedIndex + 1) % this.replaySpeedOptions.length;
-        DelayedMethod.speed = this.currentReplaySpeed;
+        this.replayModeService.replaySpeed = this.currentReplaySpeed;
     }
 
     finishReplay() {

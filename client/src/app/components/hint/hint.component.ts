@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HintService } from '@app/services/hint-service/hint.service';
 
 @Component({
@@ -7,14 +7,14 @@ import { HintService } from '@app/services/hint-service/hint.service';
     styleUrls: ['./hint.component.scss'],
 })
 export class HintComponent implements OnInit {    
-
-    maxGivenHints:number;
+    @ViewChild('hint') div: ElementRef;
+    maxGivenHints$ = this.hintService.counter$;
 
     constructor(private hintService: HintService){}
 
     ngOnInit(){
-        this.hintService.reset();
-        this.maxGivenHints = this.hintService.maxGivenHints;
+        // this.hintService.reset();
+        // this.maxGivenHints = this.hintService.maxGivenHints;
     }
     
 }
