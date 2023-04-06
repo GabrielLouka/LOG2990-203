@@ -12,7 +12,6 @@
             <button class="button-style game-btn" (click)="this.resetPopUpElement.showPopUp(true)">Réinitialiser les jeux</button>
         </div>
     </Section>
-    <app-spinner *ngIf="this.theGamesService.isLoading" class="spinner"></app-spinner>
     <div
         *ngIf="theGamesService && theGamesService.games && theGamesService.games.length === 0 && !this.theGamesService.isLoading"
         class="flex-column center button-style no-hover no-game"

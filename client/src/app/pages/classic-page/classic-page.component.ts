@@ -511,8 +511,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
         ) {
             if (this.replayModeService.shouldShowReplayModeGUI) return;
-            if (event instanceof KeyboardEvent)
-            {
+            if (event instanceof KeyboardEvent) {
                 if (event.key === 't') {
                     if (this.letterTPressed) {
                         this.startCheating();
@@ -527,14 +526,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             } else if (event instanceof MouseEvent) {
                 const element = this.hintElement.div.nativeElement;
                 if (element && element.contains(event.target as HTMLElement)) {
-                  this.handleHintMode();
+                    this.handleHintMode();
                 }
             }
         }
     }
 
-    handleKeyUpEvent(event: KeyboardEvent){
-        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)){
+    handleKeyUpEvent(event: KeyboardEvent) {
+        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
             this.handleHintMode();
             this.canvasHandlingService.focusKeyEvent(this.hintElement.div);
         }
@@ -552,7 +551,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.rightCanvasContext as CanvasRenderingContext2D,
                 this.canvasHandlingService.currentModifiedImage,
                 this.games[this.currentGameIndex].modifiedImage,
-                { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints.getValue(), diffs: this.foundDifferences },
+                {
+                    gameData: this.games[this.currentGameIndex].gameData,
+                    hints: this.hintService.maxGivenHints.getValue(),
+                    diffs: this.foundDifferences,
+                },
             );
             this.hintService.decrement();
             this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds);
