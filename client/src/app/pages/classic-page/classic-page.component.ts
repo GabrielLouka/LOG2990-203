@@ -23,7 +23,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { Observable, catchError, map, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -53,7 +53,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     differencesFound1: number = 0;
     differencesFound2: number = 0;
     minDifferences: number = 0;
-    canvasIsClickable: boolean = false;
     startingTime: Date;
     activePlayer: boolean;
     hasAlreadyReceiveMatchData: boolean = false;
@@ -134,8 +133,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
         DelayedMethod.speed = 1;
 
-        console.log(this.currentGameId);
-        console.log(this.matchmakingService.currentMatchId);
+        // console.log(this.currentGameId);
+        // console.log(this.matchmakingService.currentMatchId);
         window.addEventListener('keydown', this.handleEvents.bind(this));
     }
 
@@ -225,6 +224,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     async getInitialImagesFromServer() {
+        // this.canvasIsClickable = false;
+
         if (this.currentGameIndex === 0) {
             this.fetchGames().subscribe(async (games) => {
                 if (games) {
@@ -281,7 +282,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.minDifferences = Math.ceil(this.totalDifferences / 2);
         }
         this.requestStartGame();
-        this.canvasIsClickable = true;
         if (this.currentGameIndex === 0) {
             this.startTimer();
             this.replayModeService.startRecording();
@@ -296,19 +296,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
-        console.log('attempt at clicking', coordinateClick);
-        if (this.canvasIsClickable) {
-            this.socketService.send('validateDifference', {
-                foundDifferences: this.foundDifferences,
-                position: coordinateClick,
-                isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
-            });
-            console.log('click');
-            this.refreshErrorMessagePosition(event.clientX, event.clientY);
-            this.canvasHandlingService.focusKeyEvent(this.cheat);
-        } else {
-            console.log('canvas is not clickable');
-        }
+        // console.log('attempt at clicking', coordinateClick, this.canvasIsClickable);
+
+        this.socketService.send('validateDifference', {
+            foundDifferences: this.foundDifferences,
+            position: coordinateClick,
+            isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
+        });
+        console.log('click');
+        this.refreshErrorMessagePosition(event.clientX, event.clientY);
+        this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
 
     refreshErrorMessagePosition(x: number, y: number) {
