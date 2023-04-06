@@ -23,7 +23,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { catchError, map, Observable, of } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -511,8 +511,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
         ) {
             if (this.replayModeService.shouldShowReplayModeGUI) return;
-            if (event instanceof KeyboardEvent)
-            {
+            if (event instanceof KeyboardEvent) {
                 if (event.key === 't') {
                     if (this.letterTPressed) {
                         this.startCheating();
@@ -527,14 +526,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             } else if (event instanceof MouseEvent) {
                 const element = this.hintElement.div.nativeElement;
                 if (element && element.contains(event.target as HTMLElement)) {
-                  this.handleHintMode();
+                    this.handleHintMode();
                 }
             }
         }
     }
 
-    handleKeyUpEvent(event: KeyboardEvent){
-        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)){
+    handleKeyUpEvent(event: KeyboardEvent) {
+        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
             this.handleHintMode();
             this.canvasHandlingService.focusKeyEvent(this.hintElement.div);
         }
@@ -552,10 +551,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.rightCanvasContext as CanvasRenderingContext2D,
                 this.canvasHandlingService.currentModifiedImage,
                 this.games[this.currentGameIndex].modifiedImage,
-                { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints.getValue(), diffs: this.foundDifferences },
+                {
+                    gameData: this.games[this.currentGameIndex].gameData,
+                    hints: this.hintService.maxGivenHints.getValue(),
+                    diffs: this.foundDifferences,
+                },
             );
             this.hintService.decrement();
-            this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds);
+            this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
             this.timerElement.refreshTimerDisplay();
             this.hintService.showMessage(this.penaltyMessage);
         }

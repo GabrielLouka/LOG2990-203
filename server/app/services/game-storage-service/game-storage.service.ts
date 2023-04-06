@@ -157,7 +157,11 @@ export class GameStorageService {
     > {
         // checks if the number of games available for one page is under four
         const skipNumber = pageNumber * R_ONLY.gamesLimit;
-        const nextGames = await this.collection.find<GameData>({}).skip(skipNumber).limit(R_ONLY.gamesLimit).toArray();
+        const nextGames = await this.collection
+            .find<GameData>({}, { projection: { differences: 0, nbrDifferences: 0 } })
+            .skip(skipNumber)
+            .limit(R_ONLY.gamesLimit)
+            .toArray();
 
         const gamesToReturn = [];
         for (const game of nextGames) {

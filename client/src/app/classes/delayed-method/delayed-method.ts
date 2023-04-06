@@ -17,6 +17,14 @@ export class DelayedMethod {
         DelayedMethod.instances = [];
     }
 
+    static pauseAll(): void {
+        DelayedMethod.instances.forEach((instance) => instance.pause());
+    }
+
+    static resumeAll(): void {
+        DelayedMethod.instances.forEach((instance) => instance.resume());
+    }
+
     async start(): Promise<string> {
         this.isExecuted = false;
         this.isPaused = false;
