@@ -555,7 +555,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 { gameData: this.games[this.currentGameIndex].gameData, hints: this.hintService.maxGivenHints.getValue(), diffs: this.foundDifferences },
             );
             this.hintService.decrement();
-            this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds, true);
+            this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
             this.timerElement.refreshTimerDisplay();
             this.hintService.showMessage(this.penaltyMessage);
         }

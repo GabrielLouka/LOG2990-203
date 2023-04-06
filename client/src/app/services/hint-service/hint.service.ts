@@ -25,11 +25,11 @@ export class HintService {
         this.maxGivenHints.next(currentValue - 1);
     }
 
-    handleHint(chat: ChatComponent, time: number, isClassic: boolean) {
+    handleHint(chat: ChatComponent, time: number, isLimited: boolean) {
         const now = new Date();
         const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';
         chat.sendSystemMessage(formattedTime);
-        return isClassic ? time + 10 : time - 10; // will be a constant, and will recall same method for LT but negation
+        return isLimited ? time - 10 : time + 10; // will be a constant, and will recall same method for LT but negation
     }
 
     showMessage(penaltyMessage: ElementRef) {
