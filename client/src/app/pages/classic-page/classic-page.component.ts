@@ -70,9 +70,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
-    randomQuadrant: { x: number; y: number; width: number; height: number };
-    randomSubQuadrant: { x: number; y: number; width: number; height: number };
-    randomCircle: Vector2;
 
     replaySpeedOptions: number[] = [SPEED_X1, SPEED_X2, SPEED_X4];
     currentReplaySpeedIndex = 0;
@@ -84,8 +81,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private route: ActivatedRoute,
         public matchmakingService: MatchmakingService,
         private chatService: ChatService,
-        private historyService: HistoryService,
         private hintService: HintService,
+        private historyService: HistoryService,
     ) {}
 
     get leftCanvasContext() {
@@ -306,7 +303,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.replayModeService.startRecording();
         }
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
-        this.hintService.initialzeGame({ game: this.games[this.currentGameIndex].gameData, foundDifferences: this.foundDifferences });
     }
 
     startTimer() {
@@ -610,5 +606,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     finishReplay() {
         this.timerElement.pauseTimer();
+
+        
     }
 }
