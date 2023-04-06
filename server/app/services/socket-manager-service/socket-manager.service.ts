@@ -78,6 +78,11 @@ export class SocketManager {
                 sendGameMatchProgressUpdate(data.matchId);
             });
 
+            socket.on('setWinner', (data: { matchId: string; winner: Player }) => {
+                this.matchManagerService.setMatchWinner(data.matchId, data.winner);
+                sendMatchUpdate({ matchId: data.matchId });
+            });
+
             socket.on('joinRoom', (data: { matchId: string }) => {
                 joinMatchRoom(data);
             });

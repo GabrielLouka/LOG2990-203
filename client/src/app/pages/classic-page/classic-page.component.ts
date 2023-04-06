@@ -22,7 +22,6 @@ import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
-import { QUADRANTS, SUB_QUADRANTS } from "@common/utils/env.quadrants";
 import { Buffer } from 'buffer';
 import { Observable, catchError, map, of } from 'rxjs';
 
@@ -117,6 +116,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.replaySpeedOptions[this.currentReplaySpeedIndex];
     }
 
+    get numberOfDifferencesRequiredToWin(): number {
+        return this.isOneVersusOne ? this.minDifferences : this.totalDifferences;
+    }
+
     getPlayerUsername(isPlayer1: boolean): string {
         if (isPlayer1) return this.matchmakingService.player1Username;
         return this.matchmakingService.player2Username;
@@ -150,10 +153,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         //         this.handleHintMode();
         //     }
         // });
-
-        this.randomQuadrant = this.generateRandomQuadrant(QUADRANTS);
-        this.randomSubQuadrant = this.generateRandomQuadrant(SUB_QUADRANTS);
-        this.randomCircle = this.generateRandomDifference();
         
         this.hintService.reset();
     }
@@ -164,24 +163,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.replayModeService.stopAllPlayingActions();
-        if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode)
+        if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode) {
             this.historyService.createHistoryData(
                 this.player1,
-                this.isWinByDefault,
+                this.differencesFound1 < this.totalDifferences,
                 this.matchmakingService.isSoloMode,
                 this.player1,
                 this.player2,
                 this.timerElement.getTime(),
             );
-        else if (this.matchmakingService.isSoloMode)
-            this.historyService.createHistoryData(
-                this.player1,
-                !this.isWinByDefault,
-                this.matchmakingService.isSoloMode,
-                this.player1,
-                this.player2,
-                this.timerElement.getTime(),
-            );
+        }
         this.socketService.disconnect();
     }
 
@@ -201,21 +192,23 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         if (match) {
             this.onReceiveMatchData();
-            if (this.isSolo || this.isOneVersusOne) {
-                if (this.isPlayer2Win(match)) {
-                    this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
-                } else if (this.isPlayer1Win(match)) {
-                    this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
-                }
-            } else {
-                if ((this.isPlayer2Win(match) || this.isPlayer1Win(match)) && this.isCoop) {
-                    this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
-                } else if (this.isPlayer1Win(match)) {
-                    this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+            if (this.matchmakingService.currentMatch?.matchStatus === MatchStatus.InProgress) {
+                if (this.isSolo || this.isOneVersusOne) {
+                    if (this.isPlayer2Win(match)) {
+                        this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGame(false, this.isWinByDefault);
+                    } else if (this.isPlayer1Win(match)) {
+                        this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGame(true, this.isWinByDefault);
+                    }
+                } else {
+                    if ((this.isPlayer2Win(match) || this.isPlayer1Win(match)) && this.isCoop) {
+                        this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+                    } else if (this.isPlayer1Win(match)) {
+                        this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+                    }
                 }
             }
         }
@@ -358,7 +351,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (this.matchmakingService.isLimitedTimeSolo || this.matchmakingService.isCoopMode) {
                         if (this.currentGameIndex === this.games.length - 1) {
-                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
+                            this.onWinGame(true, !this.isWinByDefault);
                         } else {
                             this.currentGameIndex++;
                             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -370,13 +363,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                             }
                             this.getInitialImagesFromServer();
                         }
-                    } else if (this.matchmakingService.isOneVersusOne) {
-                        if (this.differencesFound1 >= this.minDifferences) {
-                            this.onWinGame(this.player2, !this.isWinByDefault);
-                        } else if (this.differencesFound2 >= this.minDifferences) this.onWinGame(this.player2, !this.isWinByDefault);
-                    } else if (this.isSolo) {
-                        if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.player1, !this.isWinByDefault);
+                    } else {
+                        const player1Wins = this.differencesFound1 >= this.numberOfDifferencesRequiredToWin;
+                        const player2Wins = this.differencesFound2 >= this.numberOfDifferencesRequiredToWin;
+                        if (player1Wins || player2Wins) {
+                            this.onWinGame(player1Wins, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -489,9 +480,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showConfirmationPopUp();
     }
 
-    onWinGame(winningPlayer: string, isWinByDefault: boolean) {
-        if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.isOneVersusOne) {
-            console.log('Win by : ' + winningPlayer);
+    onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
+        const winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
+        if (this.isPlayer1 === isPlayer1Win) {
+            console.log('You Win : ' + winningPlayer);
             this.historyService.createHistoryData(
                 winningPlayer,
                 isWinByDefault,
@@ -500,16 +492,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.player2,
                 this.timerElement.getTime(),
             );
-        } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
-            console.log('Win by default' + winningPlayer);
-            this.historyService.createHistoryData(
-                winningPlayer,
-                isWinByDefault,
-                this.matchmakingService.isSoloMode,
-                this.player1,
-                this.player2,
-                this.timerElement.getTime(),
-            );
+
+            this.socketService.send('setWinner', {
+                matchId: this.matchmakingService.currentMatchId,
+                winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
+            });
         }
         this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
         this.gameOver(isWinByDefault);
@@ -526,8 +513,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
         ) {
             if (this.replayModeService.shouldShowReplayModeGUI) return;
-            if (event instanceof KeyboardEvent)
-            {
+            if (event instanceof KeyboardEvent) {
                 if (event.key === 't') {
                     if (this.letterTPressed) {
                         this.startCheating();
@@ -542,14 +528,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             } else if (event instanceof MouseEvent) {
                 const element = this.hintElement.div.nativeElement;
                 if (element && element.contains(event.target as HTMLElement)) {
-                  this.handleHintMode();
+                    this.handleHintMode();
                 }
             }
         }
     }
 
-    handleKeyUpEvent(event: KeyboardEvent){
-        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)){
+    handleKeyUpEvent(event: KeyboardEvent) {
+        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
             this.handleHintMode();
             this.canvasHandlingService.focusKeyEvent(this.hintElement.div);
         }
@@ -559,37 +545,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver(isWinByDefault);
         this.popUpElement.showGameOverPopUpLimited(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
     }    
-
-    generateRandomDifference(){
-        let randomIndex;
-        let randomDifference;
-        let randomVector;     
-        let diffFound;
-        do {
-            randomIndex = Math.floor(Math.random() * this.games[this.currentGameIndex].gameData.differences.length);
-            diffFound = this.foundDifferences[randomIndex];
-            
-        } while(diffFound);
-        randomDifference = this.games[this.currentGameIndex].gameData.differences[randomIndex];
-        randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];
-        return randomVector;
-    }
-
-    generateRandomQuadrant(quadrants: { x: number; y: number; width: number; height: number}[]){
-        const randomVector = this.generateRandomDifference();
-        let rect;
-        do {
-            let randomSection = Math.floor(Math.random() * quadrants.length);
-
-            rect = quadrants[randomSection];            
-
-        } while(
-            !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
-                ((CANVAS_HEIGHT - randomVector.y >= rect.y) && 
-                (CANVAS_HEIGHT - randomVector.y < rect.y + rect.height)))
-        );
-        return rect;
-    }
     
     handleHintMode() {
 

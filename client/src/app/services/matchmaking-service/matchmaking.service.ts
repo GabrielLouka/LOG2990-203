@@ -86,6 +86,14 @@ export class MatchmakingService {
         this.currentMatch = match;
     }
 
+    get player1(): Player | null | undefined {
+        return this.currentMatch?.player1;
+    }
+
+    get player2(): Player | null | undefined {
+        return this.currentMatch?.player1;
+    }
+
     // This is NOT supposed to be a setter because it communicates with the server!
     // :)
     setCurrentMatchType(matchType: MatchType) {
