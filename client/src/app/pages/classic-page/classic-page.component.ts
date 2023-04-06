@@ -601,7 +601,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onReplaySpeedButtonClick(): void {
         this.currentReplaySpeedIndex = (this.currentReplaySpeedIndex + 1) % this.replaySpeedOptions.length;
-        DelayedMethod.speed = this.currentReplaySpeed;
+        this.replayModeService.replaySpeed = this.currentReplaySpeed;
     }
 
     finishReplay() {
