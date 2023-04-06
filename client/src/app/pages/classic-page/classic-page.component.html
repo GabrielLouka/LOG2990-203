@@ -41,7 +41,7 @@
                 <app-timer
                     #timerElement
                     [incrementTime]="currentGameId !== '-1'"
-                    (timeReachedZero)="onWinGame(getPlayerUsername(true), !this.isWinByDefault)"
+                    (timeReachedZero)="onWinGame(true, !this.isWinByDefault)"
                 ></app-timer>
             </div>
         </div>

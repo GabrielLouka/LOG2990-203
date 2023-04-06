@@ -70,6 +70,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
+    randomQuadrant: { x: number; y: number; width: number; height: number };
+    randomSubQuadrant: { x: number; y: number; width: number; height: number };
+    randomCircle: Vector2;
 
     replaySpeedOptions: number[] = [SPEED_X1, SPEED_X2, SPEED_X4];
     currentReplaySpeedIndex = 0;
@@ -81,8 +84,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private route: ActivatedRoute,
         public matchmakingService: MatchmakingService,
         private chatService: ChatService,
-        private hintService: HintService,
         private historyService: HistoryService,
+        private hintService: HintService,
     ) {}
 
     get leftCanvasContext() {
@@ -120,6 +123,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.replaySpeedOptions[this.currentReplaySpeedIndex];
     }
 
+    get numberOfDifferencesRequiredToWin(): number {
+        return this.isOneVersusOne ? this.minDifferences : this.totalDifferences;
+    }
+
     getPlayerUsername(isPlayer1: boolean): string {
         if (isPlayer1) return this.matchmakingService.player1Username;
         return this.matchmakingService.player2Username;
@@ -138,6 +145,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
         this.canvasHandlingService = new CanvasHandlingService(this.leftCanvas, this.rightCanvas, new ImageManipulationService());
+
         // Replay Mode Initialization
         this.replayModeService.onStartReplayMode.add(this.resetGame.bind(this));
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
@@ -150,6 +158,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         //         this.handleHintMode();
         //     }
         // });
+
         this.hintService.reset();
     }
 
@@ -159,24 +168,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.replayModeService.stopAllPlayingActions();
-        if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode)
+        if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode) {
             this.historyService.createHistoryData(
                 this.player1,
-                this.isWinByDefault,
+                this.differencesFound1 < this.totalDifferences,
                 this.matchmakingService.isSoloMode,
                 this.player1,
                 this.player2,
                 this.timerElement.getTime(),
             );
-        else if (this.matchmakingService.isSoloMode)
-            this.historyService.createHistoryData(
-                this.player1,
-                !this.isWinByDefault,
-                this.matchmakingService.isSoloMode,
-                this.player1,
-                this.player2,
-                this.timerElement.getTime(),
-            );
+        }
         this.socketService.disconnect();
     }
 
@@ -196,21 +197,23 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         if (match) {
             this.onReceiveMatchData();
-            if (this.isSolo || this.isOneVersusOne) {
-                if (this.isPlayer2Win(match)) {
-                    this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGame(this.player2.toUpperCase(), this.isWinByDefault);
-                } else if (this.isPlayer1Win(match)) {
-                    this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGame(this.player1.toUpperCase(), this.isWinByDefault);
-                }
-            } else {
-                if ((this.isPlayer2Win(match) || this.isPlayer1Win(match)) && this.isCoop) {
-                    this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
-                } else if (this.isPlayer1Win(match)) {
-                    this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
-                    this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+            if (this.matchmakingService.currentMatch?.matchStatus === MatchStatus.InProgress) {
+                if (this.isSolo || this.isOneVersusOne) {
+                    if (this.isPlayer2Win(match)) {
+                        this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGame(false, this.isWinByDefault);
+                    } else if (this.isPlayer1Win(match)) {
+                        this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGame(true, this.isWinByDefault);
+                    }
+                } else {
+                    if ((this.isPlayer2Win(match) || this.isPlayer1Win(match)) && this.isCoop) {
+                        this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+                    } else if (this.isPlayer1Win(match)) {
+                        this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
+                        this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
+                    }
                 }
             }
         }
@@ -235,6 +238,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
+
         window.removeEventListener('keydown', this.handleEvents.bind(this));
     }
 
@@ -302,6 +306,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.replayModeService.startRecording();
         }
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
+        this.hintService.initialzeGame({ game: this.games[this.currentGameIndex].gameData, foundDifferences: this.foundDifferences });
     }
 
     startTimer() {
@@ -348,7 +353,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (this.matchmakingService.isLimitedTimeSolo || this.matchmakingService.isCoopMode) {
                         if (this.currentGameIndex === this.games.length - 1) {
-                            this.onWinGame(this.matchmakingService.player1Username, !this.isWinByDefault);
+                            this.onWinGame(true, !this.isWinByDefault);
                         } else {
                             this.currentGameIndex++;
                             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -360,13 +365,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                             }
                             this.getInitialImagesFromServer();
                         }
-                    } else if (this.matchmakingService.isOneVersusOne) {
-                        if (this.differencesFound1 >= this.minDifferences) {
-                            this.onWinGame(this.player2, !this.isWinByDefault);
-                        } else if (this.differencesFound2 >= this.minDifferences) this.onWinGame(this.player2, !this.isWinByDefault);
-                    } else if (this.isSolo) {
-                        if (this.differencesFound1 >= this.totalDifferences) {
-                            this.onWinGame(this.player1, !this.isWinByDefault);
+                    } else {
+                        const player1Wins = this.differencesFound1 >= this.numberOfDifferencesRequiredToWin;
+                        const player2Wins = this.differencesFound2 >= this.numberOfDifferencesRequiredToWin;
+                        if (player1Wins || player2Wins) {
+                            this.onWinGame(player1Wins, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -479,8 +482,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showConfirmationPopUp();
     }
 
-    onWinGame(winningPlayer: string, isWinByDefault: boolean) {
-        if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.isOneVersusOne) {
+    onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
+        const winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
+        if (this.isPlayer1 === isPlayer1Win) {
+            console.log('You Win : ' + winningPlayer);
             this.historyService.createHistoryData(
                 winningPlayer,
                 isWinByDefault,
@@ -489,15 +494,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.player2,
                 this.timerElement.getTime(),
             );
-        } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
-            this.historyService.createHistoryData(
-                winningPlayer,
-                isWinByDefault,
-                this.matchmakingService.isSoloMode,
-                this.player1,
-                this.player2,
-                this.timerElement.getTime(),
-            );
+
+            this.socketService.send('setWinner', {
+                matchId: this.matchmakingService.currentMatchId,
+                winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
+            });
         }
         this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
         this.gameOver(isWinByDefault);

@@ -25,6 +25,15 @@ export class MatchManagerService {
         if (matchToUpdate) matchToUpdate.matchType = matchType;
     }
 
+    setMatchWinner(matchId: string, winner: Player) {
+        const matchToUpdate = this.getMatchById(matchId);
+        if (matchToUpdate?.matchStatus === MatchStatus.InProgress) {
+            matchToUpdate.matchStatus = winner.playerId === matchToUpdate.player1?.playerId ? MatchStatus.Player1Win : MatchStatus.Player2Win;
+        }
+
+        console.log('Match winner set : ' + JSON.stringify(matchToUpdate));
+    }
+
     setMatchPlayer(matchId: string, player: Player) {
         const matchToUpdate = this.getMatchById(matchId);
 
@@ -35,6 +44,11 @@ export class MatchManagerService {
             } else {
                 matchToUpdate.player2 = player;
                 if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer2) matchToUpdate.matchStatus = MatchStatus.InProgress;
+            }
+
+            if ((matchToUpdate.matchType === MatchType.Solo || matchToUpdate.matchType === MatchType.LimitedSolo) && matchToUpdate.player1)
+            {
+                matchToUpdate.matchStatus = MatchStatus.InProgress;
             }
         }
     }
@@ -59,6 +73,8 @@ export class MatchManagerService {
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
             else modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
         }
+
+        console.log('MatchManagerService: removePlayerFromMatch: ', modifiedMatch);
 
         return modifiedMatch?.matchId ?? null;
     }
