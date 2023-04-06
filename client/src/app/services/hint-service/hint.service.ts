@@ -15,6 +15,9 @@ export class HintService {
 
     constructor(private imageManipulationService: ImageManipulationService) {}
 
+    initialize() {
+        this.imageManipulationService.randomNumber = Math.random();
+    }
 
     reset() {
         this.maxGivenHints.next(NUMBER_HINTS);

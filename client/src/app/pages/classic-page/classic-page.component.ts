@@ -157,6 +157,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         // });
 
         this.hintService.reset();
+        this.hintService.initialize();
     }
 
     sendSystemMessageToChat(message: string) {
@@ -606,7 +607,5 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     finishReplay() {
         this.timerElement.pauseTimer();
-
-        
     }
 }
