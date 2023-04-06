@@ -107,11 +107,13 @@ export class ReplayModeService {
             this.recordedActions.forEach((action) => {
                 action.pause();
             });
+            DelayedMethod.pauseAll();
         } else if (this.currentState === ReplayModeState.Paused) {
             this.resumeReplayingTimer();
             this.recordedActions.forEach((action) => {
                 action.resume();
             });
+            DelayedMethod.resumeAll();
         }
     }
 
