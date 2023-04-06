@@ -170,11 +170,32 @@ export class ImageManipulationService {
         randomDifference = game.differences[randomIndex];
         randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
 
-        await this.blinkQuadrant(canvasContext.context, {x: randomVector.x, y: height - randomVector.y, width: 20, height: 20});
+        await this.blinkDisk(canvasContext.context, randomVector.x, height - randomVector.y);
 
         this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
 
         
+    }
+
+    async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number){
+        const radius = 70; 
+        const startAngle = 0; 
+        const endAngle = Math.PI * 2; 
+        const anticlockwise = false; 
+                
+        for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
+            context.fillStyle = '#FF0000';
+            context.beginPath();
+            context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+            context.fill();
+            await this.sleep(QUARTER_SECOND);
+            context.fillStyle = '#0000FF';
+            context.beginPath();
+            context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+            context.fill();
+            await this.sleep(QUARTER_SECOND);            
+        }
+
     }
 
 
