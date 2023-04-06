@@ -164,12 +164,13 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
             const serverResult: ImageUploadResult = JSON.parse(response.body);
             this.resultModal.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
             this.formToSendAfterServerConfirmation = {
-                differences: serverResult.differences,
+                nbrOfDifferences: serverResult.numberOfDifferences,
                 firstImage,
                 secondImage,
                 gameId: serverResult.generatedGameId,
                 gameName: '',
                 isEasy: serverResult.isEasy,
+                radius: this.enlargementRadius,
             };
             this.totalDifferences = serverResult.numberOfDifferences;
             this.isEasy = serverResult.isEasy;

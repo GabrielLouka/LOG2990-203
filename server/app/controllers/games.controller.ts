@@ -1,4 +1,5 @@
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { GameData } from '@common/interfaces/game-data';
@@ -10,7 +11,11 @@ import { Service } from 'typedi';
 @Service()
 export class GamesController {
     router: Router;
-    constructor(public gameStorageService: GameStorageService, public matchManagerService: MatchManagerService) {
+    constructor(
+        public gameStorageService: GameStorageService,
+        public matchManagerService: MatchManagerService,
+        public imageProcessingService: ImageProcessingService,
+    ) {
         this.configureRouter();
     }
 
@@ -59,13 +64,14 @@ export class GamesController {
             this.gameStorageService.storeGameImages(receivedNameForm.gameId, buffer1, buffer2);
             const newGameToAdd: GameData = {
                 id: receivedNameForm.gameId,
-                nbrDifferences: receivedNameForm.differences.length,
-                differences: receivedNameForm.differences,
+                nbrDifferences: receivedNameForm.nbrOfDifferences,
+                differences: this.imageProcessingService.getDifferencesPositionsList(buffer1, buffer2, receivedNameForm.radius),
                 name: receivedNameForm.gameName,
                 isEasy: receivedNameForm.isEasy,
                 oneVersusOneRanking: defaultRanking,
                 soloRanking: defaultRanking,
             };
+
             this.gameStorageService
                 .storeGameResult(newGameToAdd)
                 .then(() => {

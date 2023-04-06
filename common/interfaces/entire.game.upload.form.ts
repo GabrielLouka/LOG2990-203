@@ -1,4 +1,3 @@
-import { Vector2 } from '../classes/vector2';
 import { DifferenceImage } from './difference.image';
 
 // After the client sends the ImageUploadForm, the server sends back an ImageUploadResult
@@ -8,7 +7,8 @@ export interface EntireGameUploadForm {
     gameId: number;
     firstImage: DifferenceImage;
     secondImage: DifferenceImage;
-    differences: Vector2[][];
+    nbrOfDifferences: number;
     gameName: string;
     isEasy: boolean;
+    radius: number;
 }

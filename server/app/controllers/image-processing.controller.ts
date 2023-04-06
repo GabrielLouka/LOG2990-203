@@ -29,7 +29,6 @@ export class ImageProcessingController {
                 numberOfDifferences: 0,
                 message: '',
                 generatedGameId: NOT_FOUND,
-                differences: [],
                 isEasy: true,
             };
             try {

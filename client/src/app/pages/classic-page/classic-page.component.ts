@@ -21,9 +21,19 @@ import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
-import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
+import {
+    ABORTED_GAME_MESSAGE,
+    CANVAS_HEIGHT,
+    LIMITED_TIME_DURATION,
+    MILLISECOND_TO_SECONDS,
+    SPEED_X1,
+    SPEED_X2,
+    SPEED_X4,
+    VOLUME_ERROR,
+    VOLUME_SUCCESS,
+} from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { Observable, catchError, map, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -61,7 +71,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
 
-    replaySpeedOptions: number[] = [1, 2, 4];
+    replaySpeedOptions: number[] = [SPEED_X1, SPEED_X2, SPEED_X4];
     currentReplaySpeedIndex = 0;
     // eslint-disable-next-line max-params
     constructor(
@@ -133,8 +143,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
         DelayedMethod.speed = 1;
 
-        // console.log(this.currentGameId);
-        // console.log(this.matchmakingService.currentMatchId);
         window.addEventListener('keydown', this.handleEvents.bind(this));
         window.addEventListener('keydown', this.handleKeyUpEvent.bind(this));
         // document.addEventListener('keydown', (event: KeyboardEvent) => { //will cause crash if first using button, then 'i'
@@ -303,14 +311,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
-        // console.log('attempt at clicking', coordinateClick, this.canvasIsClickable);
-
         this.socketService.send('validateDifference', {
             foundDifferences: this.foundDifferences,
             position: coordinateClick,
             isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
         });
-        console.log('click');
         this.refreshErrorMessagePosition(event.clientX, event.clientY);
         this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
@@ -476,7 +481,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGame(winningPlayer: string, isWinByDefault: boolean) {
         if (this.getPlayerUsername(this.matchmakingService.isPlayer1) === winningPlayer && this.matchmakingService.isOneVersusOne) {
-            console.log('Win by : ' + winningPlayer);
             this.historyService.createHistoryData(
                 winningPlayer,
                 isWinByDefault,
@@ -486,7 +490,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.timerElement.getTime(),
             );
         } else if (this.matchmakingService.isPlayer1 && isWinByDefault) {
-            console.log('Win by default' + winningPlayer);
             this.historyService.createHistoryData(
                 winningPlayer,
                 isWinByDefault,

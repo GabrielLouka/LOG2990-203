@@ -51,7 +51,11 @@ const INITIAL_PENALTY = 5;
 const INITIAL_BONUS = 5;
 const MAX_PENALTY = 10;
 const MAX_BONUS = 10;
+const SPEED_X1 = 1;
+const SPEED_X2 = 2;
+const SPEED_X4 = 4;
 
+export { SPEED_X1, SPEED_X2, SPEED_X4 };
 export {
     DO_YOU_WANT_TO_PLAY_WITH_MESSAGE,
     WAITING_FOR_PLAYER_MESSAGE,
