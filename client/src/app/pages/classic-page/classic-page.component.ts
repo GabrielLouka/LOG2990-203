@@ -570,23 +570,28 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleHintMode() {
-        if (this.hintService.maxGivenHints.getValue() > 0) {
-            this.hintService.showHint(
-                this.rightCanvas,
-                this.rightCanvasContext as CanvasRenderingContext2D,
-                this.canvasHandlingService.currentModifiedImage,
-                this.games[this.currentGameIndex].modifiedImage,
-                {
-                    gameData: this.games[this.currentGameIndex].gameData,
-                    hints: this.hintService.maxGivenHints.getValue(),
-                    diffs: this.foundDifferences,
-                },
-            );
-            this.hintService.decrement();
-            this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
-            this.timerElement.refreshTimerDisplay();
-            this.hintService.showMessage(this.penaltyMessage);
-        }
+        const showHintMethod = () => {
+            if (this.hintService.maxGivenHints.getValue() > 0) {
+                this.hintService.showHint(
+                    this.rightCanvas,
+                    this.rightCanvasContext as CanvasRenderingContext2D,
+                    this.canvasHandlingService.currentModifiedImage,
+                    this.games[this.currentGameIndex].modifiedImage,
+                    {
+                        gameData: this.games[this.currentGameIndex].gameData,
+                        hints: this.hintService.maxGivenHints.getValue(),
+                        diffs: this.foundDifferences,
+                    },
+                );
+                this.hintService.decrement();
+                this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
+                this.timerElement.refreshTimerDisplay();
+                this.hintService.showRedError(this.penaltyMessage);
+            }
+        };
+        showHintMethod();
+        this.hintService.sendHintMessage(this.chat);
+        this.replayModeService.addMethodToReplay(showHintMethod);
     }
 
     startCheating() {
@@ -622,6 +627,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.chat.resetChat();
         this.differencesFound1 = 0;
         this.differencesFound2 = 0;
+        this.hintService.reset();
     }
 
     onReplaySpeedButtonClick(): void {

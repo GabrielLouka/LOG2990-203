@@ -29,13 +29,16 @@ export class HintService {
     }
 
     handleHint(chat: ChatComponent, time: number, isLimited: boolean) {
-        const now = new Date();
-        const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';
-        chat.sendSystemMessage(formattedTime);
         return isLimited ? time - 10 : time + 10; // will be a constant, and will recall same method for LT but negation
     }
 
-    showMessage(penaltyMessage: ElementRef) {
+    sendHintMessage(chat: ChatComponent) {
+        const now = new Date();
+        const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';
+        chat.sendSystemMessage(formattedTime);
+    }
+
+    showRedError(penaltyMessage: ElementRef) {
         penaltyMessage.nativeElement.style.display = this.returnDisplay('block');
         setTimeout(() => {
             if (penaltyMessage.nativeElement.style.display !== 'none') {

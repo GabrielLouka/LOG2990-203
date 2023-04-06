@@ -102,11 +102,14 @@ export class ImageManipulationService {
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
         console.log('random rect', randomRect);
         console.log('random rect index', Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length));
-        await this.blinkQuadrant(canvasContext.context, randomRect);
-        this.loadCanvasImages(
-            this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
-            canvasContext.context,
-        );
+
+        const resetMethod = () =>
+            this.loadCanvasImages(
+                this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+                canvasContext.context,
+            );
+
+        await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
 
     async showSecondHint(
@@ -150,11 +153,12 @@ export class ImageManipulationService {
         const randomRect =
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
-        await this.blinkQuadrant(canvasContext.context, randomRect);
-        this.loadCanvasImages(
-            this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
-            canvasContext.context,
-        );
+        const resetMethod = () =>
+            this.loadCanvasImages(
+                this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+                canvasContext.context,
+            );
+        await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
 
     async showThirdHint(
@@ -165,43 +169,66 @@ export class ImageManipulationService {
         const height = canvasContext.canvas.nativeElement.height;
         const randomVector = this.generateRandomVector(game, differences);
 
-        await this.blinkDisk(canvasContext.context, randomVector.x, height - randomVector.y);
+        const resetMethod = () =>
+            this.loadCanvasImages(
+                this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+                canvasContext.context,
+            );
 
-        this.loadCanvasImages(
-            this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
-            canvasContext.context,
-        );
+        await this.blinkDisk(canvasContext.context, randomVector.x, height - randomVector.y, resetMethod);
     }
 
-    async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number) {
+    async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number, reset: () => void) {
         const radius = 70;
         const startAngle = 0;
         const endAngle = Math.PI * 2;
         const anticlockwise = false;
 
+        const wholeBlink = new Action<void>();
+        let blinkCount = 0;
         for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
-            context.fillStyle = '#FF0000';
-            context.beginPath();
-            context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-            context.fill();
-            await this.sleep(QUARTER_SECOND);
-            context.fillStyle = '#0000FF';
-            context.beginPath();
-            context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-            context.fill();
-            await this.sleep(QUARTER_SECOND);
+            blinkCount++;
+            const blink1 = new DelayedMethod(() => {
+                context.fillStyle = '#FF0000';
+                context.beginPath();
+                context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                context.fill();
+            }, QUARTER_SECOND * blinkCount);
+            blinkCount++;
+            const blink2 = new DelayedMethod(() => {
+                context.fillStyle = '#0000FF';
+                context.beginPath();
+                context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                context.fill();
+            }, QUARTER_SECOND * blinkCount);
+            wholeBlink.add(async () => blink1.start());
+            wholeBlink.add(async () => blink2.start());
         }
+        const resetDelayedMethod = new DelayedMethod(reset, QUARTER_SECOND * (blinkCount + 1));
+        wholeBlink.add(async () => resetDelayedMethod.start());
+        wholeBlink.invoke();
     }
 
-    async blinkQuadrant(context: CanvasRenderingContext2D, rect: { x: number; y: number; width: number; height: number }) {
+    async blinkQuadrant(context: CanvasRenderingContext2D, rect: { x: number; y: number; width: number; height: number }, reset: () => void) {
+        const wholeBlink = new Action<void>();
+        let blinkCount = 0;
         for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
-            context.fillStyle = '#FF0000';
-            context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
-            await this.sleep(QUARTER_SECOND);
-            context.fillStyle = '#0000FF';
-            context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
-            await this.sleep(QUARTER_SECOND);
+            blinkCount++;
+            const blink1 = new DelayedMethod(() => {
+                context.fillStyle = '#FF0000';
+                context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
+            }, QUARTER_SECOND * blinkCount);
+            blinkCount++;
+            const blink2 = new DelayedMethod(() => {
+                context.fillStyle = '#0000FF';
+                context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
+            }, QUARTER_SECOND * blinkCount);
+            wholeBlink.add(async () => blink1.start());
+            wholeBlink.add(async () => blink2.start());
         }
+        const resetDelayedMethod = new DelayedMethod(reset, QUARTER_SECOND * (blinkCount + 1));
+        wholeBlink.add(async () => resetDelayedMethod.start());
+        wholeBlink.invoke();
     }
 
     generatePseudoRandomNumber() {
@@ -212,7 +239,6 @@ export class ImageManipulationService {
         this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
         const wholeBlink = new Action<void>();
         let blinkCount = 0;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
             blinkCount++;
             const blink1 = new DelayedMethod(() => {
