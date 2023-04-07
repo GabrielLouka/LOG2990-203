@@ -54,37 +54,9 @@ export class ImageProcessingService {
             numberOfDifferences: allDifferences.length,
             message: 'Success!',
             generatedGameId: -1,
+            differences: allDifferences,
             isEasy: !this.isHard(allDifferences.length, sumOfAllDifferences),
         };
-    };
-
-    getDifferencesPositionsList = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): Vector2[][] => {
-        const visitRadius = radius;
-        const differencesList: Vector2[][] = [[]];
-        const currentDifferenceGroupIndex = 0;
-        const allPixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
-        const allPixelsToVisitSet: Set<string> = new Set();
-        allPixelsToVisit.forEach((pixel) => {
-            allPixelsToVisitSet.add(pixel.x + ' ' + pixel.y);
-        });
-
-        const alreadyVisited: Map<string, number> = new Map();
-        const nextPixelsToVisit: Queue<{ pos: Vector2; radius: number }> = new Queue();
-        const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
-        const visitData: VisitData = { alreadyVisited, allPixelsToVisitSet, visitRadius, imageDimensions };
-        const differenceObject = { currentDifferenceGroupIndex, differencesList };
-        while (allPixelsToVisit.length > 0) {
-            const nextPixel = allPixelsToVisit.pop();
-            nextPixelsToVisit.enqueue({ pos: nextPixel as Vector2, radius: visitData.visitRadius });
-
-            this.addingPixelToListOfDifference(visitData, nextPixelsToVisit, differenceObject);
-            if (differenceObject.differencesList[differenceObject.currentDifferenceGroupIndex].length > 0 && allPixelsToVisit.length > 0) {
-                differenceObject.differencesList.push([]);
-                differenceObject.currentDifferenceGroupIndex++;
-            }
-        }
-        if (differenceObject.differencesList[differenceObject.differencesList.length - 1].length === 0) differenceObject.differencesList.pop();
-        return differenceObject.differencesList;
     };
 
     private isHard = (numberOfDifferences: number, sumOfAllDifferences: Vector2[]): boolean => {
@@ -128,7 +100,34 @@ export class ImageProcessingService {
             return;
         }
     };
+    private getDifferencesPositionsList = (imageBuffer1: Buffer, imageBuffer2: Buffer, radius: number): Vector2[][] => {
+        const visitRadius = radius;
+        const differencesList: Vector2[][] = [[]];
+        const currentDifferenceGroupIndex = 0;
+        const allPixelsToVisit: Vector2[] = this.getDifferentPixelPositionsBetweenImages(imageBuffer1, imageBuffer2);
+        const allPixelsToVisitSet: Set<string> = new Set();
+        allPixelsToVisit.forEach((pixel) => {
+            allPixelsToVisitSet.add(pixel.x + ' ' + pixel.y);
+        });
 
+        const alreadyVisited: Map<string, number> = new Map();
+        const nextPixelsToVisit: Queue<{ pos: Vector2; radius: number }> = new Queue();
+        const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
+        const visitData: VisitData = { alreadyVisited, allPixelsToVisitSet, visitRadius, imageDimensions };
+        const differenceObject = { currentDifferenceGroupIndex, differencesList };
+        while (allPixelsToVisit.length > 0) {
+            const nextPixel = allPixelsToVisit.pop();
+            nextPixelsToVisit.enqueue({ pos: nextPixel as Vector2, radius: visitData.visitRadius });
+
+            this.addingPixelToListOfDifference(visitData, nextPixelsToVisit, differenceObject);
+            if (differenceObject.differencesList[differenceObject.currentDifferenceGroupIndex].length > 0 && allPixelsToVisit.length > 0) {
+                differenceObject.differencesList.push([]);
+                differenceObject.currentDifferenceGroupIndex++;
+            }
+        }
+        if (differenceObject.differencesList[differenceObject.differencesList.length - 1].length === 0) differenceObject.differencesList.pop();
+        return differenceObject.differencesList;
+    };
     private addingPixelToListOfDifference = (
         visitData: VisitData,
         nextPixelsToVisit: Queue<{

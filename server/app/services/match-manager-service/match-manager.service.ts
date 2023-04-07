@@ -46,8 +46,7 @@ export class MatchManagerService {
                 if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer2) matchToUpdate.matchStatus = MatchStatus.InProgress;
             }
 
-            if ((matchToUpdate.matchType === MatchType.Solo || matchToUpdate.matchType === MatchType.LimitedSolo) && matchToUpdate.player1)
-            {
+            if ((matchToUpdate.matchType === MatchType.Solo || matchToUpdate.matchType === MatchType.LimitedSolo) && matchToUpdate.player1) {
                 matchToUpdate.matchStatus = MatchStatus.InProgress;
             }
         }
