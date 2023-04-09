@@ -108,6 +108,7 @@ export class GameStorageService {
                 modifiedImage: images.modifiedImage,
             });
         }
+        // gamesToReturn.sort(() => Math.random() - 1 / 2);
         return gamesToReturn;
     }
     /**

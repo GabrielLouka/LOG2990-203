@@ -22,7 +22,7 @@
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="currentGameId !== '-1' ? (isOneVersusOne ? minDifferences : totalDifferences) : -1"
                     [ngClass]="{
-                        currentPlayer: activePlayer || this.isCoop
+                        currentPlayer: activePlayer
                     }"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
