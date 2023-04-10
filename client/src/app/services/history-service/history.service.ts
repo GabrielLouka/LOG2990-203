@@ -2,6 +2,7 @@
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { MatchType } from '@common/enums/match-type';
 import { HistoryData } from '@common/interfaces/history-data';
 
 @Injectable({
@@ -45,13 +46,32 @@ export class HistoryService {
         this.gameStartingTime = datePipe.transform(newDate, 'dd.MM.yyyy - HH:mm');
     }
 
-    // eslint-disable-next-line max-params
-    createHistoryData(winningPlayer: string, isWinByDefault: boolean, isSoloMode: boolean, player1: string, player2: string, endGameTime: string) {
-        const gameMode = isSoloMode ? 'Classic - Solo' : 'Classic - 1vs1';
-        const time = endGameTime;
+    matchTypeToString(matchType: MatchType): string {
+        switch (matchType) {
+            case MatchType.Solo: {
+                return 'Classique - Solo';
+            }
+            case MatchType.OneVersusOne: {
+                return 'Classique - 1vs1';
+            }
+            case MatchType.LimitedCoop: {
+                return 'Temps Limité - Coop';
+            }
+            case MatchType.LimitedSolo: {
+                return 'Temps Limité  - Solo';
+            }
+            default: {
+                return 'sus';
+            }
+        }
+    }
 
-        const player1Username = isSoloMode ? player1 : winningPlayer;
-        const player2Username = isSoloMode ? '' : player2 === winningPlayer ? player1 : player2;
+    // eslint-disable-next-line max-params
+    createHistoryData(winningPlayer: string, isWinByDefault: boolean, matchType: MatchType, player1: string, player2: string, endGameTime: string) {
+        const time = endGameTime;
+        const gameMode = this.matchTypeToString(matchType);
+        const player1Username = matchType === MatchType.Solo ? player1 : winningPlayer;
+        const player2Username = matchType === MatchType.Solo ? '' : player2 === winningPlayer ? player1 : player2;
         this.historyToSave = {
             startingTime: this.gameStartingTime,
             duration: time,

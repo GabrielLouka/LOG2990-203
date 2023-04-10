@@ -19,6 +19,7 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
+import { MatchType } from '@common/enums/match-type';
 import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
@@ -169,7 +170,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.historyService.createHistoryData(
                 this.player1,
                 this.differencesFound1 < this.totalDifferences,
-                this.matchmakingService.isSoloMode,
+                this.matchmakingService.currentMatch?.matchType as MatchType,
                 this.player1,
                 this.player2,
                 this.timerElement.getTime(),
@@ -194,12 +195,21 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         if (match) {
             this.onReceiveMatchData();
-            if (this.isSolo || this.isOneVersusOne) {
-                if (this.gameIsOver(match) && !this.isOver) {
+            // this.sendSystemMessageToChat(('match type is: ' + this.matchmakingService.currentMatch?.matchType.toString()) as string);
+            // this.sendSystemMessageToChat(('match status is: ' + this.matchmakingService.currentMatch?.matchStatus.toString()) as string);
+
+            if (this.gameIsOver(match) && !this.isOver) {
+                if (this.isSolo || this.isOneVersusOne) {
                     this.chat.sendSystemMessage(
                         (this.isPlayer1Win(match) ? this.player2.toUpperCase() : this.player1.toUpperCase()) + ABORTED_GAME_MESSAGE,
                     );
                     this.onWinGame(this.isPlayer1Win(match), true);
+                }
+                else {
+                    this.matchmakingService.setCurrentMatchType(MatchType.LimitedSolo);
+                    this.isOver = true;
+                    this.sendSystemMessageToChat(('match type is: ' + this.matchmakingService.currentMatch?.matchType.toString()) as string);
+            this.sendSystemMessageToChat(('match status is: ' + this.matchmakingService.currentMatch?.matchStatus.toString()) as string);
                 }
             }
         }
@@ -346,7 +356,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (this.matchmakingService.isLimitedTimeSolo || this.matchmakingService.isCoopMode) {
                         if (this.currentGameIndex === this.games.length - 1) {
-                            this.onWinGame(true, !this.isWinByDefault);
+                            this.onWinGame(true, this.isOver);
                         } else {
                             this.currentGameIndex++;
                             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
@@ -485,7 +495,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.historyService.createHistoryData(
                 winningPlayer,
                 isWinByDefault,
-                this.matchmakingService.isSoloMode,
+                this.matchmakingService.currentMatch?.matchType as MatchType,
                 this.player1,
                 this.player2,
                 this.timerElement.getTime(),

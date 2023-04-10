@@ -125,24 +125,40 @@
                     <div class="flex-row center">
                         <span
                             class="material-symbols-outlined"
-                            *ngIf="history.gameMode === 'Classic - 1vs1' || (history.gameMode === 'Classic - Solo' && !history.isWinByDefault)"
+                            *ngIf="
+                                history.gameMode === 'Classique - 1vs1' ||
+                                (history.gameMode === 'Classique - Solo' && !history.isWinByDefault)
+                            "
                         >
                             military_tech
                         </span>
                         <span
                             [ngClass]="{
-                                'crossed-out': history.gameMode === 'Classic - Solo' && history.isWinByDefault,
-                                'text-bold':
-                                    ((history.gameMode === 'Classic - Solo' || history.gameMode === 'Classic - 1vs1') && !history.isWinByDefault) ||
-                                    (history.gameMode === 'Classic - 1vs1' && history.isWinByDefault)
+                                'crossed-out': history.gameMode === 'Classique - Solo' && history.isWinByDefault,
+                                'text-bold': !history.isWinByDefault || (history.gameMode === 'Temps Limité  - Solo' && history.player2 !== '')                                   
                             }"
                         >
                             {{ history.player1 }}
                         </span>
-                        <span *ngIf="history.player2 !== ''">&nbsp;VS&nbsp;</span>
+                        <span *ngIf="history.player2 !== '' && history.gameMode === 'Classique - 1vs1'">&nbsp;VS&nbsp;</span>
                         <span
+                            *ngIf="
+                                (history.player2 !== '' && history.gameMode === 'Temps Limité - Coop') ||
+                                (history.gameMode === 'Temps Limité  - Solo' && history.isWinByDefault)
+                            "
+                            >&nbsp;ET&nbsp;</span
+                        >
+                        <span
+                            *ngIf="
+                                (history.player2 !== '' && (history.gameMode === 'Classique - 1vs1' || history.gameMode === 'Temps Limité - Coop')) ||
+                                (history.gameMode === 'Temps Limité  - Solo' && history.isWinByDefault)
+                            "
                             [ngClass]="{
-                                'crossed-out': history.gameMode === 'Classic - 1vs1' && history.isWinByDefault
+                                'crossed-out':
+                                    (history.gameMode === 'Classique - 1vs1' || history.gameMode === 'Temps Limité - Coop') && history.isWinByDefault ||
+                                    (history.gameMode === 'Temps Limité  - Solo' && history.isWinByDefault),
+                                'text-bold':
+                                    history.gameMode === 'Temps Limité - Coop'
                             }"
                         >
                             {{ history.player2 }}
