@@ -66,6 +66,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentReplaySpeedIndex = 0;
     seedsArray: number[];
     isOver: boolean = false;
+    isPlayer1Ready: unknown;
+    isPlayer2Ready: boolean;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -195,21 +197,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         if (match) {
             this.onReceiveMatchData();
-            // this.sendSystemMessageToChat(('match type is: ' + this.matchmakingService.currentMatch?.matchType.toString()) as string);
-            // this.sendSystemMessageToChat(('match status is: ' + this.matchmakingService.currentMatch?.matchStatus.toString()) as string);
-
             if (this.gameIsOver(match) && !this.isOver) {
                 if (this.isSolo || this.isOneVersusOne) {
                     this.chat.sendSystemMessage(
                         (this.isPlayer1Win(match) ? this.player2.toUpperCase() : this.player1.toUpperCase()) + ABORTED_GAME_MESSAGE,
                     );
                     this.onWinGame(this.isPlayer1Win(match), true);
-                }
-                else {
+                } else {
                     this.matchmakingService.setCurrentMatchType(MatchType.LimitedSolo);
                     this.isOver = true;
-                    this.sendSystemMessageToChat(('match type is: ' + this.matchmakingService.currentMatch?.matchType.toString()) as string);
-            this.sendSystemMessageToChat(('match status is: ' + this.matchmakingService.currentMatch?.matchStatus.toString()) as string);
                 }
             }
         }
@@ -339,11 +335,23 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.games[this.currentGameIndex].gameData });
+        if (this.isCoop) {
+            this.socketService.send('readyPlayer', { isPlayer1: this.isPlayer1 });
+        }
     }
 
     addServerSocketMessagesListeners() {
         if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
-
+        this.socketService.on('readyUpdate', (data: { isPlayer1: boolean }) => {
+            if (!this.isPlayer1Ready && data.isPlayer1) {
+                this.isPlayer1Ready = data.isPlayer1;
+            } else if (!this.isPlayer2Ready && !data.isPlayer1) {
+                this.isPlayer2Ready = !data.isPlayer1;
+            }
+            if (this.isPlayer1Ready && this.isPlayer2Ready) {
+                this.startTimer();
+            }
+        });
         this.socketService.on(
             'validationReturned',
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {

@@ -33,7 +33,7 @@ export class TimerComponent implements OnDestroy {
         if (this.incrementTime) {
             return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
         } else {
-            this.timeInSeconds = 120 - this.timeInSeconds;
+            this.timeInSeconds = LIMITED_TIME_DURATION - this.timeInSeconds;
             return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
         }
     }

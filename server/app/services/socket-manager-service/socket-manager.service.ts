@@ -161,6 +161,10 @@ export class SocketManager {
                 }
                 this.sio.to(joinedRoomName).emit('randomizedOrder', { seedsArray: randomSeeds });
             });
+
+            socket.on('readyPlayer', (data: { isPlayer1: boolean }) => {
+                this.sio.to(joinedRoomName).emit('readyUpdate', { isPlayer1: data.isPlayer1 });
+            });
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;
                 socket.join(joinedRoomName);
