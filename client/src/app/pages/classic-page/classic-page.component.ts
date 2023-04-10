@@ -64,6 +64,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     replaySpeedOptions: number[] = [1, 2, 4];
     currentReplaySpeedIndex = 0;
     seedsArray: number[];
+    isOver: boolean = false;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -126,6 +127,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     isPlayer2Win(match: Match): boolean {
         return match.matchStatus === MatchStatus.Player2Win;
+    }
+    gameIsOver(match: Match): boolean {
+        return match.matchStatus === MatchStatus.Player1Win || match.matchStatus === MatchStatus.Player2Win;
     }
 
     ngOnInit(): void {
@@ -190,23 +194,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         if (match) {
             this.onReceiveMatchData();
-            if (this.matchmakingService.currentMatch?.matchStatus === MatchStatus.InProgress) {
-                if (this.isSolo || this.isOneVersusOne) {
-                    if (this.isPlayer2Win(match)) {
-                        this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
-                        this.onWinGame(false, this.isWinByDefault);
-                    } else if (this.isPlayer1Win(match)) {
-                        this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
-                        this.onWinGame(true, this.isWinByDefault);
-                    }
-                } else {
-                    if ((this.isPlayer2Win(match) || this.isPlayer1Win(match)) && this.isCoop) {
-                        this.chat.sendSystemMessage(this.player1.toUpperCase() + ABORTED_GAME_MESSAGE);
-                        this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
-                    } else if (this.isPlayer1Win(match)) {
-                        this.chat.sendSystemMessage(this.player2.toUpperCase() + ABORTED_GAME_MESSAGE);
-                        this.onWinGameLimited(this.player1.toUpperCase(), this.player2.toUpperCase(), this.isWinByDefault);
-                    }
+            if (this.isSolo || this.isOneVersusOne) {
+                if (this.gameIsOver(match) && !this.isOver) {
+                    this.chat.sendSystemMessage(
+                        (this.isPlayer1Win(match) ? this.player2.toUpperCase() : this.player1.toUpperCase()) + ABORTED_GAME_MESSAGE,
+                    );
+                    this.onWinGame(this.isPlayer1Win(match), true);
                 }
             }
         }
@@ -506,6 +499,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
+        this.isOver = true;
         this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode, startReplayAction);
     }
 
