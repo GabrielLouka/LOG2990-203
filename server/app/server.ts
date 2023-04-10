@@ -38,7 +38,12 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.socketManager = new SocketManager(this.server, this.matchManagerService, this.rankingService);
+        this.socketManager = new SocketManager(
+            this.server,
+            this.matchManagerService,
+            this.rankingService,
+            new GameStorageService(this.databaseService),
+        );
         this.socketManager.handleSockets();
 
         this.server.listen(Server.appPort);
