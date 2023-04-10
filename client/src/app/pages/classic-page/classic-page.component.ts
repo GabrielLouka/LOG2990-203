@@ -23,7 +23,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { Observable, catchError, map, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -63,7 +63,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     replaySpeedOptions: number[] = [1, 2, 4];
     currentReplaySpeedIndex = 0;
-    seedsArray: number[];
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -133,9 +132,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
         this.canvasHandlingService = new CanvasHandlingService(this.leftCanvas, this.rightCanvas, new ImageManipulationService());
-        if (this.currentGameId === '-1') {
-            this.socketService.send('randomizeGameOrder');
-        }
+
         // Replay Mode Initialization
         this.replayModeService.onStartReplayMode.add(this.resetGame.bind(this));
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
@@ -243,10 +240,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 if (games) {
                     this.games = games;
                 }
-                if (this.currentGameId === '-1') {
-                    let k = 0;
-                    this.games.sort(() => this.matchmakingService.currentSeeds[k++] - 1 / 2);
-                }
                 await this.canvasHandlingService.updateCanvas(
                     this.games[this.currentGameIndex].originalImage,
                     this.games[this.currentGameIndex].modifiedImage,
@@ -319,7 +312,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             position: coordinateClick,
             isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
         });
-
         console.log('click');
         this.refreshErrorMessagePosition(event.clientX, event.clientY);
         this.canvasHandlingService.focusKeyEvent(this.cheat);
@@ -393,9 +385,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
             this.chat.sendTimeScoreMessage(data.rankingData);
-        });
-        this.socketService.on('randomizedOrder', async (data: { seedsArray: number[] }) => {
-            this.matchmakingService.currentSeeds = await data.seedsArray;
         });
     }
 
@@ -619,5 +608,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     finishReplay() {
         this.timerElement.pauseTimer();
+
+        
     }
 }

@@ -22,7 +22,7 @@ export class ChatService {
     }
 
     get isMode1vs1() {
-        return this.matchmakingService.isOneVersusOne || this.matchmakingService.isCoopMode;
+        return this.matchmakingService.isOneVersusOne;
     }
 
     sendMessage(isPlayer1: boolean, newMessage: string) {
