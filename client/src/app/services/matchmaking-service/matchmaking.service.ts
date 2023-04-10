@@ -25,6 +25,7 @@ export class MatchmakingService {
     currentMatch: Match | null;
     onSingleGameDeleted: Action<string | null>;
     onAllGameDeleted: Action<string | null>;
+    currentSeeds: number[] = [];
 
     constructor(private readonly socketService: SocketClientService) {}
 
