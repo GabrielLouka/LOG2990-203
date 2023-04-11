@@ -107,9 +107,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     get isSolo() {
         return this.matchmakingService.isSoloMode;
     }
+
     get isOneVersusOne() {
         return this.matchmakingService.isOneVersusOne;
     }
+
     get isLimitedTimeSolo() {
         return this.matchmakingService.isLimitedTimeSolo;
     }
@@ -120,9 +122,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     get isPlayer1() {
         return this.matchmakingService.isPlayer1;
     }
+
     get isCoop() {
         return this.matchmakingService.isCoopMode;
     }
+
     get isCheating() {
         return this.canvasHandlingService.isCheating;
     }
@@ -151,6 +155,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isPlayer2Win(match: Match): boolean {
         return match.matchStatus === MatchStatus.Player2Win;
     }
+
     gameIsOver(match: Match): boolean {
         return match.matchStatus === MatchStatus.Player1Win || match.matchStatus === MatchStatus.Player2Win;
     }

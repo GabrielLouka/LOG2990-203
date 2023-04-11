@@ -123,12 +123,14 @@ export class SocketManager {
             });
 
             socket.on('resetAllGames', () => {
+                this.gamesStorageService.resetAllScores();
                 this.sio.emit('allGamesReset');
                 this.sio.emit('actionOnGameReloadingThePage');
             });
 
-            socket.on('resetGame', (data: { hasResetGame: boolean; id: string }) => {
-                this.sio.emit('gameReset', { gameReset: data.hasResetGame, id: data.id }, socket.id);
+            socket.on('resetGame', (data: { id: string }) => {
+                this.gamesStorageService.resetScoresById(data.id);
+                this.sio.emit('gameReset', { id: data.id }, socket.id);
                 this.sio.emit('actionOnGameReloadingThePage');
             });
 

@@ -55,11 +55,11 @@ export class OverlayComponent {
     }
 
     deleteSelectedGame(isDeleteRequest: boolean): void {
-        this.gamesService.deleteOneById(isDeleteRequest, this.id);
+        this.gamesService.deleteById(isDeleteRequest, this.id);
     }
 
     resetSelectedGame(isResetRequest: boolean): void {
-        this.gamesService.resetOneById(isResetRequest, this.id);
+        this.gamesService.resetById(isResetRequest, this.id);
     }
 
     reloadPage(): void {

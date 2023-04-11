@@ -95,8 +95,6 @@ export class MatchmakingService {
         this.currentMatch = match;
     }
 
-    // This is NOT supposed to be a setter because it communicates with the server!
-    // :)
     setCurrentMatchType(matchType: MatchType) {
         const matchId = this.currentSocketId;
 
