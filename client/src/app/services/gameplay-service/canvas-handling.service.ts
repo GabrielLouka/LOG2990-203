@@ -103,7 +103,7 @@ export class CanvasHandlingService {
 
         this.blinkDelayedMethodLeft.start();
         this.blinkDelayedMethodRight.start();
-        this.isCheating = !this.isCheating;
+        this.isCheating = true;
     }
 
     putCanvasIntoInitialState(
@@ -118,9 +118,9 @@ export class CanvasHandlingService {
 
     stopCheating() {
         this.backgroundColor = '';
-        this.blinkDelayedMethodLeft.stop();
-        this.blinkDelayedMethodRight.stop();
-        this.isCheating = !this.isCheating;
+        if (this.blinkDelayedMethodLeft) this.blinkDelayedMethodLeft.stop();
+        if (this.blinkDelayedMethodRight) this.blinkDelayedMethodRight.stop();
+        this.isCheating = false;
         this.putCanvasIntoInitialState(
             { originalImage: this.originalImage, currentModifiedImage: this.currentModifiedImage },
             { leftContext: this.leftCanvasContext as CanvasRenderingContext2D, rightContext: this.rightCanvasContext as CanvasRenderingContext2D },

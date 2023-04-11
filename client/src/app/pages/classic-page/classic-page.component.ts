@@ -535,7 +535,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     } else {
                         this.stopCheating();
                     }
-                    this.letterTPressed = !this.letterTPressed;
                 }
                 // else if (event.key === 'i'){
                 //     this.handleHintMode();
@@ -596,6 +595,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 },
                 this.foundDifferences,
             );
+            this.letterTPressed = true;
         };
         startCheatingMethod();
         this.replayModeService.addMethodToReplay(startCheatingMethod);
@@ -604,6 +604,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     stopCheating() {
         const stopCheatingMethod = () => {
             this.canvasHandlingService.stopCheating();
+            this.letterTPressed = false;
         };
         stopCheatingMethod();
         this.replayModeService.addMethodToReplay(stopCheatingMethod);
@@ -611,11 +612,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     resetGame() {
         this.foundDifferences = [];
-        this.canvasHandlingService.stopCheating();
+        this.stopCheating();
         this.canvasHandlingService.currentModifiedImage = Buffer.from(this.games[this.currentGameIndex].modifiedImage);
         this.canvasHandlingService.updateCanvas(this.games[this.currentGameIndex].originalImage, this.games[this.currentGameIndex].modifiedImage);
-        this.stopCheating();
-        this.canvasHandlingService.isCheating = false;
         this.chat.resetChat();
         this.differencesFound1 = 0;
         this.differencesFound2 = 0;
@@ -629,5 +628,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     finishReplay() {
         this.timerElement.pauseTimer();
+        this.stopCheating();
     }
 }
