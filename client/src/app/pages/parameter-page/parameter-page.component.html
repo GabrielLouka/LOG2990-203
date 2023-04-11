@@ -116,7 +116,7 @@
             </div>
 
             <div class="history-board flex-column">
-                <div class="flex-row center history-card space-around" *ngFor="let history of this.historyService.history">
+                <div class="flex-row center history-card space-around" *ngFor="let history of this.historyService.gameHistories">
                     <div class="flex-column center game-mode">
                         <b>{{ history.gameMode }}</b>
                         <div>{{ history.startingTime }}</div>
@@ -125,27 +125,40 @@
                     <div class="flex-row center">
                         <span
                             class="material-symbols-outlined"
-                            *ngIf="history.gameMode === 'Classic - 1vs1' || (history.gameMode === 'Classic - Solo' && !history.isWinByDefault)"
+                            *ngIf="history.gameMode === 'Classic - 1vs1' || (history.gameMode === 'Classic - Solo' && !history.isWinningByDefault)"
                         >
                             military_tech
                         </span>
                         <span
                             [ngClass]="{
-                                'crossed-out': history.gameMode === 'Classic - Solo' && history.isWinByDefault,
-                                'text-bold':
-                                    ((history.gameMode === 'Classic - Solo' || history.gameMode === 'Classic - 1vs1') && !history.isWinByDefault) ||
-                                    (history.gameMode === 'Classic - 1vs1' && history.isWinByDefault)
+                                'crossed-out': history.gameMode === 'Classic - Solo' && history.isWinningByDefault,
+                                'text-bold': !history.isWinningByDefault || (history.gameMode === 'Temps Limité  - Solo' && history.player2?.username !== '')
                             }"
                         >
                             {{ history.player1 }}
                         </span>
-                        <span *ngIf="history.player2 !== ''">&nbsp;VS&nbsp;</span>
+                        <span *ngIf="history.player2?.username!== '' && history.gameMode === 'Classic - 1vs1'">&nbsp;VS&nbsp;</span>
                         <span
+                            *ngIf="
+                                (history.player2?.username !== '' && history.gameMode === 'Temps Limité - Coop') ||
+                                (history.gameMode === 'Temps Limité  - Solo' && history.isWinningByDefault)
+                            "
+                            >&nbsp;ET&nbsp;</span
+                        >
+                        <span
+                            *ngIf="
+                                (history.player2?.username !== '' &&
+                                    (history.gameMode === 'Classic - 1vs1' || history.gameMode === 'Temps Limité - Coop')) ||
+                                (history.gameMode === 'Temps Limité  - Solo' && history.isWinningByDefault)
+                            "
                             [ngClass]="{
-                                'crossed-out': history.gameMode === 'Classic - 1vs1' && history.isWinByDefault
+                                'crossed-out':
+                                    ((history.gameMode === 'Classic - 1vs1' || history.gameMode === 'Temps Limité - Coop') && history.isWinningByDefault) ||
+                                    (history.gameMode === 'Temps Limité  - Solo' && history.isWinningByDefault),
+                                'text-bold': history.gameMode === 'Temps Limité - Coop'
                             }"
                         >
-                            {{ history.player2 }}
+                            {{ history.player2?.username }}
                         </span>
                     </div>
                     <div class="divider"></div>

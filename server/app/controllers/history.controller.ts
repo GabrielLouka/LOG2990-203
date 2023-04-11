@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import { HistoryStorageService } from '@app/services/history-storage-service/history-storage.service';
-import { HistoryData } from '@common/interfaces/history-data';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';
@@ -35,16 +34,16 @@ export class HistoryController {
                 });
         });
 
-        this.router.post('/', async (req: Request, res: Response) => {
-            const historyForm: HistoryData = req.body;
-            this.historyStorageService
-                .storeHistory(historyForm)
-                .then(() => {
-                    res.status(StatusCodes.CREATED);
-                })
-                .catch((error: Error) => {
-                    res.status(StatusCodes.NOT_FOUND).send(error.message);
-                });
-        });
+        // this.router.post('/', async (req: Request, res: Response) => {
+        //     const historyForm: HistoryData = req.body;
+        //     this.historyStorageService
+        //         .storeHistory(historyForm)
+        //         .then(() => {
+        //             res.status(StatusCodes.CREATED);
+        //         })
+        //         .catch((error: Error) => {
+        //             res.status(StatusCodes.NOT_FOUND).send(error.message);
+        //         });
+        // });
     }
 }

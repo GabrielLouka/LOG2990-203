@@ -1,4 +1,5 @@
 import { GameRankingService } from '@app/services/game-ranking-service/game-ranking-time.service';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { MatchingDifferencesService } from '@app/services/matching-difference-service/matching-differences.service';
 import { Player } from '@common/classes/player';
@@ -16,6 +17,7 @@ export class SocketManager {
         server: http.Server,
         private readonly matchManagerService: MatchManagerService,
         private readonly gameRankingTimeService: GameRankingService,
+        private readonly gamesStorageService: GameStorageService,
     ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] }, maxHttpBufferSize: 1e8 });
         this.matchingDifferencesService = new MatchingDifferencesService();
@@ -74,7 +76,7 @@ export class SocketManager {
             socket.on('setMatchPlayer', (data: { matchId: string; player: Player }) => {
                 this.matchManagerService.setMatchPlayer(data.matchId, data.player);
                 sendMatchUpdate({ matchId: data.matchId });
-                console.log('set match player ', this.matchManagerService.getMatchById(data.matchId));
+                // console.log('set match player ', this.matchManagerService.getMatchById(data.matchId));
                 sendGameMatchProgressUpdate(data.matchId);
             });
 
@@ -151,7 +153,18 @@ export class SocketManager {
                     matchToJoinIfAvailable,
                 });
             });
+            socket.on('randomizeGameOrder', async () => {
+                const randomSeeds: number[] = [];
 
+                for (let i = 0; i < (await this.gamesStorageService.getGamesLength()); i++) {
+                    randomSeeds.push(Math.random());
+                }
+                this.sio.to(joinedRoomName).emit('randomizedOrder', { seedsArray: randomSeeds });
+            });
+
+            socket.on('readyPlayer', (data: { isPlayer1: boolean }) => {
+                this.sio.to(joinedRoomName).emit('readyUpdate', { isPlayer1: data.isPlayer1 });
+            });
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;
                 socket.join(joinedRoomName);

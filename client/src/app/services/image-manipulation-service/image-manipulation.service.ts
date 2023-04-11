@@ -21,7 +21,7 @@ import { Buffer } from 'buffer';
     providedIn: 'root',
 })
 export class ImageManipulationService {
-
+    randomNumber: number = -1;
     // can be used on a canvas from a buffer
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
@@ -59,163 +59,186 @@ export class ImageManipulationService {
         return modifiedImageBuffer;
     }
 
+    generateRandomVector(game: GameData, foundDifferences: boolean[]) {
+        const unfoundDifferences = game.differences.filter((difference, index) => !foundDifferences[index]);
+        const randomDifference = unfoundDifferences[Math.floor(this.generatePseudoRandomNumber() * unfoundDifferences.length)];
+        return randomDifference[Math.floor(this.generatePseudoRandomNumber() * randomDifference.length)];
+    }
+
     async showFirstHint(
-        canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
-        game: GameData, differences: boolean[], rect: { x: number; y: number; width: number; height: number}){
-        
-        // const width = canvasContext.canvas.nativeElement.width;
-        // const height = canvasContext.canvas.nativeElement.height;
-        // const quarterWidth = width / 2;
-        // const quarterHeight = height / 2;
-        
-        
-        // const quadrants = [
-        //     { x: 0, y: 0, width: quarterWidth, height: quarterHeight },
-        //     { x: quarterWidth, y: 0, width: quarterWidth, height: quarterHeight },
-        //     { x: 0, y: quarterHeight, width: quarterWidth, height: quarterHeight },
-        //     { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight }
-        // ];
-        // let rect;
-        // let randomIndex;
-        // let randomDifference;
-        // let randomVector;     
-        // let diffFound;
-        // do {
-        //     randomIndex = Math.floor(Math.random() * game.differences.length);
-        //     diffFound = differences[randomIndex];
-            
-        // } while(diffFound);
-        // randomDifference = game.differences[randomIndex];
-        // randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
-        
-        // do {
-        //     let randomSection = Math.floor(Math.random() * quadrants.length);
+        canvasContext: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
+        game: GameData,
+        differences: boolean[],
+    ) {
+        const width = canvasContext.canvas.nativeElement.width;
+        const height = canvasContext.canvas.nativeElement.height;
+        const quarterWidth = width / 2;
+        const quarterHeight = height / 2;
 
-        //     rect = quadrants[randomSection];            
+        const quadrants = [
+            { x: 0, y: 0, width: quarterWidth, height: quarterHeight },
+            { x: quarterWidth, y: 0, width: quarterWidth, height: quarterHeight },
+            { x: 0, y: quarterHeight, width: quarterWidth, height: quarterHeight },
+            { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight },
+        ];
+        const randomVector = this.generateRandomVector(game, differences);
+        console.log('random vector', randomVector);
+        console.log('quadrants', quadrants);
 
-        // } while(
-        //     !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
-        //         ((height - randomVector.y >= rect.y) && (height - randomVector.y < rect.y + rect.height)))
-        // );
-        await this.blinkQuadrant(canvasContext.context, rect);
-        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
-                    
+        let quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
+        for (const quadrant of quadrants) {
+            if (
+                randomVector.x >= quadrant.x &&
+                randomVector.x < quadrant.x + quadrant.width &&
+                height - randomVector.y >= quadrant.y &&
+                height - randomVector.y < quadrant.y + quadrant.height
+            ) {
+                quadrantsThatContainTheRandomVector.push(quadrant);
+            }
+        }
+
+        console.log('quadrants that contain the random vector', quadrantsThatContainTheRandomVector);
+        const randomRect =
+            quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
+        console.log('random rect', randomRect);
+        console.log('random rect index', Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length));
+
+        const resetMethod = () =>
+            this.loadCanvasImages(
+                this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+                canvasContext.context,
+            );
+
+        await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
 
     async showSecondHint(
-        canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
-        game: GameData, differences: boolean[], rect: { x: number; y: number; width: number; height: number}
-    ){
-        // const width = canvasContext.canvas.nativeElement.width;
-        // const height = canvasContext.canvas.nativeElement.height;
-        // const quarterWidth = width / 4;
-        // const quarterHeight = height / 4;
+        canvasContext: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
+        game: GameData,
+        differences: boolean[],
+    ) {
+        const width = canvasContext.canvas.nativeElement.width;
+        const height = canvasContext.canvas.nativeElement.height;
+        const quarterWidth = width / 4;
+        const quarterHeight = height / 4;
 
-        // const subQuadrants = [];
+        const subQuadrants = [];
 
-        // for (let i = 0; i < 4; i++) {
-        //     for (let j = 0; j < 4; j++) {
-        //         const quadrant = {
-        //             x: i * quarterWidth,
-        //             y: j * quarterHeight,
-        //             width: quarterWidth,
-        //             height: quarterHeight,
-        //         };                
-        //         subQuadrants.push(quadrant);              
-        //     }
-        // }
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 4; j++) {
+                const quadrant = {
+                    x: i * quarterWidth,
+                    y: j * quarterHeight,
+                    width: quarterWidth,
+                    height: quarterHeight,
+                };
+                subQuadrants.push(quadrant);
+            }
+        }
 
-        // let rect;
-        // let randomIndex;
-        // let randomDifference;
-        // let randomVector;     
-        // let diffFound;
-        // do {
-        //     randomIndex = Math.floor(Math.random() * game.differences.length);
-        //     diffFound = differences[randomIndex];
-            
-        // } while(diffFound);
-        // randomDifference = game.differences[randomIndex];
-        // randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
-        
-        // do {
-        //     let randomSection = Math.floor(Math.random() * subQuadrants.length);
+        const randomVector = this.generateRandomVector(game, differences);
 
-        //     rect = subQuadrants[randomSection];            
+        let quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
+        for (const quadrant of subQuadrants) {
+            if (
+                randomVector.x >= quadrant.x &&
+                randomVector.x < quadrant.x + quadrant.width &&
+                height - randomVector.y >= quadrant.y &&
+                height - randomVector.y < quadrant.y + quadrant.height
+            ) {
+                quadrantsThatContainTheRandomVector.push(quadrant);
+            }
+        }
 
-        // } while(
-        //     !((randomVector.x >= rect.x && randomVector.x < rect.x  + rect.width) &&
-        //         ((height - randomVector.y >= rect.y) && (height - randomVector.y < rect.y + rect.height)))
-        // );
+        const randomRect =
+            quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
-
-        await this.blinkQuadrant(canvasContext.context, rect);
-        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
+        const resetMethod = () =>
+            this.loadCanvasImages(
+                this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+                canvasContext.context,
+            );
+        await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
-
 
     async showThirdHint(
-        canvasContext : {context: CanvasRenderingContext2D, canvas: ElementRef<HTMLCanvasElement>, imageNew: Buffer, original: Buffer}, 
-        game: GameData, differences: boolean[], randomVector: {x: number, y: number}
-    ){
-        // const height = canvasContext.canvas.nativeElement.height;
-        // let randomIndex;
-        // let randomDifference;
-        // let randomVector;     
-        // let diffFound;
-        // do {
-        //     randomIndex = Math.floor(Math.random() * game.differences.length);
-        //     diffFound = differences[randomIndex];
-            
-        // } while(diffFound);
-        // randomDifference = game.differences[randomIndex];
-        // randomVector = randomDifference[Math.floor(Math.random() * randomDifference.length)];     
+        canvasContext: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
+        game: GameData,
+        differences: boolean[],
+    ) {
+        const height = canvasContext.canvas.nativeElement.height;
+        const randomVector = this.generateRandomVector(game, differences);
 
-        await this.blinkDisk(canvasContext.context, randomVector.x, CANVAS_HEIGHT - randomVector.y);
+        const resetMethod = () =>
+            this.loadCanvasImages(
+                this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+                canvasContext.context,
+            );
 
-        this.loadCanvasImages(this.getImageSourceFromBuffer(canvasContext.imageNew? canvasContext.imageNew : canvasContext.original), canvasContext.context);
-
-        
+        await this.blinkDisk(canvasContext.context, randomVector.x, height - randomVector.y, resetMethod);
     }
 
-    async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number){
-        const radius = 70; 
-        const startAngle = 0; 
-        const endAngle = Math.PI * 2; 
-        const anticlockwise = false; 
-                
-        for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
-            context.fillStyle = '#FF0000';
-            context.beginPath();
-            context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-            context.fill();
-            await this.sleep(QUARTER_SECOND);
-            context.fillStyle = '#0000FF';
-            context.beginPath();
-            context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
-            context.fill();
-            await this.sleep(QUARTER_SECOND);            
-        }
+    async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number, reset: () => void) {
+        const radius = 70;
+        const startAngle = 0;
+        const endAngle = Math.PI * 2;
+        const anticlockwise = false;
 
+        const wholeBlink = new Action<void>();
+        let blinkCount = 0;
+        for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
+            blinkCount++;
+            const blink1 = new DelayedMethod(() => {
+                context.fillStyle = '#FF0000';
+                context.beginPath();
+                context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                context.fill();
+            }, QUARTER_SECOND * blinkCount);
+            blinkCount++;
+            const blink2 = new DelayedMethod(() => {
+                context.fillStyle = '#0000FF';
+                context.beginPath();
+                context.arc(x, y, radius, startAngle, endAngle, anticlockwise);
+                context.fill();
+            }, QUARTER_SECOND * blinkCount);
+            wholeBlink.add(async () => blink1.start());
+            wholeBlink.add(async () => blink2.start());
+        }
+        const resetDelayedMethod = new DelayedMethod(reset, QUARTER_SECOND * (blinkCount + 1));
+        wholeBlink.add(async () => resetDelayedMethod.start());
+        wholeBlink.invoke();
     }
 
-
-    async blinkQuadrant(context: CanvasRenderingContext2D, rect: { x: number; y: number; width: number; height: number }) {
+    async blinkQuadrant(context: CanvasRenderingContext2D, rect: { x: number; y: number; width: number; height: number }, reset: () => void) {
+        const wholeBlink = new Action<void>();
+        let blinkCount = 0;
         for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
-            context.fillStyle = '#FF0000';
-            context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
-            await this.sleep(QUARTER_SECOND);
-            context.fillStyle = '#0000FF';
-            context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
-            await this.sleep(QUARTER_SECOND);
+            blinkCount++;
+            const blink1 = new DelayedMethod(() => {
+                context.fillStyle = '#FF0000';
+                context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
+            }, QUARTER_SECOND * blinkCount);
+            blinkCount++;
+            const blink2 = new DelayedMethod(() => {
+                context.fillStyle = '#0000FF';
+                context.fillRect(rect.x as number, rect.y as number, rect.width as number, rect.height as number);
+            }, QUARTER_SECOND * blinkCount);
+            wholeBlink.add(async () => blink1.start());
+            wholeBlink.add(async () => blink2.start());
         }
+        const resetDelayedMethod = new DelayedMethod(reset, QUARTER_SECOND * (blinkCount + 1));
+        wholeBlink.add(async () => resetDelayedMethod.start());
+        wholeBlink.invoke();
+    }
+
+    generatePseudoRandomNumber() {
+        return this.randomNumber;
     }
 
     async blinkDifference(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
         this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
         const wholeBlink = new Action<void>();
         let blinkCount = 0;
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         for (let i = 0; i < NUMBER_OF_BLINKS; i++) {
             blinkCount++;
             const blink1 = new DelayedMethod(() => {
