@@ -117,6 +117,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.isOneVersusOne ? this.minDifferences : this.totalDifferences;
     }
 
+    get isGameInteractable(): boolean {
+        return !this.replayModeService.shouldShowReplayModeGUI;
+    }
+
     getPlayerUsername(isPlayer1: boolean): string {
         if (isPlayer1) return this.matchmakingService.player1Username;
         return this.matchmakingService.player2Username;
@@ -304,6 +308,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         // this.historyService.saveStartGameTime();
     }
     onMouseDown(event: MouseEvent) {
+        if (!this.isGameInteractable) return;
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
         // console.log('attempt at clicking', coordinateClick, this.canvasIsClickable);
 
@@ -329,7 +334,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.games[this.currentGameIndex].gameData });
-            this.socketService.send('readyPlayer', { isPlayer1: this.isPlayer1 });
+        this.socketService.send('readyPlayer', { isPlayer1: this.isPlayer1 });
     }
 
     addServerSocketMessagesListeners() {
@@ -527,7 +532,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.isCoop ||
             (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
         ) {
-            if (this.replayModeService.shouldShowReplayModeGUI) return;
+            if (!this.isGameInteractable) return;
             if (event instanceof KeyboardEvent) {
                 if (event.key === 't') {
                     if (this.letterTPressed) {
@@ -549,6 +554,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleKeyUpEvent(event: KeyboardEvent) {
+        if (!this.isGameInteractable) return;
         if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
             this.handleHintMode();
             this.canvasHandlingService.focusKeyEvent(this.hintElement.div);
@@ -558,6 +564,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onWinGameLimited(winningPlayer1: string, winningPlayer2: string, isWinByDefault: boolean) {
         this.gameOver(isWinByDefault);
         this.popUpElement.showGameOverPopUpLimited(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
+    }
+
+    hintModeButton() {
+        if (this.isGameInteractable) this.handleHintMode();
     }
 
     handleHintMode() {
@@ -595,7 +605,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 },
                 this.foundDifferences,
             );
-            this.letterTPressed = true;
+            this.letterTPressed = false;
         };
         startCheatingMethod();
         this.replayModeService.addMethodToReplay(startCheatingMethod);
@@ -604,7 +614,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     stopCheating() {
         const stopCheatingMethod = () => {
             this.canvasHandlingService.stopCheating();
-            this.letterTPressed = false;
+            this.letterTPressed = true;
         };
         stopCheatingMethod();
         this.replayModeService.addMethodToReplay(stopCheatingMethod);
