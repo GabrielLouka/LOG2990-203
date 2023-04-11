@@ -85,7 +85,7 @@ export class ImageManipulationService {
         console.log('random vector', randomVector);
         console.log('quadrants', quadrants);
 
-        let quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
+        const quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
         for (const quadrant of quadrants) {
             if (
                 randomVector.x >= quadrant.x &&
@@ -138,7 +138,7 @@ export class ImageManipulationService {
 
         const randomVector = this.generateRandomVector(game, differences);
 
-        let quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
+        const quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
         for (const quadrant of subQuadrants) {
             if (
                 randomVector.x >= quadrant.x &&
@@ -255,17 +255,35 @@ export class ImageManipulationService {
         wholeBlink.invoke();
     }
 
+    // alternateOldNewImage(oldImage: Buffer, newImage: Buffer, context: CanvasRenderingContext2D) {
+    //     let showOldImage = false;
+    //     const interval = window.setInterval(() => {
+    //         if (showOldImage) {
+    //             this.loadCanvasImages(this.getImageSourceFromBuffer(oldImage), context);
+    //         } else {
+    //             this.loadCanvasImages(this.getImageSourceFromBuffer(newImage), context);
+    //         }
+    //         showOldImage = !showOldImage;
+    //     }, QUARTER_SECOND / 2);
+    //     return interval;
+    // }
+
     alternateOldNewImage(oldImage: Buffer, newImage: Buffer, context: CanvasRenderingContext2D) {
         let showOldImage = false;
-        const interval = window.setInterval(() => {
-            if (showOldImage) {
-                this.loadCanvasImages(this.getImageSourceFromBuffer(oldImage), context);
-            } else {
-                this.loadCanvasImages(this.getImageSourceFromBuffer(newImage), context);
-            }
-            showOldImage = !showOldImage;
-        }, QUARTER_SECOND / 2);
-        return interval;
+        const loopBlink = new DelayedMethod(
+            () => {
+                if (showOldImage) {
+                    this.loadCanvasImages(this.getImageSourceFromBuffer(oldImage), context);
+                } else {
+                    this.loadCanvasImages(this.getImageSourceFromBuffer(newImage), context);
+                }
+                showOldImage = !showOldImage;
+            },
+            QUARTER_SECOND / 2,
+            true,
+        );
+
+        return loopBlink;
     }
 
     loadCurrentImage(image: Buffer, context: CanvasRenderingContext2D) {
