@@ -137,7 +137,7 @@ export class GameStorageService {
      * @param id game identifier
      * @returns true if deleted, false if not
      */
-    async deleteOneById(id: string): Promise<void> {
+    async deleteById(id: string): Promise<void> {
         const query = { id: parseInt(id, 10) };
         await this.collection.findOneAndDelete(query);
         await this.deleteStoredData(id);
@@ -240,13 +240,18 @@ export class GameStorageService {
         return (await this.getGameById(id)).gameData?.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
 
-    async resetGameRecordTimes(id: string) {
+    async resetScoresById(id: string) {
         const query = { id: parseInt(id, 10) };
+        console.log('GAME RESET BY ID');
         const resetRanking = { $set: { oneVersusOneRanking: defaultRanking, soloRanking: defaultRanking } };
-        await this.collection.updateOne(query, resetRanking);
+        try {
+            await this.collection.findOneAndUpdate(query, resetRanking);
+        } catch (e) {
+            console.error('update error : ' + e);
+        }
     }
 
-    async resetAllGamesRecordTimes() {
+    async resetAllScores() {
         const resetRanking = { $set: { oneVersusOneRanking: defaultRanking, soloRanking: defaultRanking } };
         await this.collection.updateMany({}, resetRanking);
     }

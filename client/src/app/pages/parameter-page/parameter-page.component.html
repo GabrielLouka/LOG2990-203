@@ -23,7 +23,7 @@
             <div *ngIf="confirmation" class="flex-column center confirmation-container">
                 <div class="button-style no-hover cadre">
                     <div class="flex-column center confirmation-message">
-                        <h2>Etes vous sûr de vouloir {{ isReset ? 'réinitialiser' : 'sauvegarder' }} les constantes de jeu?</h2>
+                        <h2>Êtes vous sûr de vouloir {{ isReset ? 'réinitialiser' : 'sauvegarder' }} les constantes de jeu?</h2>
                         <p><b> Ce changement s'applique à tous les joueurs !</b></p>
                     </div>
                     <div class="flex-row space-around confirmation-btn">
@@ -132,12 +132,13 @@
                         <span
                             [ngClass]="{
                                 'crossed-out': history.gameMode === 'Classic - Solo' && history.isWinningByDefault,
-                                'text-bold': !history.isWinningByDefault || (history.gameMode === 'Temps Limité  - Solo' && history.player2?.username !== '')
+                                'text-bold':
+                                    !history.isWinningByDefault || (history.gameMode === 'Temps Limité  - Solo' && history.player2?.username !== '')
                             }"
                         >
                             {{ history.player1 }}
                         </span>
-                        <span *ngIf="history.player2?.username!== '' && history.gameMode === 'Classic - 1vs1'">&nbsp;VS&nbsp;</span>
+                        <span *ngIf="history.player2?.username !== '' && history.gameMode === 'Classic - 1vs1'">&nbsp;VS&nbsp;</span>
                         <span
                             *ngIf="
                                 (history.player2?.username !== '' && history.gameMode === 'Temps Limité - Coop') ||
@@ -153,7 +154,8 @@
                             "
                             [ngClass]="{
                                 'crossed-out':
-                                    ((history.gameMode === 'Classic - 1vs1' || history.gameMode === 'Temps Limité - Coop') && history.isWinningByDefault) ||
+                                    ((history.gameMode === 'Classic - 1vs1' || history.gameMode === 'Temps Limité - Coop') &&
+                                        history.isWinningByDefault) ||
                                     (history.gameMode === 'Temps Limité  - Solo' && history.isWinningByDefault),
                                 'text-bold': history.gameMode === 'Temps Limité - Coop'
                             }"

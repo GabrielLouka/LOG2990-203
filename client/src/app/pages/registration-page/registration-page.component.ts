@@ -119,10 +119,12 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     }
     joinLimitedTimeGame() {
         if (!this.limitedTimeMatchId) return;
+
         this.showButtons = false;
         this.incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage();
         this.matchmakingService.joinGame(this.limitedTimeMatchId, this.id as string);
         this.limitedTimeMatchId = null;
+
         if (this.username) {
             this.matchmakingService.sendMatchJoinRequest(this.username);
         }
@@ -132,6 +134,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.auth.registerUser(this.registrationForm.value.username as string);
         this.username = this.registrationForm.value.username;
         this.hasUsernameRegistered = true;
+
         if (this.matchmakingService.currentMatchPlayed) {
             if (
                 this.username &&
