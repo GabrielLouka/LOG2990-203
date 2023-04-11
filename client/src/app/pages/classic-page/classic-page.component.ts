@@ -22,7 +22,7 @@ import { MatchType } from '@common/enums/match-type';
 import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import {
-    ABORTED_GAME_MESSAGE,
+    ABORTED_GAME_TEXT,
     CANVAS_HEIGHT,
     FOUR_TIMES_SPEED,
     LIMITED_TIME_DURATION,
@@ -211,7 +211,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.onReceiveMatchData();
             if (this.gameIsOver(match) && !this.isOver) {
                 if (this.isSolo || this.isOneVersusOne) {
-                    this.chat.sendSystemMessage((this.isPlayer1Win(match) ? this.player2 : this.player1) + ABORTED_GAME_MESSAGE);
+                    this.chat.sendSystemMessage((this.isPlayer1Win(match) ? this.player2 : this.player1) + ABORTED_GAME_TEXT);
                     this.onWinGame(this.isPlayer1Win(match), true);
                 } else {
                     this.matchmakingService.setCurrentMatchType(MatchType.LimitedSolo);
@@ -413,7 +413,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         });
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
-            console.log('newBreakingScore reçu');
             this.chat.sendTimeScoreMessage(data.rankingData);
         });
 
