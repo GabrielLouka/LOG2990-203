@@ -146,8 +146,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
         DelayedMethod.speed = 1;
 
-        // console.log(this.currentGameId);
-        // console.log(this.matchmakingService.currentMatchId);
         window.addEventListener('keydown', this.handleEvents.bind(this));
         window.addEventListener('keydown', this.handleKeyUpEvent.bind(this));
         // document.addEventListener('keydown', (event: KeyboardEvent) => { //will cause crash if first using button, then 'i'
@@ -378,7 +376,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         const player1Wins = this.differencesFound1 >= this.numberOfDifferencesRequiredToWin;
                         const player2Wins = this.differencesFound2 >= this.numberOfDifferencesRequiredToWin;
                         if (player1Wins || player2Wins) {
-                            this.onWinGame(player1Wins, !this.isWinByDefault);
+                            this.onWinGame(data.isPlayer1, !this.isWinByDefault);
                         }
                     }
                 } else {
@@ -516,7 +514,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
-        this.popUpElement.showGameOverPopUp(winningPlayer, isWinByDefault, this.matchmakingService.isSoloMode, startReplayAction);
+        this.popUpElement.showGameOverPopUp(
+            isWinByDefault,
+            this.currentMatchType as MatchType,
+            startReplayAction,
+            isPlayer1Win ? this.getPlayerUsername(true) : this.getPlayerUsername(false),
+            isPlayer1Win ? this.getPlayerUsername(false) : this.getPlayerUsername(true),
+        );
     }
 
     handleEvents(event: KeyboardEvent | MouseEvent) {
