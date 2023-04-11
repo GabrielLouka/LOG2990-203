@@ -45,8 +45,7 @@ export class PopUpComponent {
         if (matchType === MatchType.LimitedCoop) {
             this.isLimitedTime = true;
             winMessage = `Félicitations ${username1?.toUpperCase()} et ${username2?.toUpperCase()} vous avez remporté !`;
-        }
-        else {
+        } else {
             winMessage = `Félicitations ${username1?.toUpperCase()} vous avez remporté !`;
         }
         //     const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
@@ -55,7 +54,11 @@ export class PopUpComponent {
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: winMessage,
-            message: isWinByDefault ? 'Votre adversaire a quitté la partie...' : 'Excellente partie !',
+            message: isWinByDefault
+                ? matchType === MatchType.Solo || matchType === MatchType.OneVersusOne
+                    ? 'Votre adversaire a quitté la partie...'
+                    : 'Votre partenaire a quitté la partie...'
+                : 'Excellente partie !',
             option1: 'Menu Principal',
             option2: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? 'Reprise Vidéo' : '',
             isConfirmation: false,

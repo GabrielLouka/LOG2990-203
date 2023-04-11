@@ -65,8 +65,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentReplaySpeedIndex = 0;
     seedsArray: number[];
     isOver: boolean = false;
-    isPlayer1Ready: unknown;
-    isPlayer2Ready: boolean;
+    isPlayer1Ready: boolean = false;
+    isPlayer2Ready: boolean = false;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -226,7 +226,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
-
         window.removeEventListener('keydown', this.handleEvents.bind(this));
     }
 
@@ -294,7 +293,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.requestStartGame();
         if (this.currentGameIndex === 0) {
-            this.startTimer();
             this.replayModeService.startRecording();
         }
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
@@ -331,20 +329,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.games[this.currentGameIndex].gameData });
-        if (this.isCoop) {
             this.socketService.send('readyPlayer', { isPlayer1: this.isPlayer1 });
-        }
     }
 
     addServerSocketMessagesListeners() {
         if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
         this.socketService.on('readyUpdate', (data: { isPlayer1: boolean }) => {
             if (!this.isPlayer1Ready && data.isPlayer1) {
-                this.isPlayer1Ready = data.isPlayer1;
+                this.isPlayer1Ready = true;
             } else if (!this.isPlayer2Ready && !data.isPlayer1) {
-                this.isPlayer2Ready = !data.isPlayer1;
+                this.isPlayer2Ready = true;
             }
-            if (this.isPlayer1Ready && this.isPlayer2Ready) {
+            if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
                 this.startTimer();
             }
         });
