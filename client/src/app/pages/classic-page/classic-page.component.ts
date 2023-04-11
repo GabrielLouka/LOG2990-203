@@ -10,6 +10,7 @@ import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 import { CanvasHandlingService } from '@app/services/gameplay-service/canvas-handling.service';
 import { HintService } from '@app/services/hint-service/hint.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -35,7 +36,6 @@ import {
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { Observable, catchError, map, of } from 'rxjs';
-import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 
 @Component({
     selector: 'app-classic-page',
@@ -531,8 +531,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             isWinByDefault,
             this.currentMatchType as MatchType,
             startReplayAction,
-            isPlayer1Win ? this.getPlayerUsername(true) : this.getPlayerUsername(false),
-            isPlayer1Win ? this.getPlayerUsername(false) : this.getPlayerUsername(true),
+            this.timerElement.timeInSeconds === 0 ? undefined : isPlayer1Win ? this.getPlayerUsername(true) : this.getPlayerUsername(false),
+            this.timerElement.timeInSeconds === 0 ? undefined : isPlayer1Win ? this.getPlayerUsername(false) : this.getPlayerUsername(true),
         );
     }
 
