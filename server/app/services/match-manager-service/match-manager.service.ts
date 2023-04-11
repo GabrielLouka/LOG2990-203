@@ -88,11 +88,13 @@ export class MatchManagerService {
             if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2) {
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
             } else {
-
-                modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+                if (modifiedMatch.matchType !== MatchType.LimitedCoop && modifiedMatch.matchType !== MatchType.LimitedSolo) {
+                    modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+                } else {
+                    modifiedMatch.matchType = MatchType.LimitedSolo;
+                }
             }
         }
-
 
         return modifiedMatch?.matchId ?? null;
     }

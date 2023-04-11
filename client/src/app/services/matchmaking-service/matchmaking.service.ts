@@ -81,7 +81,7 @@ export class MatchmakingService {
 
     get player1Id(): string | undefined {
         return this.currentMatch?.player1?.playerId;
-    } 
+    }
 
     get player1(): Player | null | undefined {
         return this.currentMatch?.player1;
@@ -90,7 +90,7 @@ export class MatchmakingService {
     get player2(): Player | null | undefined {
         return this.currentMatch?.player1;
     }
-    
+
     set currentMatchGame(match: Match) {
         this.currentMatch = match;
     }
