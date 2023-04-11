@@ -65,8 +65,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentReplaySpeedIndex = 0;
     seedsArray: number[];
     isOver: boolean = false;
-    isPlayer1Ready: unknown;
-    isPlayer2Ready: boolean;
+    isPlayer1Ready: boolean = false;
+    isPlayer2Ready: boolean = false;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -226,7 +226,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
-
         window.removeEventListener('keydown', this.handleEvents.bind(this));
     }
 
@@ -294,7 +293,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.requestStartGame();
         if (this.currentGameIndex === 0) {
-            this.startTimer();
             this.replayModeService.startRecording();
         }
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
@@ -331,20 +329,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     requestStartGame() {
         this.socketService.send('registerGameData', { gameData: this.games[this.currentGameIndex].gameData });
-        if (this.isCoop) {
             this.socketService.send('readyPlayer', { isPlayer1: this.isPlayer1 });
-        }
     }
 
     addServerSocketMessagesListeners() {
         if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
         this.socketService.on('readyUpdate', (data: { isPlayer1: boolean }) => {
             if (!this.isPlayer1Ready && data.isPlayer1) {
-                this.isPlayer1Ready = data.isPlayer1;
+                this.isPlayer1Ready = true;
             } else if (!this.isPlayer2Ready && !data.isPlayer1) {
-                this.isPlayer2Ready = !data.isPlayer1;
+                this.isPlayer2Ready = true;
             }
-            if (this.isPlayer1Ready && this.isPlayer2Ready) {
+            if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
                 this.startTimer();
             }
         });
@@ -539,7 +535,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     } else {
                         this.stopCheating();
                     }
-                    this.letterTPressed = !this.letterTPressed;
                 }
                 // else if (event.key === 'i'){
                 //     this.handleHintMode();
@@ -600,6 +595,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 },
                 this.foundDifferences,
             );
+            this.letterTPressed = true;
         };
         startCheatingMethod();
         this.replayModeService.addMethodToReplay(startCheatingMethod);
@@ -608,6 +604,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     stopCheating() {
         const stopCheatingMethod = () => {
             this.canvasHandlingService.stopCheating();
+            this.letterTPressed = false;
         };
         stopCheatingMethod();
         this.replayModeService.addMethodToReplay(stopCheatingMethod);
@@ -615,11 +612,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     resetGame() {
         this.foundDifferences = [];
-        this.canvasHandlingService.stopCheating();
+        this.stopCheating();
         this.canvasHandlingService.currentModifiedImage = Buffer.from(this.games[this.currentGameIndex].modifiedImage);
         this.canvasHandlingService.updateCanvas(this.games[this.currentGameIndex].originalImage, this.games[this.currentGameIndex].modifiedImage);
-        this.stopCheating();
-        this.canvasHandlingService.isCheating = false;
         this.chat.resetChat();
         this.differencesFound1 = 0;
         this.differencesFound2 = 0;
@@ -633,5 +628,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     finishReplay() {
         this.timerElement.pauseTimer();
+        this.stopCheating();
     }
 }
