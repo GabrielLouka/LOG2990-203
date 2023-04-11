@@ -566,6 +566,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.popUpElement.showGameOverPopUpLimited(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
     }
 
+    hintModeButton() {
+        if (this.isGameInteractable) this.handleHintMode();
+    }
+
     handleHintMode() {
         const showHintMethod = () => {
             if (this.hintService.maxGivenHints.getValue() > 0) {

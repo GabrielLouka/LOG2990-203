@@ -8,7 +8,7 @@
         <h1 class="titre">{{ this.gameTitle }}</h1>
         <app-hint
             *ngIf="this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo"
-            (click)="handleHintMode()"
+            (click)="hintModeButton()"
             #hintElement
         ></app-hint>
     </div>
