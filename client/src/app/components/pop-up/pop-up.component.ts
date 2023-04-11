@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Action } from '@common/classes/action';
+import { MatchType } from '@common/enums/match-type';
 
 @Component({
     selector: 'app-pop-up',
@@ -33,23 +34,52 @@ export class PopUpComponent {
         });
         this.showPopUp();
     }
-
-    showGameOverPopUp(username: string | undefined, isWinByDefault: boolean, isSoloMode: boolean, startReplayAction: Action<void> | null) {
-        const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
-        const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
-        const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
+    showGameOverPopUp(
+        isWinByDefault: boolean,
+        matchType: MatchType,
+        startReplayAction: Action<void> | null,
+        username1: string | undefined,
+        username2: string | undefined = undefined,
+    ) {
+        let winMessage;
+        if (matchType === MatchType.LimitedCoop) {
+            this.isLimitedTime = true;
+            winMessage = `Félicitations ${username1?.toUpperCase()} et ${username2?.toUpperCase()} vous avez remporté !`;
+        }
+        else {
+            winMessage = `Félicitations ${username1?.toUpperCase()} vous avez remporté !`;
+        }
+        //     const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
+        // const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
+        // const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
-            title: isWinByDefault ? soloMessage : titleMessage,
+            title: winMessage,
             message: isWinByDefault ? 'Votre adversaire a quitté la partie...' : 'Excellente partie !',
             option1: 'Menu Principal',
-            option2: 'Reprise Vidéo',
+            option2: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? 'Reprise Vidéo' : '',
             isConfirmation: false,
             isGameOver: true,
-            option2Action: startReplayAction,
+            option2Action: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? startReplayAction : null,
         });
         this.showPopUp();
     }
+    // showGameOverPopUp(username: string | undefined, isWinByDefault: boolean, isSoloMode: boolean, startReplayAction: Action<void> | null) {
+    //     const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
+    //     const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
+    //     const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
+    //     this.popUpInfo.splice(0, this.popUpInfo.length);
+    //     this.popUpInfo.push({
+    //         title: isWinByDefault ? soloMessage : titleMessage,
+    //         message: isWinByDefault ? 'Votre adversaire a quitté la partie...' : 'Excellente partie !',
+    //         option1: 'Menu Principal',
+    //         option2: 'Reprise Vidéo',
+    //         isConfirmation: false,
+    //         isGameOver: true,
+    //         option2Action: startReplayAction,
+    //     });
+    //     this.showPopUp();
+    // }
     // eslint-disable-next-line max-params
     showGameOverPopUpLimited(username1: string | undefined, username2: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
         this.isLimitedTime = true;

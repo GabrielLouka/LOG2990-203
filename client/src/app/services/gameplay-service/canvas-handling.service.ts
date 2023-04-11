@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { ElementRef, Injectable, ViewChild } from '@angular/core';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { GameData } from '@common/interfaces/game-data';
 import { Buffer } from 'buffer';
@@ -9,8 +10,8 @@ import { Buffer } from 'buffer';
 export class CanvasHandlingService {
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
     backgroundColor: string;
-    intervalIDLeft: number;
-    intervalIDRight: number;
+    blinkDelayedMethodLeft: DelayedMethod;
+    blinkDelayedMethodRight: DelayedMethod;
     isCheating: boolean = false;
     isWinByDefault: boolean = true;
     foundDifferences: boolean[];
@@ -88,17 +89,20 @@ export class CanvasHandlingService {
         this.backgroundColor = '#66FF99';
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(gameData, images, foundDifferences);
         this.originalImage = images.originalImage;
-        this.intervalIDLeft = this.startInterval(
+        this.blinkDelayedMethodLeft = this.startDelayedMethod(
             { originalImage: images.originalImage, newImage },
             this.leftCanvasContext as CanvasRenderingContext2D,
         );
-        this.intervalIDRight = this.startInterval(
+        this.blinkDelayedMethodRight = this.startDelayedMethod(
             { originalImage: images.originalImage, newImage },
             this.rightCanvasContext as CanvasRenderingContext2D,
         );
         if (this.currentGameId !== '-1') {
             this.currentModifiedImage = newImage;
         }
+
+        this.blinkDelayedMethodLeft.start();
+        this.blinkDelayedMethodRight.start();
         this.isCheating = !this.isCheating;
     }
 
@@ -114,8 +118,8 @@ export class CanvasHandlingService {
 
     stopCheating() {
         this.backgroundColor = '';
-        window.clearInterval(this.intervalIDLeft as number);
-        window.clearInterval(this.intervalIDRight as number);
+        this.blinkDelayedMethodLeft.stop();
+        this.blinkDelayedMethodRight.stop();
         this.isCheating = !this.isCheating;
         this.putCanvasIntoInitialState(
             { originalImage: this.originalImage, currentModifiedImage: this.currentModifiedImage },
@@ -123,7 +127,7 @@ export class CanvasHandlingService {
         );
     }
 
-    startInterval(images: { originalImage: Buffer; newImage: Buffer }, leftContext: CanvasRenderingContext2D) {
+    startDelayedMethod(images: { originalImage: Buffer; newImage: Buffer }, leftContext: CanvasRenderingContext2D) {
         return this.imageManipulationService.alternateOldNewImage(images.originalImage, images.newImage, leftContext as CanvasRenderingContext2D);
     }
 }
