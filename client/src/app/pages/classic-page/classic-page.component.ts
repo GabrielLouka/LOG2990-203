@@ -6,6 +6,7 @@ import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
@@ -52,6 +53,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
+    @ViewChild('spinner') spinnerComponent!: SpinnerComponent;
     isWinByDefault: boolean = true;
     foundDifferences: boolean[];
     letterTPressed: boolean = true;
@@ -358,6 +360,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.isPlayer2Ready = true;
             }
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
+                this.spinnerComponent.hideSpinner();
                 this.startTimer();
             }
             if (this.isCoop) {

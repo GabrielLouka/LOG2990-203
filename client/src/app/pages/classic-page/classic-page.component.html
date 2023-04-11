@@ -11,11 +11,10 @@
             (click)="hintModeButton()"
             #hintElement
         ></app-hint>
-    </div>
-
+    </div>   
     <div class="flex-column center">
-        <div class="flex-row center data-container">
-            <div class="flex-row difference-container">
+        <div class="flex-row center data-container">          
+            <div class="flex-row difference-container">           
                 <app-found-differences-counter
                     class="hints-container"
                     [username]="
@@ -30,7 +29,7 @@
                     [ngClass]="{
                         currentPlayer: activePlayer || this.isCoop || this.isLimitedTimeSolo
                     }"
-                ></app-found-differences-counter>
+                ></app-found-differences-counter>         
                 <app-found-differences-counter
                     class="hints-container"
                     *ngIf="isOneVersusOne && currentGameId !== '-1'"
@@ -42,6 +41,7 @@
                     }"
                 ></app-found-differences-counter>
             </div>
+            <app-spinner #spinner></app-spinner>
             <div class="timer-container">
                 <div #penalty class="penalty-message">Penalité : +10s</div>
                 <app-timer
