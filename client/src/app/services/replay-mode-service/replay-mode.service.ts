@@ -153,12 +153,12 @@ export class ReplayModeService {
     private pauseReplayingTimer() {
         this.currentState = ReplayModeState.Paused;
         clearInterval(this.timerId);
-        this.visibleTimer.pauseTimer();
+        this.visibleTimer.pause();
     }
 
     private resumeReplayingTimer() {
         this.currentState = ReplayModeState.Replaying;
-        this.visibleTimer.resumeTimer();
+        this.visibleTimer.resume();
     }
 
     private resetTimer() {

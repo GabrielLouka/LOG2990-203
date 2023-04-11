@@ -27,20 +27,36 @@ export class GameRankingService {
 
     async updateRanking(gameId: string, isOneVersusOne: boolean): Promise<RankingData | void> {
         try {
-            console.log('ICI tabarnak');
             const updateRankingIndex = isOneVersusOne
                 ? await this.gameStorageService.updateGameOneVersusOneNewBreakingRecord(gameId, this.newRanking)
                 : await this.gameStorageService.updateGameSoloNewBreakingRecord(gameId, this.newRanking);
             if (updateRankingIndex) {
                 return {
-                    username: this.newRanking.name.toUpperCase(),
-                    position: (updateRankingIndex + 1).toString(),
+                    username: this.newRanking.name,
+                    position: this.positionToString(updateRankingIndex + 1),
                     gameName: this.gameName,
                     matchType: this.matchType,
                 } as RankingData;
             }
         } catch (e) {
             return Promise.reject('The game is null');
+        }
+    }
+
+    private positionToString(position: number): string {
+        switch (position) {
+            case 1: {
+                return 'première';
+            }
+            case 2: {
+                return 'deuxième';
+            }
+            case 3: {
+                return 'troisième';
+            }
+            default: {
+                return '';
+            }
         }
     }
 }
