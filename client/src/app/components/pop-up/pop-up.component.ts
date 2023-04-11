@@ -42,11 +42,15 @@ export class PopUpComponent {
         username2: string | undefined = undefined,
     ) {
         let winMessage;
+
         if (matchType === MatchType.LimitedCoop) {
             this.isLimitedTime = true;
             winMessage = `Félicitations ${username1?.toUpperCase()} et ${username2?.toUpperCase()} vous avez remporté !`;
         } else {
             winMessage = `Félicitations ${username1?.toUpperCase()} vous avez remporté !`;
+        }
+        if (username1 === undefined && username2 === undefined) {
+            winMessage = 'Le temps est écoulé!';
         }
         //     const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
         // const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
