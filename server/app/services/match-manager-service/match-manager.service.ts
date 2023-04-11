@@ -1,12 +1,17 @@
+/* eslint-disable complexity */
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
 import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
 import { Service } from 'typedi';
+// eslint-disable-next-line no-restricted-imports
+import { HistoryStorageService } from '../history-storage-service/history-storage.service';
 
 @Service()
 export class MatchManagerService {
     private currentOnlinePlayedMatches: Match[] = [];
+
+    constructor(private historyStorageService: HistoryStorageService) {}
 
     get currentMatches(): Match[] {
         return this.currentOnlinePlayedMatches;
@@ -31,7 +36,8 @@ export class MatchManagerService {
             matchToUpdate.matchStatus = winner.playerId === matchToUpdate.player1?.playerId ? MatchStatus.Player1Win : MatchStatus.Player2Win;
         }
 
-        console.log('Match winner set : ' + JSON.stringify(matchToUpdate));
+        // eslint-disable-next-line no-console
+        // console.log('Match winner set : ' + JSON.stringify(matchToUpdate));
     }
 
     setMatchPlayer(matchId: string, player: Player) {
@@ -52,9 +58,20 @@ export class MatchManagerService {
         }
     }
 
+    // TODO: ESSAYER DE COMPRENDRE LA LOGIQUE DE CETTE FONCTOIN :'(
     removePlayerFromMatch(playerId: string): string | null {
         let modifiedMatch: Match | null = null;
         for (const match of this.currentOnlinePlayedMatches) {
+            if ((match.matchStatus === MatchStatus.InProgress || match.matchStatus === MatchStatus.Player1Win) && match.player2 === undefined) {
+                this.historyStorageService.player1 = match.player1;
+                this.historyStorageService.duration = '10:00';
+                this.historyStorageService.startingGameTime = new Date();
+
+                this.historyStorageService.gameMode = match.matchType;
+                this.historyStorageService.endStatus = match.matchStatus;
+
+                this.historyStorageService.storeHistory();
+            }
             if (match.player1?.playerId === playerId) {
                 match.player1 = null;
                 modifiedMatch = match;
@@ -68,12 +85,14 @@ export class MatchManagerService {
         }
 
         if (modifiedMatch) {
-            if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2)
+            if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2) {
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
-            else modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+            } else {
+
+                modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+            }
         }
 
-        console.log('MatchManagerService: removePlayerFromMatch: ', modifiedMatch);
 
         return modifiedMatch?.matchId ?? null;
     }

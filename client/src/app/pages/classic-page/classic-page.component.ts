@@ -11,7 +11,6 @@ import { ChatService } from '@app/services/chat-service/chat.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { CanvasHandlingService } from '@app/services/gameplay-service/canvas-handling.service';
 import { HintService } from '@app/services/hint-service/hint.service';
-import { HistoryService } from '@app/services/history-service/history.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { ReplayModeService } from '@app/services/replay-mode-service/replay-mode.service';
@@ -77,7 +76,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         public matchmakingService: MatchmakingService,
         private chatService: ChatService,
         private hintService: HintService,
-        private historyService: HistoryService,
     ) {}
 
     get leftCanvasContext() {
@@ -169,14 +167,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.replayModeService.stopAllPlayingActions();
         if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode) {
-            this.historyService.createHistoryData(
-                this.player1,
-                this.differencesFound1 < this.totalDifferences,
-                this.matchmakingService.currentMatch?.matchType as MatchType,
-                this.player1,
-                this.player2,
-                this.timerElement.getTime(),
-            );
+            // this.historyService.createHistoryData(
+            //     this.player1,
+            //     this.differencesFound1 < this.totalDifferences,
+            //     this.matchmakingService.currentMatch?.matchType as MatchType,
+            //     this.player1,
+            //     this.player2,
+            //     this.timerElement.getTime(),
+            // );
         }
         this.socketService.disconnect();
     }
@@ -307,7 +305,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     startTimer() {
         this.timerElement.resetTimer();
         this.timerElement.startTimer();
-        this.historyService.saveStartGameTime();
+        // this.historyService.saveStartGameTime();
     }
     onMouseDown(event: MouseEvent) {
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
@@ -499,15 +497,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
         const winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
         if (this.isPlayer1 === isPlayer1Win) {
-            console.log('You Win : ' + winningPlayer);
-            this.historyService.createHistoryData(
-                winningPlayer,
-                isWinByDefault,
-                this.matchmakingService.currentMatch?.matchType as MatchType,
-                this.player1,
-                this.player2,
-                this.timerElement.getTime(),
-            );
+            // console.log('You Win : ' + winningPlayer);
+            // this.historyService.createHistoryData(
+            //     winningPlayer,
+            //     isWinByDefault,
+            //     this.matchmakingService.currentMatch?.matchType as MatchType,
+            //     this.player1,
+            //     this.player2,
+            //     this.timerElement.getTime(),
+            // );
 
             this.socketService.send('setWinner', {
                 matchId: this.matchmakingService.currentMatchId,
