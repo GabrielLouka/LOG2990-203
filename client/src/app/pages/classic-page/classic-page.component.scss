@@ -46,6 +46,10 @@ canvas {
 }
 
 .penalty-message {
+    position: absolute;
+    top: 27.5vh;
+    right: 50%;
+
     display: none;
     color: red;
     font-weight: 600;

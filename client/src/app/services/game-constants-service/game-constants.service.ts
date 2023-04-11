@@ -14,6 +14,18 @@ export class GameConstantsService {
 
     constructor(public communicationService: CommunicationService) {}
 
+    get countdownValue(): number {
+        return this.constants.countdownValue;
+    }
+
+    get penaltyValue(): number {
+        return this.constants.penaltyValue;
+    }
+
+    get bonusValue(): number {
+        return this.constants.bonusValue;
+    }
+
     initGameConstants() {
         const routeToSend = '/game_constants/';
         this.communicationService.get(routeToSend).subscribe({

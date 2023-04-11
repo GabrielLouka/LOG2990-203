@@ -43,7 +43,7 @@
             </div>
             <app-spinner #spinner></app-spinner>
             <div class="timer-container">
-                <div #penalty class="penalty-message">Penalité : +10s</div>
+                <div #penalty *ngIf="this.gameConstantsService.penaltyValue > 0" class="penalty-message">Penalité : +{{ this.gameConstantsService.penaltyValue }}s</div>
                 <app-timer
                     #timerElement
                     [incrementTime]="currentGameId !== '-1'"

@@ -2,9 +2,7 @@
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { Service } from 'typedi';
-import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
-import { Player } from '@common/classes/player';
 import { ObjectId } from 'mongodb';
 
 @Service()
@@ -14,9 +12,10 @@ export class HistoryStorageService {
         startingTime: Date;
         gameMode: MatchType | undefined;
         duration: string;
-        player1: Player | null;
-        player2: Player | null;
-        endStatus: MatchStatus;
+        player1: string | undefined;
+        player2: string | undefined;
+        isWinByDefault: boolean;
+        isPlayer1Victory: boolean;
     };
     constructor(private databaseService: DatabaseService) {
         this.historyToSave = {
@@ -24,9 +23,10 @@ export class HistoryStorageService {
             startingTime: new Date(),
             duration: '',
             gameMode: MatchType.LimitedCoop,
-            player1: { username: '', playerId: '' },
-            player2: { username: '', playerId: '' },
-            endStatus: MatchStatus.InProgress,
+            player1: '',
+            player2: '',
+            isWinByDefault: false,
+            isPlayer1Victory: false,
         };
     }
 
@@ -34,11 +34,11 @@ export class HistoryStorageService {
         return this.databaseService.database.collection(process.env.DATABASE_COLLECTION_HISTORY as string);
     }
 
-    set player1(player1: Player | null) {
+    set player1(player1: string | undefined) {
         this.historyToSave.player1 = player1;
     }
 
-    set player2(player2: Player | null) {
+    set player2(player2: string | undefined) {
         this.historyToSave.player2 = player2;
     }
 
@@ -52,12 +52,16 @@ export class HistoryStorageService {
         this.historyToSave.duration = duration;
     }
 
-    set endStatus(endStatus: MatchStatus) {
-        this.historyToSave.endStatus = endStatus;
+    set isWinByDefault(isWinByDefault: boolean) {
+        this.historyToSave.isWinByDefault = isWinByDefault;
     }
 
     set gameMode(gameMode: MatchType | undefined) {
         this.historyToSave.gameMode = gameMode;
+    }
+
+    set isPlayer1Victory(isPlayer1Victory: boolean) {
+        this.historyToSave.isPlayer1Victory = isPlayer1Victory;
     }
 
     async getAllHistory(): Promise<unknown[]> {

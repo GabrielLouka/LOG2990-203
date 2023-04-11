@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { ElementRef, Injectable } from '@angular/core';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameData } from '@common/interfaces/game-data';
@@ -5,6 +6,7 @@ import { MILLISECOND_TO_SECONDS, NUMBER_HINTS } from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { BehaviorSubject } from 'rxjs';
 import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
+import { GameConstantsService } from '../game-constants-service/game-constants.service';
 
 @Injectable({
     providedIn: 'root',
@@ -13,7 +15,9 @@ export class HintService {
     maxGivenHints = new BehaviorSubject<number>(NUMBER_HINTS);
     counter$ = this.maxGivenHints.asObservable();
 
-    constructor(private imageManipulationService: ImageManipulationService) {}
+    constructor(private imageManipulationService: ImageManipulationService, public gameConstantsService: GameConstantsService) {
+        this.gameConstantsService.initGameConstants();
+    }
 
     initialize() {
         this.imageManipulationService.randomNumber = Math.random();
@@ -29,7 +33,7 @@ export class HintService {
     }
 
     handleHint(chat: ChatComponent, time: number, isLimited: boolean) {
-        return isLimited ? time - 10 : time + 10; // will be a constant, and will recall same method for LT but negation
+        return isLimited ? time - this.gameConstantsService.penaltyValue : time + this.gameConstantsService.penaltyValue;
     }
 
     sendHintMessage(chat: ChatComponent) {

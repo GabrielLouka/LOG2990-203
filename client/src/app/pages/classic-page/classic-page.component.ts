@@ -35,6 +35,7 @@ import {
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { Observable, catchError, map, of } from 'rxjs';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 
 @Component({
     selector: 'app-classic-page',
@@ -85,11 +86,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
         public replayModeService: ReplayModeService,
+        public gameConstantsService: GameConstantsService,
         private route: ActivatedRoute,
         public matchmakingService: MatchmakingService,
         private chatService: ChatService,
         private hintService: HintService,
-    ) {}
+    ) {
+        this.gameConstantsService.initGameConstants();
+    }
 
     get leftCanvasContext() {
         return this.leftCanvas.nativeElement.getContext('2d');
@@ -181,16 +185,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.replayModeService.stopAllPlayingActions();
-        if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode) {
-            // this.historyService.createHistoryData(
-            //     this.player1,
-            //     this.differencesFound1 < this.totalDifferences,
-            //     this.matchmakingService.currentMatch?.matchType as MatchType,
-            //     this.player1,
-            //     this.player2,
-            //     this.timerElement.getTime(),
-            // );
-        }
         this.socketService.disconnect();
     }
 
@@ -318,12 +312,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     startTimer() {
         this.timerElement.resetTimer();
         this.timerElement.startTimer();
-        // this.historyService.saveStartGameTime();
     }
     onMouseDown(event: MouseEvent) {
         if (!this.isGameInteractive) return;
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
-        // console.log('attempt at clicking', coordinateClick, this.canvasIsClickable);
 
         this.socketService.send('validateDifference', {
             foundDifferences: this.foundDifferences,
@@ -384,7 +376,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         } else {
                             this.currentGameIndex++;
                             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                            this.timerElement.timeInSeconds = Math.min(LIMITED_TIME_DURATION, this.timerElement.timeInSeconds + 20);
+                            this.timerElement.timeInSeconds = Math.min(
+                                LIMITED_TIME_DURATION,
+                                this.timerElement.timeInSeconds + this.gameConstantsService.bonusValue,
+                            );
                             if (this.isCheating) {
                                 this.stopCheating();
                                 this.foundDifferences = new Array(this.games[this.currentGameIndex].gameData.nbrDifferences).fill(false);
@@ -393,11 +388,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                             this.getInitialImagesFromServer();
                         }
                     } else {
-                        const player1Wins = this.differencesFound1 >= this.numberOfDifferencesRequiredToWin;
-                        const player2Wins = this.differencesFound2 >= this.numberOfDifferencesRequiredToWin;
-                        if (player1Wins || player2Wins) {
-                            this.onWinGame(data.isPlayer1, !this.isWinByDefault);
-                        }
+                        const isPlayer1Wins = this.differencesFound1 >= this.numberOfDifferencesRequiredToWin;
+                        const isPlayer2Wins = this.differencesFound2 >= this.numberOfDifferencesRequiredToWin;
+                        if (isPlayer1Wins) {
+                            this.onWinGame(true, !this.isWinByDefault);
+                        } else if (isPlayer2Wins) this.onWinGame(false, !this.isWinByDefault);
                     }
                 } else {
                     this.onFindWrongDifference(data.isPlayer1);
@@ -520,16 +515,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
         const winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
         if (this.isPlayer1 === isPlayer1Win) {
-            // console.log('You Win : ' + winningPlayer);
-            // this.historyService.createHistoryData(
-            //     winningPlayer,
-            //     isWinByDefault,
-            //     this.matchmakingService.currentMatch?.matchType as MatchType,
-            //     this.player1,
-            //     this.player2,
-            //     this.timerElement.getTime(),
-            // );
-
             this.socketService.send('setWinner', {
                 matchId: this.matchmakingService.currentMatchId,
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
