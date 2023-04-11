@@ -196,6 +196,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.player2 = this.matchmakingService.player2Username;
         }
         if (match) {
+            this.sendSystemMessageToChat('p1: ' + this.getPlayerUsername(true));
+            this.sendSystemMessageToChat('p2: ' + this.getPlayerUsername(false));
             this.onReceiveMatchData();
             if (this.gameIsOver(match) && !this.isOver) {
                 if (this.isSolo || this.isOneVersusOne) {
@@ -361,7 +363,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
                     if (this.matchmakingService.isLimitedTimeSolo || this.matchmakingService.isCoopMode) {
                         if (this.currentGameIndex === this.games.length - 1) {
-                            this.onWinGame(true, this.isOver);
+                            this.onWinGame(data.isPlayer1, this.isOver);
                         } else {
                             this.currentGameIndex++;
                             // eslint-disable-next-line @typescript-eslint/no-magic-numbers

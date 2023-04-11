@@ -88,7 +88,7 @@ export class MatchmakingService {
     }
 
     get player2(): Player | null | undefined {
-        return this.currentMatch?.player1;
+        return this.currentMatch?.player2;
     }
 
     set currentMatchGame(match: Match) {
