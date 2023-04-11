@@ -77,6 +77,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isOver: boolean = false;
     isPlayer1Ready: boolean = false;
     isPlayer2Ready: boolean = false;
+    isOriginallyCoop: boolean = false;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -359,6 +360,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
                 this.startTimer();
             }
+            if (this.isCoop) {
+                this.isOriginallyCoop = true;
+            }
         });
 
         this.socketService.on(
@@ -423,8 +427,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     increasePlayerScore(isPlayer1: boolean): void {
         const increaseScoreMethod = () => {
-            if (isPlayer1) this.differencesFound1++;
-            else this.differencesFound2++;
+            if (isPlayer1 || this.isCoop || this.isLimitedTimeSolo) {
+                this.differencesFound1++;
+            } else this.differencesFound2++;
         };
         increaseScoreMethod();
         this.replayModeService.addMethodToReplay(increaseScoreMethod);
@@ -528,6 +533,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             });
         }
         this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
+        if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {
+            isWinByDefault = true;
+        }
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
