@@ -73,7 +73,6 @@ export class HistoryStorageService {
     }
 
     async storeHistory() {
-        console.log(this.historyToSave);
         return this.collection.insertOne(this.historyToSave);
     }
 }

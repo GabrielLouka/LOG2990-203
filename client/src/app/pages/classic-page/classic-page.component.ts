@@ -73,6 +73,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
+    isLoading: boolean = true;
 
     replaySpeedOptions: number[] = [NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED];
     currentReplaySpeedIndex = 0;
@@ -351,6 +352,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             }
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
                 this.spinnerComponent.hideSpinner();
+                this.isLoading = false;
                 this.startTimer();
             }
             if (this.isCoop) {

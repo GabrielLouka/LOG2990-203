@@ -12,6 +12,9 @@
             #hintElement
         ></app-hint>
     </div>   
+    <div *ngIf="isLoading" class="loading-screen">
+        <app-spinner #spinner class="spinner"></app-spinner>
+    </div>
     <div class="flex-column center">
         <div class="flex-row center data-container">          
             <div class="flex-row difference-container">           
@@ -41,7 +44,6 @@
                     }"
                 ></app-found-differences-counter>
             </div>
-            <app-spinner #spinner></app-spinner>
             <div class="timer-container">
                 <div #penalty *ngIf="this.gameConstantsService.penaltyValue > 0" class="penalty-message">Penalité : +{{ this.gameConstantsService.penaltyValue }}s</div>
                 <app-timer

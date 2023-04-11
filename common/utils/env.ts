@@ -68,7 +68,7 @@ const DO_YOU_WANT_TO_PLAY_WITH_TEXT = 'Voulez-vous jouer avec ';
 const WAITING_FOR_PLAYER_TEXT = "En attente d'un adversaire...";
 const WAITING_PLAYER_ANSWER_TEXT = "En attente de la réponse de l'adversaire...";
 const REDIRECTED_TO_MAIN_PAGE_TEXT = "Le jeu a été supprimé, vous avez donc été redirigé à l'accueil";
-const LIMITED_TIME_USER_ENTERED_TEXT = 'Pseudo validé, veuillez choisir un mode (solo ou co-op):';
+const LIMITED_TIME_USER_ENTERED_TEXT = 'Quel mode de jeu voulez-vous jouer ?';
 
 // Pop up displayed texts
 const ALL_GAMES_TEXT = 'TOUS LES JEUX ?';
