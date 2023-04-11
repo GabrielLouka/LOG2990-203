@@ -203,8 +203,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.player2 = this.matchmakingService.player2Username;
         }
         if (match) {
-            this.sendSystemMessageToChat('p1: ' + this.getPlayerUsername(true));
-            this.sendSystemMessageToChat('p2: ' + this.getPlayerUsername(false));
             this.onReceiveMatchData();
             if (this.gameIsOver(match) && !this.isOver) {
                 if (this.isSolo || this.isOneVersusOne) {
