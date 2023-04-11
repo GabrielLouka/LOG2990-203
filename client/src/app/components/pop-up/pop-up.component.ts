@@ -58,11 +58,14 @@ export class PopUpComponent {
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: winMessage,
-            message: isWinByDefault
-                ? matchType === MatchType.Solo || matchType === MatchType.OneVersusOne
-                    ? 'Votre adversaire a quitté la partie...'
-                    : 'Votre partenaire a quitté la partie...'
-                : 'Excellente partie !',
+            message:
+                username1 === undefined && username2 === undefined
+                    ? 'Dommage...'
+                    : isWinByDefault
+                    ? matchType === MatchType.Solo || matchType === MatchType.OneVersusOne
+                        ? 'Votre adversaire a quitté la partie...'
+                        : 'Votre partenaire a quitté la partie...'
+                    : 'Excellente partie !',
             option1: 'Menu Principal',
             option2: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? 'Reprise Vidéo' : '',
             isConfirmation: false,
