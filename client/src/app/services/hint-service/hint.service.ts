@@ -4,16 +4,14 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameData } from '@common/interfaces/game-data';
 import { MILLISECOND_TO_SECONDS, NUMBER_HINTS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { BehaviorSubject } from 'rxjs';
-import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 import { GameConstantsService } from '../game-constants-service/game-constants.service';
+import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class HintService {
-    maxGivenHints = new BehaviorSubject<number>(NUMBER_HINTS);
-    counter$ = this.maxGivenHints.asObservable();
+    maxGivenHints = NUMBER_HINTS;
 
     constructor(private imageManipulationService: ImageManipulationService, public gameConstantsService: GameConstantsService) {
         this.gameConstantsService.initGameConstants();
@@ -24,18 +22,17 @@ export class HintService {
     }
 
     reset() {
-        this.maxGivenHints.next(NUMBER_HINTS);
+        this.maxGivenHints = NUMBER_HINTS;
     }
 
     decrement() {
-        const currentValue = this.maxGivenHints.value;
-        this.maxGivenHints.next(currentValue - 1);
+        this.maxGivenHints--;
     }
 
-    handleHint(chat: ChatComponent, time: number, isLimited: boolean) {
+    handleChatAndPenalty(time: number, isLimited: boolean) {
         return isLimited ? time - this.gameConstantsService.penaltyValue : time + this.gameConstantsService.penaltyValue;
     }
-
+    
     sendHintMessage(chat: ChatComponent) {
         const now = new Date();
         const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';

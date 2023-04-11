@@ -556,7 +556,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 // else if (event.key === 'i'){
                 //     this.handleHintMode();
                 // }
-            } else if (event instanceof MouseEvent) {
+            } else if (event instanceof MouseEvent && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
                 const element = this.hintElement.div.nativeElement;
                 if (element && element.contains(event.target as HTMLElement)) {
                     this.handleHintMode();
@@ -584,7 +584,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     handleHintMode() {
         const showHintMethod = () => {
-            if (this.hintService.maxGivenHints.getValue() > 0) {
+            if (this.hintService.maxGivenHints > 0) {
                 this.hintService.showHint(
                     this.rightCanvas,
                     this.rightCanvasContext as CanvasRenderingContext2D,
@@ -592,18 +592,21 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.games[this.currentGameIndex].modifiedImage,
                     {
                         gameData: this.games[this.currentGameIndex].gameData,
-                        hints: this.hintService.maxGivenHints.getValue(),
+                        hints: this.hintService.maxGivenHints,
                         diffs: this.foundDifferences,
                     },
-                );
-                this.hintService.decrement();
-                this.timerElement.timeInSeconds = this.hintService.handleHint(this.chat, this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
-                this.timerElement.refreshTimerDisplay();
-                this.hintService.showRedError(this.penaltyMessage);
-            }
-        };
+                    );
+                    console.log("hints left : " + this.hintService.maxGivenHints);
+                    this.timerElement.timeInSeconds = this.hintService.handleChatAndPenalty(this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
+                    this.timerElement.refreshTimerDisplay();
+                    this.hintService.showRedError(this.penaltyMessage);
+                }
+            };
         showHintMethod();
-        this.hintService.sendHintMessage(this.chat);
+        if (this.hintService.maxGivenHints > 0) {
+            this.hintService.sendHintMessage(this.chat);
+            this.hintService.decrement();
+        }
         this.replayModeService.addMethodToReplay(showHintMethod);
     }
 

@@ -82,8 +82,6 @@ export class ImageManipulationService {
             { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight },
         ];
         const randomVector = this.generateRandomVector(game, differences);
-        console.log('random vector', randomVector);
-        console.log('quadrants', quadrants);
 
         const quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
         for (const quadrant of quadrants) {
@@ -97,11 +95,8 @@ export class ImageManipulationService {
             }
         }
 
-        console.log('quadrants that contain the random vector', quadrantsThatContainTheRandomVector);
         const randomRect =
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
-        console.log('random rect', randomRect);
-        console.log('random rect index', Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length));
 
         const resetMethod = () =>
             this.loadCanvasImages(
