@@ -12,6 +12,7 @@ import {
     providedIn: 'root',
 })
 export class IncomingPlayerService {
+    id: string | null;
     private waitingPlayers: Player[] = [];
     private incomingPlayer: Player | null = null;
     private joiningStatusMessage: string;
@@ -75,8 +76,10 @@ export class IncomingPlayerService {
             const startingGameMessage = DO_YOU_WANT_TO_PLAY_WITH_TEXT;
 
             this.joiningStatusMessage = startingGameMessage + `${this.firstIncomingPlayer.username} ?\n`;
-
             this.incomingPlayer = this.firstIncomingPlayer;
+            if (this.id === '-1') {
+                this.acceptIncomingPlayer();
+            }
         } else {
             this.updateWaitingForIncomingPlayerMessage();
             this.incomingPlayer = null;

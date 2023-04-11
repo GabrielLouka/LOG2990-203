@@ -1,10 +1,9 @@
-import { Player } from "@common/classes/player";
-
 export interface HistoryData {
     startingTime: string | null | Date;
     duration: string;
     gameMode: string;
-    player1: Player | null;
-    player2: Player | null;
-    isWinningByDefault: boolean;
+    player1: string | undefined;
+    player2: string | undefined;
+    isWinByDefault: boolean;
 }
+ 

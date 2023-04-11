@@ -6,9 +6,11 @@ import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
 import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 import { CanvasHandlingService } from '@app/services/gameplay-service/canvas-handling.service';
 import { HintService } from '@app/services/hint-service/hint.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -52,6 +54,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
     @ViewChild('errorSound', { static: true }) errorSound: ElementRef<HTMLAudioElement>;
     @ViewChild('cheatElement') cheat: ElementRef | undefined;
+    @ViewChild('spinner') spinnerComponent!: SpinnerComponent;
     isWinByDefault: boolean = true;
     foundDifferences: boolean[];
     letterTPressed: boolean = true;
@@ -70,6 +73,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
+    isLoading: boolean = true;
 
     replaySpeedOptions: number[] = [NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED];
     currentReplaySpeedIndex = 0;
@@ -77,16 +81,20 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isOver: boolean = false;
     isPlayer1Ready: boolean = false;
     isPlayer2Ready: boolean = false;
+    isOriginallyCoop: boolean = false;
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
         public communicationService: CommunicationService,
         public replayModeService: ReplayModeService,
+        public gameConstantsService: GameConstantsService,
         private route: ActivatedRoute,
         public matchmakingService: MatchmakingService,
         private chatService: ChatService,
         private hintService: HintService,
-    ) {}
+    ) {
+        this.gameConstantsService.initGameConstants();
+    }
 
     get leftCanvasContext() {
         return this.leftCanvas.nativeElement.getContext('2d');
@@ -183,16 +191,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.replayModeService.stopAllPlayingActions();
-        if (this.differencesFound1 < this.totalDifferences && this.matchmakingService.isSoloMode) {
-            // this.historyService.createHistoryData(
-            //     this.player1,
-            //     this.differencesFound1 < this.totalDifferences,
-            //     this.matchmakingService.currentMatch?.matchType as MatchType,
-            //     this.player1,
-            //     this.player2,
-            //     this.timerElement.getTime(),
-            // );
-        }
         this.socketService.disconnect();
     }
 
@@ -211,8 +209,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.player2 = this.matchmakingService.player2Username;
         }
         if (match) {
-            this.sendSystemMessageToChat('p1: ' + this.getPlayerUsername(true));
-            this.sendSystemMessageToChat('p2: ' + this.getPlayerUsername(false));
             this.onReceiveMatchData();
             if (this.gameIsOver(match) && !this.isOver) {
                 if (this.isSolo || this.isOneVersusOne) {
@@ -320,12 +316,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     startTimer() {
         this.timerElement.resetTimer();
         this.timerElement.startTimer();
-        // this.historyService.saveStartGameTime();
     }
     onMouseDown(event: MouseEvent) {
         if (!this.isGameInteractive) return;
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
-        // console.log('attempt at clicking', coordinateClick, this.canvasIsClickable);
 
         this.socketService.send('validateDifference', {
             foundDifferences: this.foundDifferences,
@@ -362,7 +356,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.isPlayer2Ready = true;
             }
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
+                this.spinnerComponent.hideSpinner();
+                this.isLoading = false;
                 this.startTimer();
+            }
+            if (this.isCoop) {
+                this.isOriginallyCoop = true;
             }
         });
 
@@ -382,7 +381,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         } else {
                             this.currentGameIndex++;
                             // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-                            this.timerElement.timeInSeconds = Math.min(LIMITED_TIME_DURATION, this.timerElement.timeInSeconds + 20);
+                            this.timerElement.timeInSeconds = Math.min(
+                                LIMITED_TIME_DURATION,
+                                this.timerElement.timeInSeconds + this.gameConstantsService.bonusValue,
+                            );
                             if (this.isCheating) {
                                 this.stopCheating();
                                 this.foundDifferences = new Array(this.games[this.currentGameIndex].gameData.nbrDifferences).fill(false);
@@ -391,11 +393,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                             this.getInitialImagesFromServer();
                         }
                     } else {
-                        const player1Wins = this.differencesFound1 >= this.numberOfDifferencesRequiredToWin;
-                        const player2Wins = this.differencesFound2 >= this.numberOfDifferencesRequiredToWin;
-                        if (player1Wins || player2Wins) {
-                            this.onWinGame(data.isPlayer1, !this.isWinByDefault);
-                        }
+                        const isPlayer1Wins = this.differencesFound1 >= this.numberOfDifferencesRequiredToWin;
+                        const isPlayer2Wins = this.differencesFound2 >= this.numberOfDifferencesRequiredToWin;
+                        if (isPlayer1Wins) {
+                            this.onWinGame(true, !this.isWinByDefault);
+                        } else if (isPlayer2Wins) this.onWinGame(false, !this.isWinByDefault);
                     }
                 } else {
                     this.onFindWrongDifference(data.isPlayer1);
@@ -428,8 +430,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     increasePlayerScore(isPlayer1: boolean): void {
         const increaseScoreMethod = () => {
-            if (isPlayer1) this.differencesFound1++;
-            else this.differencesFound2++;
+            if (isPlayer1 || this.isCoop || this.isLimitedTimeSolo) {
+                this.differencesFound1++;
+            } else this.differencesFound2++;
         };
         increaseScoreMethod();
         this.replayModeService.addMethodToReplay(increaseScoreMethod);
@@ -517,22 +520,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
         const winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
         if (this.isPlayer1 === isPlayer1Win) {
-            // console.log('You Win : ' + winningPlayer);
-            // this.historyService.createHistoryData(
-            //     winningPlayer,
-            //     isWinByDefault,
-            //     this.matchmakingService.currentMatch?.matchType as MatchType,
-            //     this.player1,
-            //     this.player2,
-            //     this.timerElement.getTime(),
-            // );
-
             this.socketService.send('setWinner', {
                 matchId: this.matchmakingService.currentMatchId,
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
             });
         }
         this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
+        if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {
+            isWinByDefault = true;
+        }
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
@@ -540,8 +536,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             isWinByDefault,
             this.currentMatchType as MatchType,
             startReplayAction,
-            isPlayer1Win ? this.getPlayerUsername(true) : this.getPlayerUsername(false),
-            isPlayer1Win ? this.getPlayerUsername(false) : this.getPlayerUsername(true),
+            this.timerElement.timeInSeconds === 0 ? undefined : isPlayer1Win ? this.getPlayerUsername(true) : this.getPlayerUsername(false),
+            this.timerElement.timeInSeconds === 0 ? undefined : isPlayer1Win ? this.getPlayerUsername(false) : this.getPlayerUsername(true),
         );
     }
 

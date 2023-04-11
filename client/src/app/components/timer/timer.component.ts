@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
-import { LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 
 @Component({
     selector: 'app-timer',
@@ -16,6 +17,10 @@ export class TimerComponent implements OnDestroy {
     intervalId: number;
     loopingMethod: DelayedMethod;
     shouldStop = false;
+
+    constructor(public gameConstantsService: GameConstantsService) {
+        this.gameConstantsService.initGameConstants();
+    }
 
     get minutes(): number {
         return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
@@ -33,7 +38,7 @@ export class TimerComponent implements OnDestroy {
         if (this.incrementTime) {
             return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
         } else {
-            this.timeInSeconds = LIMITED_TIME_DURATION - this.timeInSeconds;
+            this.timeInSeconds = this.gameConstantsService.countdownValue - this.timeInSeconds;
             return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
         }
     }
@@ -68,7 +73,7 @@ export class TimerComponent implements OnDestroy {
     }
 
     resetTimer() {
-        this.timeInSeconds = this.incrementTime ? 0 : LIMITED_TIME_DURATION;
+        this.timeInSeconds = this.incrementTime ? 0 : this.gameConstantsService.countdownValue;
         this.minute.nativeElement.innerText = '00';
         this.second.nativeElement.innerText = '00';
         clearInterval(this.intervalId);

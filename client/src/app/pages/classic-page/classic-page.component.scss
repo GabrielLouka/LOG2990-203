@@ -46,6 +46,10 @@ canvas {
 }
 
 .penalty-message {
+    position: absolute;
+    top: 27.5vh;
+    right: 50%;
+
     display: none;
     color: red;
     font-weight: 600;
@@ -96,4 +100,21 @@ canvas {
 .replay-icon {
     scale: 1.2;
     font-weight: 700;
+}
+
+.spinner {
+    position: absolute;
+    top: 50%;
+    left: 44%;
+    scale: 1.5;
+}
+
+.loading-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.308);
+    z-index: 100;
 }
