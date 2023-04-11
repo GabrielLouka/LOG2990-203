@@ -39,7 +39,7 @@ describe('TimerComponent', () => {
     });
 
     it('stopTimer should affect true to shouldStop property', () => {
-        component.pauseTimer();
+        component.pause();
         expect(component['shouldStop']).toEqual(true);
     });
 
@@ -52,7 +52,6 @@ describe('TimerComponent', () => {
 
     it('should call the tickTock method every INTERVAL_VALUE milliseconds', fakeAsync(() => {
         spyOn(component, 'ticToc');
-        component.ngAfterViewInit();
         tick(INTERVAL_VALUE);
         expect(component.ticToc).toHaveBeenCalled();
         component.ngOnDestroy();

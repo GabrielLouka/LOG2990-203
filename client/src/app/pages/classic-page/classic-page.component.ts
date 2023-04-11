@@ -21,7 +21,17 @@ import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
 import { GameData } from '@common/interfaces/game-data';
 import { RankingData } from '@common/interfaces/ranking.data';
-import { ABORTED_GAME_MESSAGE, CANVAS_HEIGHT, LIMITED_TIME_DURATION, MILLISECOND_TO_SECONDS, VOLUME_ERROR, VOLUME_SUCCESS } from '@common/utils/env';
+import {
+    ABORTED_GAME_MESSAGE,
+    CANVAS_HEIGHT,
+    FOUR_TIMES_SPEED,
+    LIMITED_TIME_DURATION,
+    MILLISECOND_TO_SECONDS,
+    NORMAL_SPEED,
+    TWO_TIMES_SPEED,
+    VOLUME_ERROR,
+    VOLUME_SUCCESS,
+} from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { Observable, catchError, map, of } from 'rxjs';
 
@@ -61,7 +71,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
 
-    replaySpeedOptions: number[] = [1, 2, 4];
+    replaySpeedOptions: number[] = [NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED];
     currentReplaySpeedIndex = 0;
     seedsArray: number[];
     isOver: boolean = false;
@@ -117,7 +127,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return this.isOneVersusOne ? this.minDifferences : this.totalDifferences;
     }
 
-    get isGameInteractable(): boolean {
+    get isGameInteractive(): boolean {
         return !this.replayModeService.shouldShowReplayModeGUI;
     }
 
@@ -199,9 +209,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.onReceiveMatchData();
             if (this.gameIsOver(match) && !this.isOver) {
                 if (this.isSolo || this.isOneVersusOne) {
-                    this.chat.sendSystemMessage(
-                        (this.isPlayer1Win(match) ? this.player2.toUpperCase() : this.player1.toUpperCase()) + ABORTED_GAME_MESSAGE,
-                    );
+                    this.chat.sendSystemMessage((this.isPlayer1Win(match) ? this.player2 : this.player1) + ABORTED_GAME_MESSAGE);
                     this.onWinGame(this.isPlayer1Win(match), true);
                 } else {
                     this.matchmakingService.setCurrentMatchType(MatchType.LimitedSolo);
@@ -211,7 +219,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
     }
 
-    onReceiveMatchData() {
+    onReceiveMatchData(): void {
         if (this.hasAlreadyReceiveMatchData) return;
         this.hasAlreadyReceiveMatchData = true;
         if (this.isPlayer1) {
@@ -308,7 +316,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         // this.historyService.saveStartGameTime();
     }
     onMouseDown(event: MouseEvent) {
-        if (!this.isGameInteractable) return;
+        if (!this.isGameInteractive) return;
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
         // console.log('attempt at clicking', coordinateClick, this.canvasIsClickable);
 
@@ -339,6 +347,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     addServerSocketMessagesListeners() {
         if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
+
         this.socketService.on('readyUpdate', (data: { isPlayer1: boolean }) => {
             if (!this.isPlayer1Ready && data.isPlayer1) {
                 this.isPlayer1Ready = true;
@@ -349,11 +358,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.startTimer();
             }
         });
+
         this.socketService.on(
             'validationReturned',
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
                 if (data.isValidated) {
-                    const message = 'Différence trouvée par ' + this.getPlayerUsername(data.isPlayer1).toUpperCase();
+                    const message = 'Différence trouvée par ' + this.getPlayerUsername(data.isPlayer1);
                     this.sendSystemMessageToChat(message);
                     this.increasePlayerScore(data.isPlayer1);
                     this.refreshFoundDifferences(data.foundDifferences);
@@ -385,6 +395,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 }
             },
         );
+
         this.socketService.on('messageBetweenPlayers', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
             this.chatService.pushMessage(
                 {
@@ -400,14 +411,16 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         });
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
+            console.log('newBreakingScore reçu');
             this.chat.sendTimeScoreMessage(data.rankingData);
         });
+
         this.socketService.on('randomizedOrder', async (data: { seedsArray: number[] }) => {
-            this.matchmakingService.currentSeeds = await data.seedsArray;
+            this.matchmakingService.currentSeeds = data.seedsArray;
         });
     }
 
-    increasePlayerScore(isPlayer1: boolean) {
+    increasePlayerScore(isPlayer1: boolean): void {
         const increaseScoreMethod = () => {
             if (isPlayer1) this.differencesFound1++;
             else this.differencesFound2++;
@@ -416,7 +429,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.addMethodToReplay(increaseScoreMethod);
     }
 
-    refreshFoundDifferences(foundDifferences: boolean[]) {
+    refreshFoundDifferences(foundDifferences: boolean[]): void {
         const refreshMethod = () => {
             this.foundDifferences = foundDifferences;
             this.onFindDifference();
@@ -426,18 +439,18 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.addMethodToReplay(refreshMethod);
     }
 
-    onFindWrongDifference(isPlayer1: boolean) {
+    onFindWrongDifference(isPlayer1: boolean): void {
         let message = 'Erreur';
 
         if (!this.matchmakingService.isSoloMode) {
-            message += ' par ' + this.getPlayerUsername(isPlayer1).toUpperCase();
+            message += ' par ' + this.getPlayerUsername(isPlayer1);
         }
         if (isPlayer1 === this.matchmakingService.isPlayer1) this.showErrorText();
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.sendSystemMessageToChat(message);
     }
 
-    showErrorText() {
+    showErrorText(): void {
         const showErrorMethod = () => {
             this.errorMessage.nativeElement.style.display = 'block';
             this.leftCanvas.nativeElement.style.pointerEvents = 'none';
@@ -455,7 +468,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.addMethodToReplay(showErrorMethod);
     }
 
-    onFindDifference() {
+    onFindDifference(): void {
         this.playSound(true);
         if (this.currentGameId !== '-1') {
             this.canvasHandlingService.refreshModifiedImage(this.games[this.currentGameIndex].gameData, this.foundDifferences);
@@ -467,17 +480,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
 
-    gameOver(isWinByDefault: boolean) {
-        this.timerElement.pauseTimer();
+    gameOver(isWinByDefault: boolean): void {
+        this.timerElement.pause();
         this.replayModeService.stopRecording();
+
         if (!isWinByDefault) {
             this.sendNewTimeScoreToServer();
+            console.log('on se rend ici sendNewTimeScoreToServer');
         } else {
             this.socketService.disconnect();
         }
     }
 
-    sendNewTimeScoreToServer() {
+    sendNewTimeScoreToServer(): void {
         this.socketService.send('gameOver', {
             gameId: this.games[this.currentGameIndex].gameData.id.toString(),
             isOneVersusOne: this.isOneVersusOne,
@@ -532,7 +547,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.isCoop ||
             (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
         ) {
-            if (!this.isGameInteractable) return;
+            if (!this.isGameInteractive) return;
             if (event instanceof KeyboardEvent) {
                 if (event.key === 't') {
                     if (this.letterTPressed) {
@@ -554,7 +569,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleKeyUpEvent(event: KeyboardEvent) {
-        if (!this.isGameInteractable) return;
+        if (!this.isGameInteractive) return;
         if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
             this.handleHintMode();
             this.canvasHandlingService.focusKeyEvent(this.hintElement.div);
@@ -567,7 +582,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     hintModeButton() {
-        if (this.isGameInteractable) this.handleHintMode();
+        if (this.isGameInteractive) this.handleHintMode();
     }
 
     handleHintMode() {
@@ -625,7 +640,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.stopCheating();
         this.canvasHandlingService.currentModifiedImage = Buffer.from(this.games[this.currentGameIndex].modifiedImage);
         this.canvasHandlingService.updateCanvas(this.games[this.currentGameIndex].originalImage, this.games[this.currentGameIndex].modifiedImage);
-        this.chat.resetChat();
+        this.chat.reset();
         this.differencesFound1 = 0;
         this.differencesFound2 = 0;
         this.hintService.reset();
@@ -637,7 +652,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     finishReplay() {
-        this.timerElement.pauseTimer();
+        this.timerElement.pause();
         this.stopCheating();
     }
 }

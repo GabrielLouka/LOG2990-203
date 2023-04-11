@@ -13,6 +13,8 @@ import * as io from 'socket.io';
 export class SocketManager {
     matchingDifferencesService: MatchingDifferencesService;
     private sio: io.Server;
+
+    // eslint-disable-next-line max-params
     constructor(
         server: http.Server,
         private readonly matchManagerService: MatchManagerService,
@@ -153,6 +155,7 @@ export class SocketManager {
                     matchToJoinIfAvailable,
                 });
             });
+
             socket.on('randomizeGameOrder', async () => {
                 const randomSeeds: number[] = [];
 
@@ -165,6 +168,7 @@ export class SocketManager {
             socket.on('readyPlayer', (data: { isPlayer1: boolean }) => {
                 this.sio.to(joinedRoomName).emit('readyUpdate', { isPlayer1: data.isPlayer1 });
             });
+
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;
                 socket.join(joinedRoomName);

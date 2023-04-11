@@ -88,11 +88,11 @@ export class TimerComponent implements OnDestroy {
         this.loopingMethod.start();
     }
 
-    pauseTimer() {
+    pause() {
         this.loopingMethod.pause();
     }
 
-    resumeTimer() {
+    resume() {
         this.loopingMethod.resume();
     }
 }
