@@ -71,7 +71,6 @@ export class SocketManager {
 
             socket.on('setMatchType', (data: { matchId: string; matchType: MatchType }) => {
                 this.matchManagerService.setMatchType(data.matchId, data.matchType);
-
                 sendMatchUpdate({ matchId: data.matchId });
             });
 

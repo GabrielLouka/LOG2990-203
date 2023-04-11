@@ -18,11 +18,17 @@
             <div class="flex-row difference-container">
                 <app-found-differences-counter
                     class="hints-container"
-                    [username]="isCoop ? this.getPlayerUsername(true) + ' et ' + this.getPlayerUsername(false) : this.getPlayerUsername(true)"
+                    [username]="
+                        isCoop
+                            ? this.getPlayerUsername(true) + ' et ' + this.getPlayerUsername(false)
+                            : this.getPlayerUsername(true) !== undefined
+                            ? this.getPlayerUsername(true)
+                            : this.getPlayerUsername(false)
+                    "
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="currentGameId !== '-1' ? (isOneVersusOne ? minDifferences : totalDifferences) : -1"
                     [ngClass]="{
-                        currentPlayer: activePlayer || this.isCoop
+                        currentPlayer: activePlayer || this.isCoop || this.isLimitedTimeSolo
                     }"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
