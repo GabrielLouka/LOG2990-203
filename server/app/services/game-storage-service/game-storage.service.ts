@@ -1,6 +1,3 @@
-/* eslint-disable no-restricted-imports */
-/* eslint-disable @typescript-eslint/naming-convention */
-/* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import { R_ONLY } from '@app/utils/env';
@@ -44,16 +41,16 @@ export class GameStorageService {
     async deleteStoredDataForAllTheGame(): Promise<void> {
         readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
             if (err) {
-                console.error(err);
+                Promise.reject(err);
             } else {
                 files.forEach((file) => {
                     if (file.isDirectory()) {
                         const folderPath = `${R_ONLY.persistentDataFolderPath}/${file.name}`;
                         rmdir(folderPath, { recursive: true }, (error) => {
                             if (error) {
-                                console.error(error);
+                                Promise.reject(error);
                             } else {
-                                console.log(`Folder ${folderPath} deleted successfully.`);
+                                Promise.resolve(`Folder ${folderPath} deleted successfully.`);
                             }
                         });
                     }
@@ -65,16 +62,16 @@ export class GameStorageService {
     async deleteStoredData(gameId: string): Promise<void> {
         readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
             if (err) {
-                console.error(err);
+                Promise.reject(err);
             } else {
                 files.forEach(async (file) => {
                     if (file.name === gameId) {
                         const folderPath = `${R_ONLY.persistentDataFolderPath}/${file.name}`;
                         rmdir(folderPath, { recursive: false }, (error) => {
                             if (error) {
-                                console.error(error);
+                                Promise.reject(error);
                             } else {
-                                console.log(`Folder ${folderPath} deleted successfully.`);
+                                Promise.resolve(`Folder ${folderPath} deleted successfully.`);
                             }
                         });
                         return;
@@ -182,13 +179,13 @@ export class GameStorageService {
         try {
             firstImage = readFileSync(folderPath + R_ONLY.originalImageFileName);
         } catch (error) {
-            console.log('error reading first image');
+            Promise.reject('error reading first image');
         }
 
         try {
             secondImage = readFileSync(folderPath + R_ONLY.modifiedImageFileName);
         } catch (error) {
-            console.log('error reading second image');
+            Promise.reject('error reading second image');
         }
 
         return { originalImage: firstImage, modifiedImage: secondImage };
@@ -202,18 +199,20 @@ export class GameStorageService {
     async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
         const gameData = (await this.getGameById(id)).gameData;
         const query = { id: parseInt(id, 10) };
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'soloRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { soloRanking: { $each: [], $sort: { score: 1 } } } };
         if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
         const options = {
             multi: false,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.soloRanking[2].name }],
         };
         try {
             await this.collection.findOneAndUpdate(query, update, options);
             await this.collection.updateOne(query, scoreUpdate);
         } catch (e) {
-            console.error('update error : ' + e);
+            Promise.reject('update error : ' + e);
         }
         return (await this.getGameById(id)).gameData?.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
@@ -221,12 +220,17 @@ export class GameStorageService {
     async updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
         const gameData = (await this.getGameById(id)).gameData;
         const query = { id: parseInt(id, 10) };
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'oneVersusOneRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { oneVersusOneRanking: { $each: [], $sort: { score: 1 } } } };
-        if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
 
+        if (!gameData) {
+            Promise.reject(`Game data not found for game with id ${id}`);
+            return;
+        }
         const options = {
             multi: false,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.oneVersusOneRanking[2].name }],
         };
 
@@ -234,19 +238,18 @@ export class GameStorageService {
             await this.collection.findOneAndUpdate(query, update, options);
             await this.collection.updateOne(query, scoreUpdate);
         } catch (e) {
-            console.error('update error : ' + e);
+            Promise.reject('update error : ' + e);
         }
         return (await this.getGameById(id)).gameData?.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
 
     async resetScoresById(id: string) {
         const query = { id: parseInt(id, 10) };
-        console.log('GAME RESET BY ID');
         const resetRanking = { $set: { oneVersusOneRanking: defaultRanking, soloRanking: defaultRanking } };
         try {
             await this.collection.findOneAndUpdate(query, resetRanking);
         } catch (e) {
-            console.error('update error : ' + e);
+            Promise.reject('update error : ' + e);
         }
     }
 
@@ -258,9 +261,9 @@ export class GameStorageService {
     createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
-                console.error('Folder was not created');
+                Promise.reject('Folder was not created');
             } else {
-                console.log('Folder successfully created.');
+                Promise.resolve('Folder successfully created.');
             }
         });
     }
@@ -281,9 +284,9 @@ export class GameStorageService {
      */
     writeFileErrorManagement = (err: NodeJS.ErrnoException) => {
         if (err) {
-            console.error('File was not successfully written');
+            Promise.reject('File was not successfully written');
         } else {
-            console.log('File successfully written.');
+            Promise.resolve('File successfully written.');
         }
     };
 
