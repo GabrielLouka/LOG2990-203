@@ -532,6 +532,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
+        console.log('Hello');
         this.popUpElement.showGameOverPopUp(
             isWinByDefault,
             this.currentMatchType as MatchType,

@@ -37,6 +37,7 @@ export class MatchManagerService {
             // Victoire normale
             matchToUpdate.matchStatus = winner.playerId === matchToUpdate.player1?.playerId ? MatchStatus.Player1Win : MatchStatus.Player2Win;
             this.storeHistory(matchToUpdate, false);
+            console.log('Victoire normale');
         }
     }
 
@@ -85,10 +86,10 @@ export class MatchManagerService {
                     // Victoire par default
                     modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
                     this.storeHistory(modifiedMatch, true);
-                    // console.log('Victoire par default');
+                    console.log('Victoire par default');
                 }
             }
-            // console.log('Match status remove ', modifiedMatch);
+            console.log('Match status remove ', modifiedMatch);
         }
 
         return modifiedMatch?.matchId ?? null;
