@@ -173,8 +173,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
         DelayedMethod.speed = 1;
 
-        window.addEventListener('keydown', this.handleEvents.bind(this));
-        // window.addEventListener('keydown', this.handleKeyUpEvent.bind(this));
+        window.addEventListener('keydown', this.handleTandClickEvent.bind(this));
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
         .pipe(
             filter(event => event.key === 'i'), 
@@ -244,7 +243,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
-        window.removeEventListener('keydown', this.handleEvents.bind(this));        
+        window.removeEventListener('keydown', this.handleTandClickEvent.bind(this));        
     }
 
     async getInitialImagesFromServer() {
@@ -545,13 +544,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         );
     }
 
-    handleEvents(event: KeyboardEvent | MouseEvent) {
+    handleTandClickEvent(event: KeyboardEvent | MouseEvent) {
         if (
             this.matchmakingService.isSoloMode ||
             this.matchmakingService.isLimitedTimeSolo ||
-            this.matchmakingService.isOneVersusOne ||
-            this.isCoop ||
-            (this.chat && this.chat.input && document.activeElement !== this.chat.input.nativeElement)
+            (this.chat && document.activeElement !== this.chat.input.nativeElement)
+            // this.matchmakingService.isOneVersusOne ||
+            // this.isCoop 
         ) {
             if (!this.isGameInteractive) return;
             if (event instanceof KeyboardEvent) {
@@ -568,14 +567,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.handleHintMode();
                 }
             }
-        }
-    }
-
-    handleKeyUpEvent(event: KeyboardEvent) {
-        if (!this.isGameInteractive) return;
-        if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
-            this.handleHintMode();
-            this.canvasHandlingService.focusKeyEvent(this.hintElement.div);
         }
     }
 
@@ -602,7 +593,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         diffs: this.foundDifferences,
                     },
                     );
-                    console.log("hints left : " + this.hintService.maxGivenHints);
                     this.timerElement.timeInSeconds = this.hintService.handleChatAndPenalty(this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
                     this.timerElement.refreshTimerDisplay();
                     this.hintService.showRedError(this.penaltyMessage);

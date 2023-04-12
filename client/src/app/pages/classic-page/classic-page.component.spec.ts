@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { BackButtonComponent } from '@app/components/back-button/back-button.component';
@@ -478,7 +478,7 @@ describe('ClassicPageComponent', () => {
             key: 't',
         });
         document.dispatchEvent(event);
-        component.handleEvents(event);
+        component.handleTandClickEvent(event);
     });
     it('should start the cheatmode', () => {
         const event = new KeyboardEvent('keydown', {
@@ -487,8 +487,8 @@ describe('ClassicPageComponent', () => {
             key: 't',
         });
         document.dispatchEvent(event);
-        component.handleEvents(event);
-        component.handleEvents(event);
+        component.handleTandClickEvent(event);
+        component.handleTandClickEvent(event);
     });
     it('should call getInitialImagesFromServer() when both canvas contexts are defined', () => {
         const spy = spyOn(component, 'getInitialImagesFromServer');
