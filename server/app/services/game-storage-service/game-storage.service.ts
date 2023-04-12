@@ -11,7 +11,6 @@ import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'f
 import { InsertOneResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
-import { environment } from '../../../../client/src/environments/environment';
 
 @Service()
 export class GameStorageService {
@@ -168,7 +167,7 @@ export class GameStorageService {
             // const images = this.getGameImages(game.id.toString());
             gamesToReturn.push({
                 gameData: game,
-                originalImage: environment.serverUrl + '/images/' + game.id.toString() + '/1',
+                originalImage: 'http://ec2-35-183-123-130.ca-central-1.compute.amazonaws.com:3000/api' + '/images/' + game.id.toString() + '/1',
                 matchToJoinIfAvailable: null,
             });
         }
