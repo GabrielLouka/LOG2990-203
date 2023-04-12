@@ -1,21 +1,31 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 // Database constants file
-const DB = {
-    NAME: 'LOG2990',
-    COLLECTION_GAMES: 'games',
-    URL: 'mongodb+srv://Admin:admin@cluster0.z0ouwix.mongodb.net/?retryWrites=true&w=majority',
-};
+const DB_URL = 'mongodb+srv://Admin:admin@cluster0.z0ouwix.mongodb.net/?retryWrites=true&w=majority';
+const DB_NAME = 'LOG2990';
+// const DATABASE_COLLECTION_GAMES="games"
 
-const R_ONLY = {
-    persistentDataFolderPath: './storedData/',
-    lastGameIdFileName: 'lastGameId.txt',
-    gameConstantsFileName: 'gameConstants.json',
-    defaultImagesPath: './storedData/default-img.json',
-    gamesLimit: 4,
-    originalImageFileName: '1.bmp',
-    modifiedImageFileName: '2.bmp',
-    REQUIRED_WIDTH: '640',
-    REQUIRED_HEIGHT: '480',
-};
-export { DB };
-export { R_ONLY };
+// V Uncomment the line below to use PRODUCTION database instead of development database V
+const DB_COLLECTION_GAMES = 'masterGames';
+const DB_COLLECTION_HISTORY = 'gameHistory';
+
+// Server storage path
+const PERSISTENT_DATA_FOLDER_PATH = './storedData/';
+const DEFAULT_IMAGES_PATH = './storedData/default-img.json';
+
+// Stored files
+const LAST_GAME_ID_FILE = 'lastGameId.txt';
+const GAME_CONSTANTS_FILE = 'gameConstants.json';
+
+// Game images specs
+const ORIGINAL_IMAGE_FILE = '1.bmp';
+const MODIFIED_IMAGE_FILE = '2.bmp';
+const IMAGE_REQUIRED_WIDTH = '640';
+const IMAGE_REQUIRED_HEIGHT = '480';
+
+// Limit of games displayed
+const DISPLAYED_GAMES_LIMIT = 4;
+
+export { DB_COLLECTION_GAMES, DB_NAME, DB_URL, DB_COLLECTION_HISTORY };
+export { PERSISTENT_DATA_FOLDER_PATH, DEFAULT_IMAGES_PATH };
+export { LAST_GAME_ID_FILE, GAME_CONSTANTS_FILE };
+export { ORIGINAL_IMAGE_FILE, MODIFIED_IMAGE_FILE, IMAGE_REQUIRED_WIDTH, IMAGE_REQUIRED_HEIGHT };
+export { DISPLAYED_GAMES_LIMIT };

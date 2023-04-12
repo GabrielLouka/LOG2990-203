@@ -1,4 +1,4 @@
-import { R_ONLY } from '@app/utils/env';
+import { PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
 import { Request, Response, Router } from 'express';
 import * as fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
@@ -17,7 +17,7 @@ export class ImageProviderController {
         this.router = Router();
 
         this.router.get('/:gameId/:imgId', async (req: Request, res: Response) => {
-            const imgPath = path.join(R_ONLY.persistentDataFolderPath, req.params.gameId, `${req.params.imgId}.bmp`);
+            const imgPath = path.join(PERSISTENT_DATA_FOLDER_PATH, req.params.gameId, `${req.params.imgId}.bmp`);
 
             // Check if the file exists
             fs.access(imgPath, fs.constants.F_OK, (err) => {

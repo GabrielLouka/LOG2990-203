@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { R_ONLY } from '@app/utils/env';
+import { GAME_CONSTANTS_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
 import { readFileSync, writeFileSync } from 'fs';
 import { Service } from 'typedi';
 
@@ -7,7 +7,7 @@ import { Service } from 'typedi';
 export class GameConstantsService {
     getConstants() {
         try {
-            const response = readFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.gameConstantsFileName);
+            const response = readFileSync(PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE);
             const data = JSON.parse(response.toString());
             return data;
         } catch (error) {
@@ -17,7 +17,7 @@ export class GameConstantsService {
 
     updateConstants(constants: unknown) {
         try {
-            const filePath = R_ONLY.persistentDataFolderPath + R_ONLY.gameConstantsFileName;
+            const filePath = PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE;
             const data = JSON.stringify(constants);
             writeFileSync(filePath, data);
         } catch (error) {

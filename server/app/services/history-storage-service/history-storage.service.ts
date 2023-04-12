@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-imports */
-/* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { historyToSave } from '@common/interfaces/history-to-save';
 import { Service } from 'typedi';
@@ -21,7 +20,6 @@ export class HistoryStorageService {
     }
 
     async storeHistory(newHistory: historyToSave) {
-        // console.log(newHistory);
         return this.collection.insertOne(newHistory);
     }
 }

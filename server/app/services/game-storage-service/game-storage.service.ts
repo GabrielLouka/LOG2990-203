@@ -1,13 +1,11 @@
-/* eslint-disable no-restricted-imports */
-/* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
-import { R_ONLY } from '@app/utils/env';
+import { DISPLAYED_GAMES_LIMIT, LAST_GAME_ID_FILE, MODIFIED_IMAGE_FILE, ORIGINAL_IMAGE_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRanking, Ranking } from '@common/interfaces/ranking';
+import { Ranking, defaultRanking } from '@common/interfaces/ranking';
 import 'dotenv/config';
-import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
+import { mkdir, readFileSync, readdir, rmdir, writeFile, writeFileSync } from 'fs';
 import { InsertOneResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
@@ -28,13 +26,13 @@ export class GameStorageService {
         // read the next id from the file lastGameId.txt if it exists or create it with 0
         try {
             let lastGameId = 0;
-            const data = readFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName);
+            const data = readFileSync(PERSISTENT_DATA_FOLDER_PATH + LAST_GAME_ID_FILE);
             lastGameId = parseInt(data.toString(), 10);
             const nextGameId = lastGameId + 1;
-            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, nextGameId.toString());
+            writeFileSync(PERSISTENT_DATA_FOLDER_PATH + LAST_GAME_ID_FILE, nextGameId.toString());
             output = nextGameId;
         } catch (err) {
-            writeFileSync(R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, '0');
+            writeFileSync(PERSISTENT_DATA_FOLDER_PATH + LAST_GAME_ID_FILE, '0');
             output = 0;
         }
 
@@ -42,13 +40,13 @@ export class GameStorageService {
     }
 
     async deleteStoredDataForAllTheGame(): Promise<void> {
-        readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
+        readdir(PERSISTENT_DATA_FOLDER_PATH, { withFileTypes: true }, (err, files) => {
             if (err) {
                 console.error(err);
             } else {
                 files.forEach((file) => {
                     if (file.isDirectory()) {
-                        const folderPath = `${R_ONLY.persistentDataFolderPath}/${file.name}`;
+                        const folderPath = `${PERSISTENT_DATA_FOLDER_PATH}/${file.name}`;
                         rmdir(folderPath, { recursive: true }, (error) => {
                             if (error) {
                                 console.error(error);
@@ -63,13 +61,13 @@ export class GameStorageService {
     }
 
     async deleteStoredData(gameId: string): Promise<void> {
-        readdir(R_ONLY.persistentDataFolderPath, { withFileTypes: true }, (err, files) => {
+        readdir(PERSISTENT_DATA_FOLDER_PATH, { withFileTypes: true }, (err, files) => {
             if (err) {
                 console.error(err);
             } else {
                 files.forEach(async (file) => {
                     if (file.name === gameId) {
-                        const folderPath = `${R_ONLY.persistentDataFolderPath}/${file.name}`;
+                        const folderPath = `${PERSISTENT_DATA_FOLDER_PATH}/${file.name}`;
                         rmdir(folderPath, { recursive: false }, (error) => {
                             if (error) {
                                 console.error(error);
@@ -155,11 +153,11 @@ export class GameStorageService {
         }[]
     > {
         // checks if the number of games available for one page is under four
-        const skipNumber = pageNumber * R_ONLY.gamesLimit;
+        const skipNumber = pageNumber * DISPLAYED_GAMES_LIMIT;
         const nextGames = await this.collection
             .find<GameData>({}, { projection: { differences: 0, nbrDifferences: 0 } })
             .skip(skipNumber)
-            .limit(R_ONLY.gamesLimit)
+            .limit(DISPLAYED_GAMES_LIMIT)
             .toArray();
 
         const gamesToReturn = [];
@@ -175,18 +173,18 @@ export class GameStorageService {
     }
 
     getGameImages(id: string) {
-        const folderPath = R_ONLY.persistentDataFolderPath + id + '/';
+        const folderPath = PERSISTENT_DATA_FOLDER_PATH + id + '/';
         let firstImage = Buffer.from([0]);
         let secondImage = Buffer.from([0]);
 
         try {
-            firstImage = readFileSync(folderPath + R_ONLY.originalImageFileName);
+            firstImage = readFileSync(folderPath + ORIGINAL_IMAGE_FILE);
         } catch (error) {
             console.log('error reading first image');
         }
 
         try {
-            secondImage = readFileSync(folderPath + R_ONLY.modifiedImageFileName);
+            secondImage = readFileSync(folderPath + MODIFIED_IMAGE_FILE);
         } catch (error) {
             console.log('error reading second image');
         }
@@ -266,12 +264,12 @@ export class GameStorageService {
     }
 
     async storeGameImages(id: number, firstImage: Buffer, secondImage: Buffer): Promise<void> {
-        const folderPath = R_ONLY.persistentDataFolderPath + id + '/';
+        const folderPath = PERSISTENT_DATA_FOLDER_PATH + id + '/';
         // Creates the subfolder for the game if it does not exist
         this.createFolder(folderPath);
 
-        writeFile(folderPath + R_ONLY.originalImageFileName, firstImage, this.writeFileErrorManagement);
-        writeFile(folderPath + R_ONLY.modifiedImageFileName, secondImage, this.writeFileErrorManagement);
+        writeFile(folderPath + ORIGINAL_IMAGE_FILE, firstImage, this.writeFileErrorManagement);
+        writeFile(folderPath + MODIFIED_IMAGE_FILE, secondImage, this.writeFileErrorManagement);
     }
 
     /**
