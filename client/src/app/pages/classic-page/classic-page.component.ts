@@ -35,7 +35,7 @@ import {
     VOLUME_SUCCESS,
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -74,7 +74,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
     isLoading: boolean = true;
-
+    keydownEventsSubscription: Subscription;
     replaySpeedOptions: number[] = [NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED];
     currentReplaySpeedIndex = 0;
     seedsArray: number[];
@@ -174,12 +174,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         DelayedMethod.speed = 1;
 
         window.addEventListener('keydown', this.handleEvents.bind(this));
-        window.addEventListener('keydown', this.handleKeyUpEvent.bind(this));
-        // document.addEventListener('keydown', (event: KeyboardEvent) => { //will cause crash if first using button, then 'i'
-        //     if (event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
-        //         this.handleHintMode();
-        //     }
-        // });
+        // window.addEventListener('keydown', this.handleKeyUpEvent.bind(this));
+        this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
+        .pipe(
+            filter(event => event.key === 'i'), 
+        )
+        .subscribe(event => {
+            this.handleHintMode();
+        });
 
         this.hintService.reset();
         this.hintService.initialize();
@@ -190,6 +192,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.keydownEventsSubscription.unsubscribe();
         this.replayModeService.stopAllPlayingActions();
         this.socketService.disconnect();
     }
@@ -241,7 +244,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
-        window.removeEventListener('keydown', this.handleEvents.bind(this));
+        window.removeEventListener('keydown', this.handleEvents.bind(this));        
     }
 
     async getInitialImagesFromServer() {
@@ -559,9 +562,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         this.stopCheating();
                     }
                 }
-                // else if (event.key === 'i'){
-                //     this.handleHintMode();
-                // }
             } else if (event instanceof MouseEvent && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)) {
                 const element = this.hintElement.div.nativeElement;
                 if (element && element.contains(event.target as HTMLElement)) {
