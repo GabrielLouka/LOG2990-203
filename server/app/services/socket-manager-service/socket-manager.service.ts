@@ -13,6 +13,8 @@ import * as io from 'socket.io';
 export class SocketManager {
     matchingDifferencesService: MatchingDifferencesService;
     private sio: io.Server;
+
+    // eslint-disable-next-line max-params
     constructor(
         server: http.Server,
         private readonly matchManagerService: MatchManagerService,
@@ -69,7 +71,6 @@ export class SocketManager {
 
             socket.on('setMatchType', (data: { matchId: string; matchType: MatchType }) => {
                 this.matchManagerService.setMatchType(data.matchId, data.matchType);
-
                 sendMatchUpdate({ matchId: data.matchId });
             });
 
@@ -122,12 +123,14 @@ export class SocketManager {
             });
 
             socket.on('resetAllGames', () => {
+                this.gamesStorageService.resetAllScores();
                 this.sio.emit('allGamesReset');
                 this.sio.emit('actionOnGameReloadingThePage');
             });
 
-            socket.on('resetGame', (data: { hasResetGame: boolean; id: string }) => {
-                this.sio.emit('gameReset', { gameReset: data.hasResetGame, id: data.id }, socket.id);
+            socket.on('resetGame', (data: { id: string }) => {
+                this.gamesStorageService.resetScoresById(data.id);
+                this.sio.emit('gameReset', { id: data.id }, socket.id);
                 this.sio.emit('actionOnGameReloadingThePage');
             });
 
@@ -153,6 +156,7 @@ export class SocketManager {
                     matchToJoinIfAvailable,
                 });
             });
+
             socket.on('randomizeGameOrder', async () => {
                 const randomSeeds: number[] = [];
 
@@ -165,6 +169,7 @@ export class SocketManager {
             socket.on('readyPlayer', (data: { isPlayer1: boolean }) => {
                 this.sio.to(joinedRoomName).emit('readyUpdate', { isPlayer1: data.isPlayer1 });
             });
+
             const joinMatchRoom = (data: { matchId: string }) => {
                 joinedRoomName = data.matchId;
                 socket.join(joinedRoomName);

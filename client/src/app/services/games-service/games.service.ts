@@ -55,7 +55,7 @@ export class GamesService {
         }
     }
 
-    deleteOneById(isDeleteRequest: boolean, id: string): void {
+    deleteById(isDeleteRequest: boolean, id: string): void {
         if (isDeleteRequest) {
             const routeToSend = '/games/' + id;
 
@@ -70,34 +70,18 @@ export class GamesService {
         }
     }
 
-    resetAll(isResetRequest: boolean): void {
+    resetById(isResetRequest: boolean, id: string): void {
         if (isResetRequest) {
-            const routeToSend = '/games/allGames';
-            this.communicationService.get(routeToSend).subscribe({
-                next: (response) => {
-                    if (response.body) {
-                        this.gamesNumber = 0;
-                        this.reloadPage();
-                    }
-                },
-            });
-            this.socketService.socket.emit('resetAllGames');
+            this.socketService.socket.emit('resetGame', { id });
         }
+        this.reloadPage();
     }
 
-    resetOneById(isDeleteRequest: boolean, id: string): void {
-        if (isDeleteRequest) {
-            const routeToSend = '/games/' + id;
-
-            this.communicationService.get(routeToSend).subscribe({
-                next: (response) => {
-                    if (response.body) {
-                        this.reloadPage();
-                    }
-                },
-            });
-            this.socketService.socket.emit('resetGame', { hasResetGame: true, id });
+    resetAll(isResetRequest: boolean): void {
+        if (isResetRequest) {
+            this.socketService.socket.emit('resetAllGames');
         }
+        this.reloadPage();
     }
 
     changeGamePages(isNext: boolean): void {

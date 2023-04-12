@@ -8,13 +8,13 @@ import { HintService } from '@app/services/hint-service/hint.service';
 })
 export class HintComponent implements OnInit {    
     @ViewChild('hint') div: ElementRef;
-    maxGivenHints$ = this.hintService.counter$;
+    maxGivenHints: number;
 
     constructor(private hintService: HintService){}
 
     ngOnInit(){
-        // this.hintService.reset();
-        // this.maxGivenHints = this.hintService.maxGivenHints;
+        this.hintService.reset();
+        this.maxGivenHints = this.hintService.maxGivenHints;
     }
     
 }

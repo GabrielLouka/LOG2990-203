@@ -11,20 +11,28 @@
             (click)="hintModeButton()"
             #hintElement
         ></app-hint>
+    </div>   
+    <div *ngIf="isLoading" class="loading-screen">
+        <app-spinner #spinner class="spinner"></app-spinner>
     </div>
-
     <div class="flex-column center">
-        <div class="flex-row center data-container">
-            <div class="flex-row difference-container">
+        <div class="flex-row center data-container">          
+            <div class="flex-row difference-container">           
                 <app-found-differences-counter
                     class="hints-container"
-                    [username]="isCoop ? this.getPlayerUsername(true) + ' et ' + this.getPlayerUsername(false) : this.getPlayerUsername(true)"
+                    [username]="
+                        isCoop
+                            ? this.getPlayerUsername(true) + ' et ' + this.getPlayerUsername(false)
+                            : this.getPlayerUsername(true) !== undefined
+                            ? this.getPlayerUsername(true)
+                            : this.getPlayerUsername(false)
+                    "
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="currentGameId !== '-1' ? (isOneVersusOne ? minDifferences : totalDifferences) : -1"
                     [ngClass]="{
-                        currentPlayer: activePlayer || this.isCoop
+                        currentPlayer: activePlayer || this.isCoop || this.isLimitedTimeSolo
                     }"
-                ></app-found-differences-counter>
+                ></app-found-differences-counter>         
                 <app-found-differences-counter
                     class="hints-container"
                     *ngIf="isOneVersusOne && currentGameId !== '-1'"
@@ -37,7 +45,7 @@
                 ></app-found-differences-counter>
             </div>
             <div class="timer-container">
-                <div #penalty class="penalty-message">Penalité : +10s</div>
+                <div #penalty *ngIf="this.gameConstantsService.penaltyValue > 0" class="penalty-message">Penalité : +{{ this.gameConstantsService.penaltyValue }}s</div>
                 <app-timer
                     #timerElement
                     [incrementTime]="currentGameId !== '-1'"

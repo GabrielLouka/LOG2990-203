@@ -1,1 +1,5 @@
-{"countdownValue":94,"penaltyValue":5,"bonusValue":8}
+{
+    "countdownValue": 10,
+    "penaltyValue": 10,
+    "bonusValue": 10
+}

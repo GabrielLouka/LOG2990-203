@@ -21,6 +21,7 @@ export class MatchManagerService {
         const matchToCreate = new Match(gameId, matchId);
         matchToCreate.matchStatus = MatchStatus.WaitingForPlayer1;
         this.currentOnlinePlayedMatches.push(matchToCreate);
+        this.historyStorageService.startingGameTime = new Date();
         return matchToCreate;
     }
 
@@ -33,11 +34,10 @@ export class MatchManagerService {
     setMatchWinner(matchId: string, winner: Player) {
         const matchToUpdate = this.getMatchById(matchId);
         if (matchToUpdate?.matchStatus === MatchStatus.InProgress) {
+            // Victoire normale
             matchToUpdate.matchStatus = winner.playerId === matchToUpdate.player1?.playerId ? MatchStatus.Player1Win : MatchStatus.Player2Win;
+            this.storeHistory(matchToUpdate, false);
         }
-
-        // eslint-disable-next-line no-console
-        // console.log('Match winner set : ' + JSON.stringify(matchToUpdate));
     }
 
     setMatchPlayer(matchId: string, player: Player) {
@@ -46,9 +46,11 @@ export class MatchManagerService {
         if (matchToUpdate) {
             if (!matchToUpdate.player1) {
                 matchToUpdate.player1 = player;
+                matchToUpdate.player1Archive = player; // Archive the value of the player
                 if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer1) matchToUpdate.matchStatus = MatchStatus.WaitingForPlayer2;
             } else {
                 matchToUpdate.player2 = player;
+                matchToUpdate.player2Archive = player; // Archive the value of the player
                 if (matchToUpdate.matchStatus === MatchStatus.WaitingForPlayer2) matchToUpdate.matchStatus = MatchStatus.InProgress;
             }
 
@@ -62,16 +64,6 @@ export class MatchManagerService {
     removePlayerFromMatch(playerId: string): string | null {
         let modifiedMatch: Match | null = null;
         for (const match of this.currentOnlinePlayedMatches) {
-            if ((match.matchStatus === MatchStatus.InProgress || match.matchStatus === MatchStatus.Player1Win) && match.player2 === undefined) {
-                this.historyStorageService.player1 = match.player1;
-                this.historyStorageService.duration = '10:00';
-                this.historyStorageService.startingGameTime = new Date();
-
-                this.historyStorageService.gameMode = match.matchType;
-                this.historyStorageService.endStatus = match.matchStatus;
-
-                this.historyStorageService.storeHistory();
-            }
             if (match.player1?.playerId === playerId) {
                 match.player1 = null;
                 modifiedMatch = match;
@@ -87,14 +79,30 @@ export class MatchManagerService {
         if (modifiedMatch) {
             if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2) {
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
+                // console.log('Partie annulée');
             } else {
-
-                modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+                if (modifiedMatch.matchStatus === MatchStatus.InProgress) {
+                    // Victoire par default
+                    modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
+                    this.storeHistory(modifiedMatch, true);
+                    // console.log('Victoire par default');
+                }
             }
+            // console.log('Match status remove ', modifiedMatch);
         }
 
-
         return modifiedMatch?.matchId ?? null;
+    }
+
+    storeHistory(match: Match, isWinByDefault: boolean) {
+        this.historyStorageService.player1 = match.player1Archive?.username;
+        this.historyStorageService.duration = '10:00';
+
+        this.historyStorageService.gameMode = match.matchType;
+        this.historyStorageService.isWinByDefault = isWinByDefault;
+        this.historyStorageService.player2 = match.player2Archive?.username;
+        this.historyStorageService.isPlayer1Victory = match.matchStatus === MatchStatus.Player1Win;
+        this.historyStorageService.storeHistory();
     }
 
     getMatchById(matchId: string): Match | null {

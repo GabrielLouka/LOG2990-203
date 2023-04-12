@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { DO_YOU_WANT_TO_PLAY_WITH_TEXT, LIMITED_TIME_USER_ENTERED, WAITING_FOR_PLAYER_TEXT, WAITING_PLAYER_ANSWER_TEXT } from '@common/utils/env';
+import {
+    DO_YOU_WANT_TO_PLAY_WITH_TEXT,
+    LIMITED_TIME_USER_ENTERED_TEXT,
+    WAITING_FOR_PLAYER_TEXT,
+    WAITING_PLAYER_ANSWER_TEXT,
+} from '@common/utils/env';
 
 @Injectable({
     providedIn: 'root',
 })
 export class IncomingPlayerService {
+    id: string | null;
     private waitingPlayers: Player[] = [];
     private incomingPlayer: Player | null = null;
     private joiningStatusMessage: string;
@@ -70,8 +76,10 @@ export class IncomingPlayerService {
             const startingGameMessage = DO_YOU_WANT_TO_PLAY_WITH_TEXT;
 
             this.joiningStatusMessage = startingGameMessage + `${this.firstIncomingPlayer.username} ?\n`;
-
             this.incomingPlayer = this.firstIncomingPlayer;
+            if (this.id === '-1') {
+                this.acceptIncomingPlayer();
+            }
         } else {
             this.updateWaitingForIncomingPlayerMessage();
             this.incomingPlayer = null;
@@ -79,7 +87,7 @@ export class IncomingPlayerService {
     }
 
     updateLimitedTimeNameEntered() {
-        this.joiningStatusMessage = LIMITED_TIME_USER_ENTERED;
+        this.joiningStatusMessage = LIMITED_TIME_USER_ENTERED_TEXT;
     }
     updateWaitingForIncomingPlayerMessage() {
         this.joiningStatusMessage = WAITING_FOR_PLAYER_TEXT;

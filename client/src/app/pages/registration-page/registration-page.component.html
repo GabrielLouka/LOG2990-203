@@ -40,13 +40,13 @@
         </form>
 
         <div *ngIf="hasUsernameRegistered">
-            <div class="flex-row center message-container">
+            <div class="flex-column center message-container">
                 <div *ngIf="queueStatusMessage !== '' && !hasFoundIncomingPlayer" class="flex-column center">
                     <h2>{{ queueStatusMessage }}</h2>
                     <app-spinner *ngIf="this.id !== '-1'" spinner></app-spinner>
                 </div>
-                <div *ngIf="this.id === '-1' && showButtons">
-                    <button class="button-style" (click)="createSoloLimitedTimeGame()">Jouer</button>
+                <div *ngIf="this.id === '-1' && showButtons" class="flex-row space-around yesNo">
+                    <button class="button-style" (click)="createSoloLimitedTimeGame()">Solo</button>
                     <button class="button-style" (click)="limitedTimeMatchId ? joinLimitedTimeGame() : createCoopGame()">Coop</button>
                 </div>
                 <div *ngIf="hasFoundIncomingPlayer" class="flex-column center">

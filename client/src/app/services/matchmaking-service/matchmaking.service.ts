@@ -81,22 +81,20 @@ export class MatchmakingService {
 
     get player1Id(): string | undefined {
         return this.currentMatch?.player1?.playerId;
-    } 
+    }
 
     get player1(): Player | null | undefined {
         return this.currentMatch?.player1;
     }
 
     get player2(): Player | null | undefined {
-        return this.currentMatch?.player1;
+        return this.currentMatch?.player2;
     }
-    
+
     set currentMatchGame(match: Match) {
         this.currentMatch = match;
     }
 
-    // This is NOT supposed to be a setter because it communicates with the server!
-    // :)
     setCurrentMatchType(matchType: MatchType) {
         const matchId = this.currentSocketId;
 
