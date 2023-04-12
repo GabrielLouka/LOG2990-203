@@ -200,11 +200,13 @@ export class GameStorageService {
     async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
         const gameData = (await this.getGameById(id)).gameData;
         const query = { id: parseInt(id, 10) };
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'soloRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { soloRanking: { $each: [], $sort: { score: 1 } } } };
         if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
         const options = {
             multi: false,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.soloRanking[2].name }],
         };
         try {
@@ -219,12 +221,14 @@ export class GameStorageService {
     async updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
         const gameData = (await this.getGameById(id)).gameData;
         const query = { id: parseInt(id, 10) };
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'oneVersusOneRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { oneVersusOneRanking: { $each: [], $sort: { score: 1 } } } };
         if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
 
         const options = {
             multi: false,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.oneVersusOneRanking[2].name }],
         };
 
@@ -239,7 +243,6 @@ export class GameStorageService {
 
     async resetScoresById(id: string) {
         const query = { id: parseInt(id, 10) };
-        console.log('GAME RESET BY ID');
         const resetRanking = { $set: { oneVersusOneRanking: defaultRanking, soloRanking: defaultRanking } };
         try {
             await this.collection.findOneAndUpdate(query, resetRanking);

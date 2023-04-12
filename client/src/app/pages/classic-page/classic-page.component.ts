@@ -35,7 +35,7 @@ import {
     VOLUME_SUCCESS,
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { catchError, filter, fromEvent, map, Observable, of, Subscription } from 'rxjs';
+import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -82,6 +82,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isPlayer1Ready: boolean = false;
     isPlayer2Ready: boolean = false;
     isOriginallyCoop: boolean = false;
+
     // eslint-disable-next-line max-params
     constructor(
         public socketService: SocketClientService,
@@ -327,7 +328,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             isPlayer1: this.matchmakingService.isSoloMode ? true : this.matchmakingService.isPlayer1,
         });
 
-        console.log('click');
         this.refreshErrorMessagePosition(event.clientX, event.clientY);
         this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
@@ -380,7 +380,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                             this.onWinGame(data.isPlayer1, this.isOver);
                         } else {
                             this.currentGameIndex++;
-                            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
                             this.timerElement.timeInSeconds = Math.min(
                                 LIMITED_TIME_DURATION,
                                 this.timerElement.timeInSeconds + this.gameConstantsService.bonusValue,
@@ -443,7 +442,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.foundDifferences = foundDifferences;
             this.onFindDifference();
         };
-        console.log('refresh found differences');
+
         refreshMethod();
         this.replayModeService.addMethodToReplay(refreshMethod);
     }
@@ -495,7 +494,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         if (!isWinByDefault) {
             this.sendNewTimeScoreToServer();
-            console.log('on se rend ici sendNewTimeScoreToServer');
         } else {
             this.socketService.disconnect();
         }

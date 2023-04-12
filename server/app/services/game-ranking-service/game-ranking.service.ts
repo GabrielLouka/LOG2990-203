@@ -1,9 +1,11 @@
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { RankingData } from '@common/interfaces/ranking.data';
+import { NOT_FOUND } from '@common/utils/env';
 import { Service } from 'typedi';
 
 @Service()
 export class GameRankingService {
+    private position: string;
     private gameName: string;
     private newRanking: { name: string; score: number; gameName: string };
     private matchType: string;
@@ -30,10 +32,12 @@ export class GameRankingService {
             const updateRankingIndex = isOneVersusOne
                 ? await this.gameStorageService.updateGameOneVersusOneNewBreakingRecord(gameId, this.newRanking)
                 : await this.gameStorageService.updateGameSoloNewBreakingRecord(gameId, this.newRanking);
-            if (updateRankingIndex) {
+
+            if (updateRankingIndex !== NOT_FOUND && updateRankingIndex !== undefined) {
+                this.positionToString(updateRankingIndex + 1);
                 return {
                     username: this.newRanking.name,
-                    position: this.positionToString(updateRankingIndex + 1),
+                    position: this.position,
                     gameName: this.gameName,
                     matchType: this.matchType,
                 } as RankingData;
@@ -43,19 +47,23 @@ export class GameRankingService {
         }
     }
 
-    private positionToString(position: number): string {
+    private positionToString(position: number): void {
         switch (position) {
             case 1: {
-                return 'première';
+                this.position = 'première';
+                break;
             }
             case 2: {
-                return 'deuxième';
+                this.position = 'deuxième';
+                break;
             }
             case 3: {
-                return 'troisième';
+                this.position = 'troisième';
+                break;
             }
             default: {
-                return '';
+                this.position = '';
+                break;
             }
         }
     }

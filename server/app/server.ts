@@ -4,7 +4,7 @@ import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { DatabaseService } from './services/database-service/database.service';
-import { GameRankingService } from './services/game-ranking-service/game-ranking-time.service';
+import { GameRankingService } from './services/game-ranking-service/game-ranking.service';
 import { GameStorageService } from './services/game-storage-service/game-storage.service';
 import { MatchManagerService } from './services/match-manager-service/match-manager.service';
 import { SocketManager } from './services/socket-manager-service/socket-manager.service';

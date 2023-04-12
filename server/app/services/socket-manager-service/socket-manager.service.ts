@@ -1,4 +1,4 @@
-import { GameRankingService } from '@app/services/game-ranking-service/game-ranking-time.service';
+import { GameRankingService } from '@app/services/game-ranking-service/game-ranking.service';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { MatchingDifferencesService } from '@app/services/matching-difference-service/matching-differences.service';
@@ -77,7 +77,6 @@ export class SocketManager {
             socket.on('setMatchPlayer', (data: { matchId: string; player: Player }) => {
                 this.matchManagerService.setMatchPlayer(data.matchId, data.player);
                 sendMatchUpdate({ matchId: data.matchId });
-                // console.log('set match player ', this.matchManagerService.getMatchById(data.matchId));
                 sendGameMatchProgressUpdate(data.matchId);
             });
 

@@ -73,15 +73,15 @@ export class GamesService {
     resetById(isResetRequest: boolean, id: string): void {
         if (isResetRequest) {
             this.socketService.socket.emit('resetGame', { id });
+            this.reloadPage();
         }
-        this.reloadPage();
     }
 
     resetAll(isResetRequest: boolean): void {
         if (isResetRequest) {
             this.socketService.socket.emit('resetAllGames');
+            this.reloadPage();
         }
-        this.reloadPage();
     }
 
     changeGamePages(isNext: boolean): void {
