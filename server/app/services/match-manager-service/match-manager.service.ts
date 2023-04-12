@@ -3,12 +3,14 @@ import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
 import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
+import { historyToSave } from '@common/interfaces/history-to-save';
 import { Service } from 'typedi';
 // eslint-disable-next-line no-restricted-imports
 import { HistoryStorageService } from '../history-storage-service/history-storage.service';
 
 @Service()
 export class MatchManagerService {
+    private startingTime: Date;
     private currentOnlinePlayedMatches: Match[] = [];
 
     constructor(private historyStorageService: HistoryStorageService) {}
@@ -21,7 +23,7 @@ export class MatchManagerService {
         const matchToCreate = new Match(gameId, matchId);
         matchToCreate.matchStatus = MatchStatus.WaitingForPlayer1;
         this.currentOnlinePlayedMatches.push(matchToCreate);
-        this.historyStorageService.startingGameTime = new Date();
+        this.startingTime = new Date();
         return matchToCreate;
     }
 
@@ -37,7 +39,6 @@ export class MatchManagerService {
             // Victoire normale
             matchToUpdate.matchStatus = winner.playerId === matchToUpdate.player1?.playerId ? MatchStatus.Player1Win : MatchStatus.Player2Win;
             this.storeHistory(matchToUpdate, false);
-            console.log('Victoire normale');
         }
     }
 
@@ -61,7 +62,6 @@ export class MatchManagerService {
         }
     }
 
-    // TODO: ESSAYER DE COMPRENDRE LA LOGIQUE DE CETTE FONCTOIN :'(
     removePlayerFromMatch(playerId: string): string | null {
         let modifiedMatch: Match | null = null;
         for (const match of this.currentOnlinePlayedMatches) {
@@ -80,30 +80,36 @@ export class MatchManagerService {
         if (modifiedMatch) {
             if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2) {
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
-                // console.log('Partie annulée');
             } else {
                 if (modifiedMatch.matchStatus === MatchStatus.InProgress) {
                     // Victoire par default
                     modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
                     this.storeHistory(modifiedMatch, true);
-                    console.log('Victoire par default');
                 }
             }
-            console.log('Match status remove ', modifiedMatch);
         }
 
         return modifiedMatch?.matchId ?? null;
     }
 
     storeHistory(match: Match, isWinByDefault: boolean) {
-        this.historyStorageService.player1 = match.player1Archive?.username;
-        this.historyStorageService.duration = '10:00';
+        const newHistory: historyToSave = {
+            startingTime: this.startingTime,
+            gameMode: match.matchType,
+            duration: this.formatDuration(this.startingTime, new Date()),
+            player1: match.player1Archive?.username,
+            player2: match.player2Archive?.username,
+            isWinByDefault,
+            isPlayer1Victory: match.matchStatus === MatchStatus.Player1Win,
+        };
+        this.historyStorageService.storeHistory(newHistory);
+    }
 
-        this.historyStorageService.gameMode = match.matchType;
-        this.historyStorageService.isWinByDefault = isWinByDefault;
-        this.historyStorageService.player2 = match.player2Archive?.username;
-        this.historyStorageService.isPlayer1Victory = match.matchStatus === MatchStatus.Player1Win;
-        this.historyStorageService.storeHistory();
+    formatDuration(startDate: Date, endDate: Date): string {
+        const diff = Math.abs(endDate.getTime() - startDate.getTime());
+        const minutes = Math.floor(diff / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 
     getMatchById(matchId: string): Match | null {
