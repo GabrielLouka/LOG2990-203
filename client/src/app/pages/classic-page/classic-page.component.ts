@@ -35,7 +35,7 @@ import {
     VOLUME_SUCCESS,
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
+import { catchError, filter, fromEvent, map, Observable, of, Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -175,12 +175,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         window.addEventListener('keydown', this.handleTandClickEvent.bind(this));
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
-        .pipe(
-            filter(event => event.key === 'i'), 
-        )
-        .subscribe(event => {
-            this.handleHintMode();
-        });
+            .pipe(filter((event) => event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)))
+            .subscribe((event) => {
+                this.handleHintMode();
+            });
 
         this.hintService.reset();
         this.hintService.initialize();
@@ -243,7 +241,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
-        window.removeEventListener('keydown', this.handleTandClickEvent.bind(this));        
+        window.removeEventListener('keydown', this.handleTandClickEvent.bind(this));
     }
 
     async getInitialImagesFromServer() {
@@ -550,7 +548,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.matchmakingService.isLimitedTimeSolo ||
             (this.chat && document.activeElement !== this.chat.input.nativeElement)
             // this.matchmakingService.isOneVersusOne ||
-            // this.isCoop 
+            // this.isCoop
         ) {
             if (!this.isGameInteractive) return;
             if (event instanceof KeyboardEvent) {
@@ -592,12 +590,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         hints: this.hintService.maxGivenHints,
                         diffs: this.foundDifferences,
                     },
-                    );
-                    this.timerElement.timeInSeconds = this.hintService.handleChatAndPenalty(this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
-                    this.timerElement.refreshTimerDisplay();
-                    this.hintService.showRedError(this.penaltyMessage);
-                }
-            };
+                );
+                this.timerElement.timeInSeconds = this.hintService.handleChatAndPenalty(this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
+                this.timerElement.refreshTimerDisplay();
+                this.hintService.showRedError(this.penaltyMessage);
+            }
+        };
         showHintMethod();
         if (this.hintService.maxGivenHints > 0) {
             this.hintService.sendHintMessage(this.chat);
