@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
 import { MatchStatus } from '@common/enums/match-status';
@@ -5,6 +6,8 @@ import { MatchType } from '@common/enums/match-type';
 import { expect } from 'chai';
 import { assert } from 'console';
 import * as sinon from 'sinon';
+import { DatabaseService } from '../database-service/database.service';
+import { HistoryStorageService } from '../history-storage-service/history-storage.service';
 import { MatchManagerService } from './match-manager.service';
 
 describe('MatchManagerService', () => {
@@ -32,7 +35,7 @@ describe('MatchManagerService', () => {
     };
 
     beforeEach(async () => {
-        matchManagerService = new MatchManagerService();
+        matchManagerService = new MatchManagerService(new HistoryStorageService(new DatabaseService()));
         createdMatch = matchManagerService.createMatch(match.gameId, match.matchId);
     });
 
