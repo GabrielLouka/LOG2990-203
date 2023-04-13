@@ -605,6 +605,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleHintMode() {
+        if (this.hintService.maxGivenHints <= 0) return;
+
         const showHintMethod = () => {
             if (this.hintService.maxGivenHints > 0) {
                 this.hintService.showHint(
@@ -621,13 +623,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.timerElement.timeInSeconds = this.hintService.handleChatAndPenalty(this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
                 this.timerElement.refreshTimerDisplay();
                 this.hintService.showRedError(this.penaltyMessage);
+                this.hintService.decrement();
             }
         };
         showHintMethod();
-        if (this.hintService.maxGivenHints > 0) {
-            this.hintService.sendHintMessage(this.chat);
-            this.hintService.decrement();
-        }
+        // if (this.hintService.maxGivenHints > 0) {
+        this.hintService.sendHintMessage(this.chat);
+        // }
         this.replayModeService.addMethodToReplay(showHintMethod);
     }
 
