@@ -85,6 +85,11 @@ export class SocketManager {
                 sendMatchUpdate({ matchId: data.matchId });
             });
 
+            socket.on('setLoser', (data: { matchId: string }) => {
+                this.matchManagerService.setMatchLose(data.matchId);
+                sendMatchUpdate({ matchId: data.matchId });
+            });
+
             socket.on('joinRoom', (data: { matchId: string }) => {
                 joinMatchRoom(data);
             });

@@ -54,6 +54,13 @@ export class MatchManagerService {
         }
     }
 
+    setMatchLose(matchId: string) {
+        const matchToUpdate = this.getMatchById(matchId);
+        if (matchToUpdate?.matchStatus === MatchStatus.InProgress) {
+            matchToUpdate.matchStatus = MatchStatus.PlayersLose;
+        }
+    }
+
     setMatchPlayer(matchId: string, player: Player) {
         const matchToUpdate = this.getMatchById(matchId);
 
