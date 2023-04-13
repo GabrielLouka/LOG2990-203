@@ -1,5 +1,6 @@
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { NOT_FOUND } from '@common/utils/env';
 import { expect } from 'chai';
 import { assert } from 'console';
@@ -28,8 +29,8 @@ describe('MatchingDifferences service', () => {
                     { x: 7, y: 8 },
                 ],
             ],
-            oneVersusOneRanking: [],
-            soloRanking: [],
+            oneVersusOneRanking: defaultRanking,
+            soloRanking: defaultRanking,
         };
         click = { x: 3, y: 4 };
     });

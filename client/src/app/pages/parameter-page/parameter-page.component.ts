@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import { Component, OnInit } from '@angular/core';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 import { HistoryService } from '@app/services/history-service/history.service';

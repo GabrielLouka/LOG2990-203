@@ -65,13 +65,11 @@ export class ReplayModeService {
     }
 
     startRecording(): void {
-        // console.log('ReplayModeService.startRecording()');
         this.resetTimer();
         this.startRecordingTimer();
     }
 
     stopRecording(): void {
-        // console.log('ReplayModeService.stopRecording()');
         this.addMethodToReplay(() => this.finishReplayMode());
         this.stopRecordingTimer();
     }
@@ -79,12 +77,10 @@ export class ReplayModeService {
     addMethodToReplay(action: () => void): void {
         if (this.currentState === ReplayModeState.Recording) {
             this.recordedActions.push(new DelayedMethod(action, this.elapsedSeconds * MILLISECOND_TO_SECONDS));
-            // console.log('recorded action at: ', this.elapsedSeconds, ' action: ', action);
         }
     }
 
     launchReplayMode() {
-        // console.log('ReplayModeService.startReplayMode() elapsedTime: ', this.elapsedSeconds);
         this.currentState = ReplayModeState.Replaying;
         this.stopAllPlayingActions();
         this.onStartReplayMode.invoke();

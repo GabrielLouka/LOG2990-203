@@ -6,13 +6,13 @@ import { MatchType } from '@common/enums/match-type';
 import { expect } from 'chai';
 import { assert } from 'console';
 import * as sinon from 'sinon';
+import { DatabaseService } from '../database-service/database.service';
 import { HistoryStorageService } from '../history-storage-service/history-storage.service';
 import { MatchManagerService } from './match-manager.service';
 
 describe('MatchManagerService', () => {
     let matchManagerService: MatchManagerService;
     let createdMatch: Match;
-    let historyStorageService: HistoryStorageService;
 
     const match = {
         gameId: 0,
@@ -35,7 +35,7 @@ describe('MatchManagerService', () => {
     };
 
     beforeEach(async () => {
-        matchManagerService = new MatchManagerService(historyStorageService);
+        matchManagerService = new MatchManagerService(new HistoryStorageService(new DatabaseService()));
         createdMatch = matchManagerService.createMatch(match.gameId, match.matchId);
     });
 

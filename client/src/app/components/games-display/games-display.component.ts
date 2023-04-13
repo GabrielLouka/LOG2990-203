@@ -45,6 +45,7 @@ export class GamesDisplayComponent implements OnInit, OnDestroy {
         this.socketService.on('actionOnGameReloadingThePage', () => {
             const pathSegments = window.location.href.split('/');
             const pageName = pathSegments[pathSegments.length - 1];
+
             if (pageName === 'selections' || pageName === 'config') {
                 this.reloadPage();
             }

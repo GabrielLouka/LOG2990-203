@@ -50,7 +50,8 @@ export class PopUpComponent {
             this.isLimitedTime = true;
             winMessage = `Félicitations ${username1} et ${username2?.toUpperCase()} vous avez remporté la partie !`;
         } else {
-            winMessage = `${username1} a remporté la partie !`;
+            if (matchType === MatchType.LimitedSolo || matchType === MatchType.Solo) winMessage = 'Félicitations vous avez remporté la partie !';
+            else winMessage = `${username1} a remporté la partie !`;
         }
         if (matchType === MatchType.LimitedSolo || matchType === MatchType.LimitedCoop) {
             if (isTimerDepleted) {

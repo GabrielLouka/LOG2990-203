@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable max-lines */
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -34,6 +33,7 @@ import {
     VOLUME_ERROR,
     VOLUME_SUCCESS,
 } from '@common/utils/env';
+import { FETCH_ALL_GAMES_PATH, FETCH_GAME_PATH } from '@common/utils/env.http';
 import { Buffer } from 'buffer';
 import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
 
@@ -82,6 +82,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isPlayer1Ready: boolean = false;
     isPlayer2Ready: boolean = false;
     isOriginallyCoop: boolean = false;
+    isEasy: boolean | undefined;
+    winningPlayer: string | undefined;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -116,6 +118,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     get isLimitedTimeSolo() {
         return this.matchmakingService.isLimitedTimeSolo;
     }
+
     get currentMatchType() {
         return this.matchmakingService.currentMatchPlayed?.matchType;
     }
@@ -174,11 +177,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
         DelayedMethod.speed = 1;
 
-        window.addEventListener('keydown', this.handleTandClickEvent.bind(this));
+        window.addEventListener('keydown', this.handleClickAndLetterTEvent.bind(this));
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
             .pipe(filter((event) => event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)))
-            .subscribe((event) => {
-                this.handleHintMode();
+            .subscribe(() => {
+                if (this.isGameInteractive) this.handleHintMode();
             });
 
         this.hintService.reset();
@@ -246,12 +249,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
-        window.removeEventListener('keydown', this.handleTandClickEvent.bind(this));
+        window.removeEventListener('keydown', this.handleClickAndLetterTEvent.bind(this));
     }
 
     async getInitialImagesFromServer() {
-        // this.canvasIsClickable = false;
-
         if (this.currentGameIndex === 0) {
             this.fetchGames().subscribe(async (games) => {
                 if (games) {
@@ -285,7 +286,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         | null
     > {
         const gameId: string = this.currentGameId ? this.currentGameId : '0';
-        const routeToSend = this.currentGameId !== '-1' ? '/games/fetchGame/' + gameId : '/games/fetchAllGames';
+        const routeToSend = this.currentGameId !== '-1' ? FETCH_GAME_PATH + gameId : FETCH_ALL_GAMES_PATH;
 
         return this.communicationService.get(routeToSend).pipe(
             map((response) => {
@@ -315,6 +316,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.currentGameIndex === 0) {
             this.replayModeService.startRecording();
         }
+        this.isEasy = this.games[this.currentGameIndex].gameData.isEasy;
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
     }
 
@@ -322,6 +324,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.timerElement.resetTimer();
         this.timerElement.startTimer();
     }
+
     onMouseDown(event: MouseEvent) {
         if (!this.isGameInteractive) return;
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
@@ -360,7 +363,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.isPlayer2Ready = true;
             }
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
-                this.spinnerComponent.hideSpinner();
                 this.isLoading = false;
                 this.startTimer();
             }
@@ -373,7 +375,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             'validationReturned',
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
                 if (data.isValidated) {
-                    const message = 'Différence trouvée par ' + this.getPlayerUsername(data.isPlayer1);
+                    let message = 'Différence trouvée par ' + this.getPlayerUsername(data.isPlayer1);
+                    if (this.isSolo || this.isLimitedTimeSolo) message = 'Différence trouvée';
                     this.sendSystemMessageToChat(message);
                     this.increasePlayerScore(data.isPlayer1);
                     this.refreshFoundDifferences(data.foundDifferences);
@@ -495,9 +498,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     gameOver(isWinByDefault: boolean): void {
         this.timerElement.pause();
         this.replayModeService.stopRecording();
+        const isWinningPlayer = this.winningPlayer === this.socketService.socketId ? true : false;
 
         if (!isWinByDefault) {
-            if (this.isSolo || this.isOneVersusOne) {
+            if ((this.isSolo || this.isOneVersusOne) && isWinningPlayer) {
                 this.sendNewTimeScoreToServer();
             }
         } else {
@@ -522,14 +526,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
-        const winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
+        this.winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
         if (this.isPlayer1 === isPlayer1Win) {
             this.socketService.send('setWinner', {
                 matchId: this.matchmakingService.currentMatchId,
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
             });
         }
-        this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
+        this.newRanking = { name: this.winningPlayer, score: this.timerElement.timeInSeconds };
         if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {
             isWinByDefault = true;
         }
@@ -547,7 +551,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onTimerEnd() {
-        console.log('timer ended !');
         this.socketService.send('setLoser', {
             matchId: this.matchmakingService.currentMatchId,
         });
@@ -567,7 +570,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         );
     }
 
-    handleTandClickEvent(event: KeyboardEvent | MouseEvent) {
+    handleClickAndLetterTEvent(event: KeyboardEvent | MouseEvent) {
         if (
             this.matchmakingService.isSoloMode ||
             this.matchmakingService.isLimitedTimeSolo ||
@@ -603,6 +606,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     handleHintMode() {
+        if (this.hintService.maxGivenHints <= 0) return;
+
         const showHintMethod = () => {
             if (this.hintService.maxGivenHints > 0) {
                 this.hintService.showHint(
@@ -616,16 +621,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         diffs: this.foundDifferences,
                     },
                 );
-                this.timerElement.timeInSeconds = this.hintService.handleChatAndPenalty(this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
-                this.timerElement.refreshTimerDisplay();
+                this.timerElement.decreaseTime(this.hintService.getTimePenalty(this.isLimitedTimeSolo));
                 this.hintService.showRedError(this.penaltyMessage);
+                this.hintService.decrement();
             }
         };
         showHintMethod();
-        if (this.hintService.maxGivenHints > 0) {
-            this.hintService.sendHintMessage(this.chat);
-            this.hintService.decrement();
-        }
+        this.hintService.sendHintMessage(this.chat);
         this.replayModeService.addMethodToReplay(showHintMethod);
     }
 

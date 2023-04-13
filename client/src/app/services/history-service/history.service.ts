@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
@@ -36,11 +35,11 @@ export class HistoryService {
                 player1: result.gameMode === MatchType.Solo ? result.player1 : result.isPlayer1Victory ? result.player1 : result.player2,
                 player2: result.gameMode === MatchType.Solo ? '' : result.isPlayer1Victory ? result.player2 : result.player1,
                 isWinByDefault: result.isWinByDefault,
+                isGameLoose: result.isGameLoose,
             };
             gameHistory.startingTime = datePipe.transform(gameHistory.startingTime, 'dd.MM.yyyy - HH:mm');
             return gameHistory;
         });
-        console.log(this.gameHistories);
     }
 
     convertGameModeToSttring(gameMode: number): string {

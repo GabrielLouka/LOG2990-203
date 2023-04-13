@@ -1,3 +1,4 @@
+/* eslint-disable no-dupe-keys */
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
@@ -67,10 +68,10 @@ describe('SocketManager', () => {
         matchId: 'match1',
         player1: matchPlayer1,
         player2: matchPlayer2,
+        player1Archive: matchPlayer1,
+        player2Archive: matchPlayer2,
         matchType: MatchType.OneVersusOne,
         matchStatus: MatchStatus.InProgress,
-        player1Archive: null,
-        player2Archive: null,
     };
     const socket = {
         id: 'socket1',

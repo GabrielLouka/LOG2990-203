@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
-import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
+import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
 
 @Component({
     selector: 'app-timer',
@@ -34,14 +34,14 @@ export class TimerComponent implements OnDestroy {
         return this.timeInSeconds;
     }
 
-    getTime(): string {
-        if (this.incrementTime) {
-            return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
-        } else {
-            this.timeInSeconds = this.gameConstantsService.countdownValue - this.timeInSeconds;
-            return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
-        }
-    }
+    // getTime(): string {
+    //     if (this.incrementTime) {
+    //         return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
+    //     } else {
+    //         this.timeInSeconds = this.gameConstantsService.countdownValue - this.timeInSeconds;
+    //         return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
+    //     }
+    // }
 
     displayTimeValue(value: number): string {
         return value < MINUTE_LIMIT ? '0' + value : value.toString();
@@ -62,6 +62,7 @@ export class TimerComponent implements OnDestroy {
                 this.timeInSeconds++;
             } else {
                 this.timeInSeconds--;
+                this.timeInSeconds = this.timeInSeconds < 0 ? 0 : this.timeInSeconds;
                 if (this.timeInSeconds <= 0) {
                     this.timeReachedZero.emit();
                 }
@@ -72,12 +73,19 @@ export class TimerComponent implements OnDestroy {
         this.refreshTimerDisplay();
     }
 
+    decreaseTime(decreaseValue: number) {
+        this.timeInSeconds -= decreaseValue;
+        this.timeInSeconds = this.timeInSeconds < 0 ? 0 : this.timeInSeconds;
+        this.refreshTimerDisplay();
+    }
+
     resetTimer() {
         this.timeInSeconds = this.incrementTime ? 0 : this.gameConstantsService.countdownValue;
         this.minute.nativeElement.innerText = '00';
         this.second.nativeElement.innerText = '00';
         clearInterval(this.intervalId);
         this.loopingMethod?.pause();
+        this.refreshTimerDisplay();
     }
 
     startTimer() {
