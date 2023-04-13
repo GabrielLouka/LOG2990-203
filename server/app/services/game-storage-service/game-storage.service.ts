@@ -1,7 +1,14 @@
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
-import { DISPLAYED_GAMES_LIMIT, LAST_GAME_ID_FILE, MODIFIED_IMAGE_FILE, ORIGINAL_IMAGE_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
+import {
+    DISPLAYED_GAMES_LIMIT,
+    IMAGE_DELIVERY_SERVER,
+    LAST_GAME_ID_FILE,
+    MODIFIED_IMAGE_FILE,
+    ORIGINAL_IMAGE_FILE,
+    PERSISTENT_DATA_FOLDER_PATH,
+} from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
 import { Ranking, defaultRanking } from '@common/interfaces/ranking';
 import 'dotenv/config';
@@ -165,7 +172,7 @@ export class GameStorageService {
             // const images = this.getGameImages(game.id.toString());
             gamesToReturn.push({
                 gameData: game,
-                originalImage: 'http://ec2-35-183-123-130.ca-central-1.compute.amazonaws.com:3000/api' + '/images/' + game.id.toString() + '/1',
+                originalImage: IMAGE_DELIVERY_SERVER + '/images/' + game.id.toString() + '/1',
                 matchToJoinIfAvailable: null,
             });
         }
