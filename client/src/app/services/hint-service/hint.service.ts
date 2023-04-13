@@ -29,9 +29,8 @@ export class HintService {
         this.maxGivenHints--;
     }
 
-    handleChatAndPenalty(time: number, isLimited: boolean) {
-        if (time < this.gameConstantsService.penaltyValue && isLimited) return (time -= time - 1);
-        return isLimited ? time - this.gameConstantsService.penaltyValue : time + this.gameConstantsService.penaltyValue;
+    getTimePenalty(isLimited: boolean) {
+        return isLimited ? this.gameConstantsService.penaltyValue : -this.gameConstantsService.penaltyValue;
     }
 
     sendHintMessage(chat: ChatComponent) {

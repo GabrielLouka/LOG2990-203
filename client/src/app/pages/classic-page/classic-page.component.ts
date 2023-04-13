@@ -620,16 +620,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         diffs: this.foundDifferences,
                     },
                 );
-                this.timerElement.timeInSeconds = this.hintService.handleChatAndPenalty(this.timerElement.timeInSeconds, this.isLimitedTimeSolo);
-                this.timerElement.refreshTimerDisplay();
+                this.timerElement.decreaseTime(this.hintService.getTimePenalty(this.isLimitedTimeSolo));
                 this.hintService.showRedError(this.penaltyMessage);
                 this.hintService.decrement();
             }
         };
         showHintMethod();
-        // if (this.hintService.maxGivenHints > 0) {
         this.hintService.sendHintMessage(this.chat);
-        // }
         this.replayModeService.addMethodToReplay(showHintMethod);
     }
 
