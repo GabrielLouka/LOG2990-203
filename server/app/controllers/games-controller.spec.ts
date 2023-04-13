@@ -88,7 +88,7 @@ describe('GamesController', () => {
                     { gameData: gameInfo.gameData, originalImage: gameInfo.originalImage, matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable },
                 ]),
             );
-            gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
+            gameStorageServiceStub.getNumberOfSavedGames.returns(Promise.resolve(1));
             supertest(expressApp)
                 .get(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)
@@ -103,7 +103,7 @@ describe('GamesController', () => {
         it('GET should not return games by page id if cannot get games', async () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.getGamesInPage.rejects(errorMessage);
-            gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
+            gameStorageServiceStub.getNumberOfSavedGames.returns(Promise.resolve(1));
             supertest(expressApp)
                 .get(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)

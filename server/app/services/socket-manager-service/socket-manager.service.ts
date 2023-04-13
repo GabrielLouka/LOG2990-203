@@ -161,10 +161,16 @@ export class SocketManager {
                 });
             });
 
+            socket.on('requestGetNumberOfGamesOnServer', async () => {
+                const count = await this.gamesStorageService.getNumberOfSavedGames();
+                this.sio.emit('numberOfGamesOnServer', count);
+            });
+
             socket.on('randomizeGameOrder', async () => {
                 const randomSeeds: number[] = [];
 
-                for (let i = 0; i < (await this.gamesStorageService.getGamesLength()); i++) {
+                const count = await this.gamesStorageService.getNumberOfSavedGames();
+                for (let i = 0; i < count; i++) {
                     randomSeeds.push(Math.random());
                 }
                 this.sio.to(joinedRoomName).emit('randomizedOrder', { seedsArray: randomSeeds });

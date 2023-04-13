@@ -10,7 +10,8 @@
         <h1 class="title" *ngIf="this.id === '-1'">Jeu Temps Limité</h1>
     </Section>
     <Section class="flex-row center registerContainer">
-        <form *ngIf="!hasUsernameRegistered" [formGroup]="registrationForm" class="flex-row register-input">
+        <app-no-games-found-popup *ngIf="noGamesAvailableOnServer"></app-no-games-found-popup>
+        <form *ngIf="!hasUsernameRegistered && !noGamesAvailableOnServer" [formGroup]="registrationForm" class="flex-row register-input">
             <label class="flex-row center user-title" for="input"><b>pseudo :</b></label>
             <input
                 name="userName"

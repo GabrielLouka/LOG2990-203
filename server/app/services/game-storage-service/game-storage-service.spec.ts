@@ -52,7 +52,7 @@ describe('Game storage service', () => {
         expect(gamePrototype).to.deep.equals(gamesDatabase[0]);
     });
     it('should return the number of games', async () => {
-        const numberOfGames = await gameStorageService.getGamesLength();
+        const numberOfGames = await gameStorageService.getNumberOfSavedGames();
         expect(numberOfGames).to.equal(1);
     });
     it('should get specific game with valid id', async () => {

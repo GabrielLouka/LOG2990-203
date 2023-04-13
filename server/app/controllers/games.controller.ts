@@ -43,7 +43,7 @@ export class GamesController {
                 for (const game of games) {
                     game.matchToJoinIfAvailable = this.matchManagerService.getMatchAvailableForGame(game.gameData.id);
                 }
-                const gameLength = await this.gameStorageService.getGamesLength();
+                const gameLength = await this.gameStorageService.getNumberOfSavedGames();
                 const gameInformation = { gameContent: games, nbrOfGame: gameLength };
                 res.send(JSON.stringify(gameInformation));
             } catch (error) {
@@ -80,7 +80,7 @@ export class GamesController {
             this.gameStorageService
                 .deleteAll()
                 .then(() => {
-                    res.status(StatusCodes.OK).send({ body: this.gameStorageService.getGamesLength() });
+                    res.status(StatusCodes.OK).send({ body: this.gameStorageService.getNumberOfSavedGames() });
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);
@@ -91,7 +91,7 @@ export class GamesController {
             this.gameStorageService
                 .deleteById(req.params.id)
                 .then(() => {
-                    res.status(StatusCodes.OK).send({ body: this.gameStorageService.getGamesLength() });
+                    res.status(StatusCodes.OK).send({ body: this.gameStorageService.getNumberOfSavedGames() });
                 })
                 .catch((error: Error) => {
                     res.status(StatusCodes.NOT_FOUND).send(error.message);

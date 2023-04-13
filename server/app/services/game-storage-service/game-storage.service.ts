@@ -120,7 +120,7 @@ export class GameStorageService {
      *
      * @returns the games list
      */
-    async getGamesLength() {
+    async getNumberOfSavedGames() {
         return await this.collection.countDocuments({});
     }
 

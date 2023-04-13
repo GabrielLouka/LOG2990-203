@@ -26,6 +26,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     });
     limitedTimeMatchId: string | null;
     showButtons: boolean = true;
+    noGamesAvailableOnServer: boolean = false; // used to determine if we should display the "no games available" message in the html page
     // eslint-disable-next-line max-params
     constructor(
         private auth: AuthService,
@@ -109,7 +110,13 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
             console.log('gameProgressUpdate registration page ', data);
         });
 
+        this.matchmakingService.socketClientService.on('numberOfGamesOnServer', (numberOfGames: number) => {
+            console.log('number of games on server ', numberOfGames);
+            this.noGamesAvailableOnServer = numberOfGames === 0;
+        });
+
         this.matchmakingService.socketClientService.socket.emit('requestRefreshGameMatchProgress', { gameId: -1 });
+        this.matchmakingService.socketClientService.socket.emit('requestGetNumberOfGamesOnServer');
     }
 
     joinLimitedTimeGame() {
