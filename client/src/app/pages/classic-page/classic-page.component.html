@@ -51,7 +51,13 @@
                 <app-timer #timerElement [incrementTime]="currentGameId !== '-1'" (timeReachedZero)="onTimerEnd()"></app-timer>
             </div>
         </div>
-        <app-info-card class="info-card" *ngIf="games" [isEasy]="this.isEasy" [matchType]="this.currentMatchType"></app-info-card>
+        <app-info-card
+            class="info-card"
+            *ngIf="games"
+            [isEasy]="this.isEasy"
+            [matchType]="this.currentMatchType"
+            [gameConstantsService]="this.gameConstantsService"
+        ></app-info-card>
         <div #cheatElement tabindex="0" [ngStyle]="{ 'background-color': this.canvasHandlingService.backgroundColor }" class="cheat-mode">
             Mode triche
         </div>

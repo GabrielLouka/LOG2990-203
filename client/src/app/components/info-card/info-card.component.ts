@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 import { MatchType } from '@common/enums/match-type';
 
 @Component({
@@ -9,7 +10,7 @@ import { MatchType } from '@common/enums/match-type';
 export class InfoCardComponent {
     @Input() isEasy: boolean | undefined;
     @Input() matchType: MatchType | undefined;
-
+    @Input() gameConstantsService: GameConstantsService | undefined;
     get difficulty() {
         return this.isEasy ? 'Facile' : 'Difficile';
     }
@@ -34,8 +35,12 @@ export class InfoCardComponent {
         }
     }
 
-    get isClassicMode() {
+    get isSoloMode() {
         return this.matchType === MatchType.Solo || this.matchType === MatchType.LimitedSolo;
+    }
+
+    get isLimitedMode() {
+        return this.matchType === MatchType.LimitedCoop || this.matchType === MatchType.LimitedSolo;
     }
 
     get isOneVersusOne() {
