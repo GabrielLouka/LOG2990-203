@@ -29,6 +29,9 @@ export class GameRankingService {
 
     async updateRanking(gameId: string, isOneVersusOne: boolean): Promise<RankingData | void> {
         try {
+            if ((await this.gameStorageService.getGameById(gameId)).gameData === null) {
+                return;
+            }
             const updateRankingIndex = isOneVersusOne
                 ? await this.gameStorageService.updateGameOneVersusOneNewBreakingRecord(gameId, this.newRanking)
                 : await this.gameStorageService.updateGameSoloNewBreakingRecord(gameId, this.newRanking);
@@ -43,7 +46,7 @@ export class GameRankingService {
                 } as RankingData;
             }
         } catch (e) {
-            return Promise.reject('The game is null');
+            return Promise.reject('The game is null' + e);
         }
     }
 

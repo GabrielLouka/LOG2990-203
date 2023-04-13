@@ -15,7 +15,6 @@ export class GameConstantsController {
 
         this.router.get('/', async (req: Request, res: Response) => {
             try {
-                // const constants = await this.gameConstantsService.getConstants();
                 const constants = this.gameConstantsService.getConstants();
                 res.send(JSON.stringify(constants));
             } catch (error) {
