@@ -60,15 +60,15 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchmakingService.onGetJoinCancel.add(this.incomingPlayerService.handleIncomingPlayerJoinCancel.bind(this.incomingPlayerService));
         this.matchmakingService.onDeletedAllGames.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
         this.matchmakingService.onDeletedSingleGame.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
-        this.matchmakingService.onResetAllGames.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
-        this.matchmakingService.onResetSingleGame.add(this.registrationService.handleGameDeleted.bind(this.registrationService));
     }
+
     createSoloLimitedTimeGame() {
         this.matchmakingService.createGame('-1');
         this.matchmakingService.setCurrentMatchType(MatchType.LimitedSolo);
         this.matchmakingService.setCurrentMatchPlayer(this.username as string);
         this.registrationService.loadGamePage(this.id);
     }
+
     ngOnDestroy(): void {
         if (this.username && this.hasSentJoinRequest) this.matchmakingService.sendMatchJoinCancel(this.username);
 
@@ -111,6 +111,7 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
 
         this.matchmakingService.socketClientService.socket.emit('requestRefreshGameMatchProgress', { gameId: -1 });
     }
+
     joinLimitedTimeGame() {
         if (!this.limitedTimeMatchId) return;
 
