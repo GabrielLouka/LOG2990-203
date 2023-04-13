@@ -219,6 +219,7 @@ deploy:server:
 
                 # Checkout to the targeted commit
                 git fetch --all
+                git stash
                 git checkout ${CI_COMMIT_SHA}
 
                 # Build the project
