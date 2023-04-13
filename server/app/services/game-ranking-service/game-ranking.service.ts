@@ -46,7 +46,7 @@ export class GameRankingService {
                 } as RankingData;
             }
         } catch (e) {
-            return Promise.reject('The game is null' + e);
+            return Promise.reject(e);
         }
     }
 

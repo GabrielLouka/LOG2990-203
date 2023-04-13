@@ -361,7 +361,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.isPlayer2Ready = true;
             }
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
-                this.spinnerComponent.hideSpinner();
                 this.isLoading = false;
                 this.startTimer();
             }
