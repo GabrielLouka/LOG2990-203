@@ -180,8 +180,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         window.addEventListener('keydown', this.handleClickAndLetterTEvent.bind(this));
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
             .pipe(filter((event) => event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)))
-            .subscribe((event) => {
-                this.handleHintMode();
+            .subscribe(() => {
+                if (this.isGameInteractive) this.handleHintMode();
             });
 
         this.hintService.reset();
