@@ -1,7 +1,7 @@
 export class DelayedMethod {
     static speed: number = 1;
     private static instances: DelayedMethod[] = []; // keep track of all instances of DelayedMethod
-    private requestId: number | undefined;
+    private timeoutId: number | undefined;
     private isPaused: boolean = false;
     private isExecuted: boolean = false;
     private startTime: number | undefined;
@@ -29,7 +29,7 @@ export class DelayedMethod {
         this.isExecuted = false;
         this.isPaused = false;
         this.startTime = Date.now();
-        this.requestId = requestAnimationFrame(this.loop.bind(this));
+        this.setTimeoutLoop();
 
         return new Promise<string>((resolve) => {
             this.resolvePromise = resolve;
@@ -38,8 +38,8 @@ export class DelayedMethod {
 
     pause() {
         this.isPaused = true;
-        if (this.requestId) {
-            cancelAnimationFrame(this.requestId);
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
         }
     }
 
@@ -58,10 +58,10 @@ export class DelayedMethod {
         this.isPaused = false;
         this.elapsed = this.elapsed / DelayedMethod.speed;
         this.startTime = Date.now() - this.elapsed;
-        this.requestId = requestAnimationFrame(this.loop.bind(this));
+        this.setTimeoutLoop();
     }
 
-    private loop() {
+    private setTimeoutLoop() {
         if (!this.isPaused) {
             this.elapsed = (Date.now() - (this.startTime ?? 0)) * DelayedMethod.speed;
             const remaining = this.delay - this.elapsed;
@@ -79,7 +79,8 @@ export class DelayedMethod {
                     return;
                 }
             }
-            this.requestId = requestAnimationFrame(this.loop.bind(this));
+            const nextTick = Math.max(remaining, 16) / DelayedMethod.speed; // cap the minimum time to 16ms to avoid unnecessarily high CPU usage
+            this.timeoutId = window.setTimeout(this.setTimeoutLoop.bind(this), nextTick);
         }
     }
 }
