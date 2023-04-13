@@ -8,4 +8,5 @@ export interface historyToSave {
     player2: string | undefined;
     isWinByDefault: boolean;
     isPlayer1Victory: boolean;
+    isGameLoose: boolean;
 }

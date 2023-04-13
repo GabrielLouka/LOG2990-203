@@ -5,5 +5,5 @@ export interface HistoryData {
     player1: string | undefined;
     player2: string | undefined;
     isWinByDefault: boolean;
+    isGameLoose: boolean;
 }
- 
