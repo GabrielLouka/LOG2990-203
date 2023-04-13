@@ -36,6 +36,7 @@ export class PopUpComponent {
     }
     showGameOverPopUp(
         isWinByDefault: boolean,
+        isTimerDepleted: boolean,
         matchType: MatchType,
         startReplayAction: Action<void> | null,
         username1: string | undefined,
@@ -43,14 +44,22 @@ export class PopUpComponent {
     ) {
         let winMessage;
 
+        let secondaryMessage = 'Excellente partie !';
+
         if (matchType === MatchType.LimitedCoop) {
             this.isLimitedTime = true;
-            winMessage = `Félicitations ${username1?.toUpperCase()} et ${username2?.toUpperCase()} vous avez remporté !`;
+            winMessage = `Félicitations ${username1} et ${username2?.toUpperCase()} vous avez remporté la partie !`;
         } else {
-            winMessage = `Félicitations ${username1?.toUpperCase()} vous avez remporté !`;
+            winMessage = `${username1} a remporté la partie !`;
         }
-        if (username1 === undefined && username2 === undefined) {
-            winMessage = 'Le temps est écoulé!';
+        if (matchType === MatchType.LimitedSolo || matchType === MatchType.LimitedCoop) {
+            if (isTimerDepleted) {
+                winMessage = 'Le temps est écoulé!';
+                secondaryMessage = 'Dommage...';
+            }
+        }
+        if (isWinByDefault) {
+            secondaryMessage = 'Votre adversaire a quitté la partie...';
         }
         //     const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
         // const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
@@ -58,14 +67,7 @@ export class PopUpComponent {
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: winMessage,
-            message:
-                username1 === undefined && username2 === undefined
-                    ? 'Dommage...'
-                    : isWinByDefault
-                    ? matchType === MatchType.Solo || matchType === MatchType.OneVersusOne
-                        ? 'Votre adversaire a quitté la partie...'
-                        : 'Votre partenaire a quitté la partie...'
-                    : 'Excellente partie !',
+            message: secondaryMessage,
             option1: 'Menu Principal',
             option2: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? 'Reprise Vidéo' : '',
             isConfirmation: false,
