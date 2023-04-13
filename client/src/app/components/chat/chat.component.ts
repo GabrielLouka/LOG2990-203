@@ -34,7 +34,7 @@ export class ChatComponent {
     }
 
     sendTimeScoreMessage(rankingData: RankingData) {
-        this.chatService.sendRecordBreakingMessage({ rankingData, chat: this.chat, newMessage: this.newMessage }, this.messages);
+        this.chatService.sendRecordBreakingMessage(rankingData, this);
     }
 
     sendSystemMessage(textToSend: string) {

@@ -1,6 +1,5 @@
 import { ElementRef, Injectable } from '@angular/core';
 import { ChatComponent } from '@app/components/chat/chat.component';
-import { ChatMessage } from '@app/interfaces/chat-message';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { ReplayModeService } from '@app/services/replay-mode-service/replay-mode.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
@@ -36,20 +35,21 @@ export class ChatService {
         }
     }
 
-    sendRecordBreakingMessage(chatELements: { rankingData: RankingData; chat: ElementRef; newMessage: string }, messages: ChatMessage[]) {
-        const message = `${chatELements.rankingData.username} obtient la ${chatELements.rankingData.position} 
-        place dans les meilleurs temps du jeu ${chatELements.rankingData.gameName} en ${chatELements.rankingData.matchType}`;
+    sendRecordBreakingMessage(rankingData: RankingData, chatComponent: ChatComponent) {
+        const message = `${rankingData.username} obtient la ${rankingData.position} 
+        place dans les meilleurs temps du jeu ${rankingData.gameName} en ${rankingData.matchType}`;
 
-        messages.push({
-            text: message,
-            username: '',
-            sentBySystem: false,
-            sentByPlayer1: false,
-            sentUpdatedScore: true,
-            sentTime: Date.now(),
-        });
-        this.scrollToBottom(chatELements.chat);
-        chatELements.newMessage = this.clearMessage();
+        this.pushMessage(
+            {
+                text: message,
+                username: '',
+                sentBySystem: false,
+                sentByPlayer1: false,
+                sentUpdatedScore: true,
+                sentTime: Date.now(),
+            },
+            chatComponent,
+        );
     }
 
     sendMessageFromSystem(textToSend: string, newMessage: string, chatComponent: ChatComponent) {

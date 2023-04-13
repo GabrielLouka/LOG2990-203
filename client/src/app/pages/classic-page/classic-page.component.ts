@@ -262,14 +262,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.games[this.currentGameIndex].originalImage,
                     this.games[this.currentGameIndex].modifiedImage,
                 );
-                await this.updateGameInfo();
+                this.updateGameInfo();
             });
         } else {
             await this.canvasHandlingService.updateCanvas(
                 this.games[this.currentGameIndex].originalImage,
                 this.games[this.currentGameIndex].modifiedImage,
             );
-            await this.updateGameInfo();
+            this.updateGameInfo();
         }
     }
 
