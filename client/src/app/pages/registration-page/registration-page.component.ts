@@ -103,15 +103,10 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
         this.matchmakingService.socketClientService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
             if (data.gameId.toString() === '-1') {
                 this.limitedTimeMatchId = data.matchToJoinIfAvailable as string;
-                console.log('update match id to join in limited time to ', data.matchToJoinIfAvailable as string);
-            } else {
-                console.log('not our game id ', data.matchToJoinIfAvailable as string);
             }
-            console.log('gameProgressUpdate registration page ', data);
         });
 
         this.matchmakingService.socketClientService.on('numberOfGamesOnServer', (numberOfGames: number) => {
-            console.log('number of games on server ', numberOfGames);
             this.noGamesAvailableOnServer = numberOfGames === 0;
         });
 

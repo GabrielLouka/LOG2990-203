@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /* eslint-disable max-lines */
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -36,7 +35,7 @@ import {
 } from '@common/utils/env';
 import { FETCH_ALL_GAMES_PATH, FETCH_GAME_PATH } from '@common/utils/env.http';
 import { Buffer } from 'buffer';
-import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
+import { catchError, filter, fromEvent, map, Observable, of, Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -549,7 +548,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onTimerEnd() {
-        console.log('timer ended !');
         this.socketService.send('setLoser', {
             matchId: this.matchmakingService.currentMatchId,
         });

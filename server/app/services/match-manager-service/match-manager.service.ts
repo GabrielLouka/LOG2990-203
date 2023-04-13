@@ -101,15 +101,7 @@ export class MatchManagerService {
         if (modifiedMatch) {
             if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2) {
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
-                console.log('Match aborted');
             } else {
-                // if (modifiedMatch.matchStatus === MatchStatus.InProgress) {
-                //     // Victoire par default
-                //     modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
-                //     this.storeHistory(modifiedMatch, true);
-                //     if (modifiedMatch.matchType === MatchType.LimitedCoop) modifiedMatch.matchType = MatchType.LimitedSolo;
-                // }
-
                 if (
                     modifiedMatch.matchStatus === MatchStatus.InProgress &&
                     (modifiedMatch.matchType === MatchType.OneVersusOne || modifiedMatch.matchType === MatchType.Solo)
@@ -121,7 +113,6 @@ export class MatchManagerService {
                     modifiedMatch.matchType = MatchType.LimitedSolo;
                 }
             }
-            console.log(modifiedMatch);
         }
 
         return modifiedMatch?.matchId ?? null;
@@ -139,7 +130,6 @@ export class MatchManagerService {
             isGameLoose: match.matchStatus === MatchStatus.PlayersLose ? true : false,
         };
         this.historyStorageService.storeHistory(newHistory);
-        console.log(newHistory);
     }
 
     formatDuration(startDate: Date, endDate: Date): string {
