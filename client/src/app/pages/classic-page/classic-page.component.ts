@@ -380,7 +380,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.sendSystemMessageToChat(message);
                     this.increasePlayerScore(data.isPlayer1);
                     this.refreshFoundDifferences(data.foundDifferences);
-                    // this.onFindDifference();
 
                     if (this.matchmakingService.isLimitedTimeSolo || this.matchmakingService.isCoopMode) {
                         if (this.currentGameIndex === this.games.length - 1) {
@@ -427,6 +426,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
             this.chat.sendTimeScoreMessage(data.rankingData);
+            this.socketService.disconnect();
         });
 
         this.socketService.on('randomizedOrder', async (data: { seedsArray: number[] }) => {
@@ -498,10 +498,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     gameOver(isWinByDefault: boolean): void {
         this.timerElement.pause();
         this.replayModeService.stopRecording();
-        const isWinningPlayer = this.winningPlayer === this.socketService.socketId ? true : false;
 
         if (!isWinByDefault) {
-            if ((this.isSolo || this.isOneVersusOne) && isWinningPlayer) {
+            if (this.isSolo || this.isOneVersusOne) {
                 this.sendNewTimeScoreToServer();
             }
         } else {
