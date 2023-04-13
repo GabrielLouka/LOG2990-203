@@ -35,7 +35,7 @@ import {
 } from '@common/utils/env';
 import { FETCH_ALL_GAMES_PATH, FETCH_GAME_PATH } from '@common/utils/env.http';
 import { Buffer } from 'buffer';
-import { catchError, filter, fromEvent, map, Observable, of, Subscription } from 'rxjs';
+import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -179,8 +179,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         window.addEventListener('keydown', this.handleClickAndLetterTEvent.bind(this));
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
             .pipe(filter((event) => event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)))
-            .subscribe((event) => {
-                this.handleHintMode();
+            .subscribe(() => {
+                if (this.isGameInteractive) this.handleHintMode();
             });
 
         this.hintService.reset();
