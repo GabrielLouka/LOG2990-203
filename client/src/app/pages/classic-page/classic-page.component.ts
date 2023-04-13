@@ -375,7 +375,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             'validationReturned',
             (data: { foundDifferences: boolean[]; isValidated: boolean; foundDifferenceIndex: number; isPlayer1: boolean }) => {
                 if (data.isValidated) {
-                    const message = 'Différence trouvée par ' + this.getPlayerUsername(data.isPlayer1);
+                    let message = 'Différence trouvée par ' + this.getPlayerUsername(data.isPlayer1);
+                    if (this.isSolo || this.isLimitedTimeSolo) message = 'Différence trouvée';
                     this.sendSystemMessageToChat(message);
                     this.increasePlayerScore(data.isPlayer1);
                     this.refreshFoundDifferences(data.foundDifferences);
