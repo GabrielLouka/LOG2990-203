@@ -104,7 +104,9 @@ export class MatchManagerService {
             } else {
                 if (
                     modifiedMatch.matchStatus === MatchStatus.InProgress &&
-                    (modifiedMatch.matchType === MatchType.OneVersusOne || modifiedMatch.matchType === MatchType.Solo)
+                    (modifiedMatch.matchType === MatchType.OneVersusOne ||
+                        modifiedMatch.matchType === MatchType.Solo ||
+                        modifiedMatch.matchType === MatchType.LimitedSolo)
                 ) {
                     // Victoire par default
                     modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;

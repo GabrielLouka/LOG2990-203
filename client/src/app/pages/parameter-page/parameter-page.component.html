@@ -159,7 +159,9 @@
                             *ngIf="!(history.player2 !== '' && history.gameMode === 'Temps Limité - Solo')"
                             [ngClass]="{
                                 'crossed-out':
-                                    ((history.gameMode === 'Classique - 1vs1' || history.gameMode === 'Temps Limité - Coop') &&
+                                    ((history.gameMode === 'Classique - 1vs1' ||
+                                        history.gameMode === 'Temps Limité - Coop' ||
+                                        history.gameMode === 'Classique - Solo') &&
                                         history.isWinByDefault) ||
                                     (history.gameMode === 'Temps Limité - Solo' && history.isWinByDefault),
                                 'text-bold': history.gameMode === 'Temps Limité - Coop' && !history.isGameLoose
