@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatabaseServiceMock } from '@app/services/database-service-mock/database.service.mock';
-import { R_ONLY } from '@app/utils/env';
+import { LAST_GAME_ID_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game-data';
 import * as chai from 'chai';
 import { expect } from 'chai';
@@ -31,14 +31,14 @@ describe('Game storage service', () => {
             nbrDifferences: 5,
             differences: [[]],
             oneVersusOneRanking: [
-                { name: 'Player 1', score: '10:00' },
-                { name: 'Player 2', score: '10:00' },
-                { name: 'Player 3', score: '10:00' },
+                { name: 'Player 1', score: 10 },
+                { name: 'Player 2', score: 10 },
+                { name: 'Player 3', score: 10 },
             ],
             soloRanking: [
-                { name: 'Player 1', score: '10:00' },
-                { name: 'Player 2', score: '10:00' },
-                { name: 'Player 3', score: '10:00' },
+                { name: 'Player 1', score: 10 },
+                { name: 'Player 2', score: 10 },
+                { name: 'Player 3', score: 10 },
             ],
         };
         await gameStorageService.collection.insertOne(gamePrototype);
@@ -67,13 +67,13 @@ describe('Game storage service', () => {
     });
     it('should delete a game with the specific id ', async () => {
         const id = '5';
-        await gameStorageService.deleteGame(id);
+        await gameStorageService.deleteById(id);
         const allGames = await gameStorageService.getAllGames();
         expect(allGames.length).to.equal(0);
     });
 
     it('should delete all the games in the database', async () => {
-        const deletedAllGames = await gameStorageService.allGames();
+        const deletedAllGames = await gameStorageService.deleteAll();
         expect(deletedAllGames).to.equals(undefined);
     });
 
@@ -87,7 +87,7 @@ describe('Game storage service', () => {
         expect(allGames.length).to.equal(1);
     });
     it('should store defaultGame in the database', async () => {
-        await gameStorageService.allGames();
+        await gameStorageService.deleteAll();
         await gameStorageService.storeDefaultGames();
         const allGames = await gameStorageService.getAllGames();
         expect(allGames.length).to.equal(1);
@@ -100,7 +100,7 @@ describe('Game storage service', () => {
         const result = gameStorageService.getNextAvailableGameId();
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(result).to.equal(15);
-        sinon.assert.calledWith(writeFileStub, R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, '15');
+        sinon.assert.calledWith(writeFileStub, PERSISTENT_DATA_FOLDER_PATH + LAST_GAME_ID_FILE, '15');
         sandbox.restore();
         sinon.restore();
     });
@@ -134,7 +134,7 @@ describe('Game storage service', () => {
     });
 
     it('should delete the stored data', () => {
-        const pathTest = R_ONLY.persistentDataFolderPath;
+        const pathTest = PERSISTENT_DATA_FOLDER_PATH;
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
         const readdirStub: sinon.SinonStub = sandbox.stub(fs, 'readdir');
         gameStorageService.deleteStoredData('5');
@@ -150,7 +150,7 @@ describe('Game storage service', () => {
         readFileStub.throws(Error);
         const result = gameStorageService.getNextAvailableGameId();
         expect(result).to.equal(0);
-        sinon.assert.calledWith(writeFileStub, R_ONLY.persistentDataFolderPath + R_ONLY.lastGameIdFileName, '0');
+        sinon.assert.calledWith(writeFileStub, PERSISTENT_DATA_FOLDER_PATH + LAST_GAME_ID_FILE, '0');
         sandbox.restore();
         sinon.restore();
     });
