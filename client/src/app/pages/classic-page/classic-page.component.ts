@@ -35,7 +35,7 @@ import {
 } from '@common/utils/env';
 import { FETCH_ALL_GAMES_PATH, FETCH_GAME_PATH } from '@common/utils/env.http';
 import { Buffer } from 'buffer';
-import { catchError, filter, fromEvent, map, Observable, of, Subscription } from 'rxjs';
+import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -83,6 +83,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isPlayer2Ready: boolean = false;
     isOriginallyCoop: boolean = false;
     isEasy: boolean | undefined;
+    winningPlayer: string | undefined;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -323,6 +324,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.timerElement.resetTimer();
         this.timerElement.startTimer();
     }
+
     onMouseDown(event: MouseEvent) {
         if (!this.isGameInteractive) return;
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
@@ -495,9 +497,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     gameOver(isWinByDefault: boolean): void {
         this.timerElement.pause();
         this.replayModeService.stopRecording();
+        const isWinningPlayer = this.winningPlayer === this.socketService.socketId ? true : false;
 
         if (!isWinByDefault) {
-            if (this.isSolo || this.isOneVersusOne) {
+            if ((this.isSolo || this.isOneVersusOne) && isWinningPlayer) {
                 this.sendNewTimeScoreToServer();
             }
         } else {
@@ -522,14 +525,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
-        const winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
+        this.winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
         if (this.isPlayer1 === isPlayer1Win) {
             this.socketService.send('setWinner', {
                 matchId: this.matchmakingService.currentMatchId,
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
             });
         }
-        this.newRanking = { name: winningPlayer, score: this.timerElement.timeInSeconds };
+        this.newRanking = { name: this.winningPlayer, score: this.timerElement.timeInSeconds };
         if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {
             isWinByDefault = true;
         }
