@@ -221,6 +221,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.isOver = true;
                 }
             }
+            if (match.matchStatus === MatchStatus.PlayersLose) {
+                this.onLoseGame();
+            }
         }
     }
 
@@ -540,6 +543,27 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             startReplayAction,
             this.getPlayerUsername(isPlayer1Win),
             this.getPlayerUsername(!isPlayer1Win),
+        );
+    }
+
+    onTimerEnd() {
+        console.log('timer ended !');
+        this.socketService.send('setLoser', {
+            matchId: this.matchmakingService.currentMatchId,
+        });
+    }
+
+    onLoseGame() {
+        this.gameOver(false);
+        const startReplayAction = this.replayModeService.startReplayModeAction;
+        this.isOver = true;
+        this.popUpElement.showGameOverPopUp(
+            false,
+            true,
+            this.currentMatchType as MatchType,
+            startReplayAction,
+            this.getPlayerUsername(true),
+            this.getPlayerUsername(false),
         );
     }
 

@@ -5,4 +5,5 @@ export enum MatchStatus {
     Player1Win,
     Player2Win,
     Aborted,
+    PlayersLose, // When timer reaches 0
 }

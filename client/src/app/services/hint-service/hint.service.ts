@@ -30,9 +30,10 @@ export class HintService {
     }
 
     handleChatAndPenalty(time: number, isLimited: boolean) {
+        if (time < this.gameConstantsService.penaltyValue && isLimited) return (time -= time - 1);
         return isLimited ? time - this.gameConstantsService.penaltyValue : time + this.gameConstantsService.penaltyValue;
     }
-    
+
     sendHintMessage(chat: ChatComponent) {
         const now = new Date();
         const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';
