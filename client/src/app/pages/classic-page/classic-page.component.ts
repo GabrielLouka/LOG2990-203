@@ -262,14 +262,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.games[this.currentGameIndex].originalImage,
                     this.games[this.currentGameIndex].modifiedImage,
                 );
-                await this.updateGameInfo();
+                this.updateGameInfo();
             });
         } else {
             await this.canvasHandlingService.updateCanvas(
                 this.games[this.currentGameIndex].originalImage,
                 this.games[this.currentGameIndex].modifiedImage,
             );
-            await this.updateGameInfo();
+            this.updateGameInfo();
         }
     }
 
@@ -533,13 +533,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
-        console.log('Hello');
         this.popUpElement.showGameOverPopUp(
             isWinByDefault,
+            this.timerElement.timeInSeconds <= 0,
             this.currentMatchType as MatchType,
             startReplayAction,
-            this.timerElement.timeInSeconds === 0 ? undefined : isPlayer1Win ? this.getPlayerUsername(true) : this.getPlayerUsername(false),
-            this.timerElement.timeInSeconds === 0 ? undefined : isPlayer1Win ? this.getPlayerUsername(false) : this.getPlayerUsername(true),
+            this.getPlayerUsername(isPlayer1Win),
+            this.getPlayerUsername(!isPlayer1Win),
         );
     }
 

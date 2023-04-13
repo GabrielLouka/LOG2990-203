@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
 import { GameCardComponent } from './game-card.component';
 describe('GameCardComponent', () => {
@@ -30,7 +30,8 @@ describe('GameCardComponent', () => {
                     { x: 0, y: 0 },
                 ],
             ],
-            ranking: defaultRankings,
+            soloRanking: defaultRanking,
+            oneVersusOneRanking: defaultRanking,
         };
         component.game = { gameData: game, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable: '1' };
         component.isPlayable = true;
@@ -51,7 +52,7 @@ describe('GameCardComponent', () => {
     });
 
     it('should return green if the game is easy', () => {
-        expect(component.getDifficultyColor()).toEqual('green');
+        expect(component.difficultyColor).toEqual('green');
     });
 
     it('should return red if the game is not easy', () => {
@@ -69,11 +70,12 @@ describe('GameCardComponent', () => {
                     { x: 0, y: 0 },
                 ],
             ],
-            ranking: defaultRankings,
+            soloRanking: defaultRanking,
+            oneVersusOneRanking: defaultRanking,
         };
         component.game = { gameData: game2, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable: '1' };
         component.ngOnInit();
         fixture.detectChanges();
-        expect(component.getDifficultyColor()).toEqual('red');
+        expect(component.difficultyColor).toEqual('red');
     });
 });
