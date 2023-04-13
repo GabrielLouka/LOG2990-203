@@ -48,8 +48,8 @@ describe('GamesController', () => {
     const images = { originalImage: Buffer.from(''), modifiedImage: Buffer.from('') };
     const gameInfo = {
         gameData: game as any,
-        originalImage: images.originalImage,
-        matchToJoinIfAvailable: 'abcde',
+        originalImage: images.originalImage as any,
+        matchToJoinIfAvailable: 'abcde' as any,
     };
     describe('GET /fetchGame/:id', () => {
         it('GET should return game by id', async () => {
@@ -85,7 +85,11 @@ describe('GamesController', () => {
         it('GET should return games by page id', async () => {
             gameStorageServiceStub.getGamesInPage.returns(
                 Promise.resolve([
-                    { gameData: gameInfo.gameData, originalImage: gameInfo.originalImage, matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable },
+                    {
+                        gameData: gameInfo.gameData as GameData,
+                        originalImage: gameInfo.originalImage,
+                        matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable,
+                    },
                 ]),
             );
             gameStorageServiceStub.getGamesLength.returns(Promise.resolve(1));
@@ -179,7 +183,7 @@ describe('GamesController', () => {
         });
 
         it('DELETE request should delete selected game from database', async () => {
-            gameStorageServiceStub.deleteOneById.resolves();
+            gameStorageServiceStub.deleteById.resolves();
             await supertest(expressApp)
                 .delete(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)
@@ -190,7 +194,7 @@ describe('GamesController', () => {
 
         it('DELETE /:id should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
-            gameStorageServiceStub.deleteOneById.rejects(errorMessage);
+            gameStorageServiceStub.deleteById.rejects(errorMessage);
             supertest(expressApp)
                 .delete(`${API_URL}/0`)
                 .expect(HTTP_STATUS_NOT_FOUND)

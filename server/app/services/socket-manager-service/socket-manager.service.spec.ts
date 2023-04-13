@@ -14,7 +14,7 @@ import { GameData } from '@common/interfaces/game-data';
 import { defaultRanking } from '@common/interfaces/ranking';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
-import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
+import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
@@ -69,6 +69,8 @@ describe('SocketManager', () => {
         player2: matchPlayer2,
         matchType: MatchType.OneVersusOne,
         matchStatus: MatchStatus.InProgress,
+        player1Archive: null,
+        player2Archive: null,
     };
     const socket = {
         id: 'socket1',

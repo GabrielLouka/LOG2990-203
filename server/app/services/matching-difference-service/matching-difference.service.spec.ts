@@ -28,7 +28,8 @@ describe('MatchingDifferences service', () => {
                     { x: 7, y: 8 },
                 ],
             ],
-            ranking: [],
+            oneVersusOneRanking: [],
+            soloRanking: [],
         };
         click = { x: 3, y: 4 };
     });
