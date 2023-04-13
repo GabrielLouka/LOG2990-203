@@ -61,4 +61,8 @@ export class OverlayComponent {
     resetSelectedGame(isResetRequest: boolean): void {
         this.gamesService.resetById(isResetRequest, this.id);
     }
+
+    reloadPage(): void {
+        window.location.reload();
+    }
 }
