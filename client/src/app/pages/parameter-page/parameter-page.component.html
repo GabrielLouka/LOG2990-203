@@ -137,9 +137,13 @@
                         <span
                             [ngClass]="{
                                 'crossed-out':
-                                    (history.gameMode === 'Classique - Solo' || history.gameMode === 'Temps Limité - Solo') && history.isWinByDefault,
+                                    (history.gameMode === 'Classique - Solo' && history.isWinByDefault) ||
+                                    (history.gameMode === 'Temps Limité - Solo' && history.player2 === null && history.isWinByDefault),
                                 'text-bold':
-                                    !history.isWinByDefault || history.gameMode === 'Classique - 1vs1' || history.gameMode === 'Temps Limité - Coop'
+                                    !history.isWinByDefault ||
+                                    history.gameMode === 'Classique - 1vs1' ||
+                                    history.gameMode === 'Temps Limité - Coop' ||
+                                    (history.gameMode === 'Temps Limité - Solo' && history.player2 !== null)
                             }"
                         >
                             {{ history.player1 }}
@@ -149,7 +153,7 @@
                         <span
                             *ngIf="
                                 (history.player2 !== '' && history.gameMode === 'Temps Limité - Coop') ||
-                                (history.gameMode === 'Temps Limité  - Solo' && history.isWinByDefault)
+                                (history.gameMode === 'Temps Limité - Solo' && history.player2 !== null)
                             "
                             >&nbsp;ET&nbsp;</span
                         >

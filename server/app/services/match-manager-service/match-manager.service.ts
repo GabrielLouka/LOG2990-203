@@ -38,7 +38,19 @@ export class MatchManagerService {
         if (matchToUpdate?.matchStatus === MatchStatus.InProgress) {
             // Victoire normale
             matchToUpdate.matchStatus = winner.playerId === matchToUpdate.player1?.playerId ? MatchStatus.Player1Win : MatchStatus.Player2Win;
-            this.storeHistory(matchToUpdate, false);
+
+            if (
+                (matchToUpdate.player1 === null && matchToUpdate.player1Archive !== null) ||
+                (matchToUpdate.player2 === null && matchToUpdate.player2Archive !== null)
+            ) {
+                if (matchToUpdate.matchType === MatchType.LimitedSolo) {
+                    this.storeHistory(matchToUpdate, true);
+                } else {
+                    this.storeHistory(matchToUpdate, false);
+                }
+            } else {
+                this.storeHistory(matchToUpdate, false);
+            }
         }
     }
 
