@@ -216,6 +216,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.chat.sendSystemMessage((this.isPlayer1Win(match) ? this.player2 : this.player1) + ABORTED_GAME_TEXT);
                     this.onWinGame(this.isPlayer1Win(match), true);
                 } else {
+                    this.chat.sendSystemMessage((this.isPlayer1Win(match) ? this.player2 : this.player1) + ABORTED_GAME_TEXT);
                     this.matchmakingService.setCurrentMatchType(MatchType.LimitedSolo);
                     this.isOver = true;
                 }
@@ -493,7 +494,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.stopRecording();
 
         if (!isWinByDefault) {
-            this.sendNewTimeScoreToServer();
+            if (this.isSolo || this.isOneVersusOne) {
+                this.sendNewTimeScoreToServer();
+            }
         } else {
             this.socketService.disconnect();
         }
