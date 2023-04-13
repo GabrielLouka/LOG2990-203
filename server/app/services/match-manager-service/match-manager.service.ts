@@ -81,10 +81,15 @@ export class MatchManagerService {
             if (!modifiedMatch.player1 && modifiedMatch.matchStatus === MatchStatus.WaitingForPlayer2) {
                 modifiedMatch.matchStatus = MatchStatus.Aborted;
             } else {
-                if (modifiedMatch.matchStatus === MatchStatus.InProgress) {
+                if (
+                    modifiedMatch.matchStatus === MatchStatus.InProgress &&
+                    (modifiedMatch.matchType === MatchType.OneVersusOne || modifiedMatch.matchType === MatchType.Solo)
+                ) {
                     // Victoire par default
                     modifiedMatch.matchStatus = modifiedMatch.player1 == null ? MatchStatus.Player2Win : MatchStatus.Player1Win;
                     this.storeHistory(modifiedMatch, true);
+                } else if (modifiedMatch.matchType === MatchType.LimitedCoop) {
+                    modifiedMatch.matchType = MatchType.LimitedSolo;
                 }
             }
         }
