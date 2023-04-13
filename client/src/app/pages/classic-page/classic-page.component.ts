@@ -181,7 +181,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
             .pipe(filter((event) => event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)))
             .subscribe(() => {
-                if (this.isGameInteractive) this.handleHintMode();
+                if (this.isGameInteractive && !this.isOver) this.handleHintMode();
             });
 
         this.hintService.reset();
@@ -495,9 +495,17 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
 
+    pauseTimer(): void {
+        const pauseTimerMethod = () => {
+            this.timerElement.pause();
+        };
+        pauseTimerMethod();
+        this.replayModeService.addMethodToReplay(pauseTimerMethod);
+    }
+
     gameOver(isWinByDefault: boolean): void {
-        this.timerElement.pause();
-        this.replayModeService.stopRecording();
+        this.pauseTimer();
+        // this.replayModeService.stopRecording();
 
         if (!isWinByDefault) {
             if (this.isSolo || this.isOneVersusOne) {
@@ -538,6 +546,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
+        // startReplayAction.add(this.replayModeService.stopRecording.bind(this.replayModeService));
         this.isOver = true;
         this.popUpElement.showGameOverPopUp(
             isWinByDefault,
@@ -574,10 +583,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.matchmakingService.isSoloMode ||
             this.matchmakingService.isLimitedTimeSolo ||
             (this.chat && document.activeElement !== this.chat.input.nativeElement)
-            // this.matchmakingService.isOneVersusOne ||
-            // this.isCoop
         ) {
-            if (!this.isGameInteractive) return;
+            if (!this.isGameInteractive || this.isOver) return;
             if (event instanceof KeyboardEvent) {
                 if (event.key === 't') {
                     if (this.letterTPressed) {
