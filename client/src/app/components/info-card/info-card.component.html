@@ -9,8 +9,8 @@
         <p class="font-size"><strong>Mode : </strong> {{ this.matchTypeToString }}</p>
         <p class="font-size"><strong>Niveau :</strong> {{ this.difficulty }}</p>
         <p class="font-size"><strong>N° d'indices : </strong> 3</p>
-        <p *ngIf="!is1v1" class="font-size"><strong> Pénalité par indice : </strong> 5 s</p>
-        <p *ngIf="matchMode === 'Classique'" class="font-size"><strong> Pénalité d'erreur : </strong> 5 s</p>
-        <p *ngIf="matchMode !== 'Classique'" class="font-size"><strong> Temps bonus : </strong> 5 s</p>
+        <p *ngIf="!isOneVersusOne" class="font-size"><strong> Pénalité par indice : </strong> 5 s</p>
+        <p *ngIf="isClassicMode" class="font-size"><strong> Pénalité d'erreur : </strong> 5 s</p>
+        <p *ngIf="isClassicMode" class="font-size"><strong> Temps bonus : </strong> 5 s</p>
     </div>
 </div>

@@ -7,8 +7,9 @@ import { MatchType } from '@common/enums/match-type';
     styleUrls: ['./info-card.component.scss'],
 })
 export class InfoCardComponent {
-    @Input() isEasy: boolean;
+    @Input() isEasy: boolean | undefined;
     @Input() matchType: MatchType | undefined;
+
     get difficulty() {
         return this.isEasy ? 'Facile' : 'Difficile';
     }
@@ -36,11 +37,12 @@ export class InfoCardComponent {
     get isClassicMode() {
         return this.matchType === MatchType.Solo || this.matchType === MatchType.LimitedSolo;
     }
-    get is1v1() {
+
+    get isOneVersusOne() {
         return this.matchType === MatchType.OneVersusOne;
     }
+
     get matchMode() {
-        if (this.isClassicMode) return 'Classique';
-        return 'Temps limité';
+        return this.matchTypeToString;
     }
 }

@@ -34,6 +34,7 @@ import {
     VOLUME_ERROR,
     VOLUME_SUCCESS,
 } from '@common/utils/env';
+import { FETCH_ALL_GAMES_PATH, FETCH_GAME_PATH } from '@common/utils/env.http';
 import { Buffer } from 'buffer';
 import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
 
@@ -82,6 +83,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isPlayer1Ready: boolean = false;
     isPlayer2Ready: boolean = false;
     isOriginallyCoop: boolean = false;
+    isEasy: boolean | undefined;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -116,6 +118,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     get isLimitedTimeSolo() {
         return this.matchmakingService.isLimitedTimeSolo;
     }
+
     get currentMatchType() {
         return this.matchmakingService.currentMatchPlayed?.matchType;
     }
@@ -174,7 +177,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.replayModeService.onFinishReplayMode.add(this.finishReplay.bind(this));
         DelayedMethod.speed = 1;
 
-        window.addEventListener('keydown', this.handleTandClickEvent.bind(this));
+        window.addEventListener('keydown', this.handleClickAndLetterTEvent.bind(this));
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
             .pipe(filter((event) => event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)))
             .subscribe((event) => {
@@ -246,12 +249,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
         this.replayModeService.visibleTimer = this.timerElement;
-        window.removeEventListener('keydown', this.handleTandClickEvent.bind(this));
+        window.removeEventListener('keydown', this.handleClickAndLetterTEvent.bind(this));
     }
 
     async getInitialImagesFromServer() {
-        // this.canvasIsClickable = false;
-
         if (this.currentGameIndex === 0) {
             this.fetchGames().subscribe(async (games) => {
                 if (games) {
@@ -285,7 +286,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         | null
     > {
         const gameId: string = this.currentGameId ? this.currentGameId : '0';
-        const routeToSend = this.currentGameId !== '-1' ? '/games/fetchGame/' + gameId : '/games/fetchAllGames';
+        const routeToSend = this.currentGameId !== '-1' ? FETCH_GAME_PATH + gameId : FETCH_ALL_GAMES_PATH;
 
         return this.communicationService.get(routeToSend).pipe(
             map((response) => {
@@ -315,6 +316,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         if (this.currentGameIndex === 0) {
             this.replayModeService.startRecording();
         }
+        this.isEasy = this.games[this.currentGameIndex].gameData.isEasy;
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
     }
 
@@ -567,7 +569,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         );
     }
 
-    handleTandClickEvent(event: KeyboardEvent | MouseEvent) {
+    handleClickAndLetterTEvent(event: KeyboardEvent | MouseEvent) {
         if (
             this.matchmakingService.isSoloMode ||
             this.matchmakingService.isLimitedTimeSolo ||
