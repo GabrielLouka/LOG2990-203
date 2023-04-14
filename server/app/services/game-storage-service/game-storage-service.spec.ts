@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+/* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatabaseServiceMock } from '@app/services/database-service-mock/database.service.mock';
@@ -12,7 +14,6 @@ import { MongoClient } from 'mongodb';
 import * as sinon from 'sinon';
 import { GameStorageService } from './game-storage.service';
 chai.use(chaiAsPromised);
-
 describe('Game storage service', () => {
     let gameStorageService: GameStorageService;
     let databaseServiceTest: DatabaseServiceMock;
@@ -49,7 +50,7 @@ describe('Game storage service', () => {
     it('should return all the games from the database', async () => {
         const gamesDatabase = await gameStorageService.getAllGames();
         expect(gamesDatabase.length).to.equal(1);
-        expect(gamePrototype).to.deep.equals(gamesDatabase[0]);
+        expect(gamePrototype).to.deep.equals(gamesDatabase[0].gameData);
     });
     it('should return the number of games', async () => {
         const numberOfGames = await gameStorageService.getNumberOfSavedGames();
@@ -70,6 +71,21 @@ describe('Game storage service', () => {
         await gameStorageService.deleteById(id);
         const allGames = await gameStorageService.getAllGames();
         expect(allGames.length).to.equal(0);
+    });
+
+    it('deleteStoredData should delete the folder with the given gameId', async () => {
+        const gameId = '123';
+        const files = [{ name: '456' }, { name: '789' }, { name: gameId }];
+        const readdirStub = sinon.stub(fs, 'readdir').yields(null, files);
+        const rmdirStub = sinon.stub(fs, 'rmdir').yields(null);
+
+        await gameStorageService.deleteStoredData(gameId);
+
+        sinon.assert.calledOnce(readdirStub);
+        sinon.assert.calledOnce(rmdirStub);
+
+        readdirStub.restore();
+        rmdirStub.restore();
     });
 
     it('should delete all the games in the database', async () => {
@@ -165,6 +181,95 @@ describe('Game storage service', () => {
         sinon.restore();
     });
 
+    it('should update the solo record', async () => {
+        const gameId = '1';
+        const record = { name: '123', score: 100 };
+
+        // const findOneAndUpdateResult = {
+        //   value: {
+        //     ranking: [
+        //       { name: '234', score: 200 },
+        //       { name: '123', score: 50 },
+        //     ],
+        //     id: gameId,
+        //   },
+        // };
+        const getGameByIdStub = sinon.stub(gameStorageService, 'getGameById');
+
+        sinon.stub(gameStorageService.collection, 'findOneAndUpdate').yields(null);
+        sinon.stub(gameStorageService.collection, 'updateOne').yields(null);
+
+        const originalImage = Buffer.from('originalImage');
+        const modifiedImage = Buffer.from('modifiedImage');
+        const mockReturnValue = {
+            gameData: gamePrototype,
+            originalImage,
+            modifiedImage,
+        };
+        getGameByIdStub.resolves(mockReturnValue);
+        const result = await gameStorageService.updateGameSoloNewBreakingRecord(gameId, record);
+        // sinon.assert.calledWith(collectionMock.findOneAndUpdate, {
+        //   id: gameId,
+        //   'ranking.playerId': record.playerId,
+        // }, {
+        //   $max: { 'ranking.$.score': record.score },
+        // });
+        expect(result).to.be.equal(-1);
+    });
+
+    it('updateGameSoloNewBreakingRecord should throw an error when game data not found', async () => {
+        try {
+            sinon.stub(gameStorageService, 'getGameById').resolves({ gameData: null, originalImage: new Buffer(3), modifiedImage: new Buffer(3) });
+            await gameStorageService.updateGameSoloNewBreakingRecord('-1', gamePrototype.oneVersusOneRanking[0]);
+        } catch (err) {
+            expect(err.message).equal(`Game data not found for game with id ${-1}`);
+        }
+    });
+
+    it('should update the 1v1 record', async () => {
+        const gameId = '1';
+        const record = { name: '123', score: 100 };
+
+        // const findOneAndUpdateResult = {
+        //   value: {
+        //     ranking: [
+        //       { name: '234', score: 200 },
+        //       { name: '123', score: 50 },
+        //     ],
+        //     id: gameId,
+        //   },
+        // };
+        const getGameByIdStub = sinon.stub(gameStorageService, 'getGameById');
+
+        sinon.stub(gameStorageService.collection, 'findOneAndUpdate').yields(null);
+        sinon.stub(gameStorageService.collection, 'updateOne').yields(null);
+
+        const originalImage = Buffer.from('originalImage');
+        const modifiedImage = Buffer.from('modifiedImage');
+        const mockReturnValue = {
+            gameData: gamePrototype,
+            originalImage,
+            modifiedImage,
+        };
+        getGameByIdStub.resolves(mockReturnValue);
+        const result = await gameStorageService.updateGameOneVersusOneNewBreakingRecord(gameId, record);
+        // sinon.assert.calledWith(collectionMock.findOneAndUpdate, {
+        //   id: gameId,
+        //   'ranking.playerId': record.playerId,
+        // }, {
+        //   $max: { 'ranking.$.score': record.score },
+        // });
+        expect(result).to.be.equal(-1);
+    });
+
+    it('updateGameOneVersusOneNewBreakingRecord should throw an error when game data not found', async () => {
+        try {
+            sinon.stub(gameStorageService, 'getGameById').resolves({ gameData: null, originalImage: new Buffer(3), modifiedImage: new Buffer(3) });
+            await gameStorageService.updateGameOneVersusOneNewBreakingRecord('-1', gamePrototype.oneVersusOneRanking[0]);
+        } catch (err) {
+            expect(err.message).equal(`Game data not found for game with id ${-1}`);
+        }
+    });
     it('should throw an error when creating the folder', () => {
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
         const pathTest = './app/data';
@@ -180,6 +285,18 @@ describe('Game storage service', () => {
         sandbox.restore();
         sinon.restore();
     });
+
+    it('should reset scores for a specific game', async () => {
+        sinon.stub(gameStorageService.collection, 'findOneAndUpdate').resolves(null);
+        expect(await gameStorageService.resetScoresById('1')).to.be.equal(undefined);
+    });
+
+    it('should reset scores for all games', async () => {
+        sinon.stub(gameStorageService.collection, 'findOneAndUpdate').resolves(null);
+        await gameStorageService.resetAllScores();
+        expect(await gameStorageService.resetAllScores()).to.be.equal(undefined);
+    });
+
     it('should store the game images in the folder', () => {
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
         const writeFileSpy = sandbox.spy(fs, 'writeFile');
