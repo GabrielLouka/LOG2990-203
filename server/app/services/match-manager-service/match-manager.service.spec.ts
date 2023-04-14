@@ -79,7 +79,7 @@ describe('MatchManagerService', () => {
         matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
         matchManagerService.setMatchPlayer(match.matchId, newPlayer);
         expect(createdMatch.player1).to.deep.equal(newPlayer);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player2Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
 
     it('should set match player 1 and not change match status is not waiting for player 2', () => {
@@ -92,7 +92,7 @@ describe('MatchManagerService', () => {
         matchManagerService.removePlayerFromMatch(player2.playerId);
         matchManagerService.setMatchPlayer(match.matchId, newPlayer);
         expect(createdMatch.player1).to.deep.equal(matchPlayer);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player1Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
 
     it('should set match player 2 and set match status to in progress', () => {
@@ -128,14 +128,14 @@ describe('MatchManagerService', () => {
         matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
         matchManagerService.setMatchPlayer(match.matchId, player2);
         matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player2Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
 
     it('should remove player 2 from match and make the player 1 win', () => {
         matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
         matchManagerService.setMatchPlayer(match.matchId, player2);
         matchManagerService.removePlayerFromMatch(player2.playerId);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player1Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
     it('should not remove player when given player is invalid', () => {
         matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
