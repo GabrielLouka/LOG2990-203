@@ -546,7 +546,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
         this.winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
-        if (this.isPlayer1 === isPlayer1Win) {
+        const isWinner = this.isPlayer1 === isPlayer1Win;
+        if (isWinner) {
             this.socketService.send('setWinner', {
                 matchId: this.matchmakingService.currentMatchId,
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,

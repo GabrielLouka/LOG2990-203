@@ -93,7 +93,7 @@ export class CreationResultModalComponent {
     async updateImageDisplay(imgData: ArrayBuffer) {
         const canvas: HTMLCanvasElement = this.imagePreview.nativeElement;
         const ctx = canvas.getContext('2d');
-        if (ctx !== null) {
+        if (ctx) {
             const bitmap = await createImageBitmap(new Blob([imgData]));
             ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, canvas.width, canvas.height);
         }
