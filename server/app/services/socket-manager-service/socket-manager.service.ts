@@ -6,7 +6,7 @@ import { Player } from '@common/classes/player';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchType } from '@common/enums/match-type';
 import { GameData } from '@common/interfaces/game-data';
-import { NOT_FOUND } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS, NOT_FOUND } from '@common/utils/env';
 import * as http from 'http';
 import * as io from 'socket.io';
 
@@ -126,14 +126,14 @@ export class SocketManager {
                     .emit('messageBetweenPlayers', { username: data.username, message: data.message, sentByPlayer1: data.sentByPlayer1 });
             });
 
-            socket.on('resetAllGames', () => {
-                this.gamesStorageService.resetAllScores();
+            socket.on('resetAllGames', async () => {
+                await this.gamesStorageService.resetAllScores();
                 this.sio.emit('allGamesReset');
                 this.sio.emit('actionOnGameReloadingThePage');
             });
 
-            socket.on('resetGame', (data: { id: string }) => {
-                this.gamesStorageService.resetScoresById(data.id);
+            socket.on('resetGame', async (data: { id: string }) => {
+                await this.gamesStorageService.resetScoresById(data.id);
                 this.sio.emit('gameReset', { id: data.id }, socket.id);
                 this.sio.emit('actionOnGameReloadingThePage');
             });
@@ -178,6 +178,39 @@ export class SocketManager {
 
             socket.on('readyPlayer', (data: { isPlayer1: boolean }) => {
                 this.sio.to(joinedRoomName).emit('readyUpdate', { isPlayer1: data.isPlayer1 });
+            });
+
+            const activeMatchTimerData: { key: string; value: { startTime: number; elapsedTime: number } }[] = [];
+            let timerInterval: NodeJS.Timeout;
+
+            socket.on('startTimer', (data: { matchId: string; elapsedTime: number }) => {
+                activeMatchTimerData.push({ key: data.matchId, value: { startTime: new Date().getTime(), elapsedTime: data.elapsedTime } });
+
+                // Start the timer interval if it hasn't already started
+                if (!timerInterval) {
+                    timerInterval = setInterval(() => {
+                        const currentTime = new Date().getTime();
+                        for (const timerData of activeMatchTimerData) {
+                            timerData.value.elapsedTime = Math.floor((currentTime - timerData.value.startTime) / MILLISECOND_TO_SECONDS);
+                            this.sio.to(joinedRoomName).emit('playersSyncTime', { elapsedTime: timerData.value.elapsedTime as number });
+                        }
+                    }, MILLISECOND_TO_SECONDS);
+                }
+            });
+
+            socket.on('stopTimer', (data: { matchId: string }) => {
+                const timerDataIndex = activeMatchTimerData.findIndex((timerData) => timerData.key === data.matchId);
+                if (timerDataIndex !== NOT_FOUND) {
+                    const timerData = activeMatchTimerData[timerDataIndex];
+                    const elapsedTime = new Date().getTime() - timerData.value.startTime;
+                    activeMatchTimerData.splice(timerDataIndex, 1);
+                    this.sio.emit('timerStopped', { elapsedTime });
+
+                    // Stop the timer interval if there are no more active matches
+                    if (activeMatchTimerData.length === 0) {
+                        clearInterval(timerInterval);
+                    }
+                }
             });
 
             const joinMatchRoom = (data: { matchId: string }) => {
