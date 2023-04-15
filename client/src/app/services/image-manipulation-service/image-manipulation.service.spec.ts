@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { ElementRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
@@ -160,5 +161,108 @@ describe('ImageManipulationService', () => {
         service.randomNumber = 0.5;
         const pseudoRandomNumber = service.generatePseudoRandomNumber();
         expect(pseudoRandomNumber).toEqual(0.5);
-      });
+    });
+
+    it('should return a valid image source from a buffer', () => {
+        const mockBuffer = Buffer.alloc(100, 1);            
+        const imageSource = service.getImageSourceFromBuffer(mockBuffer);    
+        expect(imageSource).toBeDefined();
+    });
+
+    it('should show a blinking quadrant containing a difference', async () => {
+        const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
+            nativeElement: document.createElement('canvas'),
+            
+        }; 
+        mockCanvasRef.nativeElement.width = 800;
+        mockCanvasRef.nativeElement.height = 800;
+        
+        const canvasContext = {
+            context: mockCanvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D,
+            canvas: mockCanvasRef,
+            imageNew: Buffer.alloc(100, 1),
+            original: Buffer.alloc(100, 1),
+        };
+        const gameData: GameData = {
+            id: 1,
+            name: 'Test Game',
+            isEasy: true,
+            nbrDifferences: 1,
+            differences: [[{ x: 100, y: 200 }]],
+            oneVersusOneRanking: [],
+            soloRanking: [],
+        };
+        const differences = [false];
+        spyOn(service, 'generatePseudoRandomNumber').and.returnValue(0.5);
+        spyOn(service, 'loadCanvasImages');
+    
+        await service.showFirstHint(canvasContext, gameData, differences);        
+        expect(service.loadCanvasImages).not.toHaveBeenCalled();
+    });
+
+    it('should show a blinking quadrant containing a difference', async () => {
+        const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
+            nativeElement: document.createElement('canvas'),
+            
+        }; 
+        mockCanvasRef.nativeElement.width = 800;
+        mockCanvasRef.nativeElement.height = 800;
+        
+        const canvasContext = {
+            context: mockCanvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D,
+            canvas: mockCanvasRef,
+            imageNew: Buffer.alloc(100, 1),
+            original: Buffer.alloc(100, 1),
+        };
+        const gameData: GameData = {
+            id: 1,
+            name: 'Test Game',
+            isEasy: true,
+            nbrDifferences: 1,
+            differences: [[{ x: 100, y: 200 }]],
+            oneVersusOneRanking: [],
+            soloRanking: [],
+        };
+        const differences = [false];
+        spyOn(service, 'generatePseudoRandomNumber').and.returnValue(0.5);
+        spyOn(service, 'loadCanvasImages');
+    
+        await service.showSecondHint(canvasContext, gameData, differences);        
+        expect(service.loadCanvasImages).not.toHaveBeenCalled();
+    });
+
+    it('should show a blinking quadrant containing a difference', async () => {
+        const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
+            nativeElement: document.createElement('canvas'),
+            
+        }; 
+        mockCanvasRef.nativeElement.width = 800;
+        mockCanvasRef.nativeElement.height = 800;
+        
+        const canvasContext = {
+            context: mockCanvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D,
+            canvas: mockCanvasRef,
+            imageNew: Buffer.alloc(100, 1),
+            original: Buffer.alloc(100, 1),
+        };
+        const gameData: GameData = {
+            id: 1,
+            name: 'Test Game',
+            isEasy: true,
+            nbrDifferences: 1,
+            differences: [[{ x: 100, y: 200 }]],
+            oneVersusOneRanking: [],
+            soloRanking: [],
+        };
+        const differences = [false];
+        spyOn(service, 'generatePseudoRandomNumber').and.returnValue(0.5);
+        spyOn(service, 'loadCanvasImages');
+    
+        await service.showThirdHint(canvasContext, gameData, differences);        
+        expect(service.loadCanvasImages).not.toHaveBeenCalled();
+    });
+
+
+
+
 });
