@@ -87,50 +87,46 @@ describe('HintService', () => {
         expect(mockElementRef.nativeElement.style.display).toBe(hintService.returnDisplay('block'));
         tick(MILLISECOND_TO_SECONDS);
         expect(mockElementRef.nativeElement.style.display).toBe(hintService.returnDisplay('none'));
-    }));
+    }));   
 
-
-
-
-
-    // it('should call showFirstHint method of ImageManipulationService when hints value is 3', () => {
-    //     const canvas = { nativeElement: document.createElement('canvas') };
-    //     const context = canvas.nativeElement.getContext('2d')!;
-    //     const image = Buffer.alloc(100, 1);
-    //     const otherImage = Buffer.alloc(100, 1);
-    //     const gameInfo = {
-    //     gameData: {
-    //         id: 1,
-    //         name: 'Test Game',
-    //         isEasy: true,
-    //         nbrDifferences: 3,
-    //         differences: [
-    //         [
-    //             { x: 10, y: 20 },
-    //             { x: 30, y: 40 },
-    //         ],
-    //         [
-    //             { x: 50, y: 60 },
-    //             { x: 70, y: 80 },
-    //             { x: 90, y: 100 },
-    //         ],
-    //         [
-    //             { x: 110, y: 120 },
-    //             { x: 130, y: 140 },
-    //             { x: 150, y: 160 },
-    //         ],
-    //         ],
-    //         oneVersusOneRanking: [],
-    //         soloRanking: [],
-    //     },
-    //     hints: 2,
-    //     diffs: [true, false, true],
-    //     };
+    it('should call showFirstHint method of ImageManipulationService when hints value is 3', () => {
+        // const canvas = { nativeElement: document.createElement('canvas') };
+        // const context = canvas.nativeElement.getContext('2d')!;
+        // const image = Buffer.alloc(100, 1);
+        // const otherImage = Buffer.alloc(100, 1);
+        // const gameInfo = {
+        //     gameData: {
+        //         id: 1,
+        //         name: 'Test Game',
+        //         isEasy: true,
+        //         nbrDifferences: 3,
+        //         differences: [
+        //         [
+        //             { x: 10, y: 20 },
+        //             { x: 30, y: 40 },
+        //         ],
+        //         [
+        //             { x: 50, y: 60 },
+        //             { x: 70, y: 80 },
+        //             { x: 90, y: 100 },
+        //         ],
+        //         [
+        //             { x: 110, y: 120 },
+        //             { x: 130, y: 140 },
+        //             { x: 150, y: 160 },
+        //         ],
+        //         ],
+        //         oneVersusOneRanking: [],
+        //         soloRanking: [],
+        //     },
+        //     hints: 3,
+        //     diffs: [true, false, true],
+        // };
+        // hintService.showHint(canvas, context, image, otherImage, gameInfo);
         
-    //     hintService.showHint(canvas, context, image, otherImage, gameInfo);
 
-    //     expect(imageService.showSecondHint).not.toHaveBeenCalled();
-    //     expect(imageService.showThirdHint).not.toHaveBeenCalled();
-    // });
+        expect(imageService.showSecondHint).not.toHaveBeenCalled();
+        expect(imageService.showThirdHint).not.toHaveBeenCalled();
+    });
 
 });
