@@ -65,13 +65,8 @@ export class HistoryService {
 
     deleteHistory() {
         const routeToSend = '/history/';
-        this.communicationService.delete(routeToSend).subscribe({});
+        this.communicationService.delete(routeToSend);
         this.reloadPage();
-    }
-
-    addGameHistory(history: HistoryData) {
-        const routeToSend = '/history/';
-        this.communicationService.post<HistoryData>(history, routeToSend).subscribe({});
     }
 
     reloadPage() {

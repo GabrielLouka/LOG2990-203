@@ -47,6 +47,6 @@ export class GameConstantsService {
             this.constants.penaltyValue = INITIAL_PENALTY;
             this.constants.bonusValue = INITIAL_BONUS;
         }
-        this.communicationService.post(this.constants, routeToSend).subscribe({});
+        this.communicationService.post(this.constants, routeToSend);
     }
 }
