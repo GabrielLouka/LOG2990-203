@@ -62,9 +62,6 @@ export class PopUpComponent {
         if (isWinByDefault) {
             secondaryMessage = 'Votre adversaire a quitté la partie...';
         }
-        //     const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
-        // const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
-        // const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: winMessage,
@@ -77,23 +74,9 @@ export class PopUpComponent {
         });
         this.showPopUp();
     }
-    // showGameOverPopUp(username: string | undefined, isWinByDefault: boolean, isSoloMode: boolean, startReplayAction: Action<void> | null) {
-    //     const soloMessage = `Félicitations ${username?.toUpperCase()} vous avez remporté !`;
-    //     const multiPlayerMessage = `${username?.toUpperCase()} a remporté la partie !`;
-    //     const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
-    //     this.popUpInfo.splice(0, this.popUpInfo.length);
-    //     this.popUpInfo.push({
-    //         title: isWinByDefault ? soloMessage : titleMessage,
-    //         message: isWinByDefault ? 'Votre adversaire a quitté la partie...' : 'Excellente partie !',
-    //         option1: 'Menu Principal',
-    //         option2: 'Reprise Vidéo',
-    //         isConfirmation: false,
-    //         isGameOver: true,
-    //         option2Action: startReplayAction,
-    //     });
-    //     this.showPopUp();
-    // }
+
     // eslint-disable-next-line max-params
+    // TODO faire une interface
     showGameOverPopUpLimited(username1: string | undefined, username2: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
         this.isLimitedTime = true;
         const soloMessage = `Félicitations ${username1?.toUpperCase()} vous avez remporté !`;
