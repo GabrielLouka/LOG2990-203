@@ -137,4 +137,28 @@ describe('ImageManipulationService', () => {
         expect(dimensions.x).toBe(imageWidthExpected);
         expect(dimensions.y).toBe(imageHeightExpected);
     });
+
+    it('should generate a random vector of differences', () => {
+        spyOn(service, 'generatePseudoRandomNumber').and.returnValue(0.5);
+        const foundDifferences: boolean[] = [false];
+        const gameData: GameData = {
+            id: 1,
+            name: 'Test Game',
+            isEasy: true,
+            nbrDifferences: 0,
+            differences: [[{x:0, y:1}]],
+            oneVersusOneRanking: [],
+            soloRanking: [],
+        };
+        const randomDifference = service.generateRandomVector(gameData, foundDifferences);
+    
+        expect(randomDifference).toEqual({x:0, y:1});
+
+    });
+
+    it('should generate a pseudo-random number', () => {
+        service.randomNumber = 0.5;
+        const pseudoRandomNumber = service.generatePseudoRandomNumber();
+        expect(pseudoRandomNumber).toEqual(0.5);
+      });
 });
