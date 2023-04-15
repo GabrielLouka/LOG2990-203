@@ -4,6 +4,7 @@
 // import { MatchmakingService } from '../matchmaking-service/matchmaking.service';
 // import { SocketClientService } from '../socket-client-service/socket-client.service';
 
+import { ElementRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
@@ -83,8 +84,55 @@ describe('ChatService', () => {
     });
 
     
-
+    it('should call scrollToBottom and set newMessage to empty string when pushMessage is called', () => {
+        const message = {
+          text: 'Hello, world!',
+          username: 'testuser',
+          sentBySystem: false,
+          sentByPlayer1: true,
+          sentUpdatedScore: false,
+          sentTime: Date.now(),
+        };
+        const mockElementRef = {
+            nativeElement: {
+              scrollTop: 0,
+              scrollHeight: 100,
+            },
+          };
+        chatComponent.chat = mockElementRef;
+        spyOn(chatService, 'scrollToBottom');
     
+        chatService.pushMessage(message, chatComponent);
+    
+        expect(chatService.scrollToBottom).toHaveBeenCalledWith(mockElementRef);
+        expect(chatComponent.newMessage).toBe('');
+      });
 
+      it('should push a message to the chat from the system', () => {
+        chatComponent.chat = new ElementRef({ scrollTop: 0, nativeElement: { scrollTop: 0, scrollHeight: 100 } });  
+        const textToSend = 'Hello world!';
+        chatService.sendMessageFromSystem(textToSend, '', chatComponent);
+        expect(chatComponent.messages.length).toEqual(1);
+        expect(chatComponent.messages[0].text).toEqual(textToSend);
+        expect(chatComponent.messages[0].username).toEqual('System');
+        expect(chatComponent.messages[0].sentBySystem).toEqual(true);
+        expect(chatComponent.messages[0].sentByPlayer1).toEqual(false);
+        expect(chatComponent.messages[0].sentUpdatedScore).toEqual(false);
+        expect(chatComponent.messages[0].sentTime).not.toBeNull();
+      });
+    
+      it('should add a record-breaking message to the chat', () => {
+        const rankingData = {
+          username: 'testUser',
+          position: "1",
+          gameName: 'testGame',
+          matchType: 'testMatchType',
+        };
+        spyOn(chatService, 'pushMessage');
+    
+        chatService.sendRecordBreakingMessage(rankingData, chatComponent);
+    
+        expect(chatService.pushMessage).toHaveBeenCalled();
+      });
 
 });
