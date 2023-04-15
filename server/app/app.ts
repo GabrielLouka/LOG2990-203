@@ -6,11 +6,11 @@ import { StatusCodes } from 'http-status-codes';
 import * as swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import { Service } from 'typedi';
-import { GameConstantsController } from './controllers/game-constants.controller';
-import { GamesController } from './controllers/games.controller';
-import { HistoryController } from './controllers/history.controller';
-import { ImageProcessingController } from './controllers/image-processing.controller';
-import { ImageProviderController } from './controllers/image-provider-controller';
+import { GameConstantsController } from './controllers/game-constants-controller/game-constants.controller';
+import { GamesController } from './controllers/games-controller/games.controller';
+import { HistoryController } from './controllers/history-controller/history.controller';
+import { ImageProcessingController } from './controllers/image-processing-controller/image-processing.controller';
+import { ImageProviderController } from './controllers/image-provider-controller/image-provider.controller';
 
 @Service()
 export class Application {
