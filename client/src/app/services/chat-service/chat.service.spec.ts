@@ -81,21 +81,51 @@ describe('ChatService', () => {
         expect(chatService.isTextValid('')).toBe(false);
     });
 
-    // it('should return false when the message is only whitespace', () => {
-    //     expect(chatService.isTextValid('   ')).toBe(false);
+    it('should return false when the message is only whitespace', () => {
+        expect(chatService.isTextValid('   ')).toBe(false);
+    });
+
+    it('should return true when the message contains non-whitespace characters', () => {
+        expect(chatService.isTextValid('Hello, world!')).toBe(true);
+    });
+
+    it('should send a message if the text is valid', () => {
+        const isPlayer1 = true;
+        const newMessage = 'hello world';
+        const socketSpy = jasmine.createSpyObj('Socket', ['emit']);
+        socketServiceSpy.socket = socketSpy;
+        chatService.sendMessage(isPlayer1, newMessage);
+
+        expect(socketSpy.emit).toHaveBeenCalled();
+    });
+
+    it("clearMessage should return '' ", () => {
+        const res = chatService.clearMessage();
+        expect(res).toEqual('');
+    });
+
+    // it("pushMessage should add message", () => {
+    //     const message = {
+    //         text: "okok",
+    //         username: 'okokok',
+    //         sentBySystem: false,
+    //         sentByPlayer1: true,
+    //         sentByPlayer2: false,
+    //         sentUpdatedScore: false,
+    //         sentTime: 2
+    //     };
+    //     chatService.pushMessage(message, new ChatComponent(chatService));
     // });
 
-    // it('should return true when the message contains non-whitespace characters', () => {
-    //     expect(chatService.isTextValid('Hello, world!')).toBe(true);
-    // });
-
-    // it('should send a message if the text is valid', () => {
-    //     const isPlayer1 = true;
-    //     const newMessage = 'hello world';
-    //     const socketSpy = jasmine.createSpyObj('Socket', ['emit']);
-    //     socketServiceSpy.socket = socketSpy;
-    //     chatService.sendMessage(isPlayer1, newMessage);
-
-    //     expect(socketSpy.emit).toHaveBeenCalled();
-    // });
+    it("scrollToBottom should setTimeout", () => {
+        const chatElement = {
+            nativeElement: {
+                scrollTop: 0,
+                scrollHeight: 500,
+                clientHeight: 250
+            }
+        };
+        chatService.scrollToBottom(chatElement);
+        expect(chatElement).toBeDefined();
+    });
 });
