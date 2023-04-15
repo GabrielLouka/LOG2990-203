@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef } from '@angular/core';
@@ -31,8 +32,10 @@ describe('ActionsContainer', () => {
     describe('undo', () => {
         it('should redraw all previous strokes onto the canvas', () => {
             // Given
+            const spyDraw = spyOn(actionsContainer, 'draw');
             actionsContainer.redoActions = [];
             actionsContainer.undoActions.push(new EraserElement([new Vector2(1, 2), new Vector2(3, 4)], false));
+
             actionsContainer.draw(new MouseEvent('mousemove'));
             actionsContainer.draw(new MouseEvent('mousedown'));
             actionsContainer.draw(new MouseEvent('mouseup'));
@@ -50,9 +53,12 @@ describe('ActionsContainer', () => {
             actionsContainer.redo();
             actionsContainer.redo();
             actionsContainer.redo();
+            expect(spyDraw).toHaveBeenCalledTimes(5);
         });
 
         it('should draw a rectangle with correct dimensions and clear previous rectangle', () => {
+            const spyDraw = spyOn(actionsContainer, 'draw');
+
             actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
 
             actionsContainer.initialPosition = new Vector2(10, 10);
@@ -62,11 +68,12 @@ describe('ActionsContainer', () => {
                 offsetX: 30,
                 offsetY: 30,
             } as MouseEventInit);
-
             actionsContainer.draw(mockEvent);
+            expect(spyDraw).toHaveBeenCalled();
         });
 
         it('should draw a square when shift key is pressed', () => {
+            const spyDraw = spyOn(actionsContainer, 'draw');
             actionsContainer.undoActions.push(new RectangleElement([new Vector2(1, 2), new Vector2(3, 4)], false));
             actionsContainer.initialPosition = new Vector2(10, 10);
             const mockEvent = new MouseEvent('click', {
@@ -76,6 +83,7 @@ describe('ActionsContainer', () => {
                 shiftKey: true,
             } as MouseEventInit);
             actionsContainer.draw(mockEvent);
+            expect(spyDraw).toHaveBeenCalled();
         });
 
         it('should handle mousedown event on left or right canvas', () => {
@@ -91,13 +99,14 @@ describe('ActionsContainer', () => {
             actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
             actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
             actionsContainer.rightDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
+            expect(actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent)).toBeTruthy();
         });
 
         it('should handle mousedown event on left or right canvas', () => {
             const mockEvent = new MouseEvent('mouseup', {
                 bubbles: true,
             });
-            actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent);
+            expect(actionsContainer.leftDrawingCanvas.nativeElement.dispatchEvent(mockEvent)).toBeTruthy();
         });
     });
 
