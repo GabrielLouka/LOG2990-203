@@ -1,7 +1,9 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ElementRef } from '@angular/core';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { MILLISECOND_TO_SECONDS } from '@common/utils/env';
 import { GameConstantsService } from '../game-constants-service/game-constants.service';
 import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 import { HintService } from './hint.service';
@@ -65,13 +67,27 @@ describe('HintService', () => {
         expect(display).toBeDefined();
     });
 
-    it('should send a system message to the chat component with the current time and message', () => {
+    it('should send a system message', () => {
         const now = new Date();
         const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';    
         hintService.sendHintMessage(chatComponent);
     
         expect(chatComponent.sendSystemMessage).toHaveBeenCalledWith(formattedTime);
-      });
+    });
+
+    it('should display and hide red error message', fakeAsync(() => {
+        const mockElementRef = {
+            nativeElement: {
+                style: {
+                    display: 'none'
+                }
+            }
+        } as ElementRef<HTMLDivElement>;
+        hintService.showRedError(mockElementRef);
+        expect(mockElementRef.nativeElement.style.display).toBe(hintService.returnDisplay('block'));
+        tick(MILLISECOND_TO_SECONDS);
+        expect(mockElementRef.nativeElement.style.display).toBe(hintService.returnDisplay('none'));
+    }));
 
 
 
