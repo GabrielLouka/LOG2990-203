@@ -5,6 +5,7 @@ export {
     WAITING_PLAYER_ANSWER_TEXT,
     REDIRECTED_WHEN_GAME_DELETED_TEXT,
     LIMITED_TIME_USER_ENTERED_TEXT,
+    REDIRECTED_TO_MAIN_PAGE_TEXT,
 };
 export { ALL_GAMES_TEXT, THIS_GAME_TEXT, DELETE_TEXT, RESET_TEXT, YES_TEXT, NO_TEXT, OK_TEXT, ABORTED_GAME_TEXT };
 export { NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED };
@@ -69,6 +70,7 @@ const WAITING_FOR_PLAYER_TEXT = "En attente d'un adversaire...";
 const WAITING_PLAYER_ANSWER_TEXT = "En attente de la réponse de l'adversaire...";
 const REDIRECTED_WHEN_GAME_DELETED_TEXT = 'Le jeu a été supprimé, vous avez donc été redirigé';
 const LIMITED_TIME_USER_ENTERED_TEXT = 'Quel mode de jeu voulez-vous jouer ?';
+const REDIRECTED_TO_MAIN_PAGE_TEXT = 'Vous avez été redirigé vers la page principale';
 
 // Pop up displayed texts
 const ALL_GAMES_TEXT = 'TOUS LES JEUX ?';

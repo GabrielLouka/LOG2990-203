@@ -6,17 +6,14 @@ import { HintService } from '@app/services/hint-service/hint.service';
     templateUrl: './hint.component.html',
     styleUrls: ['./hint.component.scss'],
 })
-export class HintComponent implements OnInit {    
+export class HintComponent implements OnInit {
     @ViewChild('hint') div: ElementRef;
     maxGivenHints: number;
 
-    constructor(private hintService: HintService){}
+    constructor(private hintService: HintService) {}
 
-    ngOnInit(){
+    ngOnInit() {
         this.hintService.reset();
         this.maxGivenHints = this.hintService.maxGivenHints;
     }
-    
 }
-
-

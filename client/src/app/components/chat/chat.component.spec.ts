@@ -9,7 +9,7 @@ describe('ChatComponent', () => {
     let chatService: jasmine.SpyObj<ChatService>;
 
     beforeEach(() => {
-        chatService = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendMessageFromSystem', 'scrollToBottom']);
+        chatService = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendMessageFromSystem', 'scrollToBottom', 'sendRecordBreakingMessage']);
     });
 
     beforeEach(async () => {
@@ -53,5 +53,31 @@ describe('ChatComponent', () => {
         spyOn(component, 'sendMessage');
         component.sendMessage();
         expect(chatService.sendMessage).not.toHaveBeenCalled();
+    });
+
+    it('should reset the messages array', () => {
+        component.messages = [
+            {
+                text: 'Bonjour',
+                username: 'Player1',
+                sentBySystem: false,
+                sentByPlayer1: true,
+                sentUpdatedScore: false,
+                sentTime: 10,
+            },
+        ];
+        component.reset();
+        expect(component.messages).toEqual([]);
+    });
+
+    it('should call sendRecordBreakingMessage with the rankingData and the component', () => {
+        const rankingData = {
+            username: 'Marc',
+            position: '1',
+            gameName: 'Tetris',
+            matchType: 'Classic Solo',
+        };
+        component.sendTimeScoreMessage(rankingData);
+        expect(chatService.sendRecordBreakingMessage).toHaveBeenCalledWith(rankingData, component);
     });
 });

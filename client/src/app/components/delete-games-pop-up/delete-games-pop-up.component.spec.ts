@@ -45,15 +45,9 @@ describe('DeleteGamesPopUpComponent', () => {
         expect(component.modal.nativeElement.style.display).toBe('none');
     });
 
-    // it('should show pop up when showDeleteGamesPopUp is true', () => {
-    //     component.modal = { nativeElement: { style: { display: 'none' } } };
-    //     component.showDeleteGamesPopUp(true);
-    //     expect(component.modal.nativeElement.style.display).toBe('flex');
-    // });
-
-    // it('should show the popUp when isallGames is false', () => {
-    //     component.modal = { nativeElement: { style: { display: 'none' } } };
-    //     component.showDeleteGamesPopUp(false);
-    //     expect(component.modal.nativeElement.style.display).toBe('flex');
-    // });
+    it('should show the popUp when isallGames is false', () => {
+        component.modal = { nativeElement: { style: { display: 'none' } } };
+        component.showPopUp(false);
+        expect(component.modal.nativeElement.style.display).toBe('flex');
+    });
 });

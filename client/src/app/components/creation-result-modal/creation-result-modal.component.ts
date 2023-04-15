@@ -91,11 +91,16 @@ export class CreationResultModalComponent {
     }
 
     async updateImageDisplay(imgData: ArrayBuffer) {
-        const canvas: HTMLCanvasElement = this.imagePreview.nativeElement;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-            const bitmap = await createImageBitmap(new Blob([imgData]));
-            ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, canvas.width, canvas.height);
+        try {
+            const canvas: HTMLCanvasElement = this.imagePreview.nativeElement;
+            const ctx = canvas.getContext('2d');
+
+            if (ctx) {
+                const bitmap = await createImageBitmap(new Blob([imgData]));
+                ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, canvas.width, canvas.height);
+            }
+        } catch (error) {
+            // console.error('Error updating image display:', error);
         }
     }
 
@@ -109,7 +114,9 @@ export class CreationResultModalComponent {
     resetBackgroundCanvas() {
         const canvasSize: HTMLCanvasElement = this.imagePreview.nativeElement;
 
-        const context = canvasSize.getContext('2d');
-        context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
+        if (canvasSize) {
+            const context = canvasSize.getContext('2d');
+            context?.clearRect(0, 0, canvasSize.width, canvasSize.height);
+        }
     }
 }
