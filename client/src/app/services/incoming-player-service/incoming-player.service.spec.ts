@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { DO_YOU_WANT_TO_PLAY_WITH_MESSAGE, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
+import { DO_YOU_WANT_TO_PLAY_WITH_TEXT, WAITING_FOR_PLAYER_TEXT, WAITING_PLAYER_ANSWER_TEXT } from '@common/utils/env';
 import { IncomingPlayerService } from './incoming-player.service';
 
 describe('IncomingPlayerService', () => {
@@ -121,13 +121,13 @@ describe('IncomingPlayerService', () => {
     it('should update the waiting message when no opponent is found', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleHostRejectingIncomingPlayer();
-        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_FOR_PLAYER_MESSAGE);
+        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_FOR_PLAYER_TEXT);
         expect(incomingPlayerService.numberOfIncomingPlayers).toEqual(0);
     });
 
     it('should update queue status message when incoming player is rejected', () => {
         incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage();
-        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_PLAYER_ANSWER_MESSAGE);
+        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_PLAYER_ANSWER_TEXT);
     });
 
     it('should call matchmaking sendIncomingPlayerRequest when incoming player is rejected', () => {
@@ -141,7 +141,7 @@ describe('IncomingPlayerService', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         incomingPlayerService.refreshQueueDisplay();
         expect(incomingPlayerService.statusToDisplay).toEqual(
-            DO_YOU_WANT_TO_PLAY_WITH_MESSAGE + incomingPlayerService.firstIncomingPlayer.username + ' ?\n',
+            DO_YOU_WANT_TO_PLAY_WITH_TEXT + incomingPlayerService.firstIncomingPlayer.username + ' ?\n',
         );
         expect(incomingPlayerService.firstIncomingPlayer).toEqual(player);
     });

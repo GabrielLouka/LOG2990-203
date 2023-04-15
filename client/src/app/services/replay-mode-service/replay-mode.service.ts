@@ -28,6 +28,7 @@ export class ReplayModeService {
 
     get startReplayModeAction(): Action<void> {
         const output: Action<void> = new Action<void>();
+        output.add(() => this.stopRecording());
         output.add(() => this.launchReplayMode());
         return output;
     }

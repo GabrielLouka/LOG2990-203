@@ -34,14 +34,9 @@ export class TimerComponent implements OnDestroy {
         return this.timeInSeconds;
     }
 
-    // getTime(): string {
-    //     if (this.incrementTime) {
-    //         return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
-    //     } else {
-    //         this.timeInSeconds = this.gameConstantsService.countdownValue - this.timeInSeconds;
-    //         return this.displayTimeValue(this.minutes) + ':' + this.displayTimeValue(this.seconds);
-    //     }
-    // }
+    set elapsedTime(elapsedTime: number) {
+        this.timeInSeconds = elapsedTime;
+    }
 
     displayTimeValue(value: number): string {
         return value < MINUTE_LIMIT ? '0' + value : value.toString();
@@ -54,6 +49,11 @@ export class TimerComponent implements OnDestroy {
     refreshTimerDisplay() {
         this.minute.nativeElement.innerText = this.displayTimeValue(this.minutes);
         this.second.nativeElement.innerText = this.displayTimeValue(this.seconds);
+    }
+
+    synchronizeDisplay(elapsedTime: number) {
+        this.elapsedTime = elapsedTime;
+        this.refreshTimerDisplay();
     }
 
     ticToc() {

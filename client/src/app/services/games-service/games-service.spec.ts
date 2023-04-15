@@ -140,7 +140,7 @@ describe('GamesService', () => {
         );
         spyOn(socketClientService.socket, 'emit');
         spyOn(service, 'reloadPage').and.stub();
-        await service.deleteSelectedGame(true, '3');
+        await service.deleteById(true, '3');
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/3');
         expect(socketClientService.socket.emit).toHaveBeenCalledWith('deletedGame', { hasDeletedGame: true, id: '3' });
         expect(service.reloadPage).toHaveBeenCalled();

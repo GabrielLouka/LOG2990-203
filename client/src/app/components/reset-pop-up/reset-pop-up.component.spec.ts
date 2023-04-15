@@ -21,16 +21,16 @@ describe('ResetPopUpComponent', () => {
     });
 
     it('should emit true when emitDeleteRequestConfirmation is called', () => {
-        spyOn(component.isDeleteRequest, 'emit');
-        component.emitDeleteRequestConfirmation();
-        expect(component.isDeleteRequest.emit).toHaveBeenCalledWith(true);
+        spyOn(component.isResetRequest, 'emit');
+        component.emitResetRequestConfirmation();
+        expect(component.isResetRequest.emit).toHaveBeenCalledWith(true);
     });
 
     it('should emit false when closePopUp is called', () => {
-        spyOn(component.isDeleteRequest, 'emit');
+        spyOn(component.isResetRequest, 'emit');
         component.modal = { nativeElement: { style: { display: 'flex' } } };
         component.closePopUp();
-        expect(component.isDeleteRequest.emit).toHaveBeenCalledWith(false);
+        expect(component.isResetRequest.emit).toHaveBeenCalledWith(false);
     });
 
     it('should show pop up when showPopUp is called', () => {

@@ -3,10 +3,10 @@ export {
     DO_YOU_WANT_TO_PLAY_WITH_TEXT,
     WAITING_FOR_PLAYER_TEXT,
     WAITING_PLAYER_ANSWER_TEXT,
-    REDIRECTED_TO_MAIN_PAGE_TEXT,
+    REDIRECTED_WHEN_GAME_DELETED_TEXT,
     LIMITED_TIME_USER_ENTERED_TEXT,
 };
-export { ALL_GAMES_TEXT, THIS_GAME_TEXT, DELETE_TEXT, RESET_TEXT, YES_TEXT, NO_TEXT, ABORTED_GAME_TEXT };
+export { ALL_GAMES_TEXT, THIS_GAME_TEXT, DELETE_TEXT, RESET_TEXT, YES_TEXT, NO_TEXT, OK_TEXT, ABORTED_GAME_TEXT };
 export { NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED };
 export { INITIAL_COUNTDOWN, INITIAL_PENALTY, INITIAL_BONUS, MAX_PENALTY, MAX_BONUS };
 export { CHAT_TITLE };
@@ -67,7 +67,7 @@ const FIVE_MINUTES_TO_SECONDS = 300;
 const DO_YOU_WANT_TO_PLAY_WITH_TEXT = 'Voulez-vous jouer avec ';
 const WAITING_FOR_PLAYER_TEXT = "En attente d'un adversaire...";
 const WAITING_PLAYER_ANSWER_TEXT = "En attente de la réponse de l'adversaire...";
-const REDIRECTED_TO_MAIN_PAGE_TEXT = "Le jeu a été supprimé, vous avez donc été redirigé à l'accueil";
+const REDIRECTED_WHEN_GAME_DELETED_TEXT = 'Le jeu a été supprimé, vous avez donc été redirigé';
 const LIMITED_TIME_USER_ENTERED_TEXT = 'Quel mode de jeu voulez-vous jouer ?';
 
 // Pop up displayed texts
@@ -77,6 +77,7 @@ const DELETE_TEXT = 'SUPPRIMER ';
 const RESET_TEXT = 'RÉINITIALISER ';
 const YES_TEXT = 'OUI';
 const NO_TEXT = 'NON';
+const OK_TEXT = 'OK';
 const ABORTED_GAME_TEXT = ' a abandonné la partie';
 
 // Canvas fixed dimensions

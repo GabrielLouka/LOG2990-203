@@ -181,7 +181,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.keydownEventsSubscription = fromEvent<KeyboardEvent>(window, 'keydown')
             .pipe(filter((event) => event.key === 'i' && (this.matchmakingService.isSoloMode || this.matchmakingService.isLimitedTimeSolo)))
             .subscribe(() => {
-                if (this.isGameInteractive) this.handleHintMode();
+                if (this.isGameInteractive && !this.isOver) this.handleHintMode();
             });
 
         this.hintService.reset();
@@ -320,11 +320,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
     }
 
-    startTimer() {
-        this.timerElement.resetTimer();
-        this.timerElement.startTimer();
-    }
-
     onMouseDown(event: MouseEvent) {
         if (!this.isGameInteractive) return;
         const coordinateClick: Vector2 = { x: event.offsetX, y: Math.abs(event.offsetY - CANVAS_HEIGHT) };
@@ -353,6 +348,12 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.send('readyPlayer', { isPlayer1: this.isPlayer1 });
     }
 
+    startMatch() {
+        this.isLoading = false;
+        this.timerElement.resetTimer();
+        this.socketService.send('startTimer', { matchId: this.matchmakingService.currentMatchId, elapsedTime: 0 });
+    }
+
     addServerSocketMessagesListeners() {
         if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
 
@@ -363,12 +364,19 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.isPlayer2Ready = true;
             }
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
-                this.isLoading = false;
-                this.startTimer();
+                this.startMatch();
             }
             if (this.isCoop) {
                 this.isOriginallyCoop = true;
             }
+        });
+
+        this.socketService.on('playersSyncTime', (data: { elapsedTime: number }) => {
+            this.timerElement.synchronizeDisplay(data.elapsedTime);
+        });
+
+        this.socketService.on('timerStopped', (data: { elapsedTime: number }) => {
+            this.timerElement.synchronizeDisplay(data.elapsedTime);
         });
 
         this.socketService.on(
@@ -380,7 +388,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                     this.sendSystemMessageToChat(message);
                     this.increasePlayerScore(data.isPlayer1);
                     this.refreshFoundDifferences(data.foundDifferences);
-                    // this.onFindDifference();
 
                     if (this.matchmakingService.isLimitedTimeSolo || this.matchmakingService.isCoopMode) {
                         if (this.currentGameIndex === this.games.length - 1) {
@@ -425,12 +432,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             );
         });
 
-        this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
-            this.chat.sendTimeScoreMessage(data.rankingData);
-        });
-
         this.socketService.on('randomizedOrder', async (data: { seedsArray: number[] }) => {
             this.matchmakingService.currentSeeds = data.seedsArray;
+        });
+
+        this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
+            this.chat.sendTimeScoreMessage(data.rankingData);
+            this.socketService.disconnect();
         });
     }
 
@@ -495,13 +503,24 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
 
+    pauseTimer(): void {
+        const pauseTimerMethod = () => {
+            this.timerElement.pause();
+        };
+        pauseTimerMethod();
+        this.replayModeService.addMethodToReplay(pauseTimerMethod);
+    }
+
+    stopTimer(): void {
+        this.socketService.send('stopTimer', this.matchmakingService.currentMatchId);
+    }
+
     gameOver(isWinByDefault: boolean): void {
-        this.timerElement.pause();
-        this.replayModeService.stopRecording();
-        const isWinningPlayer = this.winningPlayer === this.socketService.socketId ? true : false;
+        this.stopTimer();
+        // this.replayModeService.stopRecording();
 
         if (!isWinByDefault) {
-            if ((this.isSolo || this.isOneVersusOne) && isWinningPlayer) {
+            if (this.isSolo || this.isOneVersusOne) {
                 this.sendNewTimeScoreToServer();
             }
         } else {
@@ -527,7 +546,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
         this.winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
-        if (this.isPlayer1 === isPlayer1Win) {
+        const isWinner = this.isPlayer1 === isPlayer1Win;
+        if (isWinner) {
             this.socketService.send('setWinner', {
                 matchId: this.matchmakingService.currentMatchId,
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
@@ -539,6 +559,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
+        // startReplayAction.add(this.replayModeService.stopRecording.bind(this.replayModeService));
         this.isOver = true;
         this.popUpElement.showGameOverPopUp(
             isWinByDefault,
@@ -575,10 +596,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.matchmakingService.isSoloMode ||
             this.matchmakingService.isLimitedTimeSolo ||
             (this.chat && document.activeElement !== this.chat.input.nativeElement)
-            // this.matchmakingService.isOneVersusOne ||
-            // this.isCoop
         ) {
-            if (!this.isGameInteractive) return;
+            if (!this.isGameInteractive || this.isOver) return;
             if (event instanceof KeyboardEvent) {
                 if (event.key === 't') {
                     if (this.letterTPressed) {
