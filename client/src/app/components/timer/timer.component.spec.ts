@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { TimerComponent } from './timer.component';
 
 describe('TimerComponent', () => {
@@ -105,4 +104,52 @@ describe('TimerComponent', () => {
         component.elapsedTime = 5;
         expect(component.timeInSeconds).toBe(5);
     });
+
+    it('should reset the timer', () => {
+        component.resetTimer();
+        expect(component.timeInSeconds).toBe(0);
+    });
+
+    it('shoudl sync time', () => {
+        component.synchronizeDisplay(10);
+        expect(component.timeInSeconds).toBe(10);
+    });
+
+    it('should decrease time', () => {
+        component.decreaseTime(10);
+        expect(component.timeInSeconds).toBe(0);
+    });
+
+    it('should start timer', () => {
+        component.startTimer();
+        expect(component.shouldStop).toBe(false);
+    });
+
+    it('shoudl emit time when time is up', () => {
+        component.shouldStop = false;
+        component.incrementTime = false;
+        spyOn(component.timeReachedZero, 'emit');
+        component.timeInSeconds = 0;
+        component.ticToc();
+        expect(component.timeReachedZero.emit).toHaveBeenCalled();
+    });
+
+    it('should not emit time when time is not up', () => {
+        component.shouldStop = false;
+        component.incrementTime = false;
+        spyOn(component.timeReachedZero, 'emit');
+        component.timeInSeconds = 10;
+        component.ticToc();
+        expect(component.timeReachedZero.emit).not.toHaveBeenCalled();
+    });
+
+    // it('should pause timer', () => {
+    //     component.pause();
+    //     expect(component.loopingMethod.pause()).toHaveBeenCalled();
+    // });
+
+    // it('should resume timer', () => {
+    //     component.resume();
+    //     expect(component.loopingMethod.resume()).toHaveBeenCalled();
+    // });
 });
