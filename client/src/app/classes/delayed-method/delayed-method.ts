@@ -37,7 +37,6 @@ export class DelayedMethod {
     }
 
     pause() {
-        if (this.isExecuted) return; // we don't need to pause if it's already executed
         this.isPaused = true;
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
