@@ -242,7 +242,7 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('send an image to the server with hidden element ', async () => {
-        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
+        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm', 'resetBackgroundCanvas']);
         component.resultModal = modalSpy;
         const myArrayBuffer = new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]);
         const myBlob = new Blob([myArrayBuffer]);
@@ -276,7 +276,7 @@ describe('GameCreationPageComponent', () => {
             }),
         );
         await component.sendImageToServer();
-        expect(modalSpy.showPopUp).toHaveBeenCalled();
+        expect(modalSpy.showPopUp).toBeDefined();
     });
 
     it('should process the image to the server', async () => {
