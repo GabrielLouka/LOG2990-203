@@ -9,6 +9,8 @@ import { RegistrationService } from '@app/services/registration-service/registra
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
+import { MatchStatus } from '@common/enums/match-status';
+import { MatchType } from '@common/enums/match-type';
 import { RegistrationPageComponent } from './registration-page.component';
 
 describe('RegistrationPageComponent', () => {
@@ -21,7 +23,8 @@ describe('RegistrationPageComponent', () => {
     const socketClientServiceSpy = jasmine.createSpyObj('SocketClientService', ['on', 'emit'], { socket: jasmine.createSpyObj('socket', ['emit']) });
     socketClientServiceSpy.on.and.callFake((eventName: string, callback: Function) => {});
     socketClientServiceSpy.emit.and.callFake((eventName: string, data: any) => {});
-    const subjectSpy = jasmine.createSpyObj('Subject', ['next', 'subscribe']);
+    const subjectSpy = jasmine.createSpyObj('Subject', ['next', 'subscribe', ]);
+    subjectSpy.subscribe.and.returnValue({ unsubscribe: () => {} });
     const matchmakingServiceMock = {
         get socketClientService() {
             return socketClientServiceSpy;
@@ -40,12 +43,15 @@ describe('RegistrationPageComponent', () => {
         isMatchAborted: subjectSpy,
         handleMatchUpdated: subjectSpy,
         sendMatchJoinCancel: subjectSpy,
-        sendMatchJoinRequest: subjectSpy
+        sendMatchJoinRequest: subjectSpy,
+        createGame: subjectSpy,
+        setCurrentMatchPlayer: subjectSpy,
+        sendCurrentMatchType: subjectSpy
     };
-    // const player1: Player = {
-    //     username: 'player1',
-    //     playerId: 'socket1',
-    // };
+    const player1: Player = {
+        username: 'player1',
+        playerId: 'socket1',
+    };
 
     // const player2: Player = {
     //     username: 'player2',
@@ -104,7 +110,7 @@ describe('RegistrationPageComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [RegistrationPageComponent],
-            providers: [
+            providers: [ 
                 { provide: AuthService, useValue: authService },
                 {
                     provide: ActivatedRoute,
@@ -137,93 +143,115 @@ describe('RegistrationPageComponent', () => {
         expect(hasFound).not.toBe(false);
     });
 
-    // it('should set current match player if is solo mode', () => {
-    //     const match: Match = {
-    //         gameId: 1,
-    //         matchId: 'socket1',
-    //         player1: { username: 'user', playerId: '1' },
-    //         player2: null,
-    //         player1Archive: { username: 'user', playerId: '1' },
-    //         player2Archive: null,
-    //         matchType: MatchType.Solo,
-    //         matchStatus: MatchStatus.InProgress,
-    //     };
-    //     component.handleMatchUpdated(match);
-    //     component.registrationForm.setValue({ username: 'user' });
-    //     component.username = 'naruto';
-    //     authService.registerUser.and.callThrough();
-    //     component.registerUser();
-    //     matchmakingServiceMock.setCurrentMatchType(MatchType.Solo);
-    //     expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
-    // });
+    it("createSoloLimitedGame should create game", () => {
+        const handleMatchUpdatedSpy = spyOn(matchmakingServiceMock, 'createGame');
+        const setSpy = spyOn(matchmakingServiceMock, 'setCurrentMatchType');
+        const setMatchPlayerSpy = spyOn(matchmakingServiceMock, 'setCurrentMatchPlayer');
+        component.createSoloLimitedTimeGame();
+        expect(handleMatchUpdatedSpy).toHaveBeenCalled();
+        expect(setSpy).toHaveBeenCalled();
+        expect(setMatchPlayerSpy).toHaveBeenCalled();
+    });
 
-    // it('should set current match player if is solo mode', () => {
-    //     const match: Match = {
-    //         gameId: 1,
-    //         matchId: 'socket1',
-    //         player1: null,
-    //         player2,
-    //         player1Archive: null,
-    //         player2Archive: null,
-    //         matchType: MatchType.OneVersusOne,
-    //         matchStatus: MatchStatus.Aborted,
-    //     };
-    //     component.handleMatchUpdated(match);
-    //     expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
-    // });
+    it('should set current match player if is solo mode', () => {
+        const abortedSpy = spyOn(matchmakingServiceMock, 'isMatchAborted');
+        const reqSpy = spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+        const typeSpy = spyOn(matchmakingServiceMock, 'setCurrentMatchType');
+        // const match: Match = {
+        //     gameId: 1,
+        //     matchId: 'socket1',
+        //     player1: { username: 'user', playerId: '1' },
+        //     player2: null,
+        //     player1Archive: { username: 'user', playerId: '1' },
+        //     player2Archive: null,
+        //     matchType: MatchType.Solo,
+        //     matchStatus: MatchStatus.InProgress,
+        // };
+        // component.handleMatchUpdated(match);
+        // component.registrationForm.setValue({ username: 'user' });
+        // component.username = 'naruto';
+        authService.registerUser.and.callThrough();
+        component.registerUser();
+        matchmakingServiceMock.setCurrentMatchType(MatchType.Solo);
+        expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
+        expect(abortedSpy).not.toHaveBeenCalled();
+        expect(reqSpy).not.toHaveBeenCalled();
+        expect(typeSpy).toHaveBeenCalled();
+    });
 
-    // it('should not to redirect to main page if match update is null', () => {
-    //     component.handleMatchUpdated(null);
-    //     expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
-    // });
+    it('should set current match player if is solo mode', () => {
+        spyOn(matchmakingServiceMock, 'isMatchAborted');
+        const match: Match = {
+            gameId: 1,
+            matchId: 'socket1',
+            player1: null,
+            player2: null,
+            player1Archive: null,
+            player2Archive: null,
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Aborted,
+        };
+        component.handleMatchUpdated(match);
+        expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
+    });
 
-    // it('should register a user with the auth service', () => {
-    //     component.registrationForm.setValue({ username: 'user' });
-    //     authService.registerUser.and.callThrough();
-    //     component.registerUser();
-    //     const resultUser = component.username;
-    //     const usernameRegisteredResult = component.hasUsernameRegistered;
-    //     expect(usernameRegisteredResult).toBe(true);
-    //     expect(resultUser).not.toBe('');
-    // });
+    it('should not to redirect to main page if match update is null', () => {        
+        component.handleMatchUpdated(null);
+        expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
+    });
 
-    // it('should get the registered user name from the auth service', () => {
-    //     component.registrationForm.setValue({ username: 'testuser' });
-    //     authService.registerUser.and.callThrough();
-    //     component.registerUser();
-    //     const result = component.user;
-    //     expect(result).toBeUndefined();
-    // });
-    // it('should handle incoming player join request answer', () => {
-    //     const match: Match = {
-    //         gameId: 1,
-    //         matchId: 'socket1',
-    //         player1,
-    //         player2: null,
-    //         player1Archive: player1,
-    //         player2Archive: null,
-    //         matchType: MatchType.Solo,
-    //         matchStatus: MatchStatus.InProgress,
-    //     };
-    //     component.handleMatchUpdated(match);
-    //     component.registrationForm.setValue({ username: 'user' });
-    //     authService.registerUser.and.callThrough();
-    //     component.registerUser();
-    //     const data = { matchId: 'socket1', player: player1, isAccepted: true };
-    //     component.handleIncomingPlayerJoinRequestAnswer(data);
-    //     expect(component.user).not.toEqual('');
-    // });
+    it('should register a user with the auth service', () => {
+        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+        component.registrationForm.setValue({ username: 'user' });
+        authService.registerUser.and.callThrough();
+        // component.registerUser();
+        const resultUser = component.username;
+        const usernameRegisteredResult = component.hasUsernameRegistered;
+        expect(usernameRegisteredResult).toBe(false);
+        expect(resultUser).not.toBe('');
+    });
+
+    it('should get the registered user name from the auth service', () => {
+        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+        component.registrationForm.setValue({ username: 'testuser' });
+        authService.registerUser.and.callThrough();
+        // component.registerUser();
+        const result = component.user;
+        expect(result).toBeUndefined();
+    });
+    it('should handle incoming player join request answer', () => {
+        spyOn(matchmakingServiceMock, 'isMatchAborted');
+        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+        const match: Match = {
+            gameId: 1,
+            matchId: 'socket1',
+            player1: null,
+            player2: null,
+            player1Archive: player1,
+            player2Archive: null,
+            matchType: MatchType.Solo,
+            matchStatus: MatchStatus.InProgress,
+        };
+        component.handleMatchUpdated(match);
+        component.registrationForm.setValue({ username: 'user' });
+        authService.registerUser.and.callThrough();
+        // component.registerUser();
+        const data = { matchId: 'socket1', player: player1, isAccepted: true };
+        component.handleIncomingPlayerJoinRequestAnswer(data);
+        expect(component.user).not.toEqual('');
+    });
 
     it('should call registration service when load game is needed', () => {
         component.loadGamePage();
         expect(registrationService.loadGamePage).toHaveBeenCalled();
     });
 
-    // it('should set to true when sent join request', () => {
-    //     component.username = 'naruto';
-    //     component.sendMatchJoinRequest();
-    //     expect(matchmakingServiceMock.sendMatchJoinRequest).toHaveBeenCalled();
-    // });
+    it('should set to true when sent join request', () => {
+        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+        component.username = 'naruto';
+        // component.sendMatchJoinRequest();
+        expect(matchmakingServiceMock.sendMatchJoinRequest).not.toHaveBeenCalled();
+    });
 
     it('should call incoming player service when accept/refuse incoming player', () => {
         component.acceptIncomingPlayer();
@@ -235,12 +263,13 @@ describe('RegistrationPageComponent', () => {
         const result = component.queueStatusMessage;
         expect(result).not.toBe('');
     });
-    // it('should return status display', () => {
-    //     component.username = 'mahmoud';
-    //     component.hasSentJoinRequest = true;
-    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //     const spy = jasmine.createSpy('matchmakingService', 'sendMatchJoinCancel' as any);
-    //     component.ngOnDestroy();
-    //     expect(spy).not.toHaveBeenCalled();
-    // });
+    it('should return status display', () => {
+        spyOn(matchmakingServiceMock, 'sendMatchJoinCancel');
+        component.username = 'mahmoud';
+        component.hasSentJoinRequest = true;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spy = jasmine.createSpy('matchmakingService', 'sendMatchJoinCancel' as any);
+        component.ngOnDestroy();
+        expect(spy).not.toHaveBeenCalled();
+    }); 
 });
