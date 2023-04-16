@@ -21,29 +21,29 @@ describe('HistoryService', () => {
         expect(communicationService).toBeTruthy();
     });
 
-    it('convertGameModeToSttring should return the correct string', () => {
+    it('convertGameModeToString should return the correct string', () => {
         const gameMode = 0;
-        expect(service.convertGameModeToSttring(gameMode)).toEqual('Classique - Solo');
+        expect(service.convertGameModeToString(gameMode)).toEqual('Classique - Solo');
     });
 
-    it('convertGameModeToSttring should return the correct string', () => {
+    it('convertGameModeToString should return the correct string', () => {
         const gameMode = 1;
-        expect(service.convertGameModeToSttring(gameMode)).toEqual('Classique - 1vs1');
+        expect(service.convertGameModeToString(gameMode)).toEqual('Classique - 1vs1');
     });
 
-    it('convertGameModeToSttring should return the correct string', () => {
+    it('convertGameModeToString should return the correct string', () => {
         const gameMode = 2;
-        expect(service.convertGameModeToSttring(gameMode)).toEqual('Temps Limité - Solo');
+        expect(service.convertGameModeToString(gameMode)).toEqual('Temps Limité - Solo');
     });
 
-    it('convertGameModeToSttring should return the correct string', () => {
+    it('convertGameModeToString should return the correct string', () => {
         const gameMode = 3;
-        expect(service.convertGameModeToSttring(gameMode)).toEqual('Temps Limité - Coop');
+        expect(service.convertGameModeToString(gameMode)).toEqual('Temps Limité - Coop');
     });
 
-    it('convertGameModeToSttring should return the correct string', () => {
+    it('convertGameModeToString should return the correct string', () => {
         const gameMode = 4;
-        expect(service.convertGameModeToSttring(gameMode)).toEqual('sus');
+        expect(service.convertGameModeToString(gameMode)).toEqual('sus');
     });
 
     it('should format history data correctly', () => {

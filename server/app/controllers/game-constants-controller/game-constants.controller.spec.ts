@@ -65,20 +65,4 @@ describe('GameConstantsController', () => {
         await supertest(expressApp).post(`${API_URL}/`).send(newConstants).expect(HTTP_STATUS_OK);
         sinon.restore();
     });
-
-    // it('POST should not update the constants when an error occurs', async () => {
-    //     const errorMessage = 'Store game result failed';
-    //     gameConstantsServiceStub.updateConstants.rejects(errorMessage);
-
-    //     await supertest(expressApp)
-    //         .post(`${API_URL}/`)
-    //         .send({
-    //             constant: 'test',
-    //         })
-    //         .expect(HTTP_STATUS_NOT_FOUND)
-    //         .then((response) => {
-    //             expect(response.text).to.equal('');
-    //         });
-    //     sinon.restore();
-    // });
 });

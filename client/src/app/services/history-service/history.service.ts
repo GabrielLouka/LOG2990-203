@@ -31,7 +31,7 @@ export class HistoryService {
             const gameHistory: HistoryData = {
                 startingTime: result.startingTime,
                 duration: result.duration,
-                gameMode: this.convertGameModeToSttring(result.gameMode),
+                gameMode: this.convertGameModeToString(result.gameMode),
                 player1:
                     result.gameMode === (MatchType.Solo || MatchType.LimitedSolo)
                         ? result.player1
@@ -48,7 +48,7 @@ export class HistoryService {
         });
     }
 
-    convertGameModeToSttring(gameMode: number): string {
+    convertGameModeToString(gameMode: number): string {
         switch (gameMode) {
             case MatchType.Solo:
                 return 'Classique - Solo';
