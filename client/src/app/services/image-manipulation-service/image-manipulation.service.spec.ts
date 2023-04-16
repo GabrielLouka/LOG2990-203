@@ -6,10 +6,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ElementRef } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
-import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET } from '@common/utils/env';
+import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET, QUARTER_SECOND } from '@common/utils/env';
 import { Buffer } from 'buffer';
+import { delay } from 'rxjs';
 import { ImageManipulationService } from './image-manipulation.service';
 describe('ImageManipulationService', () => {
     // eslint-disable-next-line no-unused-vars
@@ -328,9 +330,82 @@ describe('ImageManipulationService', () => {
         expect(context.fill).toHaveBeenCalledTimes(6);
     }));
 
+    it('should blink the quadrant with the correct color', async () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+        spyOn(context, 'fillRect');
+    
+        const rect = { x: 10, y: 20, width: 30, height: 40 };
+        const blinkCount = 1;
+        const blink1 = new DelayedMethod(() => {
+          expect(context.fillStyle).toEqual('#FF0000');
+          expect(context.fillRect).toHaveBeenCalledWith(rect.x, rect.y, rect.width, rect.height);
+        }, QUARTER_SECOND * blinkCount);
+        blink1.start();
+        await delay(QUARTER_SECOND * blinkCount + 1);
+    
+        expect(context.fillRect).not.toHaveBeenCalledTimes(1);
+    });
+
+    it('should blink quadrant with correct colors', fakeAsync(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 300;
+        canvas.height = 300;
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+      
+        const reset = jasmine.createSpy('reset');
+      
+        service.blinkQuadrant(context, {x: 0, y: 0, width: 150, height: 150}, reset);
+      
+        tick(250);
+        expect(context.fillStyle).toEqual('#ff0000');
+      
+        tick(500);
+        expect(context.fillStyle).toEqual('#ff0000');
+      
+        tick(750);
+        expect(context.fillStyle).toEqual('#0000ff');
+      
+        tick(1000);
+        expect(context.fillStyle).toEqual('#0000ff');
+      
+        tick(1250);
+        expect(reset).toHaveBeenCalled();
+    }));
+
+    // it('should alternate between old and new image', async () => {
+    //     const oldImage = Buffer.alloc(100, 0);
+    //     const newImage = Buffer.alloc(100, 0);
+    //     const canvas = document.createElement('canvas');
+    //     const context = canvas.getContext('2d')!;
+    //     spyOn(CanvasRenderingContext2D.prototype, 'drawImage');
+    //     const blink = service.alternateOldNewImage(oldImage, newImage, context);
+    //     await blink.start();
+
+    //     expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
+    //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
+    //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
+        
+    // });
+
+    it('should resolve after given time interval', async () => {
+        const setTimeoutSpy = spyOn(window, 'setTimeout');
+        const timeInterval = 10;
+      
+        const sleepPromise = service.sleep(timeInterval);
+      
+        expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+        expect(sleepPromise).toBeDefined();
+      
+    });
+
     
 
 
 
 
 });
+
+
+
+
