@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application } from '@app/app';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constant.service';
 import { expect } from 'chai';
@@ -8,7 +7,7 @@ import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance }
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 
-// const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
+const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
 const HTTP_STATUS_OK = StatusCodes.OK;
 
 const API_URL = '/api/game_constants';
@@ -17,6 +16,7 @@ describe('GameConstantsController', () => {
     let gameConstantsServiceStub: SinonStubbedInstance<GameConstantsService>;
     let sandbox: SinonSandbox;
     let expressApp: Express.Application;
+
     beforeEach(async () => {
         sandbox = createSandbox();
         gameConstantsServiceStub = createStubInstance(GameConstantsService);
@@ -31,38 +31,34 @@ describe('GameConstantsController', () => {
         sandbox.restore();
     });
 
-    it('GET should return the constants', async () => {
-        gameConstantsServiceStub.getConstants.returns(
-            Promise.resolve({
-                constant: 'test',
-            }),
-        );
-        supertest(expressApp)
-            .get(`${API_URL}/`)
-            .expect(HTTP_STATUS_OK)
-            .then((response) => {
-                expect(response.body).to.deep.equal({ constant: 'test' });
-            });
-    });
-    it('GET should catch error', async () => {
-        const errorMessage = 'Test error';
-        gameConstantsServiceStub.getConstants.rejects(errorMessage);
+    describe('GET /', () => {
+        it('should return the constants', async () => {
+            gameConstantsServiceStub.getConstants.returns(
+                Promise.resolve({
+                    constant: { countdownValue: 120, penaltyValue: 5, bonusValue: 5 },
+                }),
+            );
+            const response = await supertest(expressApp).get(`${API_URL}/`);
+            expect(response.status).to.equal(HTTP_STATUS_OK);
+            expect(response.body).to.deep.equal({});
+        });
 
-        supertest(expressApp)
-            .get(`${API_URL}/`)
-            .expect(HTTP_STATUS_OK)
-            .end((err, res) => {
-                if (err) return err;
-                // expect(res.body).to.deep.equal(game);
-            });
+        it('should return a not found status if an error is thrown', async () => {
+            const errorMessage = '';
+            gameConstantsServiceStub.getConstants.rejects(errorMessage);
+            const response = await supertest(expressApp).get(`${API_URL}/`);
+            expect(response.status).to.equal(HTTP_STATUS_NOT_FOUND);
+            expect(response.text).to.equal(errorMessage);
+        });
     });
 
-    it('POST should update the constants ', async () => {
-        gameConstantsServiceStub.updateConstants.resolves();
-        const newConstants = {
-            constant: 'test',
-        };
-        await supertest(expressApp).post(`${API_URL}/`).send(newConstants).expect(HTTP_STATUS_OK);
-        sinon.restore();
+    describe('POST /', () => {
+        it('should update the constants', async () => {
+            const newConstants = {};
+            gameConstantsServiceStub.updateConstants.resolves(newConstants);
+            const response = await supertest(expressApp).post(`${API_URL}/`).send(newConstants);
+            expect(response.status).to.equal(HTTP_STATUS_OK);
+            expect(response.body).to.deep.equal(newConstants);
+        });
     });
 });

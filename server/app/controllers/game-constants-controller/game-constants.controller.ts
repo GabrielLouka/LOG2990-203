@@ -15,7 +15,7 @@ export class GameConstantsController {
 
         this.router.get('/', async (req: Request, res: Response) => {
             try {
-                const constants = this.gameConstantsService.getConstants();
+                const constants = await this.gameConstantsService.getConstants();
                 res.send(JSON.stringify(constants));
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);

@@ -6,13 +6,16 @@ import { Service } from 'typedi';
 @Service()
 export class GameConstantsService {
     getConstants() {
+        let output;
         try {
             const response = readFileSync(PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE);
             const data = JSON.parse(response.toString());
-            return data;
+            output = data;
         } catch (error) {
-            console.error(error);
+            writeFileSync(PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE, '{ countdownValue: 45, penaltyValue: 5, bonusValue: 5 }');
+            output = { countdownValue: 45, penaltyValue: 5, bonusValue: 5 };
         }
+        return output;
     }
 
     updateConstants(constants: unknown) {
