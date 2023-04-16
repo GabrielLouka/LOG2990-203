@@ -27,7 +27,7 @@ export class GameConstantsService {
     }
 
     initGameConstants() {
-        const routeToSend = '/game_constants/';
+        const routeToSend = '/game_constants';
         this.communicationService.get(routeToSend).subscribe({
             next: (response) => {
                 if (response.body) {
@@ -41,12 +41,12 @@ export class GameConstantsService {
     }
 
     updateConstants(isReset: boolean) {
-        const routeToSend = '/game_constants/';
+        const routeToSend = '/game_constants';
         if (isReset) {
             this.constants.countdownValue = INITIAL_COUNTDOWN;
             this.constants.penaltyValue = INITIAL_PENALTY;
             this.constants.bonusValue = INITIAL_BONUS;
         }
-        this.communicationService.post(this.constants, routeToSend);
+        this.communicationService.post(this.constants, routeToSend).subscribe({});
     }
 }
