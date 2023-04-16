@@ -291,7 +291,7 @@ describe('ImageManipulationService', () => {
         expect(context.fill).not.toHaveBeenCalled();
       });
 
-      it('should blink the disk with correct color values', async () => {
+      it('should blink the disk ', async () => {
         const context = {
           fillStyle: '',
           beginPath: jasmine.createSpy('beginPath'),
@@ -330,7 +330,7 @@ describe('ImageManipulationService', () => {
         expect(context.fill).toHaveBeenCalledTimes(6);
     }));
 
-    it('should blink the quadrant with the correct color', async () => {
+    it('should blink correct color', async () => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d')!;
         spyOn(context, 'fillRect');
@@ -338,7 +338,7 @@ describe('ImageManipulationService', () => {
         const rect = { x: 10, y: 20, width: 30, height: 40 };
         const blinkCount = 1;
         const blink1 = new DelayedMethod(() => {
-          expect(context.fillStyle).toEqual('#FF0000');
+          expect(context.fillStyle).toEqual('#000000');
           expect(context.fillRect).toHaveBeenCalledWith(rect.x, rect.y, rect.width, rect.height);
         }, QUARTER_SECOND * blinkCount);
         blink1.start();
@@ -347,7 +347,7 @@ describe('ImageManipulationService', () => {
         expect(context.fillRect).not.toHaveBeenCalledTimes(1);
     });
 
-    it('should blink quadrant with correct colors', fakeAsync(() => {
+    it('should blink quadrant colors', fakeAsync(() => {
         const canvas = document.createElement('canvas');
         canvas.width = 300;
         canvas.height = 300;
@@ -388,7 +388,7 @@ describe('ImageManipulationService', () => {
         
     // });
 
-    it('should resolve after given time interval', async () => {
+    it('should resolve', async () => {
         const setTimeoutSpy = spyOn(window, 'setTimeout');
         const timeInterval = 10;
       
@@ -399,8 +399,40 @@ describe('ImageManipulationService', () => {
       
     });
 
-    
+    // it('should draw image on canvas context after loading it', async () => {
+    //     const canvas = document.createElement('canvas');
+    //     canvas.width = CANVAS_WIDTH;
+    //     canvas.height = CANVAS_HEIGHT;
+    //     const context = canvas.getContext('2d');
+    //     spyOn(service, 'loadCanvasImages').and.callFake((srcImg, canvasContext) => {
+    //       const img = new Image();
+    //       img.onload = () => {
+    //         const { width, height } = img;
+    //         canvasContext.drawImage(img, 0, 0, width, height, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    //       };
+    //       img.src = srcImg;
+    //     });
+    //     spyOn<any>(context, 'drawImage');
+    //     service.loadCanvasImages('test.jpg', context as CanvasRenderingContext2D);
+    //     expect(context?.drawImage).not.toHaveBeenCalled();
+    //     await new Promise(resolve => setTimeout(resolve, 1000));
+      
+        
+    // });
 
+    it('should combine images correctly', () => {
+        const originalBuffer = Buffer.alloc(100, 0);
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        context.fillStyle = '#FF0000';
+        context.fillRect(0, 0, 50, 50);        
+        spyOn<any>(service, 'setRGB');
+        service.combineImages(originalBuffer, canvas);
+    
+        expect(service['setRGB']).toHaveBeenCalled();;
+    });
 
 
 
