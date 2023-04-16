@@ -6,6 +6,7 @@ import { ImageManipulationService } from '@app/services/image-manipulation-servi
 import { Buffer } from 'buffer';
 
 import { ElementRef } from '@angular/core';
+import { GameData } from '@common/interfaces/game-data';
 import { CheatModeService } from './cheat-mode.service';
 
 describe('CheatModeService', () => {
@@ -15,7 +16,7 @@ describe('CheatModeService', () => {
     let rightCanvasContext: CanvasRenderingContext2D;
 
     beforeEach(() => {
-        const spy = jasmine.createSpyObj('ImageManipulationService', ['alternateOldNewImage', 'loadCurrentImage']);
+        const spy = jasmine.createSpyObj('ImageManipulationService', ['alternateOldNewImage', 'loadCurrentImage', 'getModifiedImageWithoutDifferences']);
         TestBed.configureTestingModule({
             providers: 
             [CheatModeService, 
@@ -54,19 +55,48 @@ describe('CheatModeService', () => {
         expect(imageManipulationServiceSpy.loadCurrentImage).toHaveBeenCalled();
     });
 
-    // it('stopCheating should call clearInterval', () => {
-    //     const windowSpy = spyOn(window, 'clearInterval');
-    //     service.stopCheating();
-    //     expect(windowSpy).toHaveBeenCalledTimes(2);
-    // });
+    it('stopCheating should call clearInterval', () => {
+        const windowSpy = spyOn(window, 'clearInterval');
+        service.stopCheating();
+        expect(windowSpy).toHaveBeenCalledTimes(2);
+    });
 
-    // it('startInterval should call alternateOldNewImage', () => {
-    //     const originalBuffer: Buffer = Buffer.alloc(100, 1);
-    //     const modifiedBuffer: Buffer = Buffer.alloc(100, 0);
-    //     const canvas = document.createElement('canvas');
-    //     const context = canvas.getContext('2d');
+    it('startInterval should call alternateOldNewImage', () => {
+        const originalBuffer: Buffer = Buffer.alloc(100, 1);
+        const modifiedBuffer: Buffer = Buffer.alloc(100, 0);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        service.startInterval({ originalImage: originalBuffer, newImage: modifiedBuffer }, context as CanvasRenderingContext2D);
+        expect(imageManipulationServiceSpy.alternateOldNewImage).toHaveBeenCalled();
+    });
 
-    //     service.startInterval({ originalImage: originalBuffer, newImage: modifiedBuffer }, context as CanvasRenderingContext2D);
-    //     expect(imageManipulationServiceSpy.alternateOldNewImage).toHaveBeenCalled();
-    // });
+    it("activateCheatMode should cheat", () => {
+        const gameData: GameData = {
+            id: 1,
+            name: 'My Game',
+            isEasy: true,
+            nbrDifferences: 3,
+            differences: [
+              [
+                { x: 10, y: 20 },
+                { x: 30, y: 40 }
+              ],
+              [
+                { x: 50, y: 60 },
+                { x: 70, y: 80 },
+                { x: 90, y: 100 }
+              ],
+              [
+                { x: 110, y: 120 }
+              ]
+            ],
+            oneVersusOneRanking: [],
+            soloRanking: []
+        };
+        const original = Buffer.alloc(100, 0);
+        const modified = Buffer.alloc(100, 0);
+        const foundDifferences: boolean[] = [false, false, false];
+        service.activateCheatMode(gameData, {originalImage: original, modifiedImage: modified}, foundDifferences);
+        expect(imageManipulationServiceSpy.getModifiedImageWithoutDifferences).toHaveBeenCalled();
+    });
 });
