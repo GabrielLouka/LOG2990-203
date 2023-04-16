@@ -399,27 +399,6 @@ describe('ImageManipulationService', () => {
       
     });
 
-    // it('should draw image on canvas context after loading it', async () => {
-    //     const canvas = document.createElement('canvas');
-    //     canvas.width = CANVAS_WIDTH;
-    //     canvas.height = CANVAS_HEIGHT;
-    //     const context = canvas.getContext('2d');
-    //     spyOn(service, 'loadCanvasImages').and.callFake((srcImg, canvasContext) => {
-    //       const img = new Image();
-    //       img.onload = () => {
-    //         const { width, height } = img;
-    //         canvasContext.drawImage(img, 0, 0, width, height, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    //       };
-    //       img.src = srcImg;
-    //     });
-    //     spyOn<any>(context, 'drawImage');
-    //     service.loadCanvasImages('test.jpg', context as CanvasRenderingContext2D);
-    //     expect(context?.drawImage).not.toHaveBeenCalled();
-    //     await new Promise(resolve => setTimeout(resolve, 1000));
-      
-        
-    // });
-
     it('should combine images correctly', () => {
         const originalBuffer = Buffer.alloc(100, 0);
         const canvas = document.createElement('canvas');
