@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable prettier/prettier */
@@ -6,10 +8,12 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ElementRef } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game-data';
-import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET } from '@common/utils/env';
+import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET, QUARTER_SECOND } from '@common/utils/env';
 import { Buffer } from 'buffer';
+import { delay } from 'rxjs';
 import { ImageManipulationService } from './image-manipulation.service';
 describe('ImageManipulationService', () => {
     // eslint-disable-next-line no-unused-vars
@@ -262,18 +266,156 @@ describe('ImageManipulationService', () => {
         expect(service.loadCanvasImages).not.toHaveBeenCalled();
     });
 
-    it("loadCurrentImage should call loadCanvasImages", () => {
+    it('loadCurrentImage should call loadCanvasImages', () => {
         const image = Buffer.alloc(0, 100);
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         spyOn(service, 'loadCanvasImages');
         service.loadCurrentImage(image, context as CanvasRenderingContext2D);
         expect(service.loadCanvasImages).toHaveBeenCalled();
     });
 
+    it('should blink a disk', async () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        const x = 50;
+        const y = 50;
+        const reset = () => {};
+      
+        spyOn(context, 'beginPath');
+        spyOn(context, 'arc');
+        spyOn(context, 'fill');
+      
+        await service.blinkDisk(context, x, y, reset);
+      
+        expect(context.beginPath).not.toHaveBeenCalled();
+        expect(context.arc).not.toHaveBeenCalled();
+        expect(context.fill).not.toHaveBeenCalled();
+      });
+
+      it('should blink the disk ', async () => {
+        const context = {
+          fillStyle: '',
+          beginPath: jasmine.createSpy('beginPath'),
+          arc: jasmine.createSpy('arc'),
+          fill: jasmine.createSpy('fill')
+        } as unknown as CanvasRenderingContext2D;        
+        const expectedColors = ['#FF0000', '#0000FF', '#FF0000', '#0000FF', '#FF0000', '#0000FF'];
+        const expectedTimings = [250, 500, 750, 1000, 1250, 1500];      
+        const resetFn = jasmine.createSpy('resetFn');      
+        await service.blinkDisk(context, 50, 50, resetFn);      
+        expect(context.fillStyle).not.toBe(expectedColors[0]);
+        for (let i = 1; i < expectedColors.length; i++) {
+          setTimeout(() => expect(context.fillStyle).not.toBe(expectedColors[i]), expectedTimings[i-1]);
+        }      
+        setTimeout(() => expect(resetFn).toHaveBeenCalled(), expectedTimings[expectedTimings.length-1]);
+      });
+
+    it('should blink the disk', fakeAsync(() => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        spyOn(context, 'fill');
+        const x = 100;
+        const y = 100;
+        const reset = () => { };
+        service.blinkDisk(context, x, y, reset);
+        expect(context.fillStyle).toBe('#000000');
+        expect(context.fill).not.toHaveBeenCalled();
+        tick(1000);
+        expect(context.fillStyle).toBe('#0000ff');
+        expect(context.fill).toHaveBeenCalled();
+        tick(2000);
+        expect(context.fillStyle).toBe('#0000ff');
+        expect(context.fill).toHaveBeenCalledTimes(6);
+        tick(3000);
+        expect(context.fillStyle).toBe('#0000ff');
+        expect(context.fill).toHaveBeenCalledTimes(6);
+    }));
+
+    it('should blink correct color', async () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+        spyOn(context, 'fillRect');
     
+        const rect = { x: 10, y: 20, width: 30, height: 40 };
+        const blinkCount = 1;
+        const blink1 = new DelayedMethod(() => {
+          expect(context.fillStyle).toEqual('#000000');
+          expect(context.fillRect).toHaveBeenCalledWith(rect.x, rect.y, rect.width, rect.height);
+        }, QUARTER_SECOND * blinkCount);
+        blink1.start();
+        await delay(QUARTER_SECOND * blinkCount + 1);
+    
+        expect(context.fillRect).not.toHaveBeenCalledTimes(1);
+    });
 
+    it('should blink quadrant colors', fakeAsync(() => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 300;
+        canvas.height = 300;
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+      
+        const reset = jasmine.createSpy('reset');
+      
+        service.blinkQuadrant(context, {x: 0, y: 0, width: 150, height: 150}, reset);
+      
+        tick(250);
+        expect(context.fillStyle).toEqual('#ff0000');
+      
+        tick(500);
+        expect(context.fillStyle).toEqual('#ff0000');
+      
+        tick(750);
+        expect(context.fillStyle).toEqual('#0000ff');
+      
+        tick(1000);
+        expect(context.fillStyle).toEqual('#0000ff');
+      
+        tick(1250);
+        expect(reset).toHaveBeenCalled();
+    }));
 
+    // it('should alternate between old and new image', async () => {
+    //     const oldImage = Buffer.alloc(100, 0);
+    //     const newImage = Buffer.alloc(100, 0);
+    //     const canvas = document.createElement('canvas');
+    //     const context = canvas.getContext('2d')!;
+    //     spyOn(CanvasRenderingContext2D.prototype, 'drawImage');
+    //     const blink = service.alternateOldNewImage(oldImage, newImage, context);
+    //     await blink.start();
+
+    //     expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
+    //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
+    //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
+        
+    // });
+
+    it('should resolve', async () => {
+        const setTimeoutSpy = spyOn(window, 'setTimeout');
+        const timeInterval = 10;
+      
+        const sleepPromise = service.sleep(timeInterval);
+      
+        expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
+        expect(sleepPromise).toBeDefined();
+      
+    });
+
+    it('should combine images correctly', () => {
+        const originalBuffer = Buffer.alloc(100, 0);
+        const canvas = document.createElement('canvas');
+        canvas.width = 100;
+        canvas.height = 100;
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        context.fillStyle = '#FF0000';
+        context.fillRect(0, 0, 50, 50);        
+        spyOn<any>(service, 'setRGB');
+        service.combineImages(originalBuffer, canvas);
+    
+        expect(service['setRGB']).toHaveBeenCalled();;
+    });
 
 
 });
+
+

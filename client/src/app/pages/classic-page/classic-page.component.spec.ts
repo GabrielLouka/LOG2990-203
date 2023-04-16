@@ -437,6 +437,9 @@ describe('ClassicPageComponent', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
+        spyOn(component.canvasHandlingService, 'focusKeyEvent').and.callFake(() => {
+            return;
+        });
         component.onFindWrongDifference(false);
         expect(component.errorMessage.nativeElement.style.display).not.toBe(undefined);
         expect(component.leftCanvas.nativeElement.style.pointerEvents).not.toBe([]);
