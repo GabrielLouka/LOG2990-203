@@ -288,8 +288,23 @@ describe('RegistrationPageComponent', () => {
         spyOn(matchmakingServiceMock, 'setCurrentMatchType');
         spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
         spyOn(matchmakingServiceMock, 'createGame'); 
+        const spy = jasmine.createSpy('matchmakingService', 'updateWaitingForIncomingPlayerAnswerMessage' as any);
         expect(matchmakingServiceMock).toBeDefined();               
         component.joinLimitedTimeGame();
         expect(component.showButtons).toBeTruthy();
+        expect(spy).not.toHaveBeenCalled();
     });
+
+    it('should join a limited time game', () => {
+        component.limitedTimeMatchId = '123';
+        component.id = '456';
+        spyOn(matchmakingServiceMock, 'joinGame');
+        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+      
+        component.joinLimitedTimeGame();
+      
+        expect(component.showButtons).toBeFalsy();
+        expect(incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage).toHaveBeenCalled();
+        
+      });
 });
