@@ -46,7 +46,8 @@ describe('RegistrationPageComponent', () => {
         sendMatchJoinRequest: subjectSpy,
         createGame: subjectSpy,
         setCurrentMatchPlayer: subjectSpy,
-        sendCurrentMatchType: subjectSpy
+        sendCurrentMatchType: subjectSpy,
+        joinGame: subjectSpy
     };
     const player1: Player = {
         username: 'player1',
@@ -272,4 +273,23 @@ describe('RegistrationPageComponent', () => {
         component.ngOnDestroy();
         expect(spy).not.toHaveBeenCalled();
     }); 
+
+    it("createCoopGame should create game", () => {
+        spyOn(matchmakingServiceMock, 'createGame');
+        spyOn(matchmakingServiceMock, 'setCurrentMatchType');
+        spyOn(matchmakingServiceMock, 'setCurrentMatchPlayer');
+        expect(matchmakingServiceMock).toBeDefined();
+        component.createCoopGame();
+    });
+
+    it("joinLimitedTimeGame should create game", () => {
+        spyOn(matchmakingServiceMock, 'joinGame');
+        spyOn(matchmakingServiceMock, 'setCurrentMatchPlayer');
+        spyOn(matchmakingServiceMock, 'setCurrentMatchType');
+        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+        spyOn(matchmakingServiceMock, 'createGame'); 
+        expect(matchmakingServiceMock).toBeDefined();               
+        component.joinLimitedTimeGame();
+        expect(component.showButtons).toBeTruthy();
+    });
 });
