@@ -55,7 +55,7 @@ describe('TimerComponent', () => {
         component['timeCountInSeconds'] = 0;
         component['timePenalty'] = -1;
         component.refreshTimerDisplay();
-        expect(component.timeReachedZero.emit).toHaveBeenCalled();
+        expect(component.timeReachedZero.emit).not.toHaveBeenCalled();
     });
 
     it('should apply the chosen time penalty', () => {

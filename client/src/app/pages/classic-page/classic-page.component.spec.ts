@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable no-unused-vars */
@@ -195,6 +196,7 @@ describe('ClassicPageComponent', () => {
         fixture = TestBed.createComponent(ClassicPageComponent);
         component = fixture.componentInstance;
         component.games[0] = fakeGame;
+
         socketClientService = TestBed.inject(SocketClientService);
         const match: Match = {
             gameId: 0,
@@ -234,6 +236,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = jasmine.createSpyObj('ElementRef', [], {
             nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext', 'pointersEvents']),
         });
+
         fixture.detectChanges();
     });
     afterEach(() => {
@@ -280,7 +283,23 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         const event = new MouseEvent('mousedown');
         component.canvasHandlingService.canvasIsClickable = true;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isSoloMode = false;
+        component.matchmakingService = mockMatchmakingService;
         component.onMouseDown(event);
+        expect(component.isEasy).not.toBeNull();
+    });
+    it('onMouseDown should check mouse event', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        const event = new MouseEvent('mousedown');
+        component.canvasHandlingService.canvasIsClickable = true;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isSoloMode = true;
+        component.matchmakingService = mockMatchmakingService;
+        component.onMouseDown(event);
+        expect(component.isEasy).not.toBeNull();
     });
     it('onMouseDown should check mouse event', () => {
         spyOnProperty(component, 'isGameInteractive').and.returnValue(false);
@@ -297,7 +316,6 @@ describe('ClassicPageComponent', () => {
         component.player1 = 'nauot';
         component.player2 = 'nauot';
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
-
         const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
         mockMatchmakingService.isLimitedTimeSolo = false;
         mockMatchmakingService.isCoopMode = true;
@@ -317,6 +335,44 @@ describe('ClassicPageComponent', () => {
         component.player1 = 'nauot';
         component.player2 = 'nauot';
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isCoopMode = false;
+        component.matchmakingService = mockMatchmakingService;
+
+        spyOnProperty(component, 'numberOfDifferencesRequiredToWin').and.returnValue(500);
+        component.differencesFound1 = -1;
+        component.differencesFound2 = 999;
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { foundDifferences: [true, false, true], isValidated: true, foundDifferenceIndex: 1, isPlayer1: true };
+        socketTestHelper.on('validationReturned', callback);
+        socketTestHelper.peerSideEmit('validationReturned', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message validateReturn', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+        component.currentGameIndex = 0;
+        component.games[1] = fakeGame;
+        spyOnProperty(component, 'isCheating').and.returnValue(true);
+        spyOn(component.timerElement, 'applyTimePenalty').and.callFake((): any => {
+            return;
+        });
+        spyOn(component, 'startCheating').and.callFake(() => {
+            return;
+        });
+        spyOn(component, 'getInitialImagesFromServer').and.callFake((): any => {
+            return;
+        });
+        spyOn(component, 'onFindWrongDifference').and.callFake((): any => {
+            return;
+        });
         const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
         mockMatchmakingService.isLimitedTimeSolo = false;
         mockMatchmakingService.isCoopMode = true;
@@ -619,6 +675,35 @@ describe('ClassicPageComponent', () => {
             expect(result).toBeNull();
         });
     });
+    it('should fetch the games', () => {
+        component.currentGameId = undefined as any;
+        const mockResponseFetch = {
+            body: JSON.stringify([
+                {
+                    gameData: {
+                        id: '1',
+                        name: 'Game 1',
+                    },
+                    originalImage: Buffer.from('test'),
+                    modifiedImage: Buffer.from('test'),
+                },
+                {
+                    gameData: {
+                        id: '2',
+                        name: 'Game 2',
+                    },
+                    originalImage: Buffer.from('test'),
+                    modifiedImage: Buffer.from('test'),
+                },
+            ]),
+        };
+
+        mockResponseFetch.body = null as any;
+
+        component.fetchGames().subscribe((result) => {
+            expect(result).toBeNull();
+        });
+    });
 
     it('setTimout should be called onFindWrongDifferences', fakeAsync(() => {
         const canvas = document.createElement('canvas');
@@ -755,10 +840,7 @@ describe('ClassicPageComponent', () => {
         hintService.maxGivenHints = -1;
         expect(component.handleHintMode()).toEqual(undefined);
     });
-    it('should handle the click and letter T event', () => {
-        const event = new MouseEvent('mousedown');
-        component.handleClickAndLetterTEvent(event);
-    });
+
     it('should handle the click and letter T event if branch', () => {
         const match: Match = {
             gameId: 0,
@@ -774,6 +856,7 @@ describe('ClassicPageComponent', () => {
         component.matchmakingService.currentMatch = match;
         const event = new MouseEvent('mousedown');
         component.handleClickAndLetterTEvent(event);
+        expect(component.isOver).toBeFalse();
     });
 
     it('should handle the lose game', () => {
@@ -783,6 +866,15 @@ describe('ClassicPageComponent', () => {
         });
         component.onLoseGame();
         expect(component.isOver).toEqual(true);
+    });
+    it('should handle the lose game', () => {
+        component.currentGameIndex = 1;
+        spyOn(component.canvasHandlingService, 'updateCanvas').and.callFake((): any => {
+            return;
+        });
+        component.games[1] = fakeGame;
+        component.getInitialImagesFromServer();
+        expect(component.isEasy).not.toBeNull();
     });
 
     it('should return true if the player 2 win', () => {
@@ -939,9 +1031,46 @@ describe('ClassicPageComponent', () => {
     });
 
     it('should return the appropriate value on win game', () => {
+        const match: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: { username: '', playerId: '' },
+            player2: { username: 'undefined' as any, playerId: '2' },
+            player1Archive: { username: 'mario', playerId: '1' },
+            player2Archive: { username: 'luigi', playerId: '2' },
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Player1Win,
+        };
         component.isOriginallyCoop = true;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isCoopMode = true;
+        mockMatchmakingService.currentMatch = match;
+        component.matchmakingService = mockMatchmakingService;
         spyOnProperty(component, 'isPlayer1').and.returnValue(false);
         component.onWinGame(false, true);
+        expect(component.isOver).toBeTruthy();
+    });
+    it('should return the appropriate value on win game', () => {
+        const matc2: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: { username: undefined as any, playerId: '1' },
+            player2: { username: 'undefined', playerId: '2' },
+            player1Archive: { username: 'mario', playerId: '1' },
+            player2Archive: { username: 'luigi', playerId: '2' },
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Player1Win,
+        };
+        component.isOriginallyCoop = true;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isCoopMode = true;
+        mockMatchmakingService.currentMatch = matc2;
+        component.matchmakingService = mockMatchmakingService;
+        spyOnProperty(component, 'isPlayer1').and.returnValue(false);
+        component.onWinGame(false, true);
+        expect(component.isOver).toBeTruthy();
     });
 
     it('should return the appropriate value on win game', () => {
@@ -969,5 +1098,57 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.ngAfterViewInit();
         expect(spy).toHaveBeenCalled();
+    });
+    it('should handle the click and the letter T event 1 ', () => {
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isSoloMode = false;
+        component.matchmakingService = mockMatchmakingService;
+        component.handleClickAndLetterTEvent(new MouseEvent('click'));
+    });
+    it('should handle the click and the letter T event 2', () => {
+        spyOnProperty(component, 'isGameInteractive').and.returnValue(false);
+        component.isOver = true;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isSoloMode = false;
+        component.matchmakingService = mockMatchmakingService;
+        expect(component.handleClickAndLetterTEvent(new MouseEvent('click'))).toBeUndefined();
+    });
+    it('should handle the click and the letter T event 3 ', () => {
+        spyOnProperty(component, 'isGameInteractive').and.returnValue(true);
+        component.isOver = false;
+        component.letterTPressed = true;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isSoloMode = false;
+        component.matchmakingService = mockMatchmakingService;
+        spyOn(component, 'startCheating').and.callFake(() => {
+            return;
+        });
+        const event = new KeyboardEvent('keydown', {
+            key: 't',
+            bubbles: true,
+            cancelable: true,
+        });
+        component.handleClickAndLetterTEvent(event);
+    });
+    it('should handle the click and the letter T event 3 ', () => {
+        spyOnProperty(component, 'isGameInteractive').and.returnValue(true);
+        component.isOver = false;
+        component.letterTPressed = false;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isSoloMode = false;
+        component.matchmakingService = mockMatchmakingService;
+        spyOn(component, 'stopCheating').and.callFake(() => {
+            return;
+        });
+        const event = new KeyboardEvent('keydown', {
+            key: 't',
+            bubbles: true,
+            cancelable: true,
+        });
+        component.handleClickAndLetterTEvent(event);
     });
 });
