@@ -15,6 +15,7 @@ describe('TimerService', () => {
     });
 
     it('should return the correct format for given score in seconds', () => {
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         const result = service.convertScoreToString(60);
         expect(result).toEqual('01:00');
     });
