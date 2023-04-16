@@ -311,6 +311,103 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { data: 2 };
+        socketTestHelper.on('playersSyncTime', callback);
+        socketTestHelper.peerSideEmit('playersSyncTime', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { data: 2 };
+        socketTestHelper.on('timerStopped', callback);
+        socketTestHelper.peerSideEmit('timerStopped', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { data: [1, 2] };
+        socketTestHelper.on('randomizedOrder', callback);
+        socketTestHelper.peerSideEmit('randomizedOrder', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { data: {} };
+        spyOn(component.chat, 'sendTimeScoreMessage').and.callFake((): any => {});
+        socketTestHelper.on('newBreakingScore', callback);
+        socketTestHelper.peerSideEmit('newBreakingScore', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { data: true };
+        socketTestHelper.on('readyUpdate', callback);
+        socketTestHelper.peerSideEmit('readyUpdate', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+        component.isPlayer1Ready = false;
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { data: true };
+        socketTestHelper.on('readyUpdate', callback);
+        socketTestHelper.peerSideEmit('readyUpdate', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', [
             'displayConfirmation',
             'displayGameOverPopUp',
