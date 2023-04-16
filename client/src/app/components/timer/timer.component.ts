@@ -8,7 +8,7 @@ import { LIMITED_TIME_DURATION, MINUTE_LIMIT, MINUTE_TO_SECONDS, NOT_FOUND } fro
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent {
-    @Input() isNotCountdown: boolean = true;
+    @Input() isCountdown: boolean = false;
     @Output() timeReachedZero: EventEmitter<void> = new EventEmitter();
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
@@ -22,7 +22,7 @@ export class TimerComponent {
 
     get elapsedSeconds(): number {
         const output: number = this.timeCountInSeconds + this.timePenalty;
-        if (output > LIMITED_TIME_DURATION && !this.isNotCountdown) return LIMITED_TIME_DURATION;
+        if (output > LIMITED_TIME_DURATION && this.isCountdown) return LIMITED_TIME_DURATION;
         return output < 0 ? 0 : output;
     }
 
@@ -48,7 +48,7 @@ export class TimerComponent {
     }
 
     forceSetTime(elapsedTime: number) {
-        if (this.isNotCountdown) this.timeCountInSeconds = elapsedTime;
+        if (!this.isCountdown) this.timeCountInSeconds = elapsedTime;
         else {
             if (this.initialTime === NOT_FOUND) this.initialTime = this.gameConstantsService.countdownValue;
             this.timeCountInSeconds = this.initialTime - elapsedTime;
@@ -62,8 +62,8 @@ export class TimerComponent {
         this.refreshTimerDisplay();
     }
 
-    resetTimer() {
-        this.timeCountInSeconds = this.isNotCountdown ? 0 : this.gameConstantsService.countdownValue;
+    reset() {
+        this.timeCountInSeconds = this.isCountdown ? this.gameConstantsService.countdownValue : 0;
         this.timePenalty = 0;
         this.initialTime = this.timeCountInSeconds;
         this.minute.nativeElement.innerText = '00';

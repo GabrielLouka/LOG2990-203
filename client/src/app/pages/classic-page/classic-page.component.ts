@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { GameOverPopUpComponent } from '@app/components/pop-ups/game-over-pop-up/game-over-pop-up.component';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ChatService } from '@app/services/chat-service/chat.service';
@@ -47,7 +47,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('chat') chat: ChatComponent;
     @ViewChild('timerElement') timerElement: TimerComponent;
     @ViewChild('hintElement') hintElement: HintComponent;
-    @ViewChild('popUpElement') popUpElement: PopUpComponent;
+    @ViewChild('popUpElement') popUpElement: GameOverPopUpComponent;
     @ViewChild('errorMessage') errorMessage: ElementRef;
     @ViewChild('penalty') penaltyMessage: ElementRef;
     @ViewChild('successSound', { static: true }) successSound: ElementRef<HTMLAudioElement>;
@@ -147,6 +147,10 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         return !this.replayModeService.shouldShowReplayModeGUI;
     }
 
+    get isLimitedTime() {
+        return this.currentGameId === '-1';
+    }
+
     getPlayerUsername(isPlayer1: boolean): string {
         if (isPlayer1) return this.matchmakingService.player1Username;
         return this.matchmakingService.player2Username;
@@ -169,7 +173,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.addServerSocketMessagesListeners();
         this.matchmakingService.onMatchUpdated.add(this.handleMatchUpdate.bind(this));
         this.canvasHandlingService = new CanvasHandlingService(this.leftCanvas, this.rightCanvas, new ImageManipulationService());
-        if (this.currentGameId === '-1') {
+        if (this.isLimitedTime) {
             this.socketService.send('randomizeGameOrder');
         }
         // Replay Mode Initialization
@@ -257,7 +261,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 if (games) {
                     this.games = games;
                 }
-                if (this.currentGameId === '-1') {
+                if (this.isLimitedTime) {
                     let k = 0;
                     this.games.sort(() => this.matchmakingService.currentSeeds[k++] - 1 / 2);
                 }
@@ -307,7 +311,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     updateGameInfo() {
         this.foundDifferences = new Array(this.games[this.currentGameIndex].gameData.nbrDifferences).fill(false);
-        if (this.currentGameId !== '-1') {
+        if (!this.isLimitedTime) {
             this.totalDifferences = this.games[this.currentGameIndex].gameData.nbrDifferences;
             this.minDifferences = Math.ceil(this.totalDifferences / 2);
         }
@@ -350,7 +354,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     onFinishLoadingImages() {
         this.isLoading = false;
         if (!this.hasLoadedImagesForTheFirstTime) {
-            this.timerElement.resetTimer();
+            this.timerElement.reset();
             this.socketService.send('startTimer', { matchId: this.matchmakingService.currentMatchId, elapsedTime: 0 });
             this.hasLoadedImagesForTheFirstTime = true;
         }
@@ -518,12 +522,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     gameOver(isWinByDefault: boolean): void {
         this.stopTimer();
-        // this.replayModeService.stopRecording();
 
-        if (!isWinByDefault) {
-            if (this.isSolo || this.isOneVersusOne) {
-                this.sendNewTimeScoreToServer();
-            }
+        if (!isWinByDefault && (this.isSolo || this.isOneVersusOne)) {
+            this.sendNewTimeScoreToServer();
         } else {
             this.socketService.disconnect();
         }
@@ -542,7 +543,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onQuitGame() {
-        this.popUpElement.showConfirmationPopUp();
+        this.popUpElement.displayConfirmation();
     }
 
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
@@ -560,9 +561,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.gameOver(isWinByDefault);
         const startReplayAction = this.replayModeService.startReplayModeAction;
-        // startReplayAction.add(this.replayModeService.stopRecording.bind(this.replayModeService));
         this.isOver = true;
-        this.popUpElement.showGameOverPopUp(
+        this.popUpElement.displayGameOver(
             isWinByDefault,
             this.timerElement.elapsedSeconds <= 0,
             this.currentMatchType as MatchType,
@@ -583,7 +583,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver(false);
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
-        this.popUpElement.showGameOverPopUp(
+        this.popUpElement.displayGameOver(
             false,
             true,
             this.currentMatchType as MatchType,
@@ -619,7 +619,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGameLimited(winningPlayer1: string, winningPlayer2: string, isWinByDefault: boolean) {
         this.gameOver(isWinByDefault);
-        this.popUpElement.showGameOverPopUpLimited(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
+        this.popUpElement.displayLimitedGameOver(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
     }
 
     hintModeButton() {

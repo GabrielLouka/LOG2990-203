@@ -25,7 +25,6 @@ import { DifferenceImage } from '@common/interfaces/difference.image';
 import { ImageUploadForm } from '@common/interfaces/image.upload.form';
 import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
-
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
@@ -93,8 +92,8 @@ describe('GameCreationPageComponent', () => {
         component = fixture.componentInstance;
         component.leftCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
         component.rightCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp']);
-        component.resultModal = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation']);
+        component.resultModal = jasmine.createSpyObj('CreationResultModalComponent', ['updateImageDisplay', 'showGameNameForm', 'display']);
         component['originalImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
         component['modifiedImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
         component.isEasy = true;
@@ -139,10 +138,10 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('onQuitGame should call popup confirmation', () => {
-        const popUpComponentSpy = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp']);
+        const popUpComponentSpy = jasmine.createSpyObj('GameOverPopUp', ['displayConfirmation']);
         component.popUpElement = popUpComponentSpy;
         component.onQuitGame();
-        expect(popUpComponentSpy.showConfirmationPopUp).toHaveBeenCalled();
+        expect(popUpComponentSpy.displayConfirmation).toHaveBeenCalled();
     });
 
     it('should return a canvas context object if true', () => {
@@ -242,7 +241,12 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('send an image to the server with hidden element ', async () => {
-        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm', 'resetBackgroundCanvas']);
+        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', [
+            'display',
+            'updateImageDisplay',
+            'showGameNameForm',
+            'resetBackgroundCanvas',
+        ]);
         component.resultModal = modalSpy;
         const myArrayBuffer = new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]);
         const myBlob = new Blob([myArrayBuffer]);
@@ -276,7 +280,7 @@ describe('GameCreationPageComponent', () => {
             }),
         );
         await component.sendImageToServer();
-        expect(modalSpy.showPopUp).toBeDefined();
+        expect(modalSpy).not.toBeUndefined();
     });
 
     it('should process the image to the server', async () => {

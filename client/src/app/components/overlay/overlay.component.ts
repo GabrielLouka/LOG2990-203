@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
-import { ResetPopUpComponent } from '@app/components/reset-pop-up/reset-pop-up.component';
+import { DeleteGamesPopUpComponent } from '@app/components/pop-ups/delete-games-pop-up/delete-games-pop-up.component';
+import { ResetPopUpComponent } from '@app/components/pop-ups/reset-pop-up/reset-pop-up.component';
 import { GamesService } from '@app/services/games-service/games.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { MatchType } from '@common/enums/match-type';
