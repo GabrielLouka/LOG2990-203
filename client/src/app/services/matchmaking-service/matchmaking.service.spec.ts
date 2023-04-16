@@ -23,10 +23,7 @@ class SocketClientServiceMock extends SocketClientService {
 
 describe('MatchmakingService', () => {
     let matchmakingService: MatchmakingService;
-<<<<<<< Updated upstream
     let socketClientService: SocketClientService;
-=======
->>>>>>> Stashed changes
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
 
@@ -47,20 +44,11 @@ describe('MatchmakingService', () => {
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketTestHelper as unknown as Socket;
-<<<<<<< Updated upstream
         socketServiceMock.send = jasmine.createSpy('send');
         socketClientService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'disconnect', 'on', 'send', 'socket'], {
             socket: { id: matchId },
             socketId: matchId,
         });
-=======
-        socketServiceMock.socket.send = jasmine.createSpy('send');
-        socketServiceMock.send = jasmine.createSpy('send');
-        // socketClientService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'disconnect', 'on', 'send', 'socket'], {
-        //     socket: { id: matchId },
-        //     socketId: matchId,
-        // });
->>>>>>> Stashed changes
 
         TestBed.configureTestingModule({
             providers: [MatchmakingService, { provide: SocketClientService, useValue: socketServiceMock }],
@@ -80,13 +68,7 @@ describe('MatchmakingService', () => {
     });
 
     it('should disconnect socket if socket is alive', () => {
-<<<<<<< Updated upstream
         matchmakingService.connectSocket();
-=======
-        spyOn(matchmakingService, 'disconnectSocket');
-        matchmakingService.connectSocket();
-        expect(matchmakingService.disconnectSocket).toHaveBeenCalled();
->>>>>>> Stashed changes
     });
 
     it('should set match player', () => {
@@ -166,10 +148,7 @@ describe('MatchmakingService', () => {
         matchmakingService.sendMatchJoinCancel(player2.username);
         matchmakingService.handleMatchUpdateEvents();
         expect(sendSocketSpy).toHaveBeenCalled();
-<<<<<<< Updated upstream
         expect(socketClientService.send).not.toHaveBeenCalled();
-=======
->>>>>>> Stashed changes
     });
 
     it('should send incoming player request answer', () => {
@@ -236,21 +215,12 @@ describe('MatchmakingService', () => {
         matchmakingService.handleMatchUpdateEvents();
     });
 
-<<<<<<< Updated upstream
     // it('should handle incoming Player Request', () => {
     //     const callback = ((params: any) => {}) as any;
     //     socketTestHelper.on('incomingPlayerRequest', callback);
     //     socketServiceMock.socket.send('requestToJoinMatch', player1);
     //     matchmakingService.handleMatchUpdateEvents();
     // });
-=======
-    it('should handle incoming Player Request', () => {
-        const callback = ((params: any) => {}) as any;
-        socketTestHelper.on('incomingPlayerRequest', callback);
-        socketServiceMock.socket.send('requestToJoinMatch', player1);
-        matchmakingService.handleMatchUpdateEvents();
-    });
->>>>>>> Stashed changes
 
     it('should handle incomingPlayerRequest answer', () => {
         const data = { matchId: 'socket1', player: player1, isAccepted: true };
