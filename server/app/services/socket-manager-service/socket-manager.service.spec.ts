@@ -20,7 +20,6 @@ import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'si
 import { Player } from '@common/classes/player';
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
-
 const RESPONSE_DELAY = 200;
 describe('SocketManager', () => {
     let sandbox: SinonSandbox;
@@ -41,7 +40,6 @@ describe('SocketManager', () => {
         emitStub = sinon.stub(socketManager['sio'].sockets, <any>'emit');
         matchingDifferencesServiceStub = sinon.createStubInstance(MatchingDifferencesService);
         matchManagerServiceStub = sinon.createStubInstance(MatchManagerService);
-        matchManagerServiceStub.getMatchAvailableForGame.resolves('-1');
         roomEmitStub = sinon.stub(socketManager['sio'], <any>'to');
     });
 
@@ -253,6 +251,7 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY * 5);
     });
+    
 
     it('should set match type', (done) => {
         matchManagerServiceStub.createMatch(match.gameId, match.matchId);
@@ -467,7 +466,6 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY * 5);
     });
-
     it('should refresh the progress of a match in progress', (done) => {
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
@@ -546,6 +544,38 @@ describe('SocketManager', () => {
 
         setTimeout(() => {
             assert(socket.on.calledWith('readyPlayer'));
+            done();
+        }, RESPONSE_DELAY * 5);
+    });
+
+    it('should start the timer', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(22).args[1];
+        joinCallback({ matchId: 'test', elapsedTime: 1 });
+
+        setTimeout(() => {
+            assert(socket.on.calledWith('startTimer'));
+            done();
+        }, RESPONSE_DELAY * 5);
+    });
+
+    it('should stop the timer', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(23).args[1];
+        joinCallback({ matchId: 'test' });
+
+        setTimeout(() => {
+            assert(socket.on.calledWith('stopTimer'));
             done();
         }, RESPONSE_DELAY * 5);
     });
