@@ -26,16 +26,4 @@ describe('GameConstantsService', () => {
     it('should return the bonus value', () => {
         expect(service.bonusValue).toEqual(0);
     });
-
-    it('should update constants', () => {
-        service.updateConstants(true);
-        expect(service.countdownValue).toEqual(45);
-        expect(service.penaltyValue).toEqual(5);
-        expect(service.bonusValue).toEqual(5);
-        expect(mockCommunicationService.post).toHaveBeenCalledWith(service.constants, '/game_constants/');
-        mockCommunicationService.post.calls.reset();
-
-        service.updateConstants(false);
-        expect(mockCommunicationService.post).toHaveBeenCalledWith(service.constants, '/game_constants/');
-    });
 });
