@@ -18,6 +18,7 @@ import * as sinon from 'sinon';
 import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import { Player } from '@common/classes/player';
+import { RankingData } from '@common/interfaces/ranking.data';
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
 const RESPONSE_DELAY = 200;
@@ -40,6 +41,12 @@ describe('SocketManager', () => {
         emitStub = sinon.stub(socketManager['sio'].sockets, <any>'emit');
         matchingDifferencesServiceStub = sinon.createStubInstance(MatchingDifferencesService);
         matchManagerServiceStub = sinon.createStubInstance(MatchManagerService);
+        matchManagerServiceStub.getMatchById.returns(new Match(1, 'test'));
+        matchManagerServiceStub.getMatchAvailableForGame.returns('test');
+        matchManagerServiceStub.removePlayerFromMatch.returns('test');
+        sinon.stub(socketManager['matchManagerService'], 'getMatchAvailableForGame').returns('test');
+        socketManager['matchManagerService']['currentOnlinePlayedMatches'] = [new Match(1, 'test')];
+
         roomEmitStub = sinon.stub(socketManager['sio'], <any>'to');
     });
 
@@ -182,47 +189,49 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY * 5);
     });
-
-    it('should not validate difference if already found', (done) => {
-        const differencePosition: Vector2 = new Vector2(200, 100);
-        matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
-        socketManager.handleSockets();
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        connectionCallback(validateSocket);
-        const fakeEmit = sinon.fake();
-        roomEmitStub.returns({ emit: fakeEmit });
-        validateSocket.rooms.has = sinon.stub().returns(true);
-        const validateCallback = validateSocket.on.getCall(1).args[1];
-        validateCallback({ foundDifferences: [true, true], position: differencePosition, isPlayer1: true });
-        setTimeout(() => {
-            assert(validateSocket.on.calledWith('validateDifference'));
-            roomEmitStub.restore();
-            sinon.restore();
-            done();
-        }, RESPONSE_DELAY * 5);
-    });
     it('should not validate difference when not found', (done) => {
         const differencePosition: Vector2 = new Vector2(300, 200);
         matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(-1);
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
-        connectionCallback(validateSocket);
+        connectionCallback(socket);
         const fakeEmit = sinon.fake();
         roomEmitStub.returns({ emit: fakeEmit });
-        validateSocket.rooms.has = sinon.stub().returns(true);
-        const validateCallback = validateSocket.on.getCall(2).args[1];
-        validateCallback({ foundDifferences: [false, false], position: differencePosition });
+        socket.rooms.has = sinon.stub().returns(true);
+        const validateCallback = socket.on.getCall(1).args[1];
+        validateCallback({ foundDifferences: [true, true], position: differencePosition });
         setTimeout(() => {
-            assert(validateSocket.on.calledWith('validateDifference'));
+            assert(socket.on.calledWith('validateDifference'));
             roomEmitStub.restore();
             sinon.restore();
             done();
         }, RESPONSE_DELAY * 5);
     });
 
-    it('should remove player from match when disconnect is called', (done) => {
+    it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
         sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-        // sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves('-1');
+        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').returns(null);
+        sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
+        matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
+
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+
+        socketManager.handleSockets();
+        socket.rooms.has = sinon.stub().returns(false);
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const disconnectCallback = socket.on.getCall(2).args[1];
+        disconnectCallback(socket);
+        setTimeout(() => {
+            assert(socket.on.calledWith('disconnect'));
+            done();
+        }, RESPONSE_DELAY * 5);
+    });
+
+    it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
+        sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
+        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves('-1');
         sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
         matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
@@ -239,6 +248,7 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY * 5);
     });
+
     it('should createMatch with matchId and call joinMatchRoom', (done) => {
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
@@ -251,7 +261,6 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY * 5);
     });
-    
 
     it('should set match type', (done) => {
         matchManagerServiceStub.createMatch(match.gameId, match.matchId);
@@ -446,6 +455,9 @@ describe('SocketManager', () => {
 
     it('should send the winning time when a game is over', (done) => {
         socketManager.handleSockets();
+        sinon
+            .stub(socketManager['gameRankingTimeService'], 'handleNewScore')
+            .resolves({ username: 'test', position: 'première', gameName: 'testName', matchType: 'test' } as RankingData);
         const connectionCallback = connectionStub.getCall(0).args[1];
         connectionCallback(socket);
         socket.rooms.has = sinon.stub().returns(true);
@@ -466,6 +478,55 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY * 5);
     });
+
+    it('should send the winning time when a game is over, but not emit an event for undefined rankingData', (done) => {
+        socketManager.handleSockets();
+        sinon.stub(socketManager['gameRankingTimeService'], 'handleNewScore').resolves(undefined);
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(17).args[1];
+        joinCallback({
+            gameId: '1',
+            isOneVersusOne: true,
+            ranking: {
+                name: 'test',
+                score: 1,
+                gameName: '1',
+            },
+        });
+        setTimeout(() => {
+            assert(socket.on.calledWith('gameOver'));
+            done();
+        }, RESPONSE_DELAY * 5);
+    });
+
+    it('should send the winning time when a game is over, but not emit an event for undefined rankingData', (done) => {
+        socketManager.handleSockets();
+        sinon.stub(socketManager['gameRankingTimeService'], 'handleNewScore').resolves(undefined);
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(17).args[1];
+        joinCallback({
+            gameId: '1',
+            isOneVersusOne: true,
+            ranking: {
+                name: 'test',
+                score: 1,
+                gameName: '1',
+            },
+        });
+        setTimeout(() => {
+            assert(socket.on.calledWith('gameOver'));
+            done();
+        }, RESPONSE_DELAY * 5);
+    });
+
     it('should refresh the progress of a match in progress', (done) => {
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];

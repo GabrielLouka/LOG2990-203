@@ -42,7 +42,6 @@ describe('GameRankingService', () => {
             modifiedImage: Buffer.from(''),
         });
         const gameId = 'game-id';
-        const isOneVersusOne = true;
         const ranking = { name: 'player1', score: 100, gameName: 'game1' };
         const expectedRankingData: RankingData = {
             username: 'player1',
@@ -52,7 +51,44 @@ describe('GameRankingService', () => {
         };
         stub(gameStorageService, 'updateGameOneVersusOneNewBreakingRecord').resolves(1);
         stub(gameStorageService, 'updateGameSoloNewBreakingRecord').resolves(1);
-        const actualRankingData = await gameRankingService.handleNewScore(gameId, isOneVersusOne, ranking);
+        const actualRankingData = await gameRankingService.handleNewScore(gameId, true, ranking);
+
+        expect(actualRankingData).to.deep.equal(expectedRankingData);
+    });
+
+    it('should return the updated ranking data', async () => {
+        stub(gameStorageService, 'getGameById').resolves({
+            gameData: {
+                id: 1,
+                name: 'Test',
+                isEasy: false,
+                nbrDifferences: 4,
+                differences: [
+                    [
+                        { x: 4, y: 0 },
+                        { x: 3, y: 0 },
+                        { x: 2, y: 0 },
+                        { x: 1, y: 0 },
+                        { x: 0, y: 0 },
+                    ],
+                ],
+                soloRanking: defaultRanking,
+                oneVersusOneRanking: defaultRanking,
+            },
+            originalImage: Buffer.from(''),
+            modifiedImage: Buffer.from(''),
+        });
+        const gameId = 'game-id';
+        const ranking = { name: 'player1', score: 100, gameName: 'game1' };
+        const expectedRankingData: RankingData = {
+            username: 'player1',
+            position: 'deuxième',
+            gameName: 'game1',
+            matchType: 'Solo',
+        };
+        stub(gameStorageService, 'updateGameOneVersusOneNewBreakingRecord').resolves(1);
+        stub(gameStorageService, 'updateGameSoloNewBreakingRecord').resolves(1);
+        const actualRankingData = await gameRankingService.handleNewScore(gameId, false, ranking);
 
         expect(actualRankingData).to.deep.equal(expectedRankingData);
     });
