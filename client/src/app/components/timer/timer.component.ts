@@ -1,22 +1,19 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
-import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
-import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { MINUTE_LIMIT, MINUTE_TO_SECONDS, NOT_FOUND } from '@common/utils/env';
 
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
-export class TimerComponent implements OnDestroy {
-    @Input() incrementTime: boolean = true;
+export class TimerComponent {
+    @Input() isNotCountdown: boolean = true;
     @Output() timeReachedZero: EventEmitter<void> = new EventEmitter();
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
     timeInSeconds: number;
-    intervalId: number;
-    loopingMethod: DelayedMethod;
-    shouldStop = false;
+    initialTime: number = NOT_FOUND;
 
     constructor(public gameConstantsService: GameConstantsService) {
         this.gameConstantsService.initGameConstants();
@@ -30,47 +27,28 @@ export class TimerComponent implements OnDestroy {
         return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
     }
 
-    get currentTimeInSeconds(): number {
-        return this.timeInSeconds;
-    }
-
-    set elapsedTime(elapsedTime: number) {
-        this.timeInSeconds = elapsedTime;
-    }
-
-    displayTimeValue(value: number): string {
+    getTimeDisplayValue(value: number): string {
         return value < MINUTE_LIMIT ? '0' + value : value.toString();
     }
 
-    ngOnDestroy() {
-        window.clearInterval(this.intervalId);
-    }
-
     refreshTimerDisplay() {
-        this.minute.nativeElement.innerText = this.displayTimeValue(this.minutes);
-        this.second.nativeElement.innerText = this.displayTimeValue(this.seconds);
+        this.minute.nativeElement.innerText = this.getTimeDisplayValue(this.minutes);
+        this.second.nativeElement.innerText = this.getTimeDisplayValue(this.seconds);
     }
 
-    synchronizeDisplay(elapsedTime: number) {
-        this.elapsedTime = elapsedTime;
-        this.refreshTimerDisplay();
-    }
-
-    ticToc() {
-        if (!this.shouldStop) {
-            if (this.incrementTime) {
-                this.timeInSeconds++;
-            } else {
-                this.timeInSeconds--;
-                this.timeInSeconds = this.timeInSeconds < 0 ? 0 : this.timeInSeconds;
-                if (this.timeInSeconds <= 0) {
-                    this.timeReachedZero.emit();
-                }
-            }
+    forceSetTime(elapsedTime: number) {
+        if (this.isNotCountdown) this.timeInSeconds = elapsedTime;
+        else {
+            if (this.initialTime === NOT_FOUND) this.initialTime = this.gameConstantsService.countdownValue;
+            this.timeInSeconds = this.initialTime - elapsedTime;
         }
-        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
-        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
+
+        this.timeInSeconds = this.timeInSeconds < 0 ? 0 : this.timeInSeconds;
         this.refreshTimerDisplay();
+
+        if (this.timeInSeconds <= 0) {
+            this.timeReachedZero.emit();
+        }
     }
 
     decreaseTime(decreaseValue: number) {
@@ -80,32 +58,10 @@ export class TimerComponent implements OnDestroy {
     }
 
     resetTimer() {
-        this.timeInSeconds = this.incrementTime ? 0 : this.gameConstantsService.countdownValue;
+        this.timeInSeconds = this.isNotCountdown ? 0 : this.gameConstantsService.countdownValue;
+        this.initialTime = this.timeInSeconds;
         this.minute.nativeElement.innerText = '00';
         this.second.nativeElement.innerText = '00';
-        clearInterval(this.intervalId);
-        this.loopingMethod?.pause();
         this.refreshTimerDisplay();
-    }
-
-    startTimer() {
-        this.loopingMethod = new DelayedMethod(
-            () => {
-                if (this.timeInSeconds >= 0) {
-                    this.ticToc();
-                }
-            },
-            MILLISECOND_TO_SECONDS,
-            true,
-        );
-        this.loopingMethod.start();
-    }
-
-    pause() {
-        this.loopingMethod.pause();
-    }
-
-    resume() {
-        this.loopingMethod.resume();
     }
 }

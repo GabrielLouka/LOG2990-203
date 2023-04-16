@@ -248,7 +248,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
             this.getInitialImagesFromServer();
         }
         this.canvasHandlingService.focusKeyEvent(this.cheat);
-        this.replayModeService.visibleTimer = this.timerElement;
         window.removeEventListener('keydown', this.handleClickAndLetterTEvent.bind(this));
     }
 
@@ -354,6 +353,15 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.send('startTimer', { matchId: this.matchmakingService.currentMatchId, elapsedTime: 0 });
     }
 
+    updateTimerAccordingToServer(elapsedTime: number) {
+        if (this.isOver) return;
+        const forceSetTimeMethod = () => {
+            this.timerElement.forceSetTime(elapsedTime);
+        };
+        forceSetTimeMethod();
+        this.replayModeService.addMethodToReplay(forceSetTimeMethod);
+    }
+
     addServerSocketMessagesListeners() {
         if (!this.socketService.isSocketAlive) window.alert('Error : socket not connected');
 
@@ -372,11 +380,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         });
 
         this.socketService.on('playersSyncTime', (data: { elapsedTime: number }) => {
-            this.timerElement.synchronizeDisplay(data.elapsedTime);
+            this.updateTimerAccordingToServer(data.elapsedTime);
         });
 
         this.socketService.on('timerStopped', (data: { elapsedTime: number }) => {
-            this.timerElement.synchronizeDisplay(data.elapsedTime);
+            this.updateTimerAccordingToServer(data.elapsedTime);
         });
 
         this.socketService.on(
@@ -503,14 +511,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.canvasHandlingService.focusKeyEvent(this.cheat);
     }
 
-    pauseTimer(): void {
-        const pauseTimerMethod = () => {
-            this.timerElement.pause();
-        };
-        pauseTimerMethod();
-        this.replayModeService.addMethodToReplay(pauseTimerMethod);
-    }
-
     stopTimer(): void {
         this.socketService.send('stopTimer', this.matchmakingService.currentMatchId);
     }
@@ -575,6 +575,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.send('setLoser', {
             matchId: this.matchmakingService.currentMatchId,
         });
+        this.stopTimer();
     }
 
     onLoseGame() {
@@ -684,6 +685,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.differencesFound1 = 0;
         this.differencesFound2 = 0;
         this.hintService.reset();
+        this.timerElement.forceSetTime(0);
     }
 
     onReplaySpeedButtonClick(): void {
@@ -692,7 +694,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     finishReplay() {
-        this.timerElement.pause();
         this.stopCheating();
     }
 }
