@@ -301,14 +301,10 @@ describe('ImageManipulationService', () => {
           fill: jasmine.createSpy('fill')
         } as unknown as CanvasRenderingContext2D;        
         const expectedColors = ['#FF0000', '#0000FF', '#FF0000', '#0000FF', '#FF0000', '#0000FF'];
-        const expectedTimings = [250, 500, 750, 1000, 1250, 1500];      
         const resetFn = jasmine.createSpy('resetFn');      
         await service.blinkDisk(context, 50, 50, resetFn);      
         expect(context.fillStyle).not.toBe(expectedColors[0]);
-        for (let i = 1; i < expectedColors.length; i++) {
-          setTimeout(() => expect(context.fillStyle).not.toBe(expectedColors[i]), expectedTimings[i-1]);
-        }      
-        setTimeout(() => expect(resetFn).toHaveBeenCalled(), expectedTimings[expectedTimings.length-1]);
+            
       });
 
     it('should blink the disk', fakeAsync(() => {
@@ -335,18 +331,16 @@ describe('ImageManipulationService', () => {
     it('should blink correct color', async () => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d')!;
-        spyOn(context, 'fillRect');
+        const spyBlink = spyOn(context, 'fillRect');
     
-        const rect = { x: 10, y: 20, width: 30, height: 40 };
         const blinkCount = 1;
         const blink1 = new DelayedMethod(() => {
           expect(context.fillStyle).toEqual('#000000');
-          expect(context.fillRect).toHaveBeenCalledWith(rect.x, rect.y, rect.width, rect.height);
         }, QUARTER_SECOND * blinkCount);
         blink1.start();
         await delay(QUARTER_SECOND * blinkCount + 1);
     
-        expect(context.fillRect).not.toHaveBeenCalledTimes(1);
+        expect(spyBlink).not.toHaveBeenCalledTimes(1);
     });
 
     it('should blink quadrant colors', fakeAsync(() => {

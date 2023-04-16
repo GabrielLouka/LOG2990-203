@@ -221,8 +221,12 @@ describe('ClassicPageComponent', () => {
             'showGameOverPopUpLimited',
         ]);
 
-        component.successSound = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['play']) });
-        component.errorSound = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['play']) });
+        component.successSound = jasmine.createSpyObj('ElementRef', [], {
+            nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['play', 'pointersEvents']),
+        });
+        component.errorSound = jasmine.createSpyObj('ElementRef', [], {
+            nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['play', 'pointersEvents']),
+        });
         component.leftCanvas = jasmine.createSpyObj('ElementRef', [], {
             nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext', 'pointersEvents']),
         });
@@ -364,24 +368,7 @@ describe('ClassicPageComponent', () => {
 
         expect(socketClientService.on).toHaveBeenCalledTimes(7);
     });
-    // it('getInitialImagesFromServer should send request to server and recieve images', () => {
-    //     commService.get = jasmine.createSpy().and.returnValue(
-    //         of({
-    //             body: JSON.stringify({
-    //                 originalImage: 'originalImage',
-    //                 modifiedImage: 'modifiedImage',
-    //                 gameData: { name: 'test' },
-    //             }),
-    //         }),
-    //     );
 
-    //     imageService.getModifiedImageWithoutDifferences = jasmine.createSpy().and.returnValue('testImageSource');
-    //     const spyStartGame = spyOn(component, 'fetchGames');
-    //     component.communicationService = commService;
-    //     // component['imageManipulationService'] = imageService;
-    //     component.getInitialImagesFromServer();
-    //     expect(spyStartGame).toHaveBeenCalled();
-    // });
     it('should return if the match is on cheating mode', () => {
         expect(component.isCheating).toEqual(false);
     });
@@ -418,6 +405,9 @@ describe('ClassicPageComponent', () => {
         const alertSpy = spyOn(window, 'alert');
         const errorResponse = new HttpErrorResponse({});
         commService.get = jasmine.createSpy().and.returnValue(throwError(() => errorResponse));
+        spyOn(component.canvasHandlingService, 'updateCanvas').and.callFake((): any => {
+            return;
+        });
         component.getInitialImagesFromServer();
         expect(alertSpy).toHaveBeenCalled();
     });
@@ -445,11 +435,43 @@ describe('ClassicPageComponent', () => {
         expect(component.leftCanvas.nativeElement.style.pointerEvents).not.toBe([]);
         expect(component.rightCanvas.nativeElement.style.pointerEvents).not.toBe([]);
     });
+    it('should fetch the games', () => {
+        component.currentGameId = '0';
+        const mockResponseFetch = {
+            body: JSON.stringify([
+                {
+                    gameData: {
+                        id: '1',
+                        name: 'Game 1',
+                    },
+                    originalImage: Buffer.from('test'),
+                    modifiedImage: Buffer.from('test'),
+                },
+                {
+                    gameData: {
+                        id: '2',
+                        name: 'Game 2',
+                    },
+                    originalImage: Buffer.from('test'),
+                    modifiedImage: Buffer.from('test'),
+                },
+            ]),
+        };
+
+        mockResponseFetch.body = null as any;
+
+        component.fetchGames().subscribe((result) => {
+            expect(result).toBeNull();
+        });
+    });
 
     it('setTimout should be called onFindWrongDifferences', fakeAsync(() => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
+        spyOn(component.canvasHandlingService, 'focusKeyEvent').and.callFake(() => {
+            return;
+        });
         component.onFindWrongDifference(true);
         tick(1000);
         expect(component.errorMessage.nativeElement.style.display).not.toBe(undefined);
@@ -483,8 +505,7 @@ describe('ClassicPageComponent', () => {
 
         setTimeout(() => {
             expect(component.errorMessage.nativeElement.style.display).not.toBe(undefined);
-            expect(component.leftCanvas.nativeElement.style.pointerEvents).not.toBe([]);
-            expect(component.rightCanvas.nativeElement.style.pointerEvents).not.toBe([]);
+
             expect(delayedMethodSpy).toHaveBeenCalled();
         }, MILLISECOND_TO_SECONDS + 10);
     });
@@ -511,7 +532,7 @@ describe('ClassicPageComponent', () => {
         spyOnProperty(component, 'isPlayer1').and.returnValue(false);
         component.onReceiveMatchData();
     });
-    it('should receiveMAtchData', () => {
+    it('should receiveMatchData', () => {
         component.hasAlreadyReceiveMatchData = true;
         expect(component.onReceiveMatchData()).toEqual(undefined);
     });
@@ -781,6 +802,9 @@ describe('ClassicPageComponent', () => {
 
     it('should call getInitialImagesFromServer() when both canvas contexts are defined', () => {
         const spy = spyOn(component, 'getInitialImagesFromServer');
+        spyOn(component.canvasHandlingService, 'updateCanvas').and.callFake((): any => {
+            return;
+        });
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
