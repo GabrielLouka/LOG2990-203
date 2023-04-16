@@ -271,6 +271,63 @@ describe('ImageManipulationService', () => {
         expect(service.loadCanvasImages).toHaveBeenCalled();
     });
 
+    it('should blink a disk', async () => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        const x = 50;
+        const y = 50;
+        const reset = () => {};
+      
+        spyOn(context, 'beginPath');
+        spyOn(context, 'arc');
+        spyOn(context, 'fill');
+      
+        await service.blinkDisk(context, x, y, reset);
+      
+        expect(context.beginPath).not.toHaveBeenCalled();
+        expect(context.arc).not.toHaveBeenCalled();
+        expect(context.fill).not.toHaveBeenCalled();
+      });
+
+      it('should blink the disk with correct color values', async () => {
+        const context = {
+          fillStyle: '',
+          beginPath: jasmine.createSpy('beginPath'),
+          arc: jasmine.createSpy('arc'),
+          fill: jasmine.createSpy('fill')
+        } as unknown as CanvasRenderingContext2D;        
+        const expectedColors = ['#FF0000', '#0000FF', '#FF0000', '#0000FF', '#FF0000', '#0000FF'];
+        const expectedTimings = [250, 500, 750, 1000, 1250, 1500];      
+        const resetFn = jasmine.createSpy('resetFn');      
+        await service.blinkDisk(context, 50, 50, resetFn);      
+        expect(context.fillStyle).not.toBe(expectedColors[0]);
+        for (let i = 1; i < expectedColors.length; i++) {
+          setTimeout(() => expect(context.fillStyle).not.toBe(expectedColors[i]), expectedTimings[i-1]);
+        }      
+        setTimeout(() => expect(resetFn).toHaveBeenCalled(), expectedTimings[expectedTimings.length-1]);
+      });
+
+    it('should blink the disk', fakeAsync(() => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+        spyOn(context, 'fill');
+        const x = 100;
+        const y = 100;
+        const reset = () => { };
+        service.blinkDisk(context, x, y, reset);
+        expect(context.fillStyle).toBe('#000000');
+        expect(context.fill).not.toHaveBeenCalled();
+        tick(1000);
+        expect(context.fillStyle).toBe('#0000ff');
+        expect(context.fill).toHaveBeenCalled();
+        tick(2000);
+        expect(context.fillStyle).toBe('#0000ff');
+        expect(context.fill).toHaveBeenCalledTimes(6);
+        tick(3000);
+        expect(context.fillStyle).toBe('#0000ff');
+        expect(context.fill).toHaveBeenCalledTimes(6);
+    }));
+
     
 
 

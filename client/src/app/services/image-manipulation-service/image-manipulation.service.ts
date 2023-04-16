@@ -250,19 +250,6 @@ export class ImageManipulationService {
         wholeBlink.invoke();
     }
 
-    // alternateOldNewImage(oldImage: Buffer, newImage: Buffer, context: CanvasRenderingContext2D) {
-    //     let showOldImage = false;
-    //     const interval = window.setInterval(() => {
-    //         if (showOldImage) {
-    //             this.loadCanvasImages(this.getImageSourceFromBuffer(oldImage), context);
-    //         } else {
-    //             this.loadCanvasImages(this.getImageSourceFromBuffer(newImage), context);
-    //         }
-    //         showOldImage = !showOldImage;
-    //     }, QUARTER_SECOND / 2);
-    //     return interval;
-    // }
-
     alternateOldNewImage(oldImage: Buffer, newImage: Buffer, context: CanvasRenderingContext2D) {
         let showOldImage = false;
         const loopBlink = new DelayedMethod(
