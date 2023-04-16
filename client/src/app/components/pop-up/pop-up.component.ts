@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Action } from '@common/classes/action';
 import { MatchType } from '@common/enums/match-type';
