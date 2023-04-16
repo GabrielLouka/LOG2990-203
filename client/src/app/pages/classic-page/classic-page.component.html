@@ -28,14 +28,14 @@
                             : this.getPlayerUsername(false)
                     "
                     [differencesFound]="differencesFound1"
-                    [differencesNbr]="currentGameId !== '-1' ? (isOneVersusOne ? minDifferences : totalDifferences) : -1"
+                    [differencesNbr]="!this.isLimitedTime ? (isOneVersusOne ? minDifferences : totalDifferences) : -1"
                     [ngClass]="{
                         currentPlayer: activePlayer || this.isCoop || this.isLimitedTimeSolo
                     }"
                 ></app-found-differences-counter>
                 <app-found-differences-counter
                     class="hints-container"
-                    *ngIf="isOneVersusOne && currentGameId !== '-1'"
+                    *ngIf="isOneVersusOne && !this.isLimitedTime"
                     [username]="this.getPlayerUsername(false)"
                     [differencesFound]="differencesFound2"
                     [differencesNbr]="isOneVersusOne ? minDifferences : totalDifferences"
@@ -48,7 +48,7 @@
                 <div #penalty *ngIf="this.gameConstantsService.penaltyValue > 0" class="penalty-message">
                     Penalité : +{{ this.gameConstantsService.penaltyValue }}s
                 </div>
-                <app-timer #timerElement [isNotCountdown]="currentGameId !== '-1'" (timeReachedZero)="onTimerEnd()"></app-timer>
+                <app-timer #timerElement [isCountdown]="this.isLimitedTime" (timeReachedZero)="onTimerEnd()"></app-timer>
             </div>
         </div>
         <app-info-card
@@ -95,7 +95,7 @@
     </div>
 
     <div #errorMessage class="error-message">ERREUR</div>
-    <app-pop-up #popUpElement></app-pop-up>
+    <app-game-over-pop-up #popUpElement></app-game-over-pop-up>
     <audio #successSound src="./assets/sound/success2.mp3"></audio>
     <audio #errorSound src="./assets/sound/fail2.mp3"></audio>
 </body>

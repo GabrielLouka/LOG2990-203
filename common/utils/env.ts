@@ -7,7 +7,10 @@ export {
     LIMITED_TIME_USER_ENTERED_TEXT,
     REDIRECTED_TO_MAIN_PAGE_TEXT,
 };
-export { ALL_GAMES_TEXT, THIS_GAME_TEXT, DELETE_TEXT, RESET_TEXT, YES_TEXT, NO_TEXT, OK_TEXT, ABORTED_GAME_TEXT };
+// Pop up displayed texts
+export { ALL_GAMES_TEXT, THIS_GAME_TEXT, DELETE_TEXT, RESET_TEXT, ABORTED_GAME_TEXT, QUITTING_CONFIRMATION_TEXT, EXCELLENT_GAME_TEXT };
+// Buttons actions texts
+export { YES_TEXT, NO_TEXT, OK_TEXT, MAIN_MENU_TEXT, REPLAY_MODE_TEXT };
 export { NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED };
 export { INITIAL_COUNTDOWN, INITIAL_PENALTY, INITIAL_BONUS, MAX_PENALTY, MAX_BONUS };
 export { CHAT_TITLE };
@@ -77,10 +80,16 @@ const ALL_GAMES_TEXT = 'TOUS LES JEUX ?';
 const THIS_GAME_TEXT = 'CE JEU ?';
 const DELETE_TEXT = 'SUPPRIMER ';
 const RESET_TEXT = 'RÉINITIALISER ';
+const QUITTING_CONFIRMATION_TEXT = 'VOULEZ-VOUS VRAIMENT QUITTER ?';
+const ABORTED_GAME_TEXT = ' a abandonné la partie';
+const EXCELLENT_GAME_TEXT = 'Excellente partie !';
+
+// Buttons actions texts
 const YES_TEXT = 'OUI';
 const NO_TEXT = 'NON';
 const OK_TEXT = 'OK';
-const ABORTED_GAME_TEXT = ' a abandonné la partie';
+const MAIN_MENU_TEXT = 'Menu Principal';
+const REPLAY_MODE_TEXT = 'Reprise Vidéo';
 
 // Canvas fixed dimensions
 const CANVAS_WIDTH = 640;

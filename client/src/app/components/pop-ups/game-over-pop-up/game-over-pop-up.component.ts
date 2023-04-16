@@ -1,13 +1,14 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Action } from '@common/classes/action';
 import { MatchType } from '@common/enums/match-type';
+import { EXCELLENT_GAME_TEXT, MAIN_MENU_TEXT, NO_TEXT, QUITTING_CONFIRMATION_TEXT, REPLAY_MODE_TEXT, YES_TEXT } from '@common/utils/env';
 
 @Component({
-    selector: 'app-pop-up',
-    templateUrl: './pop-up.component.html',
-    styleUrls: ['./pop-up.component.scss'],
+    selector: 'app-game-over-pop-up',
+    templateUrl: './game-over-pop-up.component.html',
+    styleUrls: ['./game-over-pop-up.component.scss'],
 })
-export class PopUpComponent {
+export class GameOverPopUpComponent {
     @ViewChild('bgModal') modal!: ElementRef;
 
     popUpInfo: {
@@ -21,20 +22,21 @@ export class PopUpComponent {
     }[] = [];
     isLimitedTime: boolean = false;
 
-    showConfirmationPopUp() {
+    displayConfirmation() {
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
-            title: 'VOULEZ-VOUS VRAIMENT QUITTER ?',
+            title: QUITTING_CONFIRMATION_TEXT,
             message: '',
-            option1: 'OUI',
-            option2: 'NON',
+            option1: YES_TEXT,
+            option2: NO_TEXT,
             isConfirmation: true,
             isGameOver: false,
             option2Action: null,
         });
-        this.showPopUp();
+        this.display();
     }
-    showGameOverPopUp(
+
+    displayGameOver(
         isWinByDefault: boolean,
         isTimerDepleted: boolean,
         matchType: MatchType,
@@ -44,11 +46,11 @@ export class PopUpComponent {
     ) {
         let winMessage;
 
-        let secondaryMessage = 'Excellente partie !';
+        let secondaryMessage = EXCELLENT_GAME_TEXT;
 
         if (matchType === MatchType.LimitedCoop) {
             this.isLimitedTime = true;
-            winMessage = `Félicitations ${username1} et ${username2?.toUpperCase()} vous avez remporté la partie !`;
+            winMessage = `Félicitations ${username1} et ${username2} vous avez remporté la partie !`;
         } else {
             if (matchType === MatchType.LimitedSolo || matchType === MatchType.Solo) winMessage = 'Félicitations vous avez remporté la partie !';
             else winMessage = `${username1} a remporté la partie !`;
@@ -66,41 +68,41 @@ export class PopUpComponent {
         this.popUpInfo.push({
             title: winMessage,
             message: secondaryMessage,
-            option1: 'Menu Principal',
-            option2: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? 'Reprise Vidéo' : '',
+            option1: MAIN_MENU_TEXT,
+            option2: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? REPLAY_MODE_TEXT : '',
             isConfirmation: false,
             isGameOver: true,
             option2Action: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? startReplayAction : null,
         });
-        this.showPopUp();
+        this.display();
     }
 
     // eslint-disable-next-line max-params
     // TODO faire une interface
-    showGameOverPopUpLimited(username1: string | undefined, username2: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
+    displayLimitedGameOver(username1: string | undefined, username2: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
         this.isLimitedTime = true;
-        const soloMessage = `Félicitations ${username1?.toUpperCase()} vous avez remporté !`;
-        const multiPlayerMessage = `Félicitations ${username1?.toUpperCase() + ' ' + username2?.toUpperCase()} vous avez remporté !`;
+        const soloMessage = `Félicitations ${username1} vous avez remporté !`;
+        const multiPlayerMessage = `Félicitations ${username1 + ' ' + username2} vous avez remporté !`;
         const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: isWinByDefault ? soloMessage : titleMessage,
-            message: isWinByDefault ? 'Votre partenaire a quitté la partie...' : 'Excellente partie !',
-            option1: 'Menu Principal',
+            message: isWinByDefault ? 'Votre partenaire a quitté la partie...' : EXCELLENT_GAME_TEXT,
+            option1: MAIN_MENU_TEXT,
             option2: '',
             isConfirmation: false,
             isGameOver: true,
             option2Action: null,
         });
-        this.showPopUp();
-    }
-
-    showPopUp() {
-        this.modal.nativeElement.style.display = 'flex';
+        this.display();
     }
 
     closePopUp() {
         this.modal.nativeElement.style.display = 'none';
         this.popUpInfo[0]?.option2Action?.invoke();
+    }
+
+    display() {
+        this.modal.nativeElement.style.display = 'flex';
     }
 }

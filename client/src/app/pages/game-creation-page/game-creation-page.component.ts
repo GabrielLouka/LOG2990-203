@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { CreationResultModalComponent } from '@app/components/pop-ups/creation-result-modal/creation-result-modal.component';
+import { GameOverPopUpComponent } from '@app/components/pop-ups/game-over-pop-up/game-over-pop-up.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DrawingService } from '@app/services/drawing-service/drawing.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -30,7 +30,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     @ViewChild('pen') pen!: ElementRef;
     @ViewChild('eraser') eraser!: ElementRef;
     @ViewChild('rectangle') rectangle!: ElementRef;
-    @ViewChild('popUpElement') popUpElement: PopUpComponent;
+    @ViewChild('popUpElement') popUpElement: GameOverPopUpComponent;
 
     @ViewChild('combine') combine!: ElementRef;
 
@@ -124,12 +124,12 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     }
 
     onQuitGame() {
-        this.popUpElement.showConfirmationPopUp();
+        this.popUpElement.displayConfirmation();
     }
 
     async sendImageToServer(): Promise<void> {
         this.resultModal.resetBackgroundCanvas();
-        this.resultModal.showPopUp();
+        this.resultModal.display();
 
         if (this.originalImage && this.modifiedImage) {
             const [buffer1, buffer2] = await Promise.all([this.originalImage.arrayBuffer(), this.modifiedImage.arrayBuffer()]);
@@ -160,7 +160,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     }
 
     private handleImageUploadResult(response: HttpResponse<string>, firstImage: DifferenceImage, secondImage: DifferenceImage) {
-        if (response.body !== null) {
+        if (response.body) {
             const serverResult: ImageUploadResult = JSON.parse(response.body);
             this.resultModal.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
             this.formToSendAfterServerConfirmation = {
