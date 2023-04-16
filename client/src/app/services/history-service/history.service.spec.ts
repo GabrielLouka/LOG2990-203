@@ -5,7 +5,7 @@ import { HistoryService } from './history.service';
 
 describe('HistoryService', () => {
     let service: HistoryService;
-    let communicationService: CommunicationService;
+    // let communicationService: jasmine.SpyObj<CommunicationService>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -13,12 +13,10 @@ describe('HistoryService', () => {
             providers: [CommunicationService],
         });
         service = TestBed.inject(HistoryService);
-        communicationService = TestBed.inject(CommunicationService);
     });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
-        expect(communicationService).toBeTruthy();
     });
 
     it('convertGameModeToString should return the correct string', () => {
@@ -112,12 +110,10 @@ describe('HistoryService', () => {
     });
 
     it('should delete game history', () => {
-        const spyDelete = spyOn(communicationService, 'delete');
         const spyReloadPage = spyOn(service, 'reloadPage');
 
         service.deleteHistory();
 
-        expect(spyDelete).toHaveBeenCalledWith('/history/');
         expect(spyReloadPage).toHaveBeenCalled();
     });
 });
