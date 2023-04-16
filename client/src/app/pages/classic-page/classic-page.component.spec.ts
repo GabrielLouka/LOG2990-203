@@ -122,6 +122,7 @@ describe('ClassicPageComponent', () => {
             'isTextValid',
             'isPlayer1',
             'isMode1vs1',
+            'pushMessage',
         ]);
         matchMakingService = jasmine.createSpyObj('MatchmakingService', [
             'currentMatchId',
@@ -297,6 +298,29 @@ describe('ClassicPageComponent', () => {
         component.player2 = 'nauot';
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isCoopMode = true;
+        component.matchmakingService = mockMatchmakingService;
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { foundDifferences: [true, false, true], isValidated: true, foundDifferenceIndex: 1, isPlayer1: true };
+        socketTestHelper.on('validationReturned', callback);
+        socketTestHelper.peerSideEmit('validationReturned', data);
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isCoopMode = true;
+        component.matchmakingService = mockMatchmakingService;
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
         const callback = ((params: any) => {}) as any;
@@ -390,6 +414,9 @@ describe('ClassicPageComponent', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
+        spyOnProperty(component, 'isCoop').and.returnValue(true);
+        spyOnProperty(component, 'isSolo').and.returnValue(false);
+        spyOnProperty(component, 'isLimitedTimeSolo').and.returnValue(true);
         component.player1 = 'nauot';
         component.player2 = 'nauot';
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
@@ -397,7 +424,8 @@ describe('ClassicPageComponent', () => {
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
         const callback = ((params: any) => {}) as any;
-        const data = { data: true };
+        const data = { isPlayer1: true };
+
         socketTestHelper.on('readyUpdate', callback);
         socketTestHelper.peerSideEmit('readyUpdate', data);
         expect(socketClientService.on).toHaveBeenCalledTimes(7);
@@ -439,6 +467,23 @@ describe('ClassicPageComponent', () => {
         const data = { foundDifferences: [true, false, true], isValidated: true, foundDifferenceIndex: 1, isPlayer1: false };
         socketTestHelper.on('validationReturned', callback);
         socketTestHelper.peerSideEmit('validationReturned', data);
+
+        expect(socketClientService.on).toHaveBeenCalledTimes(7);
+    });
+    it('addServerSocketMessagesListeners should send message', () => {
+        const canvas = document.createElement('canvas');
+        component.leftCanvas = { nativeElement: canvas };
+        component.rightCanvas = { nativeElement: canvas };
+        component.player1 = 'nauot';
+        component.player2 = 'nauot';
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+
+        spyOn(socketClientService, 'on').and.callThrough();
+        component.addServerSocketMessagesListeners();
+        const callback = ((params: any) => {}) as any;
+        const data = { username: 'string', message: 'string', sentByPlayer1: true };
+        socketTestHelper.peerSideEmit('messageBetweenPlayers', data);
+        socketTestHelper.on('messageBetweenPlayers', callback);
 
         expect(socketClientService.on).toHaveBeenCalledTimes(7);
     });
@@ -525,18 +570,26 @@ describe('ClassicPageComponent', () => {
         expect(component.differencesFound2).toEqual(1);
     });
 
-    it('should display the error message and disable pointer events on the canvases', () => {
+    it('should show error text and focus key event on canvas when wrong difference is found', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
         spyOn(component.canvasHandlingService, 'focusKeyEvent').and.callFake(() => {
             return;
         });
-        component.onFindWrongDifference(false);
+        spyOn(component, 'sendSystemMessageToChat');
+
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isSoloMode = false;
+        mockMatchmakingService.isPlayer1 = true;
+        component.matchmakingService = mockMatchmakingService;
+
+        component.onFindWrongDifference(true);
         expect(component.errorMessage.nativeElement.style.display).not.toBe(undefined);
         expect(component.leftCanvas.nativeElement.style.pointerEvents).not.toBe([]);
         expect(component.rightCanvas.nativeElement.style.pointerEvents).not.toBe([]);
     });
+
     it('should fetch the games', () => {
         component.currentGameId = '0';
         const mockResponseFetch = {
