@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { expect } from 'chai';
 import { GameConstantsService } from './game-constant.service';
 
@@ -6,10 +7,10 @@ describe('GameConstantsService', () => {
 
     describe('getConstants', () => {
         it('should return game constants', () => {
-            let theConstants = gameConstantsService.updateConstants(null);
+            const initConstants = { countdownValue: 45, penaltyValue: 5, bonusValue: 5 };
+            let theConstants = gameConstantsService.updateConstants(initConstants);
             theConstants = gameConstantsService.getConstants();
-            expect(theConstants).to.equal(null);
+            expect(theConstants).to.equal(initConstants);
         });
     });
 });
-
