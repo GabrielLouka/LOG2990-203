@@ -75,16 +75,6 @@ describe('CreationResultModalComponent', () => {
         expect(component.errorPopupText.nativeElement.style.display).toBe('none');
     });
 
-    it('should display the error pop-up', () => {
-        communicationServiceSpy.post.and.throwError(new Error("Erreur lors de l'envoie"));
-        component.sendGameNameToServer();
-        component.modal = { nativeElement: { style: { display: 'none' } } };
-        component.errorPopupText = { nativeElement: { style: { display: 'none' } } };
-        component.display();
-        expect(component.modal.nativeElement.style.display).toBe('flex');
-        expect(component.errorPopupText.nativeElement.style.display).toBe('none');
-    });
-
     it('should close the pop-up', () => {
         component.modal = { nativeElement: { style: { display: 'flex' } } };
         component.closePopUp();

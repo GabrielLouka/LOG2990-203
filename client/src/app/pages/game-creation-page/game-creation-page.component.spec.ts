@@ -93,7 +93,7 @@ describe('GameCreationPageComponent', () => {
         component.leftCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
         component.rightCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation']);
-        component.resultModal = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
+        component.resultModal = jasmine.createSpyObj('CreationResultModalComponent', ['display', 'updateImageDisplay', 'showGameNameForm']);
         component['originalImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
         component['modifiedImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
         component.isEasy = true;
@@ -141,7 +141,7 @@ describe('GameCreationPageComponent', () => {
         const popUpComponentSpy = jasmine.createSpyObj('GameOverPopUp', ['displayConfirmation']);
         component.popUpElement = popUpComponentSpy;
         component.onQuitGame();
-        expect(popUpComponentSpy).not.toEqual(null);
+        expect(popUpComponentSpy.displayConfirmation).toHaveBeenCalled();
     });
 
     it('should return a canvas context object if true', () => {
