@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormGroup } from '@angular/forms';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { AuthService } from '@app/services/auth-service/auth.service';
 import { IncomingPlayerService } from '@app/services/incoming-player-service/incoming-player.service';
@@ -34,7 +35,12 @@ describe('RegistrationPageComponent', () => {
         onDeletedAllGames: subjectSpy,
         onDeletedSingleGame: subjectSpy,
         onResetAllGames: subjectSpy,
-        onResetSingleGame: subjectSpy
+        onResetSingleGame: subjectSpy,
+        setCurrentMatchType: subjectSpy,
+        isMatchAborted: subjectSpy,
+        handleMatchUpdated: subjectSpy,
+        sendMatchJoinCancel: subjectSpy,
+        sendMatchJoinRequest: subjectSpy
     };
     // const player1: Player = {
     //     username: 'player1',
@@ -121,15 +127,15 @@ describe('RegistrationPageComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    // it('component should have registration form as proprety', () => {
-    //     expect(component.registrationForm).toBeInstanceOf(FormGroup);
-    // });
+    it('component should have registration form as proprety', () => {
+        expect(component.registrationForm).toBeInstanceOf(FormGroup);
+    });
 
-    // it('should return if the player has found an opponent', () => {
-    //     component.ngOnDestroy();
-    //     const hasFound = component.hasFoundIncomingPlayer;
-    //     expect(hasFound).not.toBe(false);
-    // });
+    it('should return if the player has found an opponent', () => {
+        component.ngOnDestroy();
+        const hasFound = component.hasFoundIncomingPlayer;
+        expect(hasFound).not.toBe(false);
+    });
 
     // it('should set current match player if is solo mode', () => {
     //     const match: Match = {
@@ -147,7 +153,7 @@ describe('RegistrationPageComponent', () => {
     //     component.username = 'naruto';
     //     authService.registerUser.and.callThrough();
     //     component.registerUser();
-    //     matchmakingService.setCurrentMatchType(MatchType.Solo);
+    //     matchmakingServiceMock.setCurrentMatchType(MatchType.Solo);
     //     expect(registrationService.redirectToMainPage).not.toHaveBeenCalled();
     // });
 
@@ -208,27 +214,27 @@ describe('RegistrationPageComponent', () => {
     //     expect(component.user).not.toEqual('');
     // });
 
-    // it('should call registration service when load game is needed', () => {
-    //     component.loadGamePage();
-    //     expect(registrationService.loadGamePage).toHaveBeenCalled();
-    // });
+    it('should call registration service when load game is needed', () => {
+        component.loadGamePage();
+        expect(registrationService.loadGamePage).toHaveBeenCalled();
+    });
 
     // it('should set to true when sent join request', () => {
     //     component.username = 'naruto';
     //     component.sendMatchJoinRequest();
-    //     expect(component.hasSentJoinRequest).toBe(true);
+    //     expect(matchmakingServiceMock.sendMatchJoinRequest).toHaveBeenCalled();
     // });
 
-    // it('should call incoming player service when accept/refuse incoming player', () => {
-    //     component.acceptIncomingPlayer();
-    //     expect(incomingPlayerService.acceptIncomingPlayer).toHaveBeenCalled();
-    //     component.refuseIncomingPlayer();
-    //     expect(incomingPlayerService.refuseIncomingPlayer).toHaveBeenCalled();
-    // });
-    // it('should return status display', () => {
-    //     const result = component.queueStatusMessage;
-    //     expect(result).not.toBe('');
-    // });
+    it('should call incoming player service when accept/refuse incoming player', () => {
+        component.acceptIncomingPlayer();
+        expect(incomingPlayerService.acceptIncomingPlayer).toHaveBeenCalled();
+        component.refuseIncomingPlayer();
+        expect(incomingPlayerService.refuseIncomingPlayer).toHaveBeenCalled();
+    });
+    it('should return status display', () => {
+        const result = component.queueStatusMessage;
+        expect(result).not.toBe('');
+    });
     // it('should return status display', () => {
     //     component.username = 'mahmoud';
     //     component.hasSentJoinRequest = true;
