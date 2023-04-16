@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
-import { MINUTE_LIMIT, MINUTE_TO_SECONDS, NOT_FOUND } from '@common/utils/env';
+import { LIMITED_TIME_DURATION, MINUTE_LIMIT, MINUTE_TO_SECONDS, NOT_FOUND } from '@common/utils/env';
 
 @Component({
     selector: 'app-timer',
@@ -12,19 +12,26 @@ export class TimerComponent {
     @Output() timeReachedZero: EventEmitter<void> = new EventEmitter();
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
-    timeInSeconds: number;
-    initialTime: number = NOT_FOUND;
+    private timeCountInSeconds: number;
+    private timePenalty: number = 0;
+    private initialTime: number = NOT_FOUND;
 
     constructor(public gameConstantsService: GameConstantsService) {
         this.gameConstantsService.initGameConstants();
     }
 
+    get elapsedSeconds(): number {
+        const output: number = this.timeCountInSeconds + this.timePenalty;
+        if (output > LIMITED_TIME_DURATION && !this.isNotCountdown) return LIMITED_TIME_DURATION;
+        return output < 0 ? 0 : output;
+    }
+
     get minutes(): number {
-        return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
+        return Math.floor(this.elapsedSeconds / MINUTE_TO_SECONDS);
     }
 
     get seconds(): number {
-        return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
+        return Math.floor(this.elapsedSeconds % MINUTE_TO_SECONDS);
     }
 
     getTimeDisplayValue(value: number): string {
@@ -34,32 +41,31 @@ export class TimerComponent {
     refreshTimerDisplay() {
         this.minute.nativeElement.innerText = this.getTimeDisplayValue(this.minutes);
         this.second.nativeElement.innerText = this.getTimeDisplayValue(this.seconds);
-    }
 
-    forceSetTime(elapsedTime: number) {
-        if (this.isNotCountdown) this.timeInSeconds = elapsedTime;
-        else {
-            if (this.initialTime === NOT_FOUND) this.initialTime = this.gameConstantsService.countdownValue;
-            this.timeInSeconds = this.initialTime - elapsedTime;
-        }
-
-        this.timeInSeconds = this.timeInSeconds < 0 ? 0 : this.timeInSeconds;
-        this.refreshTimerDisplay();
-
-        if (this.timeInSeconds <= 0) {
+        if (this.elapsedSeconds <= 0) {
             this.timeReachedZero.emit();
         }
     }
 
-    decreaseTime(decreaseValue: number) {
-        this.timeInSeconds -= decreaseValue;
-        this.timeInSeconds = this.timeInSeconds < 0 ? 0 : this.timeInSeconds;
+    forceSetTime(elapsedTime: number) {
+        if (this.isNotCountdown) this.timeCountInSeconds = elapsedTime;
+        else {
+            if (this.initialTime === NOT_FOUND) this.initialTime = this.gameConstantsService.countdownValue;
+            this.timeCountInSeconds = this.initialTime - elapsedTime;
+        }
+
+        this.refreshTimerDisplay();
+    }
+
+    applyTimePenalty(decreaseValue: number) {
+        this.timePenalty -= decreaseValue;
         this.refreshTimerDisplay();
     }
 
     resetTimer() {
-        this.timeInSeconds = this.isNotCountdown ? 0 : this.gameConstantsService.countdownValue;
-        this.initialTime = this.timeInSeconds;
+        this.timeCountInSeconds = this.isNotCountdown ? 0 : this.gameConstantsService.countdownValue;
+        this.timePenalty = 0;
+        this.initialTime = this.timeCountInSeconds;
         this.minute.nativeElement.innerText = '00';
         this.second.nativeElement.innerText = '00';
         this.refreshTimerDisplay();

@@ -184,6 +184,9 @@ export class SocketManager {
             let timerInterval: NodeJS.Timeout;
 
             socket.on('startTimer', (data: { matchId: string; elapsedTime: number }) => {
+                // If the timer is already running for this match, don't start it again
+                if (activeMatchTimerData.find((timerData) => timerData.key === data.matchId)) return;
+
                 activeMatchTimerData.push({ key: data.matchId, value: { startTime: new Date().getTime(), elapsedTime: data.elapsedTime } });
 
                 // Start the timer interval if it hasn't already started

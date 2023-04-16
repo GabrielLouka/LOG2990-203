@@ -26,7 +26,6 @@ import {
     ABORTED_GAME_TEXT,
     CANVAS_HEIGHT,
     FOUR_TIMES_SPEED,
-    LIMITED_TIME_DURATION,
     MILLISECOND_TO_SECONDS,
     NORMAL_SPEED,
     TWO_TIMES_SPEED,
@@ -84,6 +83,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isOriginallyCoop: boolean = false;
     isEasy: boolean | undefined;
     winningPlayer: string | undefined;
+    hasLoadedImagesForTheFirstTime: boolean = false;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -347,10 +347,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.send('readyPlayer', { isPlayer1: this.isPlayer1 });
     }
 
-    startMatch() {
+    onFinishLoadingImages() {
         this.isLoading = false;
-        this.timerElement.resetTimer();
-        this.socketService.send('startTimer', { matchId: this.matchmakingService.currentMatchId, elapsedTime: 0 });
+        if (!this.hasLoadedImagesForTheFirstTime) {
+            this.timerElement.resetTimer();
+            this.socketService.send('startTimer', { matchId: this.matchmakingService.currentMatchId, elapsedTime: 0 });
+            this.hasLoadedImagesForTheFirstTime = true;
+        }
     }
 
     updateTimerAccordingToServer(elapsedTime: number) {
@@ -372,7 +375,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 this.isPlayer2Ready = true;
             }
             if ((this.isPlayer1Ready && this.isPlayer2Ready) || this.isSolo || this.isLimitedTimeSolo) {
-                this.startMatch();
+                this.onFinishLoadingImages();
             }
             if (this.isCoop) {
                 this.isOriginallyCoop = true;
@@ -402,10 +405,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                             this.onWinGame(data.isPlayer1, this.isOver);
                         } else {
                             this.currentGameIndex++;
-                            this.timerElement.timeInSeconds = Math.min(
-                                LIMITED_TIME_DURATION,
-                                this.timerElement.timeInSeconds + this.gameConstantsService.bonusValue,
-                            );
+                            // negative penalty is a bonus
+                            this.timerElement.applyTimePenalty(-this.gameConstantsService.bonusValue);
                             if (this.isCheating) {
                                 this.stopCheating();
                                 this.foundDifferences = new Array(this.games[this.currentGameIndex].gameData.nbrDifferences).fill(false);
@@ -553,7 +554,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
             });
         }
-        this.newRanking = { name: this.winningPlayer, score: this.timerElement.timeInSeconds };
+        this.newRanking = { name: this.winningPlayer, score: this.timerElement.elapsedSeconds };
         if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {
             isWinByDefault = true;
         }
@@ -563,7 +564,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.isOver = true;
         this.popUpElement.showGameOverPopUp(
             isWinByDefault,
-            this.timerElement.timeInSeconds <= 0,
+            this.timerElement.elapsedSeconds <= 0,
             this.currentMatchType as MatchType,
             startReplayAction,
             this.getPlayerUsername(isPlayer1Win),
@@ -641,7 +642,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                         diffs: this.foundDifferences,
                     },
                 );
-                this.timerElement.decreaseTime(this.hintService.getTimePenalty(this.isLimitedTimeSolo));
+                this.timerElement.applyTimePenalty(this.hintService.getTimePenalty(this.isLimitedTimeSolo));
                 this.hintService.showRedError(this.penaltyMessage);
                 this.hintService.decrement();
             }

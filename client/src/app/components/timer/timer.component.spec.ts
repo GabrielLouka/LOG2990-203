@@ -116,7 +116,7 @@ describe('TimerComponent', () => {
     });
 
     it('should decrease time', () => {
-        component.decreaseTime(10);
+        component.applyTimePenalty(10);
         expect(component.timeInSeconds).toBe(0);
     });
 
