@@ -65,7 +65,7 @@ export class HistoryService {
 
     deleteHistory() {
         const routeToSend = '/history/';
-        this.communicationService.delete(routeToSend);
+        this.communicationService.delete(routeToSend).subscribe({});
         this.reloadPage();
     }
 
