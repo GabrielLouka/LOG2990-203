@@ -45,19 +45,17 @@ describe('TimerComponent', () => {
 
     it('should refresh the current elapsed time with the correct format', () => {
         spyOn(component, 'getTimeDisplayValue').and.returnValue('30');
-        const minutes = component.minutes;
-        const seconds = component.seconds;
         component.refreshTimerDisplay();
-        expect(component.minute.nativeElement.innerText).toEqual(minutes);
-        expect(component.minute.nativeElement.innerText).toEqual(seconds);
+        expect(component.minute.nativeElement.innerText).toEqual('30');
+        expect(component.minute.nativeElement.innerText).toEqual('30');
     });
 
     it('should emit time reached 0 when no time left', () => {
-        spyOn(component, 'timeReachedZero').and.callFake(() => new EventEmitter<void>());
+        spyOn(component.timeReachedZero, 'emit').and.callFake(() => new EventEmitter<void>());
         component['timeCountInSeconds'] = 0;
         component['timePenalty'] = -1;
         component.refreshTimerDisplay();
-        expect(component.timeReachedZero).toHaveBeenCalled();
+        expect(component.timeReachedZero.emit).toHaveBeenCalled();
     });
 
     it('should apply the chosen time penalty', () => {
