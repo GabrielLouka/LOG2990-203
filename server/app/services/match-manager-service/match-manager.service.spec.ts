@@ -69,6 +69,25 @@ describe('MatchManagerService', () => {
         expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.WaitingForPlayer2);
     });
 
+    it('should correctly modify a match after a loss', () => {
+        const storeHistoryStub = sinon.stub(matchManagerService, 'storeHistory');
+        const testMatch = new Match(match.gameId, match.matchId);
+        testMatch.matchStatus = MatchStatus.InProgress;
+        sinon.stub(matchManagerService, 'getMatchById').returns(testMatch);
+        matchManagerService.setMatchLose(match.matchId);
+        sinon.assert.called(storeHistoryStub);
+    });
+
+    it('should correctly modify a match after a win (p2)', () => {
+        const storeHistoryStub = sinon.stub(matchManagerService, 'storeHistory');
+        const testMatch = new Match(match.gameId, match.matchId);
+        testMatch.player1 = matchPlayer;
+        testMatch.matchStatus = MatchStatus.InProgress;
+        sinon.stub(matchManagerService, 'getMatchById').returns(testMatch);
+        matchManagerService.setMatchWinner(match.matchId, matchPlayer);
+        sinon.assert.called(storeHistoryStub);
+    });
+
     it('should set match player 1 and not change match status is not waiting for player 1', () => {
         const newPlayer: Player = {
             username: 'player3',
@@ -103,6 +122,7 @@ describe('MatchManagerService', () => {
         expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
 
+
     it('should not set the match player if match id is not valid', () => {
         const invalidMatchId = 'match2';
         matchManagerService.setMatchPlayer(invalidMatchId, matchPlayer);
@@ -122,6 +142,17 @@ describe('MatchManagerService', () => {
         matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
         matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
         expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Aborted);
+    });
+
+    it('removePlayerFromMatch should store the leaderboard data ', () => {
+        const testMatch = new Match(match.gameId, match.matchId);
+        testMatch.player1 = matchPlayer;
+        testMatch.matchType = MatchType.Solo;
+        testMatch.matchStatus = MatchStatus.InProgress;
+        matchManagerService['currentOnlinePlayedMatches'] = [testMatch];
+        sinon.stub(matchManagerService, 'getMatchById').returns(testMatch);
+        matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.WaitingForPlayer1);
     });
 
     it('should remove player 1 from match and make the player 2 win', () => {
