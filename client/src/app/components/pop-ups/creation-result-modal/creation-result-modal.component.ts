@@ -90,7 +90,7 @@ export class CreationResultModalComponent {
                 ctx.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, canvas.width, canvas.height);
             }
         } catch (error) {
-            alert("L'affichage n'a pu être mise à jour : " + error);
+            // alert("L'affichage n'a pu être mise à jour : " + error);
         }
     }
 
