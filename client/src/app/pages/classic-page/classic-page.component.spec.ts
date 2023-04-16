@@ -10,11 +10,11 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
-import { BackButtonComponent } from '@app/components/back-button/back-button.component';
+import { BackButtonComponent } from '@app/components/buttons/back-button/back-button.component';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { HintComponent } from '@app/components/hint/hint.component';
 import { InfoCardComponent } from '@app/components/info-card/info-card.component';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { GameOverPopUpComponent } from '@app/components/pop-ups/game-over-pop-up/game-over-pop-up.component';
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ClassicPageComponent } from '@app/pages/classic-page/classic-page.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
@@ -46,7 +46,7 @@ describe('ClassicPageComponent', () => {
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
     let socketClientService: SocketClientService;
-    let popUP: jasmine.SpyObj<PopUpComponent>;
+    let popUP: jasmine.SpyObj<GameOverPopUpComponent>;
     let canvasHandlingService: jasmine.SpyObj<CanvasHandlingService>;
     let hintService: jasmine.SpyObj<HintService>;
 
@@ -164,7 +164,7 @@ describe('ClassicPageComponent', () => {
                 InfoCardComponent,
                 ChatComponent,
                 TimerComponent,
-                PopUpComponent,
+                GameOverPopUpComponent,
             ],
             providers: [
                 { provide: AuthService, useValue: authService },
@@ -187,7 +187,7 @@ describe('ClassicPageComponent', () => {
                 { provide: TimerComponent, useValue: timer },
                 { provide: ElementRef, useValue: leftCanvas },
                 { provide: ElementRef, useValue: rightCanvas },
-                { provide: PopUpComponent, useValue: popUP },
+                { provide: GameOverPopUpComponent, useValue: popUP },
             ],
         }).compileComponents();
 
@@ -213,12 +213,12 @@ describe('ClassicPageComponent', () => {
             nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['pointersEvents']),
         });
 
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', [
-            'showConfirmationPopUp',
-            'showGameOverPopUp',
-            'showPopUp',
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', [
+            'displayConfirmation',
+            'displayGameOver',
+            'display',
             'closePopUp',
-            'showGameOverPopUpLimited',
+            'displayLimitedGameOver',
         ]);
 
         component.successSound = jasmine.createSpyObj('ElementRef', [], {
@@ -295,7 +295,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
@@ -311,7 +311,12 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', [
+            'displayConfirmation',
+            'displayGameOverPopUp',
+            'display',
+            'closePopUp',
+        ]);
 
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
@@ -329,7 +334,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
@@ -346,7 +351,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         spyOn(socketClientService, 'on').and.callThrough();
         const match: Match = {
@@ -620,12 +625,12 @@ describe('ClassicPageComponent', () => {
         const event = new MouseEvent('mousedown');
         component.handleClickAndLetterTEvent(event);
     });
+
     it('should handle the lose game', () => {
-        spyOn(component.popUpElement, 'showGameOverPopUp').and.callThrough();
+        spyOn(component.popUpElement, 'displayGameOver').and.callThrough();
         spyOn(component, 'sendNewTimeScoreToServer').and.callFake(() => {
             return;
         });
-        // spyOn(component.popUpElement, 'showGameOverPopUp').and.callThrough();
         component.onLoseGame();
         expect(component.isOver).toEqual(true);
     });
@@ -644,10 +649,12 @@ describe('ClassicPageComponent', () => {
         const result = component.isPlayer2Win(match);
         expect(result).toEqual(true);
     });
+
     it('should return the player2Username', () => {
         const result = component.getPlayerUsername(false);
         expect(result).not.toEqual(undefined as any);
     });
+
     it('should return the player2', () => {
         const match: Match = {
             gameId: 0,
@@ -659,7 +666,7 @@ describe('ClassicPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player2Win,
         };
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         spyOnProperty(component, 'isSolo').and.returnValue(false);
         spyOnProperty(component, 'isOneVersusOne').and.returnValue(true);
         spyOn(component, 'isPlayer1Win').and.returnValue(true);
@@ -681,7 +688,7 @@ describe('ClassicPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player2Win,
         };
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         spyOnProperty(component, 'isSolo').and.returnValue(false);
         spyOnProperty(component, 'isOneVersusOne').and.returnValue(false);
         spyOn(component, 'isPlayer1Win').and.returnValue(true);
@@ -703,7 +710,7 @@ describe('ClassicPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player2Win,
         };
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         spyOnProperty(component, 'isSolo').and.returnValue(false);
         spyOnProperty(component, 'isOneVersusOne').and.returnValue(true);
         spyOn(component, 'isPlayer1Win').and.returnValue(false);
@@ -725,7 +732,7 @@ describe('ClassicPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player2Win,
         };
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         spyOnProperty(component, 'isSolo').and.returnValue(false);
         spyOnProperty(component, 'isOneVersusOne').and.returnValue(false);
         spyOn(component, 'isPlayer1Win').and.returnValue(false);
@@ -747,7 +754,7 @@ describe('ClassicPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.PlayersLose,
         };
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         spyOnProperty(component, 'isSolo').and.returnValue(false);
         spyOnProperty(component, 'isOneVersusOne').and.returnValue(false);
         spyOn(component, 'isPlayer1Win').and.returnValue(false);
@@ -764,27 +771,29 @@ describe('ClassicPageComponent', () => {
 
         component.handleMatchUpdate(null);
     });
-
-    it('should handle gameOver', () => {
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
-
+    it('should handle gameover', () => {
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         component.gameOver(true);
     });
+
     it('should return appropriately on quit game', () => {
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         component.onQuitGame();
     });
 
     it('should return the appropriate value on win game', () => {
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         spyOnProperty(component, 'isPlayer1').and.returnValue(true);
         component.onWinGame(true, true);
     });
+
     it('should return the appropriate value on win game', () => {
         component.isOriginallyCoop = true;
         spyOnProperty(component, 'isPlayer1').and.returnValue(false);
         component.onWinGame(false, true);
     });
+
     it('should return the appropriate value on win game', () => {
         const spy = spyOn(component, 'gameOver').and.callFake(() => {
             return;
@@ -808,9 +817,7 @@ describe('ClassicPageComponent', () => {
         const canvas = document.createElement('canvas');
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
-
         component.ngAfterViewInit();
-
         expect(spy).toHaveBeenCalled();
     });
 });

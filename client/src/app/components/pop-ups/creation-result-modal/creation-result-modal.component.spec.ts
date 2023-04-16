@@ -6,13 +6,14 @@
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { Vector2 } from '@common/classes/vector2';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
+import { SAVE_GAMES_PATH } from '@common/utils/env.http';
 import { of } from 'rxjs';
 import { CreationResultModalComponent } from './creation-result-modal.component';
 
@@ -69,18 +70,20 @@ describe('CreationResultModalComponent', () => {
 
     it('should show the pop-up', () => {
         component.modal = { nativeElement: { style: { display: 'none' } } };
-        component.showPopUp();
+        component.display();
         expect(component.modal.nativeElement.style.display).toBe('flex');
         expect(component.errorPopupText.nativeElement.style.display).toBe('none');
     });
 
-    // it('should show the error pop-up', () => {
-    //     component.modal = { nativeElement: { style: { display: 'none' } } };
-    //     component.errorPopupText = { nativeElement: { style: { display: 'none' } } };
-    //     component.showPopUp();
-    //     expect(component.modal.nativeElement.style.display).toBe('flex');
-    //     expect(component.errorPopupText.nativeElement.style.display).toBe('none');
-    // });
+    it('should display the error pop-up', () => {
+        communicationServiceSpy.post.and.throwError(new Error("Erreur lors de l'envoie"));
+        component.sendGameNameToServer();
+        component.modal = { nativeElement: { style: { display: 'none' } } };
+        component.errorPopupText = { nativeElement: { style: { display: 'none' } } };
+        component.display();
+        expect(component.modal.nativeElement.style.display).toBe('flex');
+        expect(component.errorPopupText.nativeElement.style.display).toBe('none');
+    });
 
     it('should close the pop-up', () => {
         component.modal = { nativeElement: { style: { display: 'flex' } } };
@@ -88,7 +91,7 @@ describe('CreationResultModalComponent', () => {
         expect(component.modal.nativeElement.style.display).toBe('none');
     });
 
-    it('should show the game name form', () => {
+    it('should display the game name form', () => {
         const game: EntireGameUploadForm = {
             gameId: 1,
             firstImage: { background: [1, 2, 3, 4, 5, 6, 7] },
@@ -152,6 +155,6 @@ describe('CreationResultModalComponent', () => {
             }),
         );
         component.sendGameNameToServer();
-        expect(communicationServiceSpy.post).toHaveBeenCalledWith(game, '/games/saveGame');
+        expect(communicationServiceSpy.post).toHaveBeenCalledWith(game, SAVE_GAMES_PATH);
     });
 });

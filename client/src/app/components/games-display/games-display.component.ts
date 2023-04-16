@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
+import { DeleteGamesPopUpComponent } from '@app/components/pop-ups/delete-games-pop-up/delete-games-pop-up.component';
 import { GamesService } from '@app/services/games-service/games.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';

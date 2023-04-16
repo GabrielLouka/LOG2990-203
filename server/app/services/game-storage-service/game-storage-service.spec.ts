@@ -293,7 +293,7 @@ describe('Game storage service', () => {
 
     it('should reset scores for all games', async () => {
         sinon.stub(gameStorageService.collection, 'findOneAndUpdate').resolves(null);
-        
+
         expect(await gameStorageService.resetAllScores()).to.be.equal(undefined);
     });
 
