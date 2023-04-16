@@ -18,7 +18,13 @@ describe('IncomingPlayerService', () => {
     let matchmakingServiceSpy: jasmine.SpyObj<MatchmakingService>;
 
     beforeEach(() => {
-        matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['sendIncomingPlayerRequestAnswer', 'isHost', 'currentSocketId']);
+        matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', [
+            'sendIncomingPlayerRequestAnswer',
+            'isHost',
+            'currentSocketId',
+            'setCurrentMatchType',
+            'setCurrentMatchPlayer',
+        ]);
 
         TestBed.configureTestingModule({
             providers: [IncomingPlayerService, { provide: MatchmakingService, useValue: matchmakingServiceSpy }],
