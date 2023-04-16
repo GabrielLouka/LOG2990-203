@@ -291,7 +291,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
@@ -330,7 +330,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
@@ -347,7 +347,7 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
         component.player1 = 'nauot';
         component.player2 = 'nauot';
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp', 'showGameOverPopUp', 'showPopUp', 'closePopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         spyOn(socketClientService, 'on').and.callThrough();
         const match: Match = {

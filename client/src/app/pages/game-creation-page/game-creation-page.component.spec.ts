@@ -93,7 +93,7 @@ describe('GameCreationPageComponent', () => {
         component = fixture.componentInstance;
         component.leftCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
         component.rightCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation']);
         component.resultModal = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
         component['originalImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
         component['modifiedImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
@@ -139,7 +139,7 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('onQuitGame should call popup confirmation', () => {
-        const popUpComponentSpy = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp']);
+        const popUpComponentSpy = jasmine.createSpyObj('GameOverPopUp', ['displayConfirmation']);
         component.popUpElement = popUpComponentSpy;
         component.onQuitGame();
         expect(popUpComponentSpy.showConfirmationPopUp).toHaveBeenCalled();
@@ -242,7 +242,12 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('send an image to the server with hidden element ', async () => {
-        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm', 'resetBackgroundCanvas']);
+        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', [
+            'showPopUp',
+            'updateImageDisplay',
+            'showGameNameForm',
+            'resetBackgroundCanvas',
+        ]);
         component.resultModal = modalSpy;
         const myArrayBuffer = new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]);
         const myBlob = new Blob([myArrayBuffer]);
