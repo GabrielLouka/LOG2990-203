@@ -42,7 +42,7 @@ export class TimerComponent {
         this.minute.nativeElement.innerText = this.getTimeDisplayValue(this.minutes);
         this.second.nativeElement.innerText = this.getTimeDisplayValue(this.seconds);
 
-        if (this.elapsedSeconds <= 0) {
+        if (this.elapsedSeconds <= 0 && this.isCountdown) {
             this.timeReachedZero.emit();
         }
     }
