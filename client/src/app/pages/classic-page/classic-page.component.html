@@ -48,7 +48,7 @@
                 <div #penalty *ngIf="this.gameConstantsService.penaltyValue > 0" class="penalty-message">
                     Penalité : +{{ this.gameConstantsService.penaltyValue }}s
                 </div>
-                <app-timer #timerElement [incrementTime]="currentGameId !== '-1'" (timeReachedZero)="onTimerEnd()"></app-timer>
+                <app-timer #timerElement [isNotCountdown]="currentGameId !== '-1'" (timeReachedZero)="onTimerEnd()"></app-timer>
             </div>
         </div>
         <app-info-card

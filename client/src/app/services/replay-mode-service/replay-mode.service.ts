@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
-import { TimerComponent } from '@app/components/timer/timer.component';
+// import { TimerComponent } from '@app/components/timer/timer.component';
 import { Action } from '@common/classes/action';
-import { MILLISECOND_TO_SECONDS, REPLAY_TIMER_DELAY } from '@common/utils/env';
 
 export enum ReplayModeState {
     Idle,
@@ -21,10 +20,8 @@ export class ReplayModeService {
     recordedActions: DelayedMethod[] = [];
     onStartReplayMode: Action<void> = new Action<void>();
     onFinishReplayMode: Action<void> = new Action<void>();
-    visibleTimer: TimerComponent;
     currentState: ReplayModeState = ReplayModeState.Idle;
-
-    // replayedActions: [() => void, number][] = [];
+    startRecordingDate: Date;
 
     get startReplayModeAction(): Action<void> {
         const output: Action<void> = new Action<void>();
@@ -77,7 +74,7 @@ export class ReplayModeService {
 
     addMethodToReplay(action: () => void): void {
         if (this.currentState === ReplayModeState.Recording) {
-            this.recordedActions.push(new DelayedMethod(action, this.elapsedSeconds * MILLISECOND_TO_SECONDS));
+            this.recordedActions.push(new DelayedMethod(action, this.getMillisecondsBetweenNowAndStartOfRecording()));
         }
     }
 
@@ -88,7 +85,6 @@ export class ReplayModeService {
 
         this.pauseReplayingTimer();
         this.elapsedSeconds = 0;
-        this.visibleTimer.resetTimer();
 
         this.startReplayingTimer();
 
@@ -125,15 +121,17 @@ export class ReplayModeService {
         this.onFinishReplayMode.invoke();
         this.pauseReplayingTimer();
         this.currentState = ReplayModeState.FinishedReplaying;
-        // this.stopAllPlayingActions();
     }
 
     private startRecordingTimer() {
         this.currentState = ReplayModeState.Recording;
-        const timerIncreaseFactor = REPLAY_TIMER_DELAY / MILLISECOND_TO_SECONDS;
-        this.timerId = window.setInterval(() => {
-            this.elapsedSeconds += timerIncreaseFactor;
-        }, REPLAY_TIMER_DELAY);
+        this.startRecordingDate = new Date();
+    }
+
+    private getMillisecondsBetweenNowAndStartOfRecording(): number {
+        const now = new Date();
+        const differenceInMilliseconds = now.getTime() - this.startRecordingDate.getTime();
+        return differenceInMilliseconds;
     }
 
     private stopRecordingTimer() {
@@ -143,19 +141,14 @@ export class ReplayModeService {
 
     private startReplayingTimer() {
         this.currentState = ReplayModeState.Replaying;
-        this.visibleTimer.resetTimer();
-        this.visibleTimer.startTimer();
     }
 
     private pauseReplayingTimer() {
         this.currentState = ReplayModeState.Paused;
-        clearInterval(this.timerId);
-        this.visibleTimer.pause();
     }
 
     private resumeReplayingTimer() {
         this.currentState = ReplayModeState.Replaying;
-        this.visibleTimer.resume();
     }
 
     private resetTimer() {

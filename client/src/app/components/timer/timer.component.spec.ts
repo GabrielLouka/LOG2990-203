@@ -111,7 +111,7 @@ describe('TimerComponent', () => {
     });
 
     it('shoudl sync time', () => {
-        component.synchronizeDisplay(10);
+        component.forceSetTime(10);
         expect(component.timeInSeconds).toBe(10);
     });
 
@@ -127,7 +127,7 @@ describe('TimerComponent', () => {
 
     it('shoudl emit time when time is up', () => {
         component.shouldStop = false;
-        component.incrementTime = false;
+        component.isNotCountdown = false;
         spyOn(component.timeReachedZero, 'emit');
         component.timeInSeconds = 0;
         component.ticToc();
@@ -136,7 +136,7 @@ describe('TimerComponent', () => {
 
     it('should not emit time when time is not up', () => {
         component.shouldStop = false;
-        component.incrementTime = false;
+        component.isNotCountdown = false;
         spyOn(component.timeReachedZero, 'emit');
         component.timeInSeconds = 10;
         component.ticToc();
