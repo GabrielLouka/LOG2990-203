@@ -53,6 +53,7 @@ describe('RegistrationPageComponent', () => {
         setCurrentMatchPlayer: subjectSpy,
         sendCurrentMatchType: subjectSpy,
         joinGame: subjectSpy,
+        connectSocket:subjectSpy
     };
     const player1: Player = {
         username: 'player1',
@@ -415,6 +416,21 @@ describe('RegistrationPageComponent', () => {
         // component.registerUser();
 
         // expect(matchmakingServiceMock.setCurrentMatchPlayer).toHaveBeenCalledWith('testuser');
+    });
+    it('component should have registration form as proprety', () => {
+        const activatedRouteStub = {
+            snapshot: {
+              paramMap: {
+                get: jasmine.createSpy('get').and.callFake((key) => {
+                  return key === 'id' ? '-1' : null;
+                }),
+              },
+            },
+          }; 
+          component['route'] = activatedRouteStub as any;
+          spyOn(matchmakingServiceMock,'connectSocket').and.callFake(()=>{});     
+          component.ngOnInit();
+          expect(component.id).toEqual('-1');
     });
 
     it('should update waitingForIncomingPlayerMessage if id is not -1 and current match is not played', () => {
