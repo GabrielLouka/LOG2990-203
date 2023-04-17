@@ -18,7 +18,7 @@ export class IncomingPlayerService {
     private joiningStatusMessage: string;
     private hasFoundIncomingPlayer: boolean;
 
-    constructor(private readonly matchmakingService: MatchmakingService) {}
+    constructor(private matchmakingService: MatchmakingService) {}
 
     get incomingPlayers(): Player[] {
         return this.waitingPlayers;

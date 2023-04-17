@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-import { TestBed } from '@angular/core/testing';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { GameConstantsService } from './game-constants.service';
 
@@ -8,11 +8,8 @@ describe('GameConstantsService', () => {
     let mockCommunicationService: jasmine.SpyObj<CommunicationService>;
 
     beforeEach(() => {
-        mockCommunicationService = jasmine.createSpyObj(['get', 'post']);
-        TestBed.configureTestingModule({
-            providers: [GameConstantsService, { provide: CommunicationService, useValue: mockCommunicationService }],
-        });
-        service = TestBed.inject(GameConstantsService);
+        mockCommunicationService = jasmine.createSpyObj('CommunicationService', ['post']);
+        service = new GameConstantsService(mockCommunicationService);
     });
 
     it('should return the countdown value', () => {

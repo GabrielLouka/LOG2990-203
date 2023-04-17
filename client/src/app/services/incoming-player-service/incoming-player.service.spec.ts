@@ -1,9 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { DO_YOU_WANT_TO_PLAY_WITH_TEXT, WAITING_FOR_PLAYER_TEXT, WAITING_PLAYER_ANSWER_TEXT } from '@common/utils/env';
+import {
+    DO_YOU_WANT_TO_PLAY_WITH_TEXT,
+    LIMITED_TIME_USER_ENTERED_TEXT,
+    WAITING_FOR_PLAYER_TEXT,
+    WAITING_PLAYER_ANSWER_TEXT,
+} from '@common/utils/env';
 import { IncomingPlayerService } from './incoming-player.service';
-
+let incomingPlayerService: IncomingPlayerService;
+let matchmakingServiceSpy: jasmine.SpyObj<MatchmakingService>;
 describe('IncomingPlayerService', () => {
     const player: Player = {
         username: 'player',
@@ -14,9 +21,6 @@ describe('IncomingPlayerService', () => {
         playerId: 'socket2',
     };
 
-    let incomingPlayerService: IncomingPlayerService;
-    let matchmakingServiceSpy: jasmine.SpyObj<MatchmakingService>;
-
     beforeEach(() => {
         matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['sendIncomingPlayerRequestAnswer', 'isHost', 'currentSocketId']);
 
@@ -24,6 +28,7 @@ describe('IncomingPlayerService', () => {
             providers: [IncomingPlayerService, { provide: MatchmakingService, useValue: matchmakingServiceSpy }],
         });
         incomingPlayerService = TestBed.inject(IncomingPlayerService);
+        matchmakingServiceSpy.matchIdThatWeAreTryingToJoin = null;
     });
 
     afterEach(() => {
@@ -135,8 +140,13 @@ describe('IncomingPlayerService', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         incomingPlayerService.refuseIncomingPlayer();
     });
+    it('should call matchmaking sendIncomingPlayerRequest when incoming player is rejected', () => {
+        incomingPlayerService['incomingPlayer'] = null;
+        expect(incomingPlayerService.refuseIncomingPlayer()).toBeUndefined();
+    });
 
     it('should refresh queue display', () => {
+        incomingPlayerService.id = '-1';
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         incomingPlayerService.refreshQueueDisplay();
@@ -144,6 +154,23 @@ describe('IncomingPlayerService', () => {
             DO_YOU_WANT_TO_PLAY_WITH_TEXT + incomingPlayerService.firstIncomingPlayer.username + ' ?\n',
         );
         expect(incomingPlayerService.firstIncomingPlayer).toEqual(player);
+    });
+    it('should refresh queue display', () => {
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isHost = false;
+        incomingPlayerService['matchmakingService'] = mockMatchmakingService;
+
+        expect(incomingPlayerService.handleIncomingPlayerJoinRequest(player)).toBeUndefined();
+    });
+    it('should refresh queue display', () => {
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isHost = false;
+        incomingPlayerService['matchmakingService'] = mockMatchmakingService;
+        expect(incomingPlayerService.handleIncomingPlayerJoinCancel(player.playerId)).toBeUndefined();
+    });
+    it('should update limited Name Enterred', () => {
+        incomingPlayerService.updateLimitedTimeNameEntered();
+        expect(incomingPlayerService['joiningStatusMessage']).toEqual(LIMITED_TIME_USER_ENTERED_TEXT);
     });
 
     it('should accept incoming player and call matchmakingService send request answer', () => {
