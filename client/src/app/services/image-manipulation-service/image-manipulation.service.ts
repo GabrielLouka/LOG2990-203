@@ -1,3 +1,5 @@
+// #todo
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef, Injectable } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Action } from '@common/classes/action';
@@ -58,7 +60,6 @@ export class ImageManipulationService {
         }
         return modifiedImageBuffer;
     }
-
     generateRandomVector(game: GameData, foundDifferences: boolean[]) {
         const unfoundDifferences = game.differences.filter((difference, index) => !foundDifferences[index]);
         const randomDifference = unfoundDifferences[Math.floor(this.generatePseudoRandomNumber() * unfoundDifferences.length)];
@@ -229,7 +230,6 @@ export class ImageManipulationService {
     generatePseudoRandomNumber() {
         return this.randomNumber;
     }
-
     async blinkDifference(imageOld: Buffer, imageNew: Buffer, context: CanvasRenderingContext2D) {
         this.loadCanvasImages(this.getImageSourceFromBuffer(imageNew), context);
         const wholeBlink = new Action<void>();
@@ -285,7 +285,6 @@ export class ImageManipulationService {
             context.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         };
     }
-
     combineImages(originalBuffer: Buffer, drawingCanvas: HTMLCanvasElement) {
         const context = drawingCanvas.getContext('2d') as CanvasRenderingContext2D;
         const imageData = context.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
@@ -301,7 +300,6 @@ export class ImageManipulationService {
             }
         }
     }
-
     private getRGB = (position: Vector2, imageBuffer: Buffer): Pixel | null => {
         try {
             const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
@@ -316,11 +314,9 @@ export class ImageManipulationService {
             return null;
         }
     };
-
     private setRGB = (position: Vector2, imageBuffer: Buffer, pixel: Pixel): void => {
         try {
             const pixelPosition = this.getPixelBufferPosAtPixelPos(position, imageBuffer);
-
             // Set the R, G, and B values
             imageBuffer.writeUInt8(pixel.b, pixelPosition);
             imageBuffer.writeUInt8(pixel.g, pixelPosition + 1);
@@ -330,7 +326,6 @@ export class ImageManipulationService {
             alert("OOPS! Can't write pixel at position " + position.x + ', ' + position.y + '!');
         }
     };
-
     private getPixelBufferPosAtPixelPos = (position: Vector2, imageBuffer: Buffer): number => {
         const pixelStart = BMP_FILE_HEADER_BYTES_LENGTH;
 
@@ -348,7 +343,6 @@ export class ImageManipulationService {
 
         return (position.x + yPosition * imageWidth) * PIXEL_BYTES_LENGTH + pixelStart;
     };
-
     private isImageUsingTopDownFormat = (imageBuffer: Buffer): boolean => {
         const imageHeight = imageBuffer.readInt32LE(IMAGE_HEIGHT_OFFSET);
         return imageHeight < 0;
