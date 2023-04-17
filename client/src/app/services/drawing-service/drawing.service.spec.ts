@@ -54,17 +54,23 @@ describe('DrawingService', () => {
         expect(service['actionsContainer'].color).toBe('#123456');
     });
 
-    // it('should set pen width', () => {
-    //     service.setPenWidth(true);
-    //     expect(service.penWidth).toBe(10);
+    it('should set pen width', () => {
+        service.setPenWidth(true);
+        expect(service.penWidth).toBe(11);
 
-    //     service.setPenWidth(false);
-    //     expect(service.penWidth).toBe(9);
+        service.setPenWidth(false);
+        expect(service.penWidth).toBe(10);
 
-    //     service.penWidth = 1;
-    //     service.setPenWidth(false);
-    //     expect(service.penWidth).toBe(1);
-    // });
+        service.penWidth = 1;
+        service.setPenWidth(false);
+        expect(service.penWidth).toBe(1);
+    });
+
+    it('should not exceed max pen width', () => {
+        service.penWidth = 100;
+        service.setPenWidth(true);
+        expect(service.penWidth).toBe(20);
+    });
 
     it('should deactivate tools', () => {
         service.deactivateTools();
