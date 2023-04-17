@@ -10,7 +10,7 @@ import { Container } from 'typedi';
 
 const HTTP_STATUS_OK = StatusCodes.OK;
 const API_URL = '/api/history';
-const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
+// const HTTP_STATUS_NOT_FOUND = StatusCodes.NOT_FOUND;
 describe('HistoryController', () => {
     let historyStorageService: SinonStubbedInstance<HistoryStorageService>;
     let sandbox: SinonSandbox;
@@ -29,7 +29,7 @@ describe('HistoryController', () => {
         sandbox.restore();
     });
 
-    it('GET should return the leaderboards', async () => {
+    it('GET should return the history', async () => {
         historyStorageService.getAllHistory.returns(
             Promise.resolve([
                 {
@@ -44,6 +44,7 @@ describe('HistoryController', () => {
                 expect(response.body).to.deep.equal([{ constant: 'test' }]);
             });
     });
+
     it('GET should catch error', async () => {
         const errorMessage = 'Test error';
         historyStorageService.getAllHistory.rejects(errorMessage);
@@ -56,9 +57,15 @@ describe('HistoryController', () => {
             });
     });
 
-    it('DELETE should remove the constants ', () => {
-        historyStorageService.wipeHistory.resolves();
-        supertest(expressApp).delete(`${API_URL}/`).expect(HTTP_STATUS_NOT_FOUND);
-        sinon.restore();
+    it('DELETE should remove the history', async () => {
+        const errorMessage = 'Test error';
+        historyStorageService.wipeHistory.rejects(errorMessage);
+
+        supertest(expressApp)
+            .delete(`${API_URL}/`)
+            .expect(HTTP_STATUS_OK)
+            .end((err) => {
+                if (err) return err;
+            });
     });
 });

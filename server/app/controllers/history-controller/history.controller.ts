@@ -23,14 +23,12 @@ export class HistoryController {
         });
 
         this.router.delete('/', async (req: Request, res: Response) => {
-            this.historyStorageService
-                .wipeHistory()
-                .then(() => {
-                    res.status(StatusCodes.OK);
-                })
-                .catch((error: Error) => {
-                    res.status(StatusCodes.NOT_FOUND).send(error.message);
-                });
+            try {
+                await this.historyStorageService.wipeHistory();
+                res.status(StatusCodes.OK);
+            } catch (error) {
+                res.status(StatusCodes.NOT_FOUND).send(error.message);
+            }
         });
     }
 }
