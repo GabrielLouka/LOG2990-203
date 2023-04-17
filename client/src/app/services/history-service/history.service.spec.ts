@@ -5,7 +5,6 @@ import { HistoryService } from './history.service';
 
 describe('HistoryService', () => {
     let service: HistoryService;
-    // let communicationService: jasmine.SpyObj<CommunicationService>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
