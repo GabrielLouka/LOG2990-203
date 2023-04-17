@@ -18,8 +18,8 @@ import { ReplayModeService } from '@app/services/replay-mode-service/replay-mode
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { GameData } from '@common/interfaces/game.data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import {

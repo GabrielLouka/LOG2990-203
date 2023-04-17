@@ -1,11 +1,10 @@
-/* eslint-disable no-restricted-imports */
+import { DatabaseService } from '@app/services/database-service/database.service';
+import { GameRankingService } from '@app/services/game-ranking-service/game-ranking.service';
+import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { expect } from 'chai';
 import { stub } from 'sinon';
-import { DatabaseService } from '../database-service/database.service';
-import { GameStorageService } from '../game-storage-service/game-storage.service';
-import { GameRankingService } from './game-ranking.service';
 
 describe('GameRankingService', () => {
     let gameRankingService: GameRankingService;

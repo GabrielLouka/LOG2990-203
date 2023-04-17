@@ -10,6 +10,7 @@ const DB_COLLECTION_HISTORY = 'gameHistory';
 // Server storage path
 const PERSISTENT_DATA_FOLDER_PATH = './storedData/';
 const DEFAULT_IMAGES_PATH = './storedData/default-img.json';
+const DEFAULT_GAMES_PATH = './app/data/default-games.json';
 
 // Stored files
 const LAST_GAME_ID_FILE = 'lastGameId.txt';
@@ -28,7 +29,7 @@ const IMAGE_DELIVERY_SERVER = 'http://localhost:3000/api';
 const DISPLAYED_GAMES_LIMIT = 4;
 
 export { DB_COLLECTION_GAMES, DB_NAME, DB_URL, DB_COLLECTION_HISTORY };
-export { PERSISTENT_DATA_FOLDER_PATH, DEFAULT_IMAGES_PATH };
+export { PERSISTENT_DATA_FOLDER_PATH, DEFAULT_IMAGES_PATH, DEFAULT_GAMES_PATH };
 export { LAST_GAME_ID_FILE, GAME_CONSTANTS_FILE };
 export { ORIGINAL_IMAGE_FILE, MODIFIED_IMAGE_FILE, IMAGE_REQUIRED_WIDTH, IMAGE_REQUIRED_HEIGHT };
 export { DISPLAYED_GAMES_LIMIT };

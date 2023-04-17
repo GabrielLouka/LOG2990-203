@@ -3,8 +3,8 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { Observable } from 'rxjs';
 
 @Injectable({

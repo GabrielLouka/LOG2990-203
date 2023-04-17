@@ -3,8 +3,8 @@ import { HistoryStorageService } from '@app/services/history-storage-service/his
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { expect } from 'chai';
 import { assert } from 'console';
 import * as sinon from 'sinon';

@@ -1,4 +1,4 @@
-import { Queue } from '@app/classes/queue';
+import { Queue } from '@app/classes/queue-class/queue';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
@@ -233,9 +233,7 @@ export class ImageProcessingService {
             // Top Down BMP
             yPosition = dimensions.y - position.y - 1;
         }
-
         // Calculate the starting position of the pixel
-        // return (position.x + position.y * imageBuffer.readUInt32LE(imageWidthOffset)) * pixelLength + pixelStart;
         return (position.x + yPosition * imageWidth) * pixelLength + pixelStart;
     };
 

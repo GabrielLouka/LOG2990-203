@@ -7,7 +7,7 @@ import { MatchmakingService } from '@app/services/matchmaking-service/matchmakin
 import { RegistrationService } from '@app/services/registration-service/registration.service';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchType } from '@common/enums/match-type';
+import { MatchType } from '@common/enums/match.type';
 
 @Component({
     selector: 'app-registration-page',

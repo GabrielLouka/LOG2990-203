@@ -1,5 +1,5 @@
-import { MatchStatus } from '../enums/match-status';
-import { MatchType } from '../enums/match-type';
+import { MatchStatus } from '../enums/match.status';
+import { MatchType } from '../enums/match.type';
 import { Player } from './player';
 
 export class Match {

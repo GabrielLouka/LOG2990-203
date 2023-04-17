@@ -9,8 +9,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Match } from '@common/classes/match';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { DeleteGamesPopUpComponent } from '../pop-ups/delete-games-pop-up/delete-games-pop-up.component';
 import { ResetPopUpComponent } from '../pop-ups/reset-pop-up/reset-pop-up.component';
 import { OverlayComponent } from './overlay.component';
@@ -26,10 +26,10 @@ describe('OverlayComponent', () => {
     let locationSpy: jasmine.SpyObj<Location>;
 
     beforeEach(() => {
-        matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['createGame', 'joinGame','setCurrentMatchType']);
+        matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['createGame', 'joinGame', 'setCurrentMatchType']);
         routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        popUpElementSpy = jasmine.createSpyObj('DeleteGamesPopUpComponent', ['showPopUp','displayPopUp']);
-        resetPopUpElementSpy = jasmine.createSpyObj('ResetPopUpComponent', ['showPopUp','displayPopUp']);
+        popUpElementSpy = jasmine.createSpyObj('DeleteGamesPopUpComponent', ['showPopUp', 'displayPopUp']);
+        resetPopUpElementSpy = jasmine.createSpyObj('ResetPopUpComponent', ['showPopUp', 'displayPopUp']);
 
         locationSpy = jasmine.createSpyObj('Location', ['reload']);
 
@@ -44,8 +44,6 @@ describe('OverlayComponent', () => {
                 { provide: Location, useValue: locationSpy },
                 { provide: DeleteGamesPopUpComponent, useValue: popUpElementSpy },
                 { provide: ResetPopUpComponent, useValue: resetPopUpElementSpy },
-
-
             ],
         }).compileComponents();
 
@@ -53,7 +51,7 @@ describe('OverlayComponent', () => {
         component = fixture.componentInstance;
         component.id = 'game_id_123';
         component.deletePopUpElement = popUpElementSpy;
-        component.resetPopUpElement=resetPopUpElementSpy;
+        component.resetPopUpElement = resetPopUpElementSpy;
         fixture.detectChanges();
     });
 
@@ -72,7 +70,7 @@ describe('OverlayComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player1Win,
         };
-        matchmakingServiceSpy.currentMatch=match1;
+        matchmakingServiceSpy.currentMatch = match1;
         component.createOneVersusOneGame();
 
         expect(matchmakingServiceSpy.createGame).toHaveBeenCalledWith('game_id_123');
@@ -81,8 +79,7 @@ describe('OverlayComponent', () => {
     });
 
     it('should create a Solo game and navigate to the registration page', () => {
-      
-        component.resetPopUpElement=resetPopUpElementSpy;
+        component.resetPopUpElement = resetPopUpElementSpy;
         component.createSoloGame();
         component.showResetPopUp();
         component.deleteSelectedGame(false);
@@ -99,7 +96,6 @@ describe('OverlayComponent', () => {
         expect(matchmakingServiceSpy.joinGame).not.toHaveBeenCalled();
         expect(routerSpy.navigate).not.toHaveBeenCalled();
     });
-      
 
     it('should join a game and navigate to the registration page', () => {
         component.matchToJoinIfAvailable = 'match_id_123';

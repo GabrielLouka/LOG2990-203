@@ -29,8 +29,8 @@ import { MatchmakingService } from '@app/services/matchmaking-service/matchmakin
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { MILLISECOND_TO_SECONDS } from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';

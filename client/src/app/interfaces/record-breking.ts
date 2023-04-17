@@ -1,4 +1,4 @@
-import { MatchType } from '@common/enums/match-type';
+import { MatchType } from '@common/enums/match.type';
 
 export interface RecordBreaking {
     recordBreakingPlayer: string;

@@ -1,8 +1,8 @@
 import { HistoryStorageService } from '@app/services/history-storage-service/history-storage.service';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { HistoryToSave } from '@common/interfaces/history.to.save';
 import { MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
 import { Service } from 'typedi';

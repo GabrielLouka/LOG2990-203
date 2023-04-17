@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatchType } from '@common/enums/match-type';
+import { MatchType } from '@common/enums/match.type';
 import { InfoCardComponent } from './info-card.component';
 
 describe('InfoIconComponent', () => {

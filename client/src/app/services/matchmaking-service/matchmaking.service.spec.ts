@@ -11,8 +11,8 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { Socket } from 'socket.io-client';
 import { MatchmakingService } from './matchmaking.service';
 
@@ -43,12 +43,11 @@ describe('MatchmakingService', () => {
     const gameId = '1';
 
     beforeEach(() => {
-        
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketTestHelper as unknown as Socket;
         socketServiceMock.send = jasmine.createSpy('send');
-        socketClientService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'on','disconnect', 'send', 'socket'], {
+        socketClientService = jasmine.createSpyObj('SocketClientService', ['isSocketAlive', 'connect', 'on', 'disconnect', 'send', 'socket'], {
             socket: { id: matchId },
             socketId: matchId,
         });
@@ -277,7 +276,6 @@ describe('MatchmakingService', () => {
     it('should return undefined when player2 are undefined', () => {
         expect(matchmakingService.player2).toEqual({ username: 'hallo', playerId: '1' });
         expect(matchmakingService.player1).toEqual({ username: 'hallo', playerId: '1' });
-
     });
     it('handleMatchUpdate should send update the currentMatch', () => {
         const match: Match = {
@@ -300,7 +298,8 @@ describe('MatchmakingService', () => {
     });
     it('handleMatchUpdate should send update the currentMatch', () => {
         const player: Player = {
-            username: 'hallo', playerId: '1' 
+            username: 'hallo',
+            playerId: '1',
         };
 
         matchmakingService.handleMatchUpdateEvents();
@@ -318,25 +317,24 @@ describe('MatchmakingService', () => {
         expect(matchmakingService.onAllGameDeleted).toBeDefined();
     });
     it('handleMatchUpdate should send update the currentMatch', () => {
-        const data={ hasResetGame: true, id: '1' };
+        const data = { hasResetGame: true, id: '1' };
 
         matchmakingService.handleMatchUpdateEvents();
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('gameReset', callback);
-        socketTestHelper.peerSideEmit('gameReset',data);
+        socketTestHelper.peerSideEmit('gameReset', data);
         expect(matchmakingService.onResetSingleGame).toBeDefined();
     });
     it('handleMatchUpdate should send update the currentMatch', () => {
-        const data={ hasDeletedGame: true, id: '1' };
+        const data = { hasDeletedGame: true, id: '1' };
 
         matchmakingService.handleMatchUpdateEvents();
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('gameDeleted', callback);
-        socketTestHelper.peerSideEmit('gameDeleted',data);
+        socketTestHelper.peerSideEmit('gameDeleted', data);
         expect(matchmakingService.onDeletedSingleGame).toBeDefined();
     });
     it('handleMatchUpdate should send update the currentMatch', () => {
-        
         matchmakingService.handleMatchUpdateEvents();
         const callback = ((params: any) => {}) as any;
         socketTestHelper.on('allGamesReset', callback);

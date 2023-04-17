@@ -4,7 +4,7 @@ import { MatchManagerService } from '@app/services/match-manager-service/match-m
 import { MatchingDifferencesService } from '@app/services/matching-difference-service/matching-differences.service';
 import { Player } from '@common/classes/player';
 import { Vector2 } from '@common/classes/vector2';
-import { MatchType } from '@common/enums/match-type';
+import { MatchType } from '@common/enums/match.type';
 import { GameData } from '@common/interfaces/game.data';
 import { MILLISECOND_TO_SECONDS, NOT_FOUND } from '@common/utils/env';
 import * as http from 'http';

@@ -2,6 +2,7 @@
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
 import {
+    DEFAULT_GAMES_PATH,
     DISPLAYED_GAMES_LIMIT,
     IMAGE_DELIVERY_SERVER,
     LAST_GAME_ID_FILE,
@@ -19,7 +20,6 @@ import { Service } from 'typedi';
 
 @Service()
 export class GameStorageService {
-    jsonPath: string = './app/data/default-games.json';
     fileSystemManager: FileSystemManager = new FileSystemManager();
 
     constructor(private databaseService: DatabaseService) {}
@@ -89,11 +89,6 @@ export class GameStorageService {
         });
     }
 
-    /**
-     * Returns all the available games
-     *
-     * @returns the games list
-     */
     async getAllGames(): Promise<
         {
             gameData: GameData;
@@ -112,24 +107,13 @@ export class GameStorageService {
                 modifiedImage: images.modifiedImage,
             });
         }
-        // gamesToReturn.sort(() => Math.random() - 1 / 2);
         return gamesToReturn;
     }
-    /**
-     * Returns the number of games
-     *
-     * @returns the games list
-     */
+
     async getNumberOfSavedGames() {
         return await this.collection.countDocuments({});
     }
 
-    /**
-     * Gets the game per id
-     *
-     * @param id identifier of the game
-     * @returns returns the matching game
-     */
     async getGameById(id: string) {
         const query = { id: parseInt(id, 10) };
         const game = await this.collection.findOne<GameData>(query);
@@ -137,10 +121,6 @@ export class GameStorageService {
         return { gameData: game, originalImage: images.originalImage, modifiedImage: images.modifiedImage };
     }
 
-    /**
-     * @param id game identifier
-     * @returns true if deleted, false if not
-     */
     async deleteById(id: string): Promise<void> {
         const query = { id: parseInt(id, 10) };
         await this.collection.findOneAndDelete(query);
@@ -199,7 +179,7 @@ export class GameStorageService {
     }
 
     async storeDefaultGames() {
-        const games = JSON.parse(await this.fileSystemManager.readFile(this.jsonPath)).games;
+        const games = JSON.parse(await this.fileSystemManager.readFile(DEFAULT_GAMES_PATH)).games;
         await this.databaseService.populateDb(process.env.DATABASE_COLLECTION_GAMES as string, games);
     }
 
@@ -281,11 +261,6 @@ export class GameStorageService {
         writeFile(folderPath + MODIFIED_IMAGE_FILE, secondImage, this.writeFileErrorManagement);
     }
 
-    /**
-     * Checks and validates if the file was successfully written
-     *
-     * @param err
-     */
     writeFileErrorManagement = (err: NodeJS.ErrnoException) => {
         if (err) {
             console.error('File was not successfully written');

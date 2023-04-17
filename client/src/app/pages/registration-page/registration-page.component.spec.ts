@@ -14,8 +14,8 @@ import { RegistrationService } from '@app/services/registration-service/registra
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { RegistrationPageComponent } from './registration-page.component';
 
 describe('RegistrationPageComponent', () => {
@@ -65,7 +65,7 @@ describe('RegistrationPageComponent', () => {
         setCurrentMatchPlayer: subjectSpy,
         sendCurrentMatchType: subjectSpy,
         joinGame: subjectSpy,
-        connectSocket:subjectSpy,
+        connectSocket: subjectSpy,
     };
     const player1: Player = {
         username: 'player1',
@@ -280,14 +280,14 @@ describe('RegistrationPageComponent', () => {
     });
 
     it('should set to true when sent join request', () => {
-        
-        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest').and.callFake(()=>{return;});
+        spyOn(matchmakingServiceMock, 'sendMatchJoinRequest').and.callFake(() => {
+            return;
+        });
         component.username = 'naruto';
         // component.sendMatchJoinRequest();
-        
+
         expect(matchmakingServiceMock.sendMatchJoinRequest).not.toHaveBeenCalled();
     });
-    
 
     it('should call incoming player service when accept/refuse incoming player', () => {
         component.acceptIncomingPlayer();
@@ -418,8 +418,8 @@ describe('RegistrationPageComponent', () => {
         component.id = '-1';
         component.username = 'ABc';
         component.hasUsernameRegistered = false;
-        spyOnProperty(matchmakingServiceMock,'currentMatchPlayed').and.returnValue(null);
-        
+        spyOnProperty(matchmakingServiceMock, 'currentMatchPlayed').and.returnValue(null);
+
         component.registerUser();
         component.addServerSocketMessagesListeners();
         expect(authService.registerUser).toHaveBeenCalledWith('testuser');
@@ -445,14 +445,15 @@ describe('RegistrationPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player1Win,
         };
-        spyOnProperty(matchmakingServiceMock,'currentMatchPlayed').and.returnValue(match);
-        spyOn(matchmakingServiceMock,'setCurrentMatchPlayer').and.callFake(()=>{return;});
+        spyOnProperty(matchmakingServiceMock, 'currentMatchPlayed').and.returnValue(match);
+        spyOn(matchmakingServiceMock, 'setCurrentMatchPlayer').and.callFake(() => {
+            return;
+        });
 
         component.registerUser();
 
         expect(authService.registerUser).toHaveBeenCalledWith('testuser');
         expect(component.hasUsernameRegistered).toBeTrue();
-        
     });
     it('should register user and set username, hasUsernameRegistered to true, and setCurrentMatchPlayer if current match is played', () => {
         component.registrationForm.setValue({ username: 'testuser' });
@@ -469,35 +470,37 @@ describe('RegistrationPageComponent', () => {
             matchType: MatchType.OneVersusOne,
             matchStatus: MatchStatus.Player1Win,
         };
-        spyOnProperty(matchmakingServiceMock,'currentMatchPlayed').and.returnValue(match);
-        spyOnProperty(matchmakingServiceMock,'isSoloMode').and.returnValue(true);
-        spyOn(component,'loadGamePage').and.callFake(()=>{return;});
+        spyOnProperty(matchmakingServiceMock, 'currentMatchPlayed').and.returnValue(match);
+        spyOnProperty(matchmakingServiceMock, 'isSoloMode').and.returnValue(true);
+        spyOn(component, 'loadGamePage').and.callFake(() => {
+            return;
+        });
         // spyOn(matchmakingServiceMock,'sendMatchJoinRequest').and.callFake(()=>{return;});
 
         // component.sendMatchJoinRequest();
-        spyOn(matchmakingServiceMock,'setCurrentMatchPlayer').and.callFake(()=>{return;});
+        spyOn(matchmakingServiceMock, 'setCurrentMatchPlayer').and.callFake(() => {
+            return;
+        });
 
         component.registerUser();
-        
 
         expect(authService.registerUser).toHaveBeenCalledWith('testuser');
         expect(component.hasUsernameRegistered).toBeTrue();
-        
     });
     it('component should have registration form as proprety', () => {
         const activatedRouteStub = {
             snapshot: {
-              paramMap: {
-                get: jasmine.createSpy('get').and.callFake((key) => {
-                  return key === 'id' ? '-1' : null;
-                }),
-              },
+                paramMap: {
+                    get: jasmine.createSpy('get').and.callFake((key) => {
+                        return key === 'id' ? '-1' : null;
+                    }),
+                },
             },
-          }; 
-          component['route'] = activatedRouteStub as any;
-          spyOn(matchmakingServiceMock,'connectSocket').and.callFake(()=>{});     
-          component.ngOnInit();
-          expect(component.id).toEqual('-1');
+        };
+        component['route'] = activatedRouteStub as any;
+        spyOn(matchmakingServiceMock, 'connectSocket').and.callFake(() => {});
+        component.ngOnInit();
+        expect(component.id).toEqual('-1');
     });
 
     it('should update waitingForIncomingPlayerMessage if id is not -1 and current match is not played', () => {
