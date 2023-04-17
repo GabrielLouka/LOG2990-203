@@ -1,92 +1,90 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ElementRef } from '@angular/core';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ChatComponent } from '@app/components/chat/chat.component';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
+import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MILLISECOND_TO_SECONDS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { GameConstantsService } from '../game-constants-service/game-constants.service';
-import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 import { HintService } from './hint.service';
 
 describe('HintService', () => {
-  let hintService: HintService;
-  let imageService: jasmine.SpyObj<ImageManipulationService>;
-  let chatComponent: ChatComponent;
-  let constantService: jasmine.SpyObj<GameConstantsService>;
+    let hintService: HintService;
+    let imageService: jasmine.SpyObj<ImageManipulationService>;
+    let chatComponent: ChatComponent;
+    let constantService: jasmine.SpyObj<GameConstantsService>;
 
-  const mockGame = {
-    gameData: {
-        id: 1,
-        name: 'Test Game',
-        isEasy: true,
-        nbrDifferences: 0,
-        differences: [],
-        oneVersusOneRanking: [],
-        soloRanking: [],
-    },
+    const mockGame = {
+        gameData: {
+            id: 1,
+            name: 'Test Game',
+            isEasy: true,
+            nbrDifferences: 0,
+            differences: [],
+            oneVersusOneRanking: [],
+            soloRanking: [],
+        },
         hints: 3,
         diffs: [],
     };
 
-  beforeEach(() => {
+    beforeEach(() => {
+        const spyImageManipulationService = jasmine.createSpyObj('ImageManipulationService', ['showFirstHint', 'showSecondHint']);
+        const spyGameConstantsService = jasmine.createSpyObj('GameConstantsService', ['initGameConstants']);
+        chatComponent = jasmine.createSpyObj('ChatComponent', ['sendSystemMessage']);
+        hintService = new HintService(spyImageManipulationService, spyGameConstantsService);
+        imageService = spyImageManipulationService as jasmine.SpyObj<ImageManipulationService>;
+        constantService = spyGameConstantsService as jasmine.SpyObj<GameConstantsService>;
 
-    const spyImageManipulationService = jasmine.createSpyObj('ImageManipulationService', ['showFirstHint', 'showSecondHint']);
-    const spyGameConstantsService = jasmine.createSpyObj('GameConstantsService', ['initGameConstants']);
-    chatComponent = jasmine.createSpyObj('ChatComponent', ['sendSystemMessage']);
-    hintService = new HintService(spyImageManipulationService, spyGameConstantsService);
-    imageService = spyImageManipulationService as jasmine.SpyObj<ImageManipulationService>;
-    constantService = spyGameConstantsService as jasmine.SpyObj<GameConstantsService>;
-
-    TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
-        providers: [ImageManipulationService, GameConstantsService, HintService],
+        TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
+            providers: [ImageManipulationService, GameConstantsService, HintService],
         });
         hintService = TestBed.inject(HintService);
-  });
+    });
 
-  it('should be created', () => {
-    expect(hintService).toBeTruthy();
-  });
+    it('should be created', () => {
+        expect(hintService).toBeTruthy();
+    });
 
-  it('should set randomNumber with Math.random()', () => {
-      spyOn(Math, 'random').and.returnValue(0.1234);
+    it('should set randomNumber with Math.random()', () => {
+        spyOn(Math, 'random').and.returnValue(0.1234);
 
-      hintService.initialize();
+        hintService.initialize();
 
-      expect(imageService.randomNumber).toBeUndefined();
-    }); 
+        expect(imageService.randomNumber).toBeUndefined();
+    });
 
     it('should return the correct time penalty for limited hints', () => {
         const gameConstantsSpy = jasmine.createSpyObj('GameConstantsService', ['initGameConstants']);
         gameConstantsSpy.penaltyValue = 5;
-        const isLimited = true;        
+        const isLimited = true;
         expect(hintService.getTimePenalty(isLimited)).toEqual(0);
-    });   
-    
+    });
+
     it('should return the correct time bonus for unlimited hints', () => {
         const gameConstantsSpy = jasmine.createSpyObj('GameConstantsService', ['initGameConstants']);
         gameConstantsSpy.penaltyValue = 5;
-        const isLimited = false;        
+        const isLimited = false;
         expect(hintService.getTimePenalty(isLimited)).toEqual(-0);
     });
 
-    it("decrement should decrement", () => {
+    it('decrement should decrement', () => {
         hintService.decrement();
         expect(hintService.maxGivenHints).toEqual(2);
     });
 
-    it("returnDisplay should return display", () => {
-        const display = "newDisplay";
+    it('returnDisplay should return display', () => {
+        const display = 'newDisplay';
         hintService.returnDisplay(display);
         expect(display).toBeDefined();
     });
 
     it('should send a system message', () => {
         const now = new Date();
-        const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';    
+        const formattedTime = now.toLocaleTimeString('en-US', { hour12: false }) + ' - Indice utilisé';
         hintService.sendHintMessage(chatComponent);
-    
+
         expect(chatComponent.sendSystemMessage).toHaveBeenCalledWith(formattedTime);
     });
 
@@ -94,27 +92,32 @@ describe('HintService', () => {
         const mockElementRef = {
             nativeElement: {
                 style: {
-                    display: 'none'
-                }
-            }
+                    display: 'none',
+                },
+            },
         } as ElementRef<HTMLDivElement>;
         hintService.showRedError(mockElementRef);
         expect(mockElementRef.nativeElement.style.display).toBe(hintService.returnDisplay('block'));
         tick(MILLISECOND_TO_SECONDS);
         expect(mockElementRef.nativeElement.style.display).toBe(hintService.returnDisplay('none'));
-    }));   
+    }));
 
-    it('should call showFirstHint method of ImageManipulationService when hints value is 3', () => {        
+    it('should call showFirstHint method of ImageManipulationService when hints value is 3', () => {
         // imageService.generatePseudoRandomNumber.and.returnValue(0.5);
-        const mockImageManipulationService = jasmine.createSpyObj('ImageManipulationService', 
-            ['generatePseudoRandomNumber', 'generatePseudoRandomNumber', 'showFirstHint', 'showSecondHint', 'showThirdHint']);
+        const mockImageManipulationService = jasmine.createSpyObj('ImageManipulationService', [
+            'generatePseudoRandomNumber',
+            'generatePseudoRandomNumber',
+            'showFirstHint',
+            'showSecondHint',
+            'showThirdHint',
+        ]);
         mockImageManipulationService.generatePseudoRandomNumber.and.returnValue(0.5);
         hintService = new HintService(mockImageManipulationService, constantService);
-        
+
         const canvas = { nativeElement: document.createElement('canvas') };
         const context = canvas.nativeElement.getContext('2d')!;
         const image = Buffer.alloc(100, 1);
-        const otherImage = Buffer.alloc(100, 1);        
+        const otherImage = Buffer.alloc(100, 1);
 
         mockGame.hints = 1;
         hintService.showHint(canvas, context, image, otherImage, mockGame);
@@ -134,5 +137,4 @@ describe('HintService', () => {
         expect(mockImageManipulationService.showSecondHint).toHaveBeenCalled();
         expect(mockImageManipulationService.showThirdHint).toHaveBeenCalled();
     });
-
 });

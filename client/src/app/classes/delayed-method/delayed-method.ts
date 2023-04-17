@@ -1,3 +1,5 @@
+import { MINIMUM_TIME_MILLISECONDS } from '@common/utils/env';
+
 export class DelayedMethod {
     static speed: number = 1;
     private static instances: DelayedMethod[] = []; // keep track of all instances of DelayedMethod
@@ -79,7 +81,8 @@ export class DelayedMethod {
                     return;
                 }
             }
-            const nextTick = Math.max(remaining, 16) / DelayedMethod.speed; // cap the minimum time to 16ms to avoid unnecessarily high CPU usage
+            // cap the minimum time to 16ms to avoid unnecessarily high CPU usage
+            const nextTick = Math.max(remaining, MINIMUM_TIME_MILLISECONDS) / DelayedMethod.speed;
             this.timeoutId = window.setTimeout(this.setTimeoutLoop.bind(this), nextTick);
         }
     }

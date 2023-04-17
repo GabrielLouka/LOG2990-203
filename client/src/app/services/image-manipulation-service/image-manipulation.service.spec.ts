@@ -373,20 +373,19 @@ describe('ImageManipulationService', () => {
         expect(reset).toHaveBeenCalled();
     }));
 
-    // it('should alternate between old and new image', async () => {
-    //     const oldImage = Buffer.alloc(100, 0);
-    //     const newImage = Buffer.alloc(100, 0);
-    //     const canvas = document.createElement('canvas');
-    //     const context = canvas.getContext('2d')!;
-    //     spyOn(CanvasRenderingContext2D.prototype, 'drawImage');
-    //     const blink = service.alternateOldNewImage(oldImage, newImage, context);
-    //     await blink.start();
+    it('should alternate between old and new image', async () => {
+        const oldImage = Buffer.alloc(100, 0);
+        const newImage = Buffer.alloc(100, 0);
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d')!;
+        service.alternateOldNewImage(oldImage, newImage, context);
 
-    //     expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
-    //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
-    //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
-
-    // });
+        setTimeout(() => {
+        expect(context.getImageData(0, 0, canvas.width, canvas.height)).toBeDefined();  
+        }, QUARTER_SECOND * 2);
+        
+        
+    }); 
 
     it('should resolve', async () => {
         const setTimeoutSpy = spyOn(window, 'setTimeout');

@@ -1,5 +1,3 @@
-// #todo
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { ElementRef, Injectable } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Action } from '@common/classes/action';
@@ -13,8 +11,10 @@ import {
     CANVAS_WIDTH,
     IMAGE_HEIGHT_OFFSET,
     IMAGE_WIDTH_OFFSET,
+    NOT_FOUND,
     NUMBER_OF_BLINKS,
     PIXEL_BYTES_LENGTH,
+    QUARTER,
     QUARTER_SECOND,
 } from '@common/utils/env';
 import { Buffer } from 'buffer';
@@ -23,7 +23,7 @@ import { Buffer } from 'buffer';
     providedIn: 'root',
 })
 export class ImageManipulationService {
-    randomNumber: number = -1;
+    randomNumber: number = NOT_FOUND;
     // can be used on a canvas from a buffer
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
@@ -115,13 +115,13 @@ export class ImageManipulationService {
     ) {
         const width = canvasContext.canvas.nativeElement.width;
         const height = canvasContext.canvas.nativeElement.height;
-        const quarterWidth = width / 4;
-        const quarterHeight = height / 4;
+        const quarterWidth = width / QUARTER;
+        const quarterHeight = height / QUARTER;
 
         const subQuadrants = [];
 
-        for (let i = 0; i < 4; i++) {
-            for (let j = 0; j < 4; j++) {
+        for (let i = 0; i < QUARTER; i++) {
+            for (let j = 0; j < QUARTER; j++) {
                 const quadrant = {
                     x: i * quarterWidth,
                     y: j * quarterHeight,
@@ -290,11 +290,11 @@ export class ImageManipulationService {
         const imageData = context.getImageData(0, 0, drawingCanvas.width, drawingCanvas.height);
         const pixels = imageData.data;
 
-        for (let i = 0; i < pixels.length; i += 4) {
+        for (let i = 0; i < pixels.length; i += QUARTER) {
             const alpha = pixels[i + 3];
             if (alpha !== 0) {
-                const x = (i / 4) % drawingCanvas.width;
-                let y = Math.floor(i / 4 / drawingCanvas.width);
+                const x = (i / QUARTER) % drawingCanvas.width;
+                let y = Math.floor(i / QUARTER / drawingCanvas.width);
                 y = drawingCanvas.height - y - 1;
                 this.setRGB(new Vector2(x, y), originalBuffer, new Pixel(pixels[i], pixels[i + 1], pixels[i + 2]));
             }

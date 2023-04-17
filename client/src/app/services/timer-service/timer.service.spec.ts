@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-
+import { MINUTE_TO_SECONDS } from '@common/utils/env';
 import { TimerService } from './timer.service';
 
 describe('TimerService', () => {
@@ -15,8 +15,7 @@ describe('TimerService', () => {
     });
 
     it('should return the correct format for given score in seconds', () => {
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-        const result = service.convertScoreToString(60);
+        const result = service.convertScoreToString(MINUTE_TO_SECONDS);
         expect(result).toEqual('01:00');
     });
 });

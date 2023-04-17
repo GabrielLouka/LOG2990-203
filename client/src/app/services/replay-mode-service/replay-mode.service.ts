@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
-// import { TimerComponent } from '@app/components/timer/timer.component';
 import { Action } from '@common/classes/action';
 
 export enum ReplayModeState {
