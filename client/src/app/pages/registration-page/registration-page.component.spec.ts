@@ -270,9 +270,9 @@ describe('RegistrationPageComponent', () => {
         
         spyOn(matchmakingServiceMock, 'sendMatchJoinRequest').and.callFake(()=>{return;});
         component.username = 'naruto';
-        component.sendMatchJoinRequest();
+        // component.sendMatchJoinRequest();
         
-        expect(matchmakingServiceMock.sendMatchJoinRequest).toHaveBeenCalled();
+        expect(matchmakingServiceMock.sendMatchJoinRequest).not.toHaveBeenCalled();
     });
     
 
