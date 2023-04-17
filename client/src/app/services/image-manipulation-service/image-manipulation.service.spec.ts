@@ -39,6 +39,16 @@ describe('ImageManipulationService', () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect(canvas.toDataURL()).not.toBe('');
     });
+    it('should change the canvas source when loading an image', () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d')!;
+        const src = 'assets/img/image_empty.png';
+        
+        service.loadCanvasImages(src, ctx);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(canvas.toDataURL()).not.toBe('');
+    });
+   
 
     it('should get the modified image without the specified differences', () => {
         const originalBuffer: Buffer = Buffer.alloc(100, 1);
