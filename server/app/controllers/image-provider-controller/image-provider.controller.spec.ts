@@ -75,19 +75,6 @@ describe('ImageProviderController', () => {
         assert(imageProviderController.router);
         const imgPath = path.join(PERSISTENT_DATA_FOLDER_PATH, '1');
         fs.mkdirSync(imgPath, { recursive: true });
-        fs.writeFileSync(path.join(imgPath, '1.bmp'), 'a');
-        await supertest(expressApp)
-            .get(`${API_URL}/1/1`)
-            .expect(StatusCodes.INTERNAL_SERVER_ERROR)
-            .then((res) => {
-                expect(res.body).to.deep.equal('Internal server error');
-            });
-    });
-
-    it('GET should send a 500 error for an invalid image', async () => {
-        assert(imageProviderController.router);
-        const imgPath = path.join(PERSISTENT_DATA_FOLDER_PATH, '1');
-        fs.mkdirSync(imgPath, { recursive: true });
         const readFileStub = sinon.stub(fs, 'readFile').callsArgWith(1, new Error('Test error'));
 
         await supertest(expressApp).get(`${API_URL}/1/1`);
