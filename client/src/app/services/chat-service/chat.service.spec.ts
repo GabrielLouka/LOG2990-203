@@ -51,8 +51,10 @@ describe('ChatService', () => {
     });
 
     it('is 1v1 getter', () => {
-        chatService.isMode1vs1;
-        matchmakingService.isOneVersusOne;
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isLimitedTimeSolo = false;
+        mockMatchmakingService.isCoopMode = true;
+        chatService['matchmakingService'] = mockMatchmakingService;
         expect(chatService.isMode1vs1).toBeTruthy();
     });
 
@@ -77,39 +79,47 @@ describe('ChatService', () => {
 
         expect(socketSpy.emit).toHaveBeenCalled();
     });
+    it('should send a message if the text is valid', () => {
+        const isPlayer1 = false;
+        const newMessage = 'hello world';
+        const socketSpy = jasmine.createSpyObj('Socket', ['emit']);
+        socketServiceSpy.socket = socketSpy;
+        chatService.sendMessage(isPlayer1, newMessage);
+
+        expect(socketSpy.emit).toHaveBeenCalled();
+    });
 
     it("clearMessage should return '' ", () => {
         const res = chatService.clearMessage();
         expect(res).toEqual('');
     });
 
-    
     it('should call scrollToBottom and set newMessage to empty string when pushMessage is called', () => {
         const message = {
-          text: 'Hello, world!',
-          username: 'testuser',
-          sentBySystem: false,
-          sentByPlayer1: true,
-          sentUpdatedScore: false,
-          sentTime: Date.now(),
+            text: 'Hello, world!',
+            username: 'testuser',
+            sentBySystem: false,
+            sentByPlayer1: true,
+            sentUpdatedScore: false,
+            sentTime: Date.now(),
         };
         const mockElementRef = {
             nativeElement: {
-              scrollTop: 0,
-              scrollHeight: 100,
+                scrollTop: 0,
+                scrollHeight: 100,
             },
-          };
+        };
         chatComponent.chat = mockElementRef;
         spyOn(chatService, 'scrollToBottom');
-    
+
         chatService.pushMessage(message, chatComponent);
-    
+
         expect(chatService.scrollToBottom).toHaveBeenCalledWith(mockElementRef);
         expect(chatComponent.newMessage).toBe('');
-      });
+    });
 
-      it('should push a message to the chat from the system', () => {
-        chatComponent.chat = new ElementRef({ scrollTop: 0, nativeElement: { scrollTop: 0, scrollHeight: 100 } });  
+    it('should push a message to the chat from the system', () => {
+        chatComponent.chat = new ElementRef({ scrollTop: 0, nativeElement: { scrollTop: 0, scrollHeight: 100 } });
         const textToSend = 'Hello world!';
         chatService.sendMessageFromSystem(textToSend, '', chatComponent);
         expect(chatComponent.messages.length).toEqual(1);
@@ -119,20 +129,19 @@ describe('ChatService', () => {
         expect(chatComponent.messages[0].sentByPlayer1).toEqual(false);
         expect(chatComponent.messages[0].sentUpdatedScore).toEqual(false);
         expect(chatComponent.messages[0].sentTime).not.toBeNull();
-      });
-    
-      it('should add a record-breaking message to the chat', () => {
+    });
+
+    it('should add a record-breaking message to the chat', () => {
         const rankingData = {
-          username: 'testUser',
-          position: "1",
-          gameName: 'testGame',
-          matchType: 'testMatchType',
+            username: 'testUser',
+            position: '1',
+            gameName: 'testGame',
+            matchType: 'testMatchType',
         };
         spyOn(chatService, 'pushMessage');
-    
-        chatService.sendRecordBreakingMessage(rankingData, chatComponent);
-    
-        expect(chatService.pushMessage).toHaveBeenCalled();
-      });
 
+        chatService.sendRecordBreakingMessage(rankingData, chatComponent);
+
+        expect(chatService.pushMessage).toHaveBeenCalled();
+    });
 });
