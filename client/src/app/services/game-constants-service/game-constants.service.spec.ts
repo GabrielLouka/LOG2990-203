@@ -23,4 +23,21 @@ describe('GameConstantsService', () => {
     it('should return the bonus value', () => {
         expect(service.bonusValue).toEqual(0);
     });
+
+    it('should reset constants', () => {
+        service.updateConstants(true);
+        expect(service.countdownValue).toEqual(45);
+        expect(service.penaltyValue).toEqual(5);
+        expect(service.bonusValue).toEqual(5);
+    });
+
+    it('should not reset constants', () => {
+        service.constants.countdownValue = 45;
+        service.constants.penaltyValue = 5;
+        service.constants.bonusValue = 5;
+        service.updateConstants(false);
+        expect(service.countdownValue).toEqual(45);
+        expect(service.penaltyValue).toEqual(5);
+        expect(service.bonusValue).toEqual(5);
+    });
 });
