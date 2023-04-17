@@ -31,8 +31,8 @@ export class RegistrationPageComponent implements OnInit, OnDestroy {
     constructor(
         private auth: AuthService,
         private route: ActivatedRoute,
-        private readonly matchmakingService: MatchmakingService,
-        private readonly incomingPlayerService: IncomingPlayerService,
+        private matchmakingService: MatchmakingService,
+        private incomingPlayerService: IncomingPlayerService,
         private readonly registrationService: RegistrationService,
     ) {}
 
