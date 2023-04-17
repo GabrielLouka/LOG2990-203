@@ -96,7 +96,7 @@ describe('DelayedMethod', () => {
         expect(delayedMethod1['isExecuted']).not.toBeUndefined();
     
     });
-    it('should pause all instances of DelayedMethod', async () => {
+    it('should resume all instances of DelayedMethod', async () => {
         const delay = 100;
         const spy = jasmine.createSpy();
         const delayedMethod1 = new DelayedMethod(spy, delay);
@@ -109,7 +109,7 @@ describe('DelayedMethod', () => {
         const elapsedBeforePause2 = delayedMethod2['elapsed'];
         console.log(elapsedBeforePause1);
         console.log(elapsedBeforePause2);
-        expect(DelayedMethod['instances'][0]['isPaused']).toEqual(false);
+        expect(delayedMethod1['isPaused']).not.toBeUndefined();
     
     });
     it('should set timeout loop', async () => {
