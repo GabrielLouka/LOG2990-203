@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { TimerService } from '@app/services/timer-service/timer.service';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 @Component({
     selector: 'app-game-card',
     templateUrl: './game-card.component.html',

@@ -20,7 +20,7 @@ import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import {
     ABORTED_GAME_TEXT,

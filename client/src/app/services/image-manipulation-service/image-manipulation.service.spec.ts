@@ -10,7 +10,7 @@ import { ElementRef } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Vector2 } from '@common/classes/vector2';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET, QUARTER_SECOND } from '@common/utils/env';
 import { Buffer } from 'buffer';
 import { delay } from 'rxjs';
@@ -43,12 +43,11 @@ describe('ImageManipulationService', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         const src = 'assets/img/image_empty.png';
-        
+
         service.loadCanvasImages(src, ctx);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect(canvas.toDataURL()).not.toBe('');
     });
-   
 
     it('should get the modified image without the specified differences', () => {
         const originalBuffer: Buffer = Buffer.alloc(100, 1);
@@ -161,14 +160,13 @@ describe('ImageManipulationService', () => {
             name: 'Test Game',
             isEasy: true,
             nbrDifferences: 0,
-            differences: [[{x:0, y:1}]],
+            differences: [[{ x: 0, y: 1 }]],
             oneVersusOneRanking: [],
             soloRanking: [],
         };
         const randomDifference = service.generateRandomVector(gameData, foundDifferences);
-    
-        expect(randomDifference).toEqual({x:0, y:1});
 
+        expect(randomDifference).toEqual({ x: 0, y: 1 });
     });
 
     it('should generate a pseudo-random number', () => {
@@ -178,19 +176,18 @@ describe('ImageManipulationService', () => {
     });
 
     it('should return a valid image source from a buffer', () => {
-        const mockBuffer = Buffer.alloc(100, 1);            
-        const imageSource = service.getImageSourceFromBuffer(mockBuffer);    
+        const mockBuffer = Buffer.alloc(100, 1);
+        const imageSource = service.getImageSourceFromBuffer(mockBuffer);
         expect(imageSource).toBeDefined();
     });
 
     it('should show a blinking quadrant containing a difference', async () => {
         const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
             nativeElement: document.createElement('canvas'),
-            
-        }; 
+        };
         mockCanvasRef.nativeElement.width = 800;
         mockCanvasRef.nativeElement.height = 800;
-        
+
         const canvasContext = {
             context: mockCanvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D,
             canvas: mockCanvasRef,
@@ -209,19 +206,18 @@ describe('ImageManipulationService', () => {
         const differences = [false];
         spyOn(service, 'generatePseudoRandomNumber').and.returnValue(0.5);
         spyOn(service, 'loadCanvasImages');
-    
-        await service.showFirstHint(canvasContext, gameData, differences);        
+
+        await service.showFirstHint(canvasContext, gameData, differences);
         expect(service.loadCanvasImages).not.toHaveBeenCalled();
     });
 
     it('should show a blinking quadrant containing a difference', async () => {
         const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
             nativeElement: document.createElement('canvas'),
-            
-        }; 
+        };
         mockCanvasRef.nativeElement.width = 800;
         mockCanvasRef.nativeElement.height = 800;
-        
+
         const canvasContext = {
             context: mockCanvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D,
             canvas: mockCanvasRef,
@@ -240,19 +236,18 @@ describe('ImageManipulationService', () => {
         const differences = [false];
         spyOn(service, 'generatePseudoRandomNumber').and.returnValue(0.5);
         spyOn(service, 'loadCanvasImages');
-    
-        await service.showSecondHint(canvasContext, gameData, differences);        
+
+        await service.showSecondHint(canvasContext, gameData, differences);
         expect(service.loadCanvasImages).not.toHaveBeenCalled();
     });
 
     it('should show a blinking quadrant containing a difference', async () => {
         const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
             nativeElement: document.createElement('canvas'),
-            
-        }; 
+        };
         mockCanvasRef.nativeElement.width = 800;
         mockCanvasRef.nativeElement.height = 800;
-        
+
         const canvasContext = {
             context: mockCanvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D,
             canvas: mockCanvasRef,
@@ -271,8 +266,8 @@ describe('ImageManipulationService', () => {
         const differences = [false];
         spyOn(service, 'generatePseudoRandomNumber').and.returnValue(0.5);
         spyOn(service, 'loadCanvasImages');
-    
-        await service.showThirdHint(canvasContext, gameData, differences);        
+
+        await service.showThirdHint(canvasContext, gameData, differences);
         expect(service.loadCanvasImages).not.toHaveBeenCalled();
     });
 
@@ -291,31 +286,30 @@ describe('ImageManipulationService', () => {
         const x = 50;
         const y = 50;
         const reset = () => {};
-      
+
         spyOn(context, 'beginPath');
         spyOn(context, 'arc');
         spyOn(context, 'fill');
-      
+
         await service.blinkDisk(context, x, y, reset);
-      
+
         expect(context.beginPath).not.toHaveBeenCalled();
         expect(context.arc).not.toHaveBeenCalled();
         expect(context.fill).not.toHaveBeenCalled();
-      });
+    });
 
-      it('should blink the disk ', async () => {
+    it('should blink the disk ', async () => {
         const context = {
-          fillStyle: '',
-          beginPath: jasmine.createSpy('beginPath'),
-          arc: jasmine.createSpy('arc'),
-          fill: jasmine.createSpy('fill')
-        } as unknown as CanvasRenderingContext2D;        
+            fillStyle: '',
+            beginPath: jasmine.createSpy('beginPath'),
+            arc: jasmine.createSpy('arc'),
+            fill: jasmine.createSpy('fill'),
+        } as unknown as CanvasRenderingContext2D;
         const expectedColors = ['#FF0000', '#0000FF', '#FF0000', '#0000FF', '#FF0000', '#0000FF'];
-        const resetFn = jasmine.createSpy('resetFn');      
-        await service.blinkDisk(context, 50, 50, resetFn);      
+        const resetFn = jasmine.createSpy('resetFn');
+        await service.blinkDisk(context, 50, 50, resetFn);
         expect(context.fillStyle).not.toBe(expectedColors[0]);
-            
-      });
+    });
 
     it('should blink the disk', fakeAsync(() => {
         const canvas = document.createElement('canvas');
@@ -323,7 +317,7 @@ describe('ImageManipulationService', () => {
         spyOn(context, 'fill');
         const x = 100;
         const y = 100;
-        const reset = () => { };
+        const reset = () => {};
         service.blinkDisk(context, x, y, reset);
         expect(context.fillStyle).toBe('#000000');
         expect(context.fill).not.toHaveBeenCalled();
@@ -342,14 +336,14 @@ describe('ImageManipulationService', () => {
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d')!;
         const spyBlink = spyOn(context, 'fillRect');
-    
+
         const blinkCount = 1;
         const blink1 = new DelayedMethod(() => {
-          expect(context.fillStyle).toEqual('#000000');
+            expect(context.fillStyle).toEqual('#000000');
         }, QUARTER_SECOND * blinkCount);
         blink1.start();
         await delay(QUARTER_SECOND * blinkCount + 1);
-    
+
         expect(spyBlink).not.toHaveBeenCalledTimes(1);
     });
 
@@ -358,23 +352,23 @@ describe('ImageManipulationService', () => {
         canvas.width = 300;
         canvas.height = 300;
         const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-      
+
         const reset = jasmine.createSpy('reset');
-      
-        service.blinkQuadrant(context, {x: 0, y: 0, width: 150, height: 150}, reset);
-      
+
+        service.blinkQuadrant(context, { x: 0, y: 0, width: 150, height: 150 }, reset);
+
         tick(250);
         expect(context.fillStyle).toEqual('#ff0000');
-      
+
         tick(500);
         expect(context.fillStyle).toEqual('#ff0000');
-      
+
         tick(750);
         expect(context.fillStyle).toEqual('#0000ff');
-      
+
         tick(1000);
         expect(context.fillStyle).toEqual('#0000ff');
-      
+
         tick(1250);
         expect(reset).toHaveBeenCalled();
     }));
@@ -391,18 +385,17 @@ describe('ImageManipulationService', () => {
     //     expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
     //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
     //     // expect(CanvasRenderingContext2D.prototype.drawImage).not.toHaveBeenCalled();
-        
+
     // });
 
     it('should resolve', async () => {
         const setTimeoutSpy = spyOn(window, 'setTimeout');
         const timeInterval = 10;
-      
+
         const sleepPromise = service.sleep(timeInterval);
-      
+
         expect(setTimeoutSpy).toHaveBeenCalledTimes(1);
         expect(sleepPromise).toBeDefined();
-      
     });
 
     it('should combine images correctly', () => {
@@ -412,14 +405,10 @@ describe('ImageManipulationService', () => {
         canvas.height = 100;
         const context = canvas.getContext('2d') as CanvasRenderingContext2D;
         context.fillStyle = '#FF0000';
-        context.fillRect(0, 0, 50, 50);        
+        context.fillRect(0, 0, 50, 50);
         spyOn<any>(service, 'setRGB');
         service.combineImages(originalBuffer, canvas);
-    
-        expect(service['setRGB']).toHaveBeenCalled();;
+
+        expect(service['setRGB']).toHaveBeenCalled();
     });
-
-
 });
-
-

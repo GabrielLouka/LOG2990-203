@@ -1,6 +1,6 @@
-import { MatchType } from '../enums/match-type';
+import { MatchType } from '@common/enums/match-type';
 
-export interface historyToSave {
+export interface HistoryToSave {
     startingTime: Date;
     gameMode: MatchType | undefined;
     duration: string;

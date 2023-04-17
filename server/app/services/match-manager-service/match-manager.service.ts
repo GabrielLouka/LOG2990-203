@@ -1,12 +1,11 @@
-/* eslint-disable complexity */
+import { HistoryStorageService } from '@app/services/history-storage-service/history-storage.service';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
 import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
-import { historyToSave } from '@common/interfaces/history-to-save';
+import { HistoryToSave } from '@common/interfaces/history.to.save';
+import { MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
 import { Service } from 'typedi';
-// eslint-disable-next-line no-restricted-imports
-import { HistoryStorageService } from '../history-storage-service/history-storage.service';
 
 @Service()
 export class MatchManagerService {
@@ -108,7 +107,7 @@ export class MatchManagerService {
     }
 
     storeHistory(match: Match, isWinByDefault: boolean) {
-        const newHistory: historyToSave = {
+        const newHistory: HistoryToSave = {
             startingTime: this.startingTime,
             gameMode: match.matchType,
             duration: this.formatDuration(this.startingTime, new Date()),
@@ -123,8 +122,8 @@ export class MatchManagerService {
 
     formatDuration(startDate: Date, endDate: Date): string {
         const diff = Math.abs(endDate.getTime() - startDate.getTime());
-        const minutes = Math.floor(diff / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
+        const minutes = Math.floor(diff / (MINUTE_TO_SECONDS * MILLISECOND_TO_SECONDS));
+        const seconds = Math.floor((diff % (MINUTE_TO_SECONDS * MILLISECOND_TO_SECONDS)) / MILLISECOND_TO_SECONDS);
         return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 

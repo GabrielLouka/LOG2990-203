@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { MAX_GAMES_PER_PAGE } from '@common/utils/env';
 
 @Injectable({

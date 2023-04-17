@@ -9,7 +9,7 @@ import {
     ORIGINAL_IMAGE_FILE,
     PERSISTENT_DATA_FOLDER_PATH,
 } from '@app/utils/env';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { Ranking, defaultRanking } from '@common/interfaces/ranking';
 import 'dotenv/config';
 import { mkdir, readFileSync, readdir, rmdir, writeFile, writeFileSync } from 'fs';

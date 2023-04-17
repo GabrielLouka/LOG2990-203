@@ -1,11 +1,10 @@
-/* eslint-disable no-restricted-imports */
 import { ElementRef, Injectable } from '@angular/core';
 import { ChatComponent } from '@app/components/chat/chat.component';
-import { GameData } from '@common/interfaces/game-data';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
+import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
+import { GameData } from '@common/interfaces/game.data';
 import { MILLISECOND_TO_SECONDS, NUMBER_HINTS } from '@common/utils/env';
 import { Buffer } from 'buffer';
-import { GameConstantsService } from '../game-constants-service/game-constants.service';
-import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 
 @Injectable({
     providedIn: 'root',
