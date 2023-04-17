@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game.data';
 import { expect } from 'chai';
@@ -13,6 +14,7 @@ import { Container } from 'typedi';
 import { ImageProviderController } from './image-provider.controller';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import assert = require('assert');
+import path = require('path');
 
 const API_URL = '/api/images';
 
@@ -60,21 +62,51 @@ describe('ImageProviderController', () => {
         sandbox.restore();
     });
 
-    it('GET should detect when error reading the file and send a 500 error', async () => {
+    it('GET should retrieve the appropriate image', async () => {
         assert(imageProviderController.router);
-        const accessStub = sandbox.stub(fs, 'access');
+        const imgPath = path.join(PERSISTENT_DATA_FOLDER_PATH, '1');
+        fs.mkdirSync(imgPath, { recursive: true });
+        fs.writeFileSync(path.join(imgPath, '1.bmp'), Buffer.from([0x42, 0x4d]));
+        // const accessStub = sandbox.stub(fs, 'access');
+        // const readFileStub = sandbox.stub(fs, 'readFile');
+        // accessStub.resolves({ data: Buffer.from('') });
+        // readFileStub.resolves();
+        await supertest(expressApp).get(`${API_URL}/1/1`).expect(StatusCodes.OK);
+        // .then((res) => {
+        //     expect(res.body).to.deep.equal('Internal server error');
+        // })
+        // .catch((err) => {
+        //     console.log('errfeur : ' + err);
+        // });
+    });
+
+    it('GET should send a 500 error for an invalid image', async () => {
+        assert(imageProviderController.router);
+        const imgPath = path.join(PERSISTENT_DATA_FOLDER_PATH, '1');
+        fs.mkdirSync(imgPath, { recursive: true });
+        fs.writeFileSync(path.join(imgPath, '1.bmp'), Buffer.from([0x42, 0x4d]));
+        // const accessStub = sandbox.stub(fs, 'access');
         const readFileStub = sandbox.stub(fs, 'readFile');
-        accessStub.resolves(Buffer.from(''));
-        readFileStub.throws(Error);
+        // accessStub.resolves({ data: Buffer.from('') });
+        readFileStub.resolves(new Error());
         supertest(expressApp)
-            .get(`${API_URL}/${game.id}/0`)
+            .get(`${API_URL}/1/1`)
             .expect(StatusCodes.INTERNAL_SERVER_ERROR)
             .then((res) => {
                 expect(res.body).to.deep.equal('Internal server error');
             })
             .catch((err) => {
-                console.log('erreur : ' + err);
+                console.log('errfeur : ' + err);
             });
+    });
+
+    it('GET should return 404 when the image is not found', async () => {
+        assert(imageProviderController.router);
+        const accessStub = sandbox.stub(fs, 'access');
+        const readFileStub = sandbox.stub(fs, 'readFile');
+        accessStub.resolves(Buffer.from(''));
+        readFileStub.throws(Error);
+        supertest(expressApp).get(`${API_URL}/${game.id}/0`).expect(StatusCodes.NOT_FOUND);
     });
 
     it('GET should send a 404 error when game is non existent', async () => {
