@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ElementRef } from '@angular/core';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game.data';
@@ -378,14 +378,13 @@ describe('ImageManipulationService', () => {
         const newImage = Buffer.alloc(100, 0);
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d')!;
-        spyOn(service,'loadCanvasImages');
+        spyOn(service, 'loadCanvasImages');
         service.alternateOldNewImage(oldImage, newImage, context);
         service.alternateOldNewImage(oldImage, newImage, context);
 
         DelayedMethod.resumeAll();
         expect(service.loadCanvasImages).not.toHaveBeenCalled();
-        
-    }); 
+    });
 
     it('should resolve', async () => {
         const setTimeoutSpy = spyOn(window, 'setTimeout');
@@ -409,5 +408,35 @@ describe('ImageManipulationService', () => {
         service.combineImages(originalBuffer, canvas);
 
         expect(service['setRGB']).toHaveBeenCalled();
+    });
+
+    it('should blink the disk and reset the canvas', async () => {
+        const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
+            nativeElement: document.createElement('canvas'),
+        };
+        const canvasContext = {
+            context: mockCanvasRef.nativeElement.getContext('2d') as CanvasRenderingContext2D,
+            canvas: mockCanvasRef,
+            imageNew: Buffer.alloc(100, 1),
+            original: Buffer.alloc(100, 1),
+        };
+        const gameData: GameData = {
+            id: 1,
+            name: 'Test Game',
+            isEasy: true,
+            nbrDifferences: 1,
+            differences: [[{ x: 100, y: 200 }]],
+            oneVersusOneRanking: [],
+            soloRanking: [],
+        };
+        const differences = [false];
+        const spy = spyOn(service, 'loadCanvasImages');
+
+        await service.showThirdHint(canvasContext, gameData, differences);
+
+        expect(spy).toHaveBeenCalledWith(
+            service.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+            canvasContext.context,
+        );
     });
 });
