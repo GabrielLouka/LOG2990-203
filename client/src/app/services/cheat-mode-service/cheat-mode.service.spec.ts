@@ -6,7 +6,7 @@ import { ImageManipulationService } from '@app/services/image-manipulation-servi
 import { Buffer } from 'buffer';
 
 import { ElementRef } from '@angular/core';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { CheatModeService } from './cheat-mode.service';
 
 describe('CheatModeService', () => {
@@ -16,13 +16,17 @@ describe('CheatModeService', () => {
     let rightCanvasContext: CanvasRenderingContext2D;
 
     beforeEach(() => {
-        const spy = jasmine.createSpyObj('ImageManipulationService', ['alternateOldNewImage', 'loadCurrentImage', 'getModifiedImageWithoutDifferences']);
+        const spy = jasmine.createSpyObj('ImageManipulationService', [
+            'alternateOldNewImage',
+            'loadCurrentImage',
+            'getModifiedImageWithoutDifferences',
+        ]);
         TestBed.configureTestingModule({
-            providers: 
-            [CheatModeService, 
+            providers: [
+                CheatModeService,
                 { provide: ImageManipulationService, useValue: spy },
                 { provide: CanvasRenderingContext2D, useValue: leftCanvasContext },
-                { provide: CanvasRenderingContext2D, useValue: rightCanvasContext }
+                { provide: CanvasRenderingContext2D, useValue: rightCanvasContext },
             ],
         });
         service = TestBed.inject(CheatModeService);
@@ -70,33 +74,31 @@ describe('CheatModeService', () => {
         expect(imageManipulationServiceSpy.alternateOldNewImage).toHaveBeenCalled();
     });
 
-    it("activateCheatMode should cheat", () => {
+    it('activateCheatMode should cheat', () => {
         const gameData: GameData = {
             id: 1,
             name: 'My Game',
             isEasy: true,
             nbrDifferences: 3,
             differences: [
-              [
-                { x: 10, y: 20 },
-                { x: 30, y: 40 }
-              ],
-              [
-                { x: 50, y: 60 },
-                { x: 70, y: 80 },
-                { x: 90, y: 100 }
-              ],
-              [
-                { x: 110, y: 120 }
-              ]
+                [
+                    { x: 10, y: 20 },
+                    { x: 30, y: 40 },
+                ],
+                [
+                    { x: 50, y: 60 },
+                    { x: 70, y: 80 },
+                    { x: 90, y: 100 },
+                ],
+                [{ x: 110, y: 120 }],
             ],
             oneVersusOneRanking: [],
-            soloRanking: []
+            soloRanking: [],
         };
         const original = Buffer.alloc(100, 0);
         const modified = Buffer.alloc(100, 0);
         const foundDifferences: boolean[] = [false, false, false];
-        service.activateCheatMode(gameData, {originalImage: original, modifiedImage: modified}, foundDifferences);
+        service.activateCheatMode(gameData, { originalImage: original, modifiedImage: modified }, foundDifferences);
         expect(imageManipulationServiceSpy.getModifiedImageWithoutDifferences).toHaveBeenCalled();
     });
 });

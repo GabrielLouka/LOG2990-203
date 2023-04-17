@@ -11,7 +11,7 @@ import { Match } from '@common/classes/match';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match-status';
 import { MatchType } from '@common/enums/match-type';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { defaultRanking } from '@common/interfaces/ranking';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';

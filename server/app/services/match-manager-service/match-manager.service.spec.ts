@@ -1,4 +1,6 @@
-/* eslint-disable no-restricted-imports */
+import { DatabaseService } from '@app/services/database-service/database.service';
+import { HistoryStorageService } from '@app/services/history-storage-service/history-storage.service';
+import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
 import { MatchStatus } from '@common/enums/match-status';
@@ -6,9 +8,6 @@ import { MatchType } from '@common/enums/match-type';
 import { expect } from 'chai';
 import { assert } from 'console';
 import * as sinon from 'sinon';
-import { DatabaseService } from '../database-service/database.service';
-import { HistoryStorageService } from '../history-storage-service/history-storage.service';
-import { MatchManagerService } from './match-manager.service';
 
 describe('MatchManagerService', () => {
     let matchManagerService: MatchManagerService;
@@ -121,7 +120,6 @@ describe('MatchManagerService', () => {
         expect(createdMatch.player2).to.deep.equal(player2);
         expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
-
 
     it('should not set the match player if match id is not valid', () => {
         const invalidMatchId = 'match2';

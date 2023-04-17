@@ -1,6 +1,6 @@
 import { ElementRef, Injectable } from '@angular/core';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { Buffer } from 'buffer';
 
 @Injectable({
@@ -26,7 +26,6 @@ export class CheatModeService {
         }
     }
 
-
     activateCheatMode(gameData: GameData, images: { originalImage: Buffer; modifiedImage: Buffer }, foundDifferences: boolean[]) {
         this.backgroundColor = '#66FF99';
         const newImage = this.imageManipulationService.getModifiedImageWithoutDifferences(gameData, images, foundDifferences);
@@ -45,7 +44,6 @@ export class CheatModeService {
         this.isCheating = !this.isCheating;
     }
 
-    
     putCanvasIntoInitialState(
         images: { originalImage: Buffer; currentModifiedImage: Buffer },
         canvas: { leftContext: CanvasRenderingContext2D; rightContext: CanvasRenderingContext2D },

@@ -7,7 +7,7 @@ import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-he
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { GamesService } from '@app/services/games-service/games.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { defaultRanking } from '@common/interfaces/ranking';
 import { Socket } from 'socket.io-client';
 import { GamesDisplayComponent } from './games-display.component';

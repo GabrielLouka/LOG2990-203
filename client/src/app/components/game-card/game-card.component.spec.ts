@@ -1,5 +1,5 @@
 // import { ComponentFixture, TestBed } from '@angular/core/testing';
-// import { GameData } from '@common/interfaces/game-data';
+// import { GameData } from '@common/interfaces/game.data';
 // import { defaultRanking } from '@common/interfaces/ranking';
 // import { Buffer } from 'buffer';
 // import { GameCardComponent } from './game-card.component';

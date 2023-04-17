@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatabaseServiceMock } from '@app/services/database-service-mock/database.service.mock';
 import { LAST_GAME_ID_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import * as chai from 'chai';
 import { expect } from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';

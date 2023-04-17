@@ -3,7 +3,7 @@ import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { Vector2 } from '@common/classes/vector2';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';

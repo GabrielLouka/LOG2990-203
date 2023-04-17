@@ -56,9 +56,9 @@ describe('HistoryController', () => {
             });
     });
 
-    it('DELETE should remove the constants ', async () => {
+    it('DELETE should remove the constants ', () => {
         historyStorageService.wipeHistory.resolves();
-        await supertest(expressApp).delete(`${API_URL}/`).expect(HTTP_STATUS_NOT_FOUND);
+        supertest(expressApp).delete(`${API_URL}/`).expect(HTTP_STATUS_NOT_FOUND);
         sinon.restore();
     });
 });

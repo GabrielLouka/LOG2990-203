@@ -5,7 +5,7 @@ import { MatchingDifferencesService } from '@app/services/matching-difference-se
 import { Player } from '@common/classes/player';
 import { Vector2 } from '@common/classes/vector2';
 import { MatchType } from '@common/enums/match-type';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { MILLISECOND_TO_SECONDS, NOT_FOUND } from '@common/utils/env';
 import * as http from 'http';
 import * as io from 'socket.io';
