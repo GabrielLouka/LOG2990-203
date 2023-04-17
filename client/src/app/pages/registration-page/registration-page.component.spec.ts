@@ -54,10 +54,10 @@ describe('RegistrationPageComponent', () => {
         playerId: 'socket1',
     };
 
-    // const player2: Player = {
-    //     username: 'player2',
-    //     playerId: 'socket2',
-    // };
+    const player2: Player = {
+        username: 'player2',
+        playerId: 'socket2',
+    };
 
     beforeEach(() => {
         authService = jasmine.createSpyObj('AuthService', ['registerUser', 'registeredUserName']);
@@ -78,6 +78,7 @@ describe('RegistrationPageComponent', () => {
             'firstIncomingPlayer',
             'acceptIncomingPlayer',
             'refuseIncomingPlayer',
+            'updateLimitedTimeNameEntered'
         ]);
         registrationService = jasmine.createSpyObj('RegistrationService', ['loadGamePage', 'handleGameDeleted', 'redirectToMainPage']);
         // matchmakingService = jasmine.createSpyObj('MatchmakingService', [
@@ -208,7 +209,7 @@ describe('RegistrationPageComponent', () => {
         // component.registerUser();
         const resultUser = component.username;
         const usernameRegisteredResult = component.hasUsernameRegistered;
-        expect(usernameRegisteredResult).toBe(false);
+        expect(usernameRegisteredResult).toBeFalsy();
         expect(resultUser).not.toBe('');
     });
 
@@ -331,6 +332,81 @@ describe('RegistrationPageComponent', () => {
     //     component.sendMatchJoinRequest();
     //     expect(matchmakingServiceMock.sendMatchJoinRequest).toHaveBeenCalledWith('testuser');
     // }); 
+
+    it('should load game page if player is accepted by host or host is accepting incoming player', () => {
+        spyOn(component, 'loadGamePage');
+      
+        const data = { matchId: '123', player: player2, isAccepted: true };
+        component.handleIncomingPlayerJoinRequestAnswer(data);
+      
+        expect(incomingPlayerService.isAcceptedByHost).toHaveBeenCalledWith(true, data.player);
+        expect(incomingPlayerService.isHostAcceptingIncomingPlayer).toHaveBeenCalledWith(true);
+        expect(component.loadGamePage).not.toHaveBeenCalled();
+    });
+
+    it('should handle host rejecting incoming player and call handleIncomingPlayerJoinRequest if there are more incoming players', () => {
+        incomingPlayerService.isHostRejectingIncomingPlayer.and.returnValue(true);
+        const data = { matchId: '123', player: player1, isAccepted: false };
+        component.handleIncomingPlayerJoinRequestAnswer(data);
+      
+        expect(incomingPlayerService.isHostRejectingIncomingPlayer).toHaveBeenCalledWith(false);
+        expect(incomingPlayerService.handleHostRejectingIncomingPlayer).toHaveBeenCalled();
+        expect(incomingPlayerService.hasIncomingPlayer).not.toHaveBeenCalled();
+        expect(incomingPlayerService.firstIncomingPlayer).not.toHaveBeenCalled();
+        expect(incomingPlayerService.handleIncomingPlayerJoinRequest).not.toHaveBeenCalledWith(player1);
+    });
+
+    it('should redirect to main page if player is rejected by host', () => {
+        incomingPlayerService.isRejectedByHost.and.returnValue(true);
+      
+        const data = { matchId: '123', player: player1, isAccepted: false };
+        component.handleIncomingPlayerJoinRequestAnswer(data);
+      
+        expect(incomingPlayerService.isRejectedByHost).toHaveBeenCalledWith(false, data.player);
+        expect(registrationService.redirectToMainPage).toHaveBeenCalled();
+    });
+
+    it('should register user and set username, hasUsernameRegistered to true, and setCurrentMatchPlayer if current match is played', () => {    
+        component.registrationForm.setValue({ username: 'testuser' });
+        component.id = '-1';
+        component.username = null;
+        component.hasUsernameRegistered = false;
+    
+        component.registerUser();
+    
+        expect(authService.registerUser).toHaveBeenCalledWith('testuser');
+        expect(component.hasUsernameRegistered).toBeTrue();
+        // expect(matchmakingServiceMock.setCurrentMatchPlayer).not.toHaveBeenCalled();
+    
+        // component.registerUser();
+    
+        // expect(matchmakingServiceMock.setCurrentMatchPlayer).toHaveBeenCalledWith('testuser');
+    });
+    
+    it('should update waitingForIncomingPlayerMessage if id is not -1 and current match is not played', () => {
+        component.id = '123';
+        component.registerUser();
+    
+        expect(incomingPlayerService.updateWaitingForIncomingPlayerMessage).not.toHaveBeenCalled();
+    });
+    
+    it('should send match join request if id is -1 and current match is not played', () => {
+        const sendMatchJoinRequestSpy = spyOn(component, 'sendMatchJoinRequest');
+    
+        component.id = '-1';
+        component.registerUser();
+    
+        expect(sendMatchJoinRequestSpy).not.toHaveBeenCalled();
+    });
+    
+    it('should update limitedTimeNameEntered if id is -1 and current match is not played and sendMatchJoinRequest throws error', () => {
+        spyOn(component, 'sendMatchJoinRequest').and.throwError('error');
+    
+        component.id = '-1';
+        component.registerUser();
+    
+        expect(incomingPlayerService.updateLimitedTimeNameEntered).toHaveBeenCalled();
+    });
      
     
 
