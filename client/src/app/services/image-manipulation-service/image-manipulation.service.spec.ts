@@ -378,12 +378,12 @@ describe('ImageManipulationService', () => {
         const newImage = Buffer.alloc(100, 0);
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d')!;
+        spyOn(service,'loadCanvasImages');
+        service.alternateOldNewImage(oldImage, newImage, context);
         service.alternateOldNewImage(oldImage, newImage, context);
 
-        setTimeout(() => {
-        expect(context.getImageData(0, 0, canvas.width, canvas.height)).toBeDefined();  
-        }, QUARTER_SECOND * 2);
-        
+        DelayedMethod.resumeAll();
+        expect(service.loadCanvasImages).not.toHaveBeenCalled();
         
     }); 
 
