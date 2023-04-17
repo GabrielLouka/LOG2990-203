@@ -56,7 +56,7 @@ describe('GameConstantsService', () => {
     });
 
     it('should not update game constants when error is thrown', () => {
-        const consoleSpy = sinon.spy(console, 'error');
+        const consoleSpy = sinon.spy(console, 'log');
         const errorMessage = "Erreur lors de l'écriture des constantes";
         const writeStub = sinon.stub(fs, 'writeFileSync');
         const filePath = PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE;

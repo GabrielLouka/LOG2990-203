@@ -75,7 +75,8 @@ export class CreationResultModalComponent {
                 this.router.navigate([HOME_PATH]);
             },
             error: (err: HttpErrorResponse) => {
-                alert(err);
+                // eslint-disable-next-line no-console
+                console.log(err);
             },
         });
     }

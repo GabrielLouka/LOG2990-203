@@ -25,7 +25,7 @@ export class GameConstantsService {
             const data = JSON.stringify(constants);
             writeFileSync(filePath, data);
         } catch (error) {
-            console.error(error);
+            console.log(error);
         }
     }
 }

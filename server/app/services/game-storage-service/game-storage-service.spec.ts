@@ -114,7 +114,6 @@ describe('Game storage service', () => {
         const writeFileStub = sinon.spy(fs, 'writeFileSync');
         readFileStub.returns('14');
         const result = gameStorageService.getNextAvailableGameId();
-        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         expect(result).to.equal(15);
         sinon.assert.calledWith(writeFileStub, PERSISTENT_DATA_FOLDER_PATH + LAST_GAME_ID_FILE, '15');
         sandbox.restore();
@@ -184,16 +183,6 @@ describe('Game storage service', () => {
     it('should update the solo record', async () => {
         const gameId = '1';
         const record = { name: '123', score: 100 };
-
-        // const findOneAndUpdateResult = {
-        //   value: {
-        //     ranking: [
-        //       { name: '234', score: 200 },
-        //       { name: '123', score: 50 },
-        //     ],
-        //     id: gameId,
-        //   },
-        // };
         const getGameByIdStub = sinon.stub(gameStorageService, 'getGameById');
 
         sinon.stub(gameStorageService.collection, 'findOneAndUpdate').yields(null);
@@ -208,12 +197,6 @@ describe('Game storage service', () => {
         };
         getGameByIdStub.resolves(mockReturnValue);
         const result = await gameStorageService.updateGameSoloNewBreakingRecord(gameId, record);
-        // sinon.assert.calledWith(collectionMock.findOneAndUpdate, {
-        //   id: gameId,
-        //   'ranking.playerId': record.playerId,
-        // }, {
-        //   $max: { 'ranking.$.score': record.score },
-        // });
         expect(result).to.be.equal(-1);
     });
 
@@ -229,16 +212,6 @@ describe('Game storage service', () => {
     it('should update the 1v1 record', async () => {
         const gameId = '1';
         const record = { name: '123', score: 100 };
-
-        // const findOneAndUpdateResult = {
-        //   value: {
-        //     ranking: [
-        //       { name: '234', score: 200 },
-        //       { name: '123', score: 50 },
-        //     ],
-        //     id: gameId,
-        //   },
-        // };
         const getGameByIdStub = sinon.stub(gameStorageService, 'getGameById');
 
         sinon.stub(gameStorageService.collection, 'findOneAndUpdate').yields(null);
@@ -253,12 +226,6 @@ describe('Game storage service', () => {
         };
         getGameByIdStub.resolves(mockReturnValue);
         const result = await gameStorageService.updateGameOneVersusOneNewBreakingRecord(gameId, record);
-        // sinon.assert.calledWith(collectionMock.findOneAndUpdate, {
-        //   id: gameId,
-        //   'ranking.playerId': record.playerId,
-        // }, {
-        //   $max: { 'ranking.$.score': record.score },
-        // });
         expect(result).to.be.equal(-1);
     });
 
