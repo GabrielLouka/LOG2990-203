@@ -46,13 +46,18 @@ export class GameConstantsService {
 
     updateConstants(isReset: boolean): void {
         const routeToSend = GAME_CONSTANTS_PATH;
+        const { countdownValue, penaltyValue, bonusValue } = this.constants;
+
         if (isReset) {
             this.constants = {
                 countdownValue: INITIAL_COUNTDOWN,
                 penaltyValue: INITIAL_PENALTY,
                 bonusValue: INITIAL_BONUS,
             };
+        } else if (countdownValue === INITIAL_COUNTDOWN && penaltyValue === INITIAL_PENALTY && bonusValue === INITIAL_BONUS) {
+            return;
+        } else {
+            this.communicationService.post(this.constants, routeToSend).subscribe({});
         }
-        this.communicationService.post(this.constants, routeToSend).subscribe({});
     }
 }
