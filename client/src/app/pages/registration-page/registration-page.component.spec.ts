@@ -306,5 +306,33 @@ describe('RegistrationPageComponent', () => {
         expect(component.showButtons).toBeFalsy();
         expect(incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage).toHaveBeenCalled();
         
-      });
+    });
+
+    it('should redirect to main page when match is updated and aborted', () => {
+        spyOn(matchmakingServiceMock, 'isMatchAborted').and.returnValue(true);
+        const match: Match = {
+            gameId: 1,
+            matchId: 'socket1',
+            player1: null,
+            player2: null,
+            player1Archive: player1,
+            player2Archive: null,
+            matchType: MatchType.Solo,
+            matchStatus: MatchStatus.InProgress,
+        };
+        component.handleMatchUpdated(match);
+        expect(matchmakingServiceMock.isMatchAborted).toHaveBeenCalledWith(match);
+        expect(registrationService.redirectToMainPage).toHaveBeenCalled();
+    });
+
+    // it('should call sendMatchJoinRequest with username if username is truthy', () => {
+    //     spyOn(matchmakingServiceMock, 'sendMatchJoinRequest');
+    //     component.username = 'testuser';
+    //     component.sendMatchJoinRequest();
+    //     expect(matchmakingServiceMock.sendMatchJoinRequest).toHaveBeenCalledWith('testuser');
+    // }); 
+     
+    
+
+    
 });
