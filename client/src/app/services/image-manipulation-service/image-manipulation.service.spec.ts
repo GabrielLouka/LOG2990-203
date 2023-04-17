@@ -381,11 +381,11 @@ describe('ImageManipulationService', () => {
         service.alternateOldNewImage(oldImage, newImage, context);
 
         setTimeout(() => {
-        expect(context.getImageData(0, 0, canvas.width, canvas.height)).toBeDefined(); 
+        expect(context.getImageData(0, 0, canvas.width, canvas.height)).toBeDefined();  
         }, QUARTER_SECOND * 2);
         
         
-    });
+    }); 
 
     it('should resolve', async () => {
         const setTimeoutSpy = spyOn(window, 'setTimeout');

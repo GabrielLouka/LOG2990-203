@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ElementRef } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { Buffer } from 'buffer';
 import { ImageManipulationService } from '../image-manipulation-service/image-manipulation.service';
 import { CanvasHandlingService } from './canvas-handling.service';
