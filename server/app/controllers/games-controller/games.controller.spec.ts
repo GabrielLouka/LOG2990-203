@@ -80,7 +80,31 @@ describe('GamesController', () => {
                     expect(res.body).to.deep.equal(game);
                 });
         });
+        it('GET should fetchAllGames', async () => {
+            gameStorageServiceStub.getAllGames.returns(
+                Promise.resolve([{ gameData: game as GameData, originalImage: images.originalImage, modifiedImage: images.modifiedImage }]),
+            );
+            supertest(expressApp)
+                .get(`${API_URL}/fetchAllGames`)
+                .expect(HTTP_STATUS_OK)
+                .then((response) => {
+                    expect(response.body).to.deep.equal(JSON.stringify([game]));
+                });
+        });
+        it('fetchAllGames should catch error', async () => {
+            const errorMessage = 'Update failed';
+            gameStorageServiceStub.getAllGames.rejects(errorMessage);
+
+            supertest(expressApp)
+                .get(`${API_URL}/fetchAllGames`)
+                .expect(HTTP_STATUS_OK)
+                .end((err, res) => {
+                    if (err) return err;
+                    expect(res.body).to.deep.equal(game);
+                });
+        });
     });
+
     describe('GET /:id', () => {
         it('GET should return games by page id', async () => {
             gameStorageServiceStub.getGamesInPage.returns(
