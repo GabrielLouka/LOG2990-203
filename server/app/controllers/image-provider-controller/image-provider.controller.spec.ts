@@ -2,7 +2,7 @@
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { Vector2 } from '@common/classes/vector2';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { expect } from 'chai';
 import * as fs from 'fs';
 import { StatusCodes } from 'http-status-codes';

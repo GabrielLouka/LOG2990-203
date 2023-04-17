@@ -1,11 +1,12 @@
 /* eslint-disable no-console */
 import { GAME_CONSTANTS_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
+import { ConstantsData } from '@common/interfaces/constants.data';
 import { readFileSync, writeFileSync } from 'fs';
 import { Service } from 'typedi';
 
 @Service()
 export class GameConstantsService {
-    getConstants() {
+    getConstants(): ConstantsData {
         let output;
         try {
             const response = readFileSync(PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE);
@@ -18,7 +19,7 @@ export class GameConstantsService {
         return output;
     }
 
-    updateConstants(constants: unknown) {
+    updateConstants(constants: ConstantsData): void {
         try {
             const filePath = PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE;
             const data = JSON.stringify(constants);

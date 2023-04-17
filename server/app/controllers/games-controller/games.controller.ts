@@ -1,7 +1,7 @@
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { defaultRanking } from '@common/interfaces/ranking';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';

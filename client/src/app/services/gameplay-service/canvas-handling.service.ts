@@ -2,7 +2,7 @@
 import { ElementRef, Injectable, ViewChild } from '@angular/core';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import { Buffer } from 'buffer';
 @Injectable({
     providedIn: 'root',

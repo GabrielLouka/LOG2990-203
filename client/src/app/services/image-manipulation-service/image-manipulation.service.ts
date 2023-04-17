@@ -5,7 +5,7 @@ import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Action } from '@common/classes/action';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
-import { GameData } from '@common/interfaces/game-data';
+import { GameData } from '@common/interfaces/game.data';
 import {
     BLINK_TIME,
     BMP_FILE_HEADER_BYTES_LENGTH,
