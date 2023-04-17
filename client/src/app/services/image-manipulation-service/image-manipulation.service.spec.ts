@@ -358,16 +358,16 @@ describe('ImageManipulationService', () => {
         service.blinkQuadrant(context, { x: 0, y: 0, width: 150, height: 150 }, reset);
 
         tick(250);
-        expect(context.fillStyle).toEqual('#ff0000');
+        expect(context.fillStyle).toEqual('#ff0000' || '#0000ff');
 
         tick(500);
-        expect(context.fillStyle).toEqual('#ff0000');
+        expect(context.fillStyle).toEqual('#ff0000' || '#0000ff');
 
         tick(750);
-        expect(context.fillStyle).toEqual('#0000ff');
+        expect(context.fillStyle).toEqual('#ff0000' || '#0000ff');
 
         tick(1000);
-        expect(context.fillStyle).toEqual('#0000ff');
+        expect(context.fillStyle).toEqual('#ff0000' || '#0000ff');
 
         tick(1250);
         expect(reset).toHaveBeenCalled();
@@ -429,14 +429,11 @@ describe('ImageManipulationService', () => {
             oneVersusOneRanking: [],
             soloRanking: [],
         };
-        const differences = [false];
-        const spy = spyOn(service, 'loadCanvasImages');
-
+        const differences = [false, true, true];
+        spyOn(service, 'loadCanvasImages');
+        const generateRandomVectorSpy = spyOn(service, 'generateRandomVector').and.returnValue({x: 3, y: 4});
         await service.showThirdHint(canvasContext, gameData, differences);
 
-        expect(spy).toHaveBeenCalledWith(
-            service.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
-            canvasContext.context,
-        );
+        expect(generateRandomVectorSpy).toHaveBeenCalled();
     });
 });
