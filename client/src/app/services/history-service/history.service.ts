@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { MatchType } from '@common/enums/match-type';
-import { HistoryData } from '@common/interfaces/history-data';
+import { HistoryData } from '@common/interfaces/history.data';
 
 @Injectable({
     providedIn: 'root',
