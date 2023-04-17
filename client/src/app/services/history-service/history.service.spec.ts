@@ -116,4 +116,36 @@ describe('HistoryService', () => {
 
         expect(spyReloadPage).toHaveBeenCalled();
     });
+
+    it('should return this.gameHistories', () => {
+        service.gameHistories = [
+            {
+                startingTime: '2022-01-01T00:00:00Z',
+                duration: '60',
+                gameMode: 'Solo',
+                player1: 'player1',
+                player2: 'player2',
+                isWinByDefault: false,
+                isGameLoose: true,
+            },
+        ];
+
+        expect(service.history).toEqual([
+            {
+                startingTime: '2022-01-01T00:00:00Z',
+                duration: '60',
+                gameMode: 'Solo',
+                player1: 'player1',
+                player2: 'player2',
+                isWinByDefault: false,
+                isGameLoose: true,
+            },
+        ]);
+    });
+
+    it('should return true if gameHistories is empty', () => {
+        service.gameHistories = [];
+
+        expect(service.isHistoryEmpty).toEqual(true);
+    });
 });

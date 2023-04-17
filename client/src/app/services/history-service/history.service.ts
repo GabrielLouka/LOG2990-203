@@ -9,8 +9,15 @@ import { HistoryData } from '@common/interfaces/history-data';
 })
 export class HistoryService {
     gameHistories: HistoryData[] = [];
-
     constructor(private readonly communicationService: CommunicationService) {}
+
+    get history(): HistoryData[] {
+        return this.gameHistories;
+    }
+
+    get isHistoryEmpty(): boolean {
+        return this.gameHistories.length === 0;
+    }
 
     fetchHistoryFromServer() {
         const routeToSend = '/history/';
