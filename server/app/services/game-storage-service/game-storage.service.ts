@@ -169,7 +169,6 @@ export class GameStorageService {
 
         const gamesToReturn = [];
         for (const game of nextGames) {
-            // const images = this.getGameImages(game.id.toString());
             gamesToReturn.push({
                 gameData: game,
                 originalImage: IMAGE_DELIVERY_SERVER + '/images/' + game.id.toString() + '/1',
