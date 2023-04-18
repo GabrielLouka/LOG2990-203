@@ -8,7 +8,7 @@ import { MatchType } from '@common/enums/match.type';
     styleUrls: ['./info-card.component.scss'],
 })
 export class InfoCardComponent {
-    @Input() name : string | undefined;
+    @Input() name: string | undefined;
     @Input() isEasy: boolean | undefined;
     @Input() matchType: MatchType | undefined;
     @Input() gameConstantsService: GameConstantsService | undefined;

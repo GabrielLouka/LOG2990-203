@@ -36,7 +36,7 @@ describe('GameCreationPageComponent', () => {
     let onloadRef: Function | undefined;
     const originalOnload = Object.getPrototypeOf(Image).onload;
     // eslint-disable-next-line no-unused-vars
-    
+
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',

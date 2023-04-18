@@ -67,6 +67,7 @@ describe('ImageProviderController', () => {
         assert(imageProviderController.router);
         const imgPath = path.join(PERSISTENT_DATA_FOLDER_PATH, '1');
         fs.mkdirSync(imgPath, { recursive: true });
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         fs.writeFileSync(path.join(imgPath, '1.bmp'), Buffer.from([0x42, 0x4d]));
         await supertest(expressApp).get(`${API_URL}/1/1`).expect(StatusCodes.OK);
     });
