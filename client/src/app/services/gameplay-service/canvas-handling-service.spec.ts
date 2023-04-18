@@ -97,30 +97,6 @@ describe('HintService', () => {
         expect(imageManipulationServiceSpy.getModifiedImageWithoutDifferences).toHaveBeenCalled();
     });
 
-    // it("initialize cheat mode", () => {
-    //   const gameData: GameData = {
-    //     id: 1,
-    //     name: 'Find the Differences',
-    //     isEasy: true,
-    //     nbrDifferences: 5,
-    //     differences: [],
-    //     oneVersusOneRanking: [],
-    //     soloRanking: []
-    //   };
-    //   const foundDifferences: boolean[] = [];
-    //   const image = Buffer.alloc(100, 0);
-    //   const imageOld = Buffer.alloc(100, 0);
-    //   const delayedMethod = new DelayedMethod(() => {}, 1, false);
-    //   service.blinkDelayedMethodRight = delayedMethod;
-    //   const startSpy = spyOn(delayedMethod, 'start');
-    //   service.isCheating = true;
-    //   service.initializeCheatMode(gameData, {originalImage: image, modifiedImage: imageOld}, foundDifferences);
-
-    //   expect(imageManipulationServiceSpy.getModifiedImageWithoutDifferences).toHaveBeenCalled();
-    //   expect(startSpy).toHaveBeenCalled();
-    //   expect(service.isCheating).toBeFalsy();
-    // });
-
     it('putCanvasIntoInitialState should call loadCurrentImage', () => {
         const image = Buffer.alloc(100, 0);
         const imageOld = Buffer.alloc(100, 0);
@@ -141,5 +117,30 @@ describe('HintService', () => {
         service.stopCheating();
         expect(service.blinkDelayedMethodLeft.stop).toHaveBeenCalled();
         expect(service.blinkDelayedMethodRight.stop).toHaveBeenCalled();
+    });
+
+    it('Initialize cheat mode should call getModifiedImageWithoutDifferences', () => {
+        const gameData: GameData = {
+            id: 1,
+            name: 'Find the Differences',
+            isEasy: true,
+            nbrDifferences: 5,
+            differences: [],
+            oneVersusOneRanking: [],
+            soloRanking: [],
+        };
+        const foundDifferences: boolean[] = [];
+        const image = Buffer.alloc(100, 0);
+        const imageOld = Buffer.alloc(100, 0);
+        const blinkDelayedMethodRight = new DelayedMethod(() => {}, 1, false);
+        const blinkDelayedMethodLeft = new DelayedMethod(() => {}, 1, false);
+
+        service.blinkDelayedMethodRight = blinkDelayedMethodRight;
+        service.blinkDelayedMethodLeft = blinkDelayedMethodLeft;
+
+        spyOn<any>(service.blinkDelayedMethodRight, 'start');
+        spyOn<any>(service.blinkDelayedMethodLeft, 'start');
+        service.initializeCheatMode(gameData, { originalImage: image, modifiedImage: imageOld }, foundDifferences);
+        expect(imageManipulationServiceSpy.getModifiedImageWithoutDifferences).toHaveBeenCalled();
     });
 });

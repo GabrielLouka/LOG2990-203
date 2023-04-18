@@ -100,8 +100,8 @@ export class CanvasHandlingService {
             this.currentModifiedImage = newImage;
         }
 
-        this.blinkDelayedMethodLeft.start();
-        this.blinkDelayedMethodRight.start();
+        if (this.blinkDelayedMethodLeft) this.blinkDelayedMethodLeft.start();
+        if (this.blinkDelayedMethodRight) this.blinkDelayedMethodRight.start();
         this.isCheating = true;
     }
 
