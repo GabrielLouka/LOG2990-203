@@ -47,7 +47,7 @@ describe('ChatService', () => {
         chatService.isPlayer1;
         matchmakingService.player1Id;
         socketServiceSpy.socketId;
-        expect(chatService.isPlayer1);
+        expect(chatService.isPlayer1).toEqual(false);
     });
 
     it('is 1v1 getter', () => {

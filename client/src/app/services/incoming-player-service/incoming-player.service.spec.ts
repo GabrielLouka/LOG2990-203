@@ -99,7 +99,8 @@ describe('IncomingPlayerService', () => {
     });
 
     it('should return false if not host accepting incoming player', () => {
-        incomingPlayerService.isHostAcceptingIncomingPlayer(true);
+        const out = incomingPlayerService.isHostAcceptingIncomingPlayer(true);
+        expect(out).not.toEqual(true);
     });
 
     it('should return the queue status to display for the users', () => {
@@ -138,7 +139,7 @@ describe('IncomingPlayerService', () => {
     it('should call matchmaking sendIncomingPlayerRequest when incoming player is rejected', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
-        incomingPlayerService.refuseIncomingPlayer();
+        expect(incomingPlayerService.refuseIncomingPlayer()).toBeUndefined();
     });
     it('should call matchmaking sendIncomingPlayerRequest when incoming player is rejected', () => {
         incomingPlayerService['incomingPlayer'] = null;

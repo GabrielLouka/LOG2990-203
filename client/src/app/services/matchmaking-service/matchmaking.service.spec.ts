@@ -82,6 +82,7 @@ describe('MatchmakingService', () => {
 
     it('should disconnect socket if socket is alive', () => {
         matchmakingService.connectSocket();
+        expect(matchmakingService.socketClientService.socket).toBeDefined();
     });
     it('should return a access to socketService', () => {
         const service = matchmakingService.socketClientService;
@@ -128,6 +129,7 @@ describe('MatchmakingService', () => {
             matchType: MatchType.OneVersusOne,
         };
         matchmakingService.currentMatchGame = match;
+        expect(matchmakingService.currentMatch).toEqual(match);
     });
 
     it('should set current match type', () => {
@@ -156,11 +158,13 @@ describe('MatchmakingService', () => {
     it('should connect sockets and handle match update events when called', () => {
         matchmakingService.createGame(gameId);
         matchmakingService.handleMatchUpdateEvents();
+        expect(matchmakingService.matchIdThatWeAreTryingToJoin).toBeNull();
     });
 
     it('should send match join request when request from incoming player', () => {
         matchmakingService.joinGame(matchId, gameId);
         matchmakingService.sendMatchJoinRequest(player2.username);
+        expect(matchmakingService.currentMatch).toBeNull();
     });
 
     it('should return true when is player 1', () => {
@@ -378,6 +382,8 @@ describe('MatchmakingService', () => {
         socketTestHelper.on('allGameDeleted', callback);
         socketTestHelper.peerSideEmit('deleteAllGames');
         matchmakingService.handleMatchUpdateEvents();
+        expect(matchmakingService.onAllGameDeleted).toBeDefined();
+
     });
 
     it('should handle update match ', () => {
@@ -385,6 +391,7 @@ describe('MatchmakingService', () => {
         socketTestHelper.on('matchUpdated', callback);
         socketTestHelper.peerSideEmit('matchUpdated', 'socket2');
         matchmakingService.handleMatchUpdateEvents();
+        expect(matchmakingService.onMatchUpdated).toBeDefined();
     });
 
     it('should handle incomingPlayerRequest answer', () => {
@@ -393,6 +400,7 @@ describe('MatchmakingService', () => {
         socketTestHelper.on('incomingPlayerRequestAnswer', callback);
         socketTestHelper.peerSideEmit('incomingPlayerRequestAnswer', data);
         matchmakingService.handleMatchUpdateEvents();
+        expect(matchmakingService.onGetJoinRequestAnswer).toBeDefined();
     });
 
     it('should handle when a game is deleted', () => {
@@ -401,6 +409,7 @@ describe('MatchmakingService', () => {
         socketTestHelper.on('gameDeleted', callback);
         socketTestHelper.peerSideEmit('deletedGame', data);
         matchmakingService.handleMatchUpdateEvents();
+        expect(matchmakingService.onDeletedSingleGame).toBeDefined();
     });
 
     it('should return false if match status is not aborted', () => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable no-restricted-imports */
 /* eslint-disable no-unused-vars */
@@ -55,8 +56,8 @@ describe('EraserTool', () => {
             const modifiedPixelsMock = [jasmine.createSpyObj('Vector2', ['x', 'y'])];
             const isLeftCanvasMock = true;
             eraserTool.actionsContainer.undoActions = [];
-
             eraserTool.addUndoElementToActionsContainer(modifiedPixelsMock, isLeftCanvasMock);
+            expect(eraserTool.actionsContainer).not.toBeUndefined();
         });
     });
 });
