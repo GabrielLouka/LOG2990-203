@@ -118,3 +118,11 @@ canvas {
     background-color: rgba(0, 0, 0, 0.308);
     z-index: 100;
 }
+
+.gameFinish {
+    cursor: not-allowed;
+    &:hover {
+        transform: scale(1);
+        background-color: white;
+      }
+}
