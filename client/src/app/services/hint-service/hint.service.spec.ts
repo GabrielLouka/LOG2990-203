@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ElementRef } from '@angular/core';
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
-import { MILLISECOND_TO_SECONDS } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 import { HintService } from './hint.service';
 

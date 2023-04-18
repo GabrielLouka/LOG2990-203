@@ -2,6 +2,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Action } from '@common/classes/action';
 import { MatchType } from '@common/enums/match.type';
+import { RankingData } from '@common/interfaces/ranking.data';
 import { EXCELLENT_GAME_TEXT, MAIN_MENU_TEXT, NO_TEXT, QUITTING_CONFIRMATION_TEXT, REPLAY_MODE_TEXT, YES_TEXT } from '@common/utils/constants';
 
 @Component({
@@ -77,7 +78,13 @@ export class GameOverPopUpComponent {
         });
         this.display();
     }
-
+    updateNewBreakingScore(rankingData: RankingData) {
+        {
+            const winMessage = `Félicitations vous obtenez la ${rankingData.position} 
+            place dans les meilleurs temps du jeu ${rankingData.gameName} en ${rankingData.matchType}`;
+            this.popUpInfo[0].message = winMessage;
+        }
+    }
     // eslint-disable-next-line max-params
     // TODO faire une interface
     displayLimitedGameOver(username1: string | undefined, username2: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {

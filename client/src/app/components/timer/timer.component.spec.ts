@@ -2,7 +2,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EventEmitter } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NOT_FOUND } from '@common/utils/env';
+import { NOT_FOUND } from '@common/utils/constants';
 import { TimerComponent } from './timer.component';
 
 describe('TimerComponent', () => {

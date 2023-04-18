@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { MINUTE_TO_SECONDS } from '@common/utils/env';
+import { MINUTE_TO_SECONDS } from '@common/utils/constants';
 import { TimerService } from './timer.service';
 
 describe('TimerService', () => {

@@ -34,7 +34,7 @@ import {
 } from '@common/utils/constants';
 import { FETCH_ALL_GAMES_PATH, FETCH_GAME_PATH } from '@common/utils/env.http';
 import { Buffer } from 'buffer';
-import { catchError, filter, fromEvent, map, Observable, of, Subscription } from 'rxjs';
+import { Observable, Subscription, catchError, filter, fromEvent, map, of } from 'rxjs';
 
 @Component({
     selector: 'app-classic-page',
@@ -451,6 +451,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
             this.chat.sendTimeScoreMessage(data.rankingData);
+            if (data.rankingData.winnerSocketId === this.matchmakingService.currentSocketId)
+                this.popUpElement.updateNewBreakingScore(data.rankingData);
         });
     }
 

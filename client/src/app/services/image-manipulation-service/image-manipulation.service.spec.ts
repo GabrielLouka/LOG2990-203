@@ -11,7 +11,7 @@ import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game.data';
-import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET, QUARTER_SECOND } from '@common/utils/env';
+import { IMAGE_HEIGHT_OFFSET, IMAGE_WIDTH_OFFSET, QUARTER_SECOND } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 import { delay } from 'rxjs';
 import { ImageManipulationService } from './image-manipulation.service';

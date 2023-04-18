@@ -137,6 +137,7 @@ describe('ChatService', () => {
             position: '1',
             gameName: 'testGame',
             matchType: 'testMatchType',
+            winnerSocketId: '1',
         };
         spyOn(chatService, 'pushMessage');
 

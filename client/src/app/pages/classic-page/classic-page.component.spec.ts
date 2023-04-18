@@ -32,6 +32,7 @@ import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { MatchStatus } from '@common/enums/match.status';
 import { MatchType } from '@common/enums/match.type';
+import { RankingData } from '@common/interfaces/ranking.data';
 import { MILLISECOND_TO_SECONDS } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
@@ -446,7 +447,16 @@ describe('ClassicPageComponent', () => {
         spyOn(socketClientService, 'on').and.callThrough();
         component.addServerSocketMessagesListeners();
         const callback = ((params: any) => {}) as any;
-        const data = { data: {} };
+        const data = {
+            rankingData: {
+                username: 'winner',
+                position: 'première',
+                gameName: 'guru',
+                matchType: 'Solo',
+                winnerSocketId: 'socket1',
+            } as RankingData,
+        };
+
         spyOn(component.chat, 'sendTimeScoreMessage').and.callFake((): any => {});
         socketTestHelper.on('newBreakingScore', callback);
         socketTestHelper.peerSideEmit('newBreakingScore', data);
