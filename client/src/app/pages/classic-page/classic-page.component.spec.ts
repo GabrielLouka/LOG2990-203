@@ -797,7 +797,7 @@ describe('ClassicPageComponent', () => {
         spyOn(component, 'stopCheating').and.callFake(() => {
             return;
         });
-        component.gameOver(false);
+        component.gameOver();
     });
 
     it('should finish the Replay', () => {
@@ -1015,7 +1015,7 @@ describe('ClassicPageComponent', () => {
     });
     it('should handle gameover', () => {
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
-        component.gameOver(true);
+        component.gameOver();
     });
 
     it('should return appropriately on quit game', () => {
