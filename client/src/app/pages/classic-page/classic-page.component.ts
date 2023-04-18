@@ -451,7 +451,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
             this.chat.sendTimeScoreMessage(data.rankingData);
-            this.socketService.disconnect();
         });
     }
 
@@ -520,14 +519,9 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.socketService.send('stopTimer', this.matchmakingService.currentMatchId);
     }
 
-    gameOver(isWinByDefault: boolean): void {
+    gameOver(): void {
         this.stopTimer();
-
-        if (!isWinByDefault && (this.isSolo || this.isOneVersusOne)) {
-            this.sendNewTimeScoreToServer();
-        } else {
-            this.socketService.disconnect();
-        }
+        // this.socketService.disconnect();
     }
 
     sendNewTimeScoreToServer(): void {
@@ -554,12 +548,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 matchId: this.matchmakingService.currentMatchId,
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
             });
+
+            this.newRanking = { name: this.winningPlayerName, score: this.timerElement.elapsedSeconds };
+            if (!isWinByDefault && (this.isSolo || this.isOneVersusOne)) this.sendNewTimeScoreToServer();
         }
-        this.newRanking = { name: this.winningPlayerName, score: this.timerElement.elapsedSeconds };
         if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {
             isWinByDefault = true;
         }
-        this.gameOver(isWinByDefault);
+        this.gameOver();
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
         this.popUpElement.displayGameOver(
@@ -580,7 +576,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onLoseGame() {
-        this.gameOver(false);
+        this.gameOver();
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
         this.popUpElement.displayGameOver(
@@ -618,7 +614,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onWinGameLimited(winningPlayer1: string, winningPlayer2: string, isWinByDefault: boolean) {
-        this.gameOver(isWinByDefault);
+        this.gameOver();
         this.popUpElement.displayLimitedGameOver(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
     }
 
