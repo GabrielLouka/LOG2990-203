@@ -16,6 +16,7 @@ export class Server {
     private static readonly appPort: string | number | boolean = Server.normalizePort(process.env.PORT || '3000');
     private static readonly baseDix: number = baseDix;
     private server: http.Server;
+    // eslint-disable-next-line max-params
     constructor(
         private application: Application,
         private databaseService: DatabaseService,

@@ -1,3 +1,4 @@
+/* eslint-disable deprecation/deprecation */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable prettier/prettier */

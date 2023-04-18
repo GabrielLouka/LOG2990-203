@@ -1,7 +1,7 @@
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game.data';
 import { defaultRanking } from '@common/interfaces/ranking';
-import { NOT_FOUND } from '@common/utils/env';
+import { NOT_FOUND } from '@common/utils/constants';
 import { expect } from 'chai';
 import { assert } from 'console';
 import * as sinon from 'sinon';
