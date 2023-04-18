@@ -76,6 +76,7 @@ describe('ChatComponent', () => {
             position: '1',
             gameName: 'Tetris',
             matchType: 'Classic Solo',
+            winnerSocketId: 'socket1',
         };
         component.sendTimeScoreMessage(rankingData);
         expect(chatService.sendRecordBreakingMessage).toHaveBeenCalledWith(rankingData, component);

@@ -149,6 +149,7 @@ export class SocketManager {
                         name: string;
                         score: number;
                         gameName: string;
+                        socketId: string;
                     };
                 }) => {
                     sendNewWinningTime(data.gameId, data.isOneVersusOne, data.ranking);
@@ -251,6 +252,7 @@ export class SocketManager {
                     name: string;
                     score: number;
                     gameName: string;
+                    socketId: string;
                 },
             ) => {
                 const rankingData = await this.gameRankingTimeService.handleNewScore(gameId, isOneVersusOne, ranking);
