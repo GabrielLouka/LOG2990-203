@@ -82,7 +82,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     isPlayer2Ready: boolean = false;
     isOriginallyCoop: boolean = false;
     isEasy: boolean | undefined;
-    winningPlayer: string | undefined;
+    winningPlayerName: string | undefined;
     hasLoadedImagesForTheFirstTime: boolean = false;
 
     // eslint-disable-next-line max-params
@@ -547,7 +547,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     }
 
     onWinGame(isPlayer1Win: boolean, isWinByDefault: boolean) {
-        this.winningPlayer = isPlayer1Win ? this.matchmakingService.player1Username : this.matchmakingService.player2Username;
+        this.winningPlayerName = isPlayer1Win ? this.player1 : this.player2;
         const isWinner = this.isPlayer1 === isPlayer1Win;
         if (isWinner) {
             this.socketService.send('setWinner', {
@@ -555,7 +555,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
             });
         }
-        this.newRanking = { name: this.winningPlayer, score: this.timerElement.elapsedSeconds };
+        this.newRanking = { name: this.winningPlayerName, score: this.timerElement.elapsedSeconds };
         if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {
             isWinByDefault = true;
         }
