@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GAME_CONSTANTS_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
 import { ConstantsData } from '@common/interfaces/constants.data';
-import { INITIAL_BONUS, INITIAL_COUNTDOWN, INITIAL_PENALTY } from '@common/utils/env';
+import { INITIAL_BONUS, INITIAL_COUNTDOWN, INITIAL_PENALTY } from '@common/utils/constants';
 import { expect } from 'chai';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
