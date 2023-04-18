@@ -687,6 +687,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.differencesFound2 = 0;
         this.hintService.reset();
         this.timerElement.forceSetTime(0);
+        this.timerElement.reset();
     }
 
     onReplaySpeedButtonClick(): void {
