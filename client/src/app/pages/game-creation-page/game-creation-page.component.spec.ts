@@ -34,6 +34,7 @@ describe('GameCreationPageComponent', () => {
     let rightCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
     let drawingService: jasmine.SpyObj<DrawingService>;
     let onloadRef: Function | undefined;
+
     // eslint-disable-next-line no-unused-vars
     Object.defineProperty(Image.prototype, 'onload', {
         get() {
