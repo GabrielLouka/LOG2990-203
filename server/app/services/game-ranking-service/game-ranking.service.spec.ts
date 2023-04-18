@@ -13,7 +13,7 @@ describe('GameRankingService', () => {
     beforeEach(() => {
         gameStorageService = new GameStorageService(new DatabaseService());
         gameRankingService = new GameRankingService(gameStorageService);
-        gameRankingService['newRanking'] = { name: 'testName', score: 1, gameName: 'testGame' };
+        gameRankingService['newRanking'] = { name: 'testName', score: 1, gameName: 'testGame', socketId: 'socket1' };
         gameRankingService['gameName'] = 'testGame';
         gameRankingService['matchType'] = '1 contre 1';
     });
@@ -41,12 +41,13 @@ describe('GameRankingService', () => {
             modifiedImage: Buffer.from(''),
         });
         const gameId = 'game-id';
-        const ranking = { name: 'player1', score: 100, gameName: 'game1' };
+        const ranking = { name: 'player1', score: 100, gameName: 'game1', socketId: 'socket1' };
         const expectedRankingData: RankingData = {
             username: 'player1',
             position: 'deuxième',
             gameName: 'game1',
             matchType: '1 contre 1',
+            winnerSocketId: 'socket1',
         };
         stub(gameStorageService, 'updateGameOneVersusOneNewBreakingRecord').resolves(1);
         stub(gameStorageService, 'updateGameSoloNewBreakingRecord').resolves(1);
@@ -78,12 +79,13 @@ describe('GameRankingService', () => {
             modifiedImage: Buffer.from(''),
         });
         const gameId = 'game-id';
-        const ranking = { name: 'player1', score: 100, gameName: 'game1' };
+        const ranking = { name: 'player1', score: 100, gameName: 'game1', socketId: 'socket1' };
         const expectedRankingData: RankingData = {
             username: 'player1',
             position: 'deuxième',
             gameName: 'game1',
             matchType: 'Solo',
+            winnerSocketId: 'socket1',
         };
         stub(gameStorageService, 'updateGameOneVersusOneNewBreakingRecord').resolves(1);
         stub(gameStorageService, 'updateGameSoloNewBreakingRecord').resolves(1);
@@ -114,7 +116,7 @@ describe('GameRankingService', () => {
             originalImage: Buffer.from(''),
             modifiedImage: Buffer.from(''),
         });
-        gameRankingService['newRanking'] = { name: 'testName', score: 1, gameName: 'testGame' };
+        gameRankingService['newRanking'] = { name: 'testName', score: 1, gameName: 'testGame', socketId: 'socket1' };
         stub(gameStorageService, 'updateGameOneVersusOneNewBreakingRecord').resolves(1);
         stub(gameStorageService, 'updateGameSoloNewBreakingRecord').resolves(1);
 
@@ -123,6 +125,7 @@ describe('GameRankingService', () => {
             position: 'deuxième',
             gameName: gameRankingService['newRanking'].gameName,
             matchType: gameRankingService['matchType'],
+            winnerSocketId: 'socket1',
         };
 
         const actualRankingData = await gameRankingService.updateRanking('gameId', true);
@@ -151,7 +154,7 @@ describe('GameRankingService', () => {
             originalImage: Buffer.from(''),
             modifiedImage: Buffer.from(''),
         });
-        gameRankingService['newRanking'] = { name: 'testName', score: 1, gameName: 'testGame' };
+        gameRankingService['newRanking'] = { name: 'testName', score: 1, gameName: 'testGame', socketId: 'socket1' };
         stub(gameStorageService, 'updateGameSoloNewBreakingRecord').resolves(1);
         gameRankingService['matchType'] = 'Solo';
         const expectedRankingData: RankingData = {
@@ -159,6 +162,7 @@ describe('GameRankingService', () => {
             position: 'deuxième',
             gameName: gameRankingService['newRanking'].gameName,
             matchType: gameRankingService['matchType'],
+            winnerSocketId: 'socket1',
         };
 
         const actualRankingData = await gameRankingService.updateRanking('gameId', false);

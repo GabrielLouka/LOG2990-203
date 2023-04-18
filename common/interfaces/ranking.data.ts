@@ -3,4 +3,5 @@ export interface RankingData {
     position: string;
     gameName: string;
     matchType: string;
+    winnerSocketId: string;
 }

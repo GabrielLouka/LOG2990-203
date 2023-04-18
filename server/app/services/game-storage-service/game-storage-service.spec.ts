@@ -206,7 +206,7 @@ describe('Game storage service', () => {
             sinon.stub(gameStorageService, 'getGameById').resolves({ gameData: null, originalImage: new Buffer(3), modifiedImage: new Buffer(3) });
             await gameStorageService.updateGameSoloNewBreakingRecord('-1', gamePrototype.oneVersusOneRanking[0]);
         } catch (err) {
-            expect(err.message).equal(`Game data not found for game with id ${-1}`);
+            expect(err.message).equal(`Game data not found for game with id${-1}`);
         }
     });
 
