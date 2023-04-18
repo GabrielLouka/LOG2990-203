@@ -32,7 +32,7 @@ import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { MatchStatus } from '@common/enums/match.status';
 import { MatchType } from '@common/enums/match.type';
-import { MILLISECOND_TO_SECONDS } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
 import { Socket } from 'socket.io-client';

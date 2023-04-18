@@ -4,7 +4,7 @@ import { MatchmakingService } from '@app/services/matchmaking-service/matchmakin
 import { ReplayModeService } from '@app/services/replay-mode-service/replay-mode.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
 import { RankingData } from '@common/interfaces/ranking.data';
-import { SYSTEM_NAME } from '@common/utils/env';
+import { SYSTEM_NAME } from '@common/utils/constants';
 
 @Injectable({
     providedIn: 'root',

@@ -1,4 +1,4 @@
-import { FIVE_MINUTES_TO_SECONDS, FOUR_MINUTES_TO_SECONDS, THREE_MINUTES_TO_SECONDS } from '@common/utils/env';
+import { FIVE_MINUTES_TO_SECONDS, FOUR_MINUTES_TO_SECONDS, THREE_MINUTES_TO_SECONDS } from '@common/utils/constants';
 export interface Ranking {
     name: string;
     score: number;

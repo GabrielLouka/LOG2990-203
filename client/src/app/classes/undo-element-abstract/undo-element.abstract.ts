@@ -1,5 +1,5 @@
 import { Vector2 } from '@common/classes/vector2';
-import { PEN_WIDTH } from '@common/utils/env';
+import { PEN_WIDTH } from '@common/utils/constants';
 export abstract class UndoElement {
     // we need those parameters to have enough data to undo the action
     // eslint-disable-next-line max-params

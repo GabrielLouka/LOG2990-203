@@ -3,7 +3,7 @@ import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { GameData } from '@common/interfaces/game.data';
-import { MILLISECOND_TO_SECONDS, NUMBER_HINTS } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS, NUMBER_HINTS } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 
 @Injectable({

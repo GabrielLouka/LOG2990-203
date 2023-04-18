@@ -3,7 +3,7 @@ import { ActionsContainer, ToolType } from '@app/classes/actions-container/actio
 import { ClearElement } from '@app/classes/clear-element/clear-element';
 import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
-import { MAX_PEN_WIDTH, NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
+import { MAX_PEN_WIDTH, NOT_FOUND, PEN_WIDTH } from '@common/utils/constants';
 
 @Injectable({
     providedIn: 'root',

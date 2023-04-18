@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ConstantsData } from '@common/interfaces/constants.data';
-import { INITIAL_BONUS, INITIAL_COUNTDOWN, INITIAL_PENALTY } from '@common/utils/env';
+import { INITIAL_BONUS, INITIAL_COUNTDOWN, INITIAL_PENALTY } from '@common/utils/constants';
 import { GAME_CONSTANTS_PATH } from '@common/utils/env.http';
 
 @Injectable({

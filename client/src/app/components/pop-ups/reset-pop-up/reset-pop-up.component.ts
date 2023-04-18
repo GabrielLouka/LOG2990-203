@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
-import { ALL_GAMES_TEXT, NO_TEXT, RESET_TEXT, THIS_GAME_TEXT, YES_TEXT } from '@common/utils/env';
+import { ALL_GAMES_TEXT, NO_TEXT, RESET_TEXT, THIS_GAME_TEXT, YES_TEXT } from '@common/utils/constants';
 
 @Component({
     selector: 'app-reset-pop-up',

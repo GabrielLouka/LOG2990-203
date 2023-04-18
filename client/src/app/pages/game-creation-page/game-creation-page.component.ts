@@ -10,7 +10,7 @@ import { DifferenceImage } from '@common/interfaces/difference.image';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { ImageUploadForm } from '@common/interfaces/image.upload.form';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, PEN_WIDTH, ROUTE_TO_SENDING_IMAGE } from '@common/utils/env';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, PEN_WIDTH, ROUTE_TO_SENDING_IMAGE } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 
 @Component({

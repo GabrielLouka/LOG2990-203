@@ -1,4 +1,4 @@
-import { MINIMUM_TIME_MILLISECONDS } from '@common/utils/env';
+import { MINIMUM_TIME_MILLISECONDS } from '@common/utils/constants';
 
 export class DelayedMethod {
     static speed: number = 1;

@@ -1,4 +1,4 @@
-import { NOT_FOUND } from '@common/utils/env';
+import { NOT_FOUND } from '@common/utils/constants';
 
 export class Action<T> {
     private funcs: ((arg: T) => void)[] = [];
