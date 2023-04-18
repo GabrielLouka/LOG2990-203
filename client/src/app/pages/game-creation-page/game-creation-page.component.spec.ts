@@ -34,17 +34,9 @@ describe('GameCreationPageComponent', () => {
     let rightCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
     let drawingService: jasmine.SpyObj<DrawingService>;
     let onloadRef: Function | undefined;
-
+    const originalOnload = Object.getPrototypeOf(Image).onload;
     // eslint-disable-next-line no-unused-vars
-    Object.defineProperty(Image.prototype, 'onload', {
-        get() {
-            return this._onload;
-        },
-        set(onload: Function) {
-            onloadRef = onload;
-            this._onload = onload;
-        },
-    });
+    
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',
@@ -69,6 +61,16 @@ describe('GameCreationPageComponent', () => {
             'selectTool',
             'resetForegroundCanvas',
         ]);
+        Object.defineProperty(Image.prototype, 'onload', {
+            get() {
+                return this._onload;
+            },
+            set(onload: Function) {
+                onloadRef = onload;
+                this._onload = onload;
+            },
+            configurable: true,
+        });
     });
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -100,6 +102,10 @@ describe('GameCreationPageComponent', () => {
         component.isEasy = true;
 
         fixture.detectChanges();
+    });
+
+    afterAll(() => {
+        Image.prototype.onload = originalOnload;
     });
 
     it('should create', () => {

@@ -17,6 +17,10 @@ import { delay } from 'rxjs';
 import { ImageManipulationService } from './image-manipulation.service';
 describe('ImageManipulationService', () => {
     // eslint-disable-next-line no-unused-vars
+    let onloadRef: Function | undefined;
+    const originalOnload = Object.getPrototypeOf(Image).onload;
+    // eslint-disable-next-line no-unused-vars
+    
     let service: ImageManipulationService;
     // We have no dependencies to other classes or Angular Components
     // but we can still let Angular handle the objet creation
@@ -25,12 +29,26 @@ describe('ImageManipulationService', () => {
     // This runs before each test so we put variables we reuse here
     beforeEach(() => {
         service = TestBed.inject(ImageManipulationService);
+        Object.defineProperty(Image.prototype, 'onload', {
+            get() {
+                return this._onload;
+            },
+            set(onload: Function) {
+                onloadRef = onload;
+                this._onload = onload;
+            },
+            configurable: true,
+        });
     });
+
+    afterAll(() => {
+        Image.prototype.onload = originalOnload;
+      });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
     });
-    
+
     it('should change the canvas source when loading an image', () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
@@ -46,6 +64,7 @@ describe('ImageManipulationService', () => {
         const src = 'assets/img/image_empty.png';
 
         service.loadCanvasImages(src, ctx);
+        onloadRef!();
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         expect(canvas.toDataURL()).not.toBe('');
     });
