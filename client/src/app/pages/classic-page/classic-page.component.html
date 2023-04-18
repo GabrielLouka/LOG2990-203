@@ -21,11 +21,13 @@
                 <app-found-differences-counter
                     class="hints-container"
                     [username]="
-                        isCoop
-                            ? this.getPlayerUsername(true) + ' et ' + this.getPlayerUsername(false)
-                            : this.getPlayerUsername(true) !== undefined
-                            ? this.getPlayerUsername(true)
-                            : this.getPlayerUsername(false)
+                        this.getPlayerUsername(true) !== undefined
+                            ? isCoop
+                                ? this.getPlayerUsername(true) + ' et ' + this.getPlayerUsername(false)
+                                : this.getPlayerUsername(true)
+                            : isOriginallyCoop
+                            ? this.player2
+                            : this.player1
                     "
                     [differencesFound]="differencesFound1"
                     [differencesNbr]="!this.isLimitedTime ? (isOneVersusOne ? minDifferences : totalDifferences) : -1"

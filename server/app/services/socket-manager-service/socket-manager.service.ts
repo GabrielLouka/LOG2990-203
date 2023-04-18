@@ -207,7 +207,7 @@ export class SocketManager {
                     const timerData = activeMatchTimerData[timerDataIndex];
                     const elapsedTime = new Date().getTime() - timerData.value.startTime;
                     activeMatchTimerData.splice(timerDataIndex, 1);
-                    this.sio.emit('timerStopped', { elapsedTime });
+                    this.sio.to(joinedRoomName).emit('timerStopped', { elapsedTime });
 
                     // Stop the timer interval if there are no more active matches
                     if (activeMatchTimerData.length === 0) {
