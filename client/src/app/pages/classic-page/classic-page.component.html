@@ -54,6 +54,7 @@
         <app-info-card
             class="info-card"
             *ngIf="games"
+            [name]="this.gameTitle"
             [isEasy]="this.isEasy"
             [matchType]="this.currentMatchType"
             [gameConstantsService]="this.gameConstantsService"
