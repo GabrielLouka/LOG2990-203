@@ -24,7 +24,6 @@ export class GameCardComponent implements OnInit {
 
     ngOnInit() {
         this.difficulty = this.game.gameData.isEasy ? 'Facile' : 'Difficile';
-        // this.originalImageSrc = `data:image/bmp;base64,${Buffer.from(this.game.originalImage).toString('base64')}`;
         this.originalImageSrc = this.game.originalImage;
     }
 }
