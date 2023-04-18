@@ -18,6 +18,7 @@ import { RankingData } from '@common/interfaces/ranking.data';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
+// eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
 const RESPONSE_DELAY = 200;

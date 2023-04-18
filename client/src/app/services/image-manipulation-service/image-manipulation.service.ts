@@ -157,6 +157,7 @@ export class ImageManipulationService {
             this.loadCanvasImages(imageSource, canvasState.context);
         };
     }
+    // eslint-disable-next-line max-params
     async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number, reset: () => void) {
         const radius = 70;
         const startAngle = 0;

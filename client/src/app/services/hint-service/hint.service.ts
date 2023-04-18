@@ -51,6 +51,7 @@ export class HintService {
         return display;
     }
 
+    // eslint-disable-next-line max-params
     showHint(
         canvas: ElementRef<HTMLCanvasElement>,
         context: CanvasRenderingContext2D,

@@ -11,9 +11,20 @@ import {
     PERSISTENT_DATA_FOLDER_PATH,
 } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game.data';
-import { Ranking, defaultRanking } from '@common/interfaces/ranking';
+import { defaultRanking, Ranking } from '@common/interfaces/ranking';
+import {
+    DELETE_SUCCESS,
+    ERROR,
+    ERROR_READING_IMAGE,
+    ERROR_READING_SECOND_IMAGE,
+    FILE_WAS_NOT_WRITTEN,
+    FILE_WRITTEN,
+    FOLDER_CREATED,
+    FOLDER_NOT_CREATED,
+    GAME_DATA_NOT_FOUND,
+} from '@common/utils/constants';
 import 'dotenv/config';
-import { mkdir, readFileSync, readdir, rmdir, writeFile, writeFileSync } from 'fs';
+import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
 import { InsertOneResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
@@ -58,7 +69,7 @@ export class GameStorageService {
                             if (error) {
                                 console.error(error);
                             } else {
-                                console.log(`Folder ${folderPath} deleted successfully.`);
+                                console.log(folderPath + DELETE_SUCCESS);
                             }
                         });
                     }
@@ -79,7 +90,7 @@ export class GameStorageService {
                             if (error) {
                                 console.error(error);
                             } else {
-                                console.log(`Folder ${folderPath} deleted successfully.`);
+                                console.log(folderPath + DELETE_SUCCESS);
                             }
                         });
                         return;
@@ -166,13 +177,13 @@ export class GameStorageService {
         try {
             firstImage = readFileSync(folderPath + ORIGINAL_IMAGE_FILE);
         } catch (error) {
-            console.log('error reading first image');
+            console.log(ERROR_READING_IMAGE);
         }
 
         try {
             secondImage = readFileSync(folderPath + MODIFIED_IMAGE_FILE);
         } catch (error) {
-            console.log('error reading second image');
+            console.log(ERROR_READING_SECOND_IMAGE);
         }
 
         return { originalImage: firstImage, modifiedImage: secondImage };
@@ -189,7 +200,7 @@ export class GameStorageService {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'soloRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { soloRanking: { $each: [], $sort: { score: 1 } } } };
-        if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
+        if (!gameData) throw new Error(GAME_DATA_NOT_FOUND + id);
         const options = {
             multi: false,
             // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -199,7 +210,7 @@ export class GameStorageService {
             await this.collection.findOneAndUpdate(query, update, options);
             await this.collection.updateOne(query, scoreUpdate);
         } catch (e) {
-            console.error('update error : ' + e);
+            console.error(ERROR + e);
         }
         return (await this.getGameById(id)).gameData?.soloRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
@@ -210,7 +221,7 @@ export class GameStorageService {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'oneVersusOneRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { oneVersusOneRanking: { $each: [], $sort: { score: 1 } } } };
-        if (!gameData) throw new Error(`Game data not found for game with id ${id}`);
+        if (!gameData) throw new Error(GAME_DATA_NOT_FOUND + id);
 
         const options = {
             multi: false,
@@ -222,7 +233,7 @@ export class GameStorageService {
             await this.collection.findOneAndUpdate(query, update, options);
             await this.collection.updateOne(query, scoreUpdate);
         } catch (e) {
-            console.error('update error : ' + e);
+            console.error(ERROR + e);
         }
         return (await this.getGameById(id)).gameData?.oneVersusOneRanking.findIndex((ranking) => ranking.name === newBreakingRanking.name);
     }
@@ -233,7 +244,7 @@ export class GameStorageService {
         try {
             await this.collection.findOneAndUpdate(query, resetRanking);
         } catch (e) {
-            console.error('update error : ' + e);
+            console.error(ERROR + e);
         }
     }
 
@@ -245,9 +256,9 @@ export class GameStorageService {
     createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
-                console.error('Folder was not created');
+                console.error(FOLDER_NOT_CREATED);
             } else {
-                console.log('Folder successfully created.');
+                console.log(FOLDER_CREATED);
             }
         });
     }
@@ -263,9 +274,9 @@ export class GameStorageService {
 
     writeFileErrorManagement = (err: NodeJS.ErrnoException) => {
         if (err) {
-            console.error('File was not successfully written');
+            console.error(FILE_WAS_NOT_WRITTEN);
         } else {
-            console.log('File successfully written.');
+            console.log(FILE_WRITTEN);
         }
     };
 

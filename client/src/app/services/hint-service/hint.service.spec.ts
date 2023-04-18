@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-magic-numbers */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ElementRef } from '@angular/core';
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -117,6 +117,7 @@ describe('HintService', () => {
         hintService = new HintService(mockImageManipulationService, constantService);
 
         const canvas = { nativeElement: document.createElement('canvas') };
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const context = canvas.nativeElement.getContext('2d')!;
         const image = Buffer.alloc(100, 1);
         const otherImage = Buffer.alloc(100, 1);
