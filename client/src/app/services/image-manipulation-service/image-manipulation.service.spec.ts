@@ -20,7 +20,7 @@ describe('ImageManipulationService', () => {
     let onloadRef: Function | undefined;
     const originalOnload = Object.getPrototypeOf(Image).onload;
     // eslint-disable-next-line no-unused-vars
-    
+
     let service: ImageManipulationService;
     // We have no dependencies to other classes or Angular Components
     // but we can still let Angular handle the objet creation
@@ -43,7 +43,7 @@ describe('ImageManipulationService', () => {
 
     afterAll(() => {
         Image.prototype.onload = originalOnload;
-      });
+    });
 
     it('should be created', () => {
         expect(service).toBeTruthy();
@@ -154,7 +154,7 @@ describe('ImageManipulationService', () => {
     it('alternateOldNewImage should call loadCanvas', () => {
         const imageOld: Buffer = Buffer.alloc(100, 1);
         const imageNew: Buffer = Buffer.alloc(100, 0);
-        
+
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d')!;
         const loadSpy = spyOn(service, 'loadCanvasImages');
@@ -430,7 +430,7 @@ describe('ImageManipulationService', () => {
         expect(service['setRGB']).toHaveBeenCalled();
     });
 
-    it('should blink the disk and reset the canvas', async () => {
+    it('should return a function that resets the canvas', () => {
         const mockCanvasRef: ElementRef<HTMLCanvasElement> = {
             nativeElement: document.createElement('canvas'),
         };
@@ -440,20 +440,15 @@ describe('ImageManipulationService', () => {
             imageNew: Buffer.alloc(100, 1),
             original: Buffer.alloc(100, 1),
         };
-        const gameData: GameData = {
-            id: 1,
-            name: 'Test Game',
-            isEasy: true,
-            nbrDifferences: 1,
-            differences: [[{ x: 100, y: 200 }]],
-            oneVersusOneRanking: [],
-            soloRanking: [],
-        };
-        const differences = [false, true, true];
-        spyOn(service, 'loadCanvasImages');
-        const generateRandomVectorSpy = spyOn(service, 'generateRandomVector').and.returnValue({ x: 3, y: 4 });
-        await service.showThirdHint(canvasContext, gameData, differences);
 
-        expect(generateRandomVectorSpy).toHaveBeenCalled();
+        const resetMethod = service.createResetMethod(canvasContext);
+        spyOn(service, 'loadCanvasImages');
+
+        resetMethod();
+
+        expect(service.loadCanvasImages).toHaveBeenCalledWith(
+            service.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
+            canvasContext.context,
+        );
     });
 });
