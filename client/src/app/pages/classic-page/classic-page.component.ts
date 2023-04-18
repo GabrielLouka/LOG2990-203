@@ -68,7 +68,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
     startingTime: Date;
     activePlayer: boolean;
     hasAlreadyReceiveMatchData: boolean = false;
-    newRanking: { name: string; score: number };
+    newRanking: { name: string; score: number; socketId: string };
+    newBreakingScore: RankingData | null;
     games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
     currentGameIndex: number = 0;
     canvasHandlingService: CanvasHandlingService;
@@ -289,7 +290,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         | null
     > {
         const gameId: string = this.currentGameId ? this.currentGameId : '0';
-        const routeToSend = this.currentGameId !== '-1' ? FETCH_GAME_PATH + gameId : FETCH_ALL_GAMES_PATH;
+        const routeToSend = !this.isLimitedTime ? FETCH_GAME_PATH + gameId : FETCH_ALL_GAMES_PATH;
 
         return this.communicationService.get(routeToSend).pipe(
             map((response) => {
@@ -451,6 +452,8 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
         this.socketService.on('newBreakingScore', (data: { rankingData: RankingData }) => {
             this.chat.sendTimeScoreMessage(data.rankingData);
+            if (data.rankingData.winnerSocketId === this.matchmakingService.currentSocketId)
+                this.popUpElement.updateNewBreakingScore(data.rankingData);
         });
     }
 
@@ -505,7 +508,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onFindDifference(): void {
         this.playSound(true);
-        if (this.currentGameId !== '-1') {
+        if (!this.isLimitedTime) {
             this.canvasHandlingService.refreshModifiedImage(this.games[this.currentGameIndex].gameData, this.foundDifferences);
         }
         if (this.isCheating) {
@@ -531,6 +534,7 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 name: this.newRanking.name,
                 score: this.newRanking.score,
                 gameName: this.games[this.currentGameIndex].gameData.name,
+                socketId: this.newRanking.socketId,
             },
         });
     }
@@ -548,7 +552,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 winner: isPlayer1Win ? this.matchmakingService.player1 : this.matchmakingService.player2,
             });
 
-            this.newRanking = { name: this.winningPlayerName, score: this.timerElement.elapsedSeconds };
+            this.newRanking = {
+                name: this.winningPlayerName,
+                score: this.timerElement.elapsedSeconds,
+                socketId: this.matchmakingService.currentSocketId,
+            };
             if (!isWinByDefault && (this.isSolo || this.isOneVersusOne)) this.sendNewTimeScoreToServer();
         }
         if (this.isOriginallyCoop && (this.getPlayerUsername(true) === undefined || this.getPlayerUsername(false) === undefined)) {

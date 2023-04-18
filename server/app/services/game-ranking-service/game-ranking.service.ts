@@ -7,7 +7,7 @@ import { Service } from 'typedi';
 export class GameRankingService {
     private position: string;
     private gameName: string;
-    private newRanking: { name: string; score: number; gameName: string };
+    private newRanking: { name: string; score: number; gameName: string; socketId: string };
     private matchType: string;
 
     constructor(private readonly gameStorageService: GameStorageService) {}
@@ -19,6 +19,7 @@ export class GameRankingService {
             name: string;
             score: number;
             gameName: string;
+            socketId: string;
         },
     ): Promise<RankingData | void> {
         this.newRanking = ranking;
@@ -43,6 +44,7 @@ export class GameRankingService {
                     position: this.position,
                     gameName: this.gameName,
                     matchType: this.matchType,
+                    winnerSocketId: this.newRanking.socketId,
                 } as RankingData;
             }
         } catch (e) {
