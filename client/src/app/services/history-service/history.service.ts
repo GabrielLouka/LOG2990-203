@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
@@ -33,26 +34,30 @@ export class HistoryService {
 
     formatHistoryData(serverResult: unknown[]) {
         const datePipe = new DatePipe('en-US');
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        this.gameHistories = serverResult.map((result: any) => {
-            const gameHistory: HistoryData = {
-                startingTime: result.startingTime,
-                duration: result.duration,
-                gameMode: this.convertGameModeToString(result.gameMode),
-                player1:
-                    result.gameMode === (MatchType.Solo || MatchType.LimitedSolo)
-                        ? result.player1
-                        : result.isPlayer1Victory
-                        ? result.player1
-                        : result.player2,
-                player2:
-                    result.gameMode === MatchType.Solo && !MatchType.LimitedSolo ? '' : result.isPlayer1Victory ? result.player2 : result.player1,
-                isWinByDefault: result.isWinByDefault,
-                isGameLoose: result.isGameLoose,
-            };
-            gameHistory.startingTime = datePipe.transform(gameHistory.startingTime, 'dd.MM.yyyy - HH:mm');
-            return gameHistory;
-        });
+        const player1Name = (result: any) => {
+            if (result.isPlayer1Victory || result.isWinByDefault) {
+                return result.player1;
+            }
+            return result.player2;
+        };
+        const player2Name = (result: any) => {
+            if (result.gameMode === MatchType.Solo || result.gameMode === MatchType.LimitedSolo) {
+                return '';
+            }
+            if (result.isPlayer1Victory || result.isWinByDefault) {
+                return result.player2;
+            }
+            return result.player1;
+        };
+        this.gameHistories = serverResult.map((result: any) => ({
+            startingTime: datePipe.transform(result.startingTime, 'dd.MM.yyyy - HH:mm'),
+            duration: result.duration,
+            gameMode: this.convertGameModeToString(result.gameMode),
+            player1: player1Name(result),
+            player2: player2Name(result),
+            isWinByDefault: result.isWinByDefault,
+            isGameLoose: result.isGameLoose,
+        }));
     }
 
     convertGameModeToString(gameMode: number): string {
