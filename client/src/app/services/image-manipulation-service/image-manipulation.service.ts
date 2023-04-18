@@ -94,11 +94,7 @@ export class ImageManipulationService {
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
         const resetMethod = this.createResetMethod(canvasContext);
-        // const resetMethod = () =>
-        //     this.loadCanvasImages(
-        //         this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
-        //         canvasContext.context,
-        //     );
+
         await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
     async showSecondHint(
@@ -138,29 +134,8 @@ export class ImageManipulationService {
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
         const resetMethod = this.createResetMethod(canvasContext);
-        // const resetMethod = () =>
-        //     this.loadCanvasImages(
-        //         this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
-        //         canvasContext.context,
-        //     );
         await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
-    // async showThirdHint(
-    //     canvasContext: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
-    //     game: GameData,
-    //     differences: boolean[],
-    // ) {
-    //     const height = canvasContext.canvas.nativeElement.height;
-    //     const randomVector = this.generateRandomVector(game, differences);
-
-    //     const resetMethod = () =>
-    //         this.loadCanvasImages(
-    //             this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
-    //             canvasContext.context,
-    //         );
-
-    //     await this.blinkDisk(canvasContext.context, randomVector.x, height - randomVector.y, resetMethod);
-    // }
     async showThirdHint(
         canvasState: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
         game: GameData,

@@ -521,7 +521,6 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     gameOver(): void {
         this.stopTimer();
-        // this.socketService.disconnect();
     }
 
     sendNewTimeScoreToServer(): void {
