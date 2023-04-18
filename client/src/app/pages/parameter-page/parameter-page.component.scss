@@ -61,15 +61,19 @@ header {
     width: 35vw;
 
     border-radius: 2.5vh;
-    background-color: rgba(0, 0, 0, 0.274);
+    background-color: rgba(0, 0, 0, 0.253);
+    position: absolute;
+    z-index: 1;
 }
 
 .confirmation-message {
     text-align: center;
+
 }
 
 .confirmation-btn {
     margin-top: 5vh;
+    width: 20vw;
 }
 
 .cadre {
@@ -109,7 +113,6 @@ header {
 
     margin: 1vh;
     padding: 1vh;
-
 }
 
 .divider {
@@ -135,6 +138,20 @@ header {
     text-decoration: line-through;
     color: #a9a9a9;
 }
+
+.confirmation-history-container {
+    
+    height: 60vh;
+    width: 35vw;
+
+    border-radius: 3vh;
+    position: absolute; 
+    z-index: 1;
+}
+
+.background {
+    background-color: rgba(0, 0, 0, 0.247);
+}
   
 
 // CSS FOR RANGE SLIDER
@@ -158,7 +175,7 @@ header {
       border-radius: 5vh;
 
       background: #434343;
-      box-shadow: -5vw 0 0 80px salmon;
+      box-shadow: -5vw 0 0 8.17vh salmon;
     }
 
     input[type="range"]::before {

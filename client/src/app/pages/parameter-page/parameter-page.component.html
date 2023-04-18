@@ -21,7 +21,7 @@
     <div class="flex-row center main-container">
         <div class="flex-column center const-container">
             <div *ngIf="confirmation" class="flex-column center confirmation-container">
-                <div class="button-style no-hover cadre">
+                <div class="flex-column center button-style no-hover cadre">
                     <div class="flex-column center confirmation-message">
                         <h2>Êtes vous sûr de vouloir {{ isReset ? 'réinitialiser' : 'sauvegarder' }} les constantes de jeu?</h2>
                         <p><b> Ce changement s'applique à tous les joueurs !</b></p>
@@ -41,7 +41,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="!confirmation">
+            <div>
                 <p class="title"><b> Constantes de jeu</b></p>
                 <div class="flex-row center">
                     <div class="flex-column const-input">
@@ -107,10 +107,36 @@
             </div>
         </div>
 
-        <div class="history-container">
+        <div
+            class="history-container"
+            [ngClass]="{
+                background: historyConfirmation
+            }"
+        >
+            <div *ngIf="historyConfirmation" class="flex-column center confirmation-history-container">
+                <div class="flex-column center button-style no-hover cadre">
+                    <div class="flex-column center confirmation-message">
+                        <h2 *ngIf="!this.historyService.isHistoryEmpty">Êtes vous sûr de vouloir supprimer tout l'historique des parties ?</h2>
+                        <p *ngIf="!this.historyService.isHistoryEmpty"><b> Ce changement est définitif !</b></p>
+                        <h2 *ngIf="this.historyService.isHistoryEmpty">L'historique est déjà vide</h2>
+                    </div>
+                    <div class="flex-row space-around confirmation-btn">
+                        <button
+                            *ngIf="!this.historyService.isHistoryEmpty"
+                            class="button-style"
+                            (click)="this.historyService.deleteHistory(); confirmation = false"
+                        >
+                            OUI
+                        </button>
+                        <button *ngIf="!this.historyService.isHistoryEmpty" class="button-style" (click)="historyConfirmation = false">NON</button>
+                        <button *ngIf="this.historyService.isHistoryEmpty" class="button-style" (click)="historyConfirmation = false">OK</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex-row center">
                 <p class="title"><b> Historique des parties jouées </b></p>
-                <button class="button-style delete-btn center" (click)="this.historyService.deleteHistory()">
+                <button class="button-style delete-btn center" (click)="this.historyConfirmation = true">
                     <span class="material-symbols-outlined option-icon"> delete </span>
                 </button>
             </div>

@@ -22,8 +22,8 @@ const MODIFIED_IMAGE_FILE = '2.bmp';
 const IMAGE_REQUIRED_WIDTH = '640';
 const IMAGE_REQUIRED_HEIGHT = '480';
 
-const IMAGE_DELIVERY_SERVER = 'http://localhost:3000/api';
-// const IMAGE_DELIVERY_SERVER = 'http://ec2-35-183-123-130.ca-central-1.compute.amazonaws.com:3000/api';
+// const IMAGE_DELIVERY_SERVER = 'http://localhost:3000/api';
+const IMAGE_DELIVERY_SERVER = 'http://ec2-35-183-123-130.ca-central-1.compute.amazonaws.com:3000/api';
 
 // Limit of games displayed
 const DISPLAYED_GAMES_LIMIT = 4;
@@ -34,3 +34,4 @@ export { LAST_GAME_ID_FILE, GAME_CONSTANTS_FILE };
 export { ORIGINAL_IMAGE_FILE, MODIFIED_IMAGE_FILE, IMAGE_REQUIRED_WIDTH, IMAGE_REQUIRED_HEIGHT };
 export { DISPLAYED_GAMES_LIMIT };
 export { IMAGE_DELIVERY_SERVER };
+

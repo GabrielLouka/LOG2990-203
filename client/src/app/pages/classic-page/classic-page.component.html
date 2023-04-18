@@ -77,20 +77,16 @@
                 <button class="button-style replay-button" title="Restart Replay" (click)="this.replayModeService.launchReplayMode()">
                     <span class="material-symbols-outlined replay-icon"> replay </span>
                 </button>
-                <button class="flex-row center button-style" title="Play Replay" (click)="this.replayModeService.togglePauseReplayMode()">
-                    <span
-                        *ngIf="replayModeService.isReplayModePaused && !replayModeService.isReplayModeFinished"
-                        class="material-symbols-outlined replay-icon"
-                    >
-                        play_arrow
-                    </span>
-                    <span
-                        *ngIf="!replayModeService.isReplayModePaused && !replayModeService.isReplayModeFinished"
-                        class="material-symbols-outlined replay-icon"
-                    >
-                        pause
-                    </span>
-                    <span *ngIf="replayModeService.isReplayModeFinished" class="material-symbols-outlined replay-icon not-allowed"> stop </span>
+                <button
+                    [ngClass]="{
+                        gameFinish: replayModeService.isReplayModeFinished
+                    }"
+                    class="flex-row center button-style"
+                    title="Play Replay"
+                    (click)="this.replayModeService.togglePauseReplayMode()"
+                >
+                    <span *ngIf="replayModeService.isReplayModePaused" class="material-symbols-outlined replay-icon"> play_arrow </span>
+                    <span *ngIf="!replayModeService.isReplayModePaused" class="material-symbols-outlined replay-icon"> pause </span>
                 </button>
                 <button class="button-style replay-button" (click)="onReplaySpeedButtonClick()">x{{ currentReplaySpeed }}</button>
             </div>

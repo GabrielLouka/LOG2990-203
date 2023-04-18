@@ -10,6 +10,7 @@ import { HistoryService } from '@app/services/history-service/history.service';
 export class ParameterPageComponent implements OnInit {
     confirmation: boolean = false;
     isReset: boolean = false;
+    historyConfirmation: boolean = false;
 
     constructor(readonly historyService: HistoryService, public gameConstantsService: GameConstantsService) {}
 
