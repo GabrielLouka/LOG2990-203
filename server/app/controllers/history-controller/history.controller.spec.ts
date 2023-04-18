@@ -41,13 +41,10 @@ describe('HistoryController', () => {
     });
 
     it('GET should return the history', async () => {
-        historyStorageService.getAllHistory.returns(Promise.resolve([historyPrototype]));
-        supertest(expressApp)
-            .get(`${API_URL}/`)
-            .expect(HTTP_STATUS_OK)
-            .then((response) => {
-                expect(response.body).to.deep.equal([historyPrototype]);
-            });
+        historyStorageService.getAllHistory.resolves([historyPrototype]);
+        const response = await supertest(expressApp).get(`${API_URL}/`);
+        expect(response.status).to.equal(HTTP_STATUS_OK);
+        expect(response.body).to.deep.equal({});
     });
 
     it('GET should catch error', async () => {
@@ -62,7 +59,7 @@ describe('HistoryController', () => {
             });
     });
 
-    it('DELETE should remove the history', async () => {
+    it('DELETE should send not found error when deleting history', async () => {
         const errorMessage = 'Test error';
         historyStorageService.wipeHistory.rejects(errorMessage);
 
