@@ -6,7 +6,7 @@ import { RectangleTool } from '@app/classes/rectangle-tool/rectangle-tool';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
 import { UndoElement } from '@app/classes/undo-element-abstract/undo-element.abstract';
 import { Vector2 } from '@common/classes/vector2';
-import { PEN_WIDTH } from '@common/utils/env';
+import { PEN_WIDTH } from '@common/utils/constants';
 
 export enum ToolType {
     CRAYON = 'crayon',

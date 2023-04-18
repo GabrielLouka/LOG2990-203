@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MINUTE_TO_SECONDS } from '@common/utils/env';
+import { MINUTE_TO_SECONDS } from '@common/utils/constants';
 
 @Injectable({
     providedIn: 'root',

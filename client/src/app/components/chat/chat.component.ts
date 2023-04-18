@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { RankingData } from '@common/interfaces/ranking.data';
-import { CHAT_TITLE } from '@common/utils/env';
+import { CHAT_TITLE } from '@common/utils/constants';
 
 @Component({
     selector: 'app-chat',

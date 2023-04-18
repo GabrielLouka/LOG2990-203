@@ -16,7 +16,7 @@ import {
     PIXEL_BYTES_LENGTH,
     QUARTER,
     QUARTER_SECOND,
-} from '@common/utils/env';
+} from '@common/utils/constants';
 import { Buffer } from 'buffer';
 
 @Injectable({

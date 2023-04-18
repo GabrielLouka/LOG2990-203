@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
-import { LIMITED_TIME_DURATION, MINUTE_LIMIT, MINUTE_TO_SECONDS, NOT_FOUND } from '@common/utils/env';
+import { LIMITED_TIME_DURATION, MINUTE_LIMIT, MINUTE_TO_SECONDS, NOT_FOUND } from '@common/utils/constants';
 
 @Component({
     selector: 'app-timer',

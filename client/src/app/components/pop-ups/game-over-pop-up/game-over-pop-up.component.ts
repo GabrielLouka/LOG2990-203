@@ -2,7 +2,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Action } from '@common/classes/action';
 import { MatchType } from '@common/enums/match.type';
-import { EXCELLENT_GAME_TEXT, MAIN_MENU_TEXT, NO_TEXT, QUITTING_CONFIRMATION_TEXT, REPLAY_MODE_TEXT, YES_TEXT } from '@common/utils/env';
+import { EXCELLENT_GAME_TEXT, MAIN_MENU_TEXT, NO_TEXT, QUITTING_CONFIRMATION_TEXT, REPLAY_MODE_TEXT, YES_TEXT } from '@common/utils/constants';
 
 @Component({
     selector: 'app-game-over-pop-up',
