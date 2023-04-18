@@ -72,10 +72,12 @@ describe('RegistrationService', () => {
 
     it('should redirect to main page', () => {
         registrationService.redirectToMainPage();
+        expect(routerMock.navigate).toHaveBeenCalled();
     });
 
     it('should handle game deletion', () => {
         registrationService.handleGameDeleted('1');
+        expect(routerMock.navigate).not.toHaveBeenCalledOnceWith('');
     });
 
     it('should load the game page', fakeAsync(() => {

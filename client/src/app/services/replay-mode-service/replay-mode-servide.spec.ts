@@ -47,6 +47,7 @@ describe('Replay Mode Service', () => {
         const delayedMethod1 = new DelayedMethod(spy, delay);
         replayModeService.recordedActions.push(delayedMethod1);
         replayModeService.replaySpeed=5;
+        expect(replayModeService.recordedActions).toContain(delayedMethod1);
     });
     it('should stop recording', ()=>{
         replayModeService.currentState=ReplayModeState.Recording;
@@ -106,6 +107,7 @@ describe('Replay Mode Service', () => {
         const recordedActions = [delayedMethod1,delayedMethod1,delayedMethod1];
         replayModeService.recordedActions = recordedActions;
         replayModeService.togglePauseReplayMode();
+        expect(replayModeService.currentState).toEqual(ReplayModeState.Paused as any);
     });
     it('should launch replay mode ',()=>{
         replayModeService.currentState=ReplayModeState.Paused;
@@ -115,6 +117,7 @@ describe('Replay Mode Service', () => {
         const recordedActions = [delayedMethod1,delayedMethod1,delayedMethod1];
         replayModeService.recordedActions = recordedActions;
         replayModeService.togglePauseReplayMode();
+        expect(replayModeService.currentState).toEqual(ReplayModeState.Replaying as any);
     });
     it('should stop all recorded actions and kill any delayed methods', () => {
         const delay = 100;

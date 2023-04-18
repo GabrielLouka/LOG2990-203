@@ -16,6 +16,7 @@ describe('DuplicationElement', () => {
         tempCanvas.height = 500;
 
         duplicateCanvas.loadCanvases(tempContext, tempContext);
+        expect(duplicateCanvas.leftContext).toEqual(tempContext);
     });
 
     it('temp canvas should have the same size as the source canvas', () => {

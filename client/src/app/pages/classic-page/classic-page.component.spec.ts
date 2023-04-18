@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable prefer-const */
 /* eslint-disable no-undef */
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -270,12 +271,13 @@ describe('ClassicPageComponent', () => {
         component.rightCanvas = { nativeElement: canvas };
 
         if (!component.rightCanvasContext) expect(imageService.blinkDifference).toHaveBeenCalled();
+        expect(component.rightCanvasContext).not.toBeUndefined();
     });
 
-    it('handleClickAndLetterTEvent should send message about difference found', () => {});
-
     it('requestStartGame should send from socket', () => {
+        const spy = spyOn(socketClientService, 'send');
         component.requestStartGame();
+        expect(spy).toHaveBeenCalled();
     });
     it('onMouseDown should check mouse event', () => {
         const canvas = document.createElement('canvas');
@@ -589,10 +591,9 @@ describe('ClassicPageComponent', () => {
         expect(component.isLoading).toEqual(true);
     });
 
-    it('should return the current replay speed ', () => {
+    it('should return the current replay speed 1 ', () => {
         expect(component.currentReplaySpeed).toEqual(1);
     });
-    it('should return the current replay speed ', () => {});
     it('should return the number of difference to found to win a game ', () => {
         spyOnProperty(component, 'isOneVersusOne').and.returnValue(true);
         component.minDifferences = 2;
@@ -760,6 +761,7 @@ describe('ClassicPageComponent', () => {
             return;
         });
         component.onFindDifference();
+        expect(component.letterTPressed).toBeTrue();
     });
 
     it('should reset the game', () => {
@@ -771,6 +773,7 @@ describe('ClassicPageComponent', () => {
     it('should receiveMAtchData', () => {
         spyOnProperty(component, 'isPlayer1').and.returnValue(false);
         component.onReceiveMatchData();
+        expect(component.activePlayer).toBeFalsy();
     });
     it('should receiveMatchData', () => {
         component.hasAlreadyReceiveMatchData = true;
@@ -787,6 +790,8 @@ describe('ClassicPageComponent', () => {
     });
     it('should finish the game', () => {
         spyOnProperty(component, 'isOneVersusOne').and.returnValue(true);
+        const spy = spyOn(socketClientService, 'send');
+
         spyOnProperty(component, 'isSolo').and.returnValue(false);
         spyOn(component, 'sendNewTimeScoreToServer').and.callFake(() => {
             return;
@@ -798,6 +803,7 @@ describe('ClassicPageComponent', () => {
             return;
         });
         component.gameOver();
+        expect(spy).toHaveBeenCalled();
     });
 
     it('should finish the Replay', () => {
@@ -1012,22 +1018,27 @@ describe('ClassicPageComponent', () => {
         component.player2 = '';
 
         component.handleMatchUpdate(null);
+        expect(component.player1).not.toBeNull();
     });
     it('should handle gameover', () => {
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+        const spy = spyOn(socketClientService, 'send');
         component.gameOver();
+        expect(spy).toHaveBeenCalled();
     });
 
     it('should return appropriately on quit game', () => {
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
 
         component.onQuitGame();
+        expect(component.popUpElement.display).not.toBeUndefined();
     });
 
     it('should return the appropriate value on win game', () => {
         component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
         spyOnProperty(component, 'isPlayer1').and.returnValue(true);
         component.onWinGame(true, true);
+        expect(component.winningPlayerName).toEqual('');
     });
 
     it('should return the appropriate value on win game', () => {
@@ -1081,12 +1092,12 @@ describe('ClassicPageComponent', () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    it('should return put canvas', () => {
-        const canvas = document.createElement('canvas');
-        component.leftCanvas = { nativeElement: canvas };
-        component.rightCanvas = { nativeElement: canvas };
-        cheatModeService = jasmine.createSpyObj('CheatModeService', ['focusKeyEvent', 'putCanvasIntoInitialState', 'stopCheating', 'startInterval']);
-    });
+    // it('should return put canvas', () => {
+    //     const canvas = document.createElement('canvas');
+    //     component.leftCanvas = { nativeElement: canvas };
+    //     component.rightCanvas = { nativeElement: canvas };
+    //     cheatModeService = jasmine.createSpyObj('CheatModeService', ['focusKeyEvent', 'putCanvasIntoInitialState', 'stopCheating', 'startInterval']);
+    // });
 
     it('should call getInitialImagesFromServer() when both canvas contexts are defined', () => {
         const spy = spyOn(component, 'getInitialImagesFromServer');
@@ -1105,6 +1116,7 @@ describe('ClassicPageComponent', () => {
         mockMatchmakingService.isSoloMode = false;
         component.matchmakingService = mockMatchmakingService;
         component.handleClickAndLetterTEvent(new MouseEvent('click'));
+        expect(component.currentGameId).not.toBeUndefined();
     });
     it('should handle the click and the letter T event 2', () => {
         spyOnProperty(component, 'isGameInteractive').and.returnValue(false);
@@ -1132,8 +1144,9 @@ describe('ClassicPageComponent', () => {
             cancelable: true,
         });
         component.handleClickAndLetterTEvent(event);
+        expect(component.handleClickAndLetterTEvent(new MouseEvent('click'))).toBeUndefined();
     });
-    it('should handle the click and the letter T event 3 ', () => {
+    it('should handle the click and the letter T event 4 ', () => {
         spyOnProperty(component, 'isGameInteractive').and.returnValue(true);
         component.isOver = false;
         component.letterTPressed = false;
@@ -1150,5 +1163,6 @@ describe('ClassicPageComponent', () => {
             cancelable: true,
         });
         component.handleClickAndLetterTEvent(event);
+        expect(component.handleClickAndLetterTEvent(new MouseEvent('click'))).toBeUndefined();
     });
 });

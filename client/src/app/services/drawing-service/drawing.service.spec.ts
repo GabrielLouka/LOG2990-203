@@ -31,7 +31,7 @@ describe('DrawingService', () => {
 
     it('should undo', () => {
         service.undo();
-        expect(service['actionsContainer'].undoActions[0]);
+        expect(service['actionsContainer'].undoActions[0]).toBeUndefined();
     });
 
     it('should redo', () => {

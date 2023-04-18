@@ -28,7 +28,6 @@ export class ImageManipulationService {
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
     }
-
     getImageDimensions = (imageBuffer: Buffer): Vector2 => {
         const imageWidth = imageBuffer.readInt32LE(IMAGE_WIDTH_OFFSET);
         let imageHeight = imageBuffer.readInt32LE(IMAGE_HEIGHT_OFFSET);
@@ -37,7 +36,6 @@ export class ImageManipulationService {
 
         return new Vector2(imageWidth, imageHeight);
     };
-
     getModifiedImageWithoutDifferences(
         gameData: GameData,
         images: { originalImage: Buffer; modifiedImage: Buffer },
@@ -65,7 +63,6 @@ export class ImageManipulationService {
         const randomDifference = unfoundDifferences[Math.floor(this.generatePseudoRandomNumber() * unfoundDifferences.length)];
         return randomDifference[Math.floor(this.generatePseudoRandomNumber() * randomDifference.length)];
     }
-
     async showFirstHint(
         canvasContext: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
         game: GameData,
@@ -75,7 +72,6 @@ export class ImageManipulationService {
         const height = canvasContext.canvas.nativeElement.height;
         const quarterWidth = width / 2;
         const quarterHeight = height / 2;
-
         const quadrants = [
             { x: 0, y: 0, width: quarterWidth, height: quarterHeight },
             { x: quarterWidth, y: 0, width: quarterWidth, height: quarterHeight },
@@ -83,7 +79,6 @@ export class ImageManipulationService {
             { x: quarterWidth, y: quarterHeight, width: quarterWidth, height: quarterHeight },
         ];
         const randomVector = this.generateRandomVector(game, differences);
-
         const quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
         for (const quadrant of quadrants) {
             if (
@@ -95,7 +90,6 @@ export class ImageManipulationService {
                 quadrantsThatContainTheRandomVector.push(quadrant);
             }
         }
-
         const randomRect =
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
@@ -105,10 +99,8 @@ export class ImageManipulationService {
         //         this.getImageSourceFromBuffer(canvasContext.imageNew ? canvasContext.imageNew : canvasContext.original),
         //         canvasContext.context,
         //     );
-
         await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
-
     async showSecondHint(
         canvasContext: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
         game: GameData,
@@ -118,9 +110,7 @@ export class ImageManipulationService {
         const height = canvasContext.canvas.nativeElement.height;
         const quarterWidth = width / QUARTER;
         const quarterHeight = height / QUARTER;
-
         const subQuadrants = [];
-
         for (let i = 0; i < QUARTER; i++) {
             for (let j = 0; j < QUARTER; j++) {
                 const quadrant = {
@@ -132,9 +122,7 @@ export class ImageManipulationService {
                 subQuadrants.push(quadrant);
             }
         }
-
         const randomVector = this.generateRandomVector(game, differences);
-
         const quadrantsThatContainTheRandomVector: { x: number; y: number; width: number; height: number }[] = [];
         for (const quadrant of subQuadrants) {
             if (
@@ -146,7 +134,6 @@ export class ImageManipulationService {
                 quadrantsThatContainTheRandomVector.push(quadrant);
             }
         }
-
         const randomRect =
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
@@ -158,7 +145,6 @@ export class ImageManipulationService {
         //     );
         await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
-
     // async showThirdHint(
     //     canvasContext: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
     //     game: GameData,
@@ -175,7 +161,6 @@ export class ImageManipulationService {
 
     //     await this.blinkDisk(canvasContext.context, randomVector.x, height - randomVector.y, resetMethod);
     // }
-
     async showThirdHint(
         canvasState: { context: CanvasRenderingContext2D; canvas: ElementRef<HTMLCanvasElement>; imageNew: Buffer; original: Buffer },
         game: GameData,
@@ -184,10 +169,8 @@ export class ImageManipulationService {
         const height = canvasState.canvas.nativeElement.height;
         const randomVector = this.generateRandomVector(game, differences);
         const resetMethod = this.createResetMethod(canvasState);
-
         await this.blinkDisk(canvasState.context, randomVector.x, height - randomVector.y, resetMethod);
     }
-
     createResetMethod(canvasState: {
         context: CanvasRenderingContext2D;
         canvas: ElementRef<HTMLCanvasElement>;
@@ -199,7 +182,6 @@ export class ImageManipulationService {
             this.loadCanvasImages(imageSource, canvasState.context);
         };
     }
-
     async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number, reset: () => void) {
         const radius = 70;
         const startAngle = 0;
@@ -230,7 +212,6 @@ export class ImageManipulationService {
         wholeBlink.add(async () => resetDelayedMethod.start());
         wholeBlink.invoke();
     }
-
     async blinkQuadrant(context: CanvasRenderingContext2D, rect: { x: number; y: number; width: number; height: number }, reset: () => void) {
         const wholeBlink = new Action<void>();
         let blinkCount = 0;
@@ -252,7 +233,6 @@ export class ImageManipulationService {
         wholeBlink.add(async () => resetDelayedMethod.start());
         wholeBlink.invoke();
     }
-
     generatePseudoRandomNumber() {
         return this.randomNumber;
     }
@@ -275,7 +255,6 @@ export class ImageManipulationService {
 
         wholeBlink.invoke();
     }
-
     alternateOldNewImage(oldImage: Buffer, newImage: Buffer, context: CanvasRenderingContext2D) {
         let showOldImage = false;
         const loopBlink = new DelayedMethod(
@@ -293,17 +272,14 @@ export class ImageManipulationService {
 
         return loopBlink;
     }
-
     loadCurrentImage(image: Buffer, context: CanvasRenderingContext2D) {
         this.loadCanvasImages(this.getImageSourceFromBuffer(image), context);
     }
-
     async sleep(time: number) {
         return new Promise((resolve) => {
             setTimeout(resolve, time);
         });
     }
-
     loadCanvasImages(srcImg: string, context: CanvasRenderingContext2D) {
         const img = new Image();
         img.src = srcImg;
@@ -354,10 +330,8 @@ export class ImageManipulationService {
     };
     private getPixelBufferPosAtPixelPos = (position: Vector2, imageBuffer: Buffer): number => {
         const pixelStart = BMP_FILE_HEADER_BYTES_LENGTH;
-
         const dimensions = this.getImageDimensions(imageBuffer);
         const imageWidth = dimensions.x;
-
         let yPosition: number;
         if (!this.isImageUsingTopDownFormat(imageBuffer)) {
             // Bottom Up BMP
