@@ -7,7 +7,7 @@ import {
     LIMITED_TIME_USER_ENTERED_TEXT,
     WAITING_FOR_PLAYER_TEXT,
     WAITING_PLAYER_ANSWER_TEXT,
-} from '@common/utils/env';
+} from '@common/utils/constants';
 import { IncomingPlayerService } from './incoming-player.service';
 let incomingPlayerService: IncomingPlayerService;
 let matchmakingServiceSpy: jasmine.SpyObj<MatchmakingService>;

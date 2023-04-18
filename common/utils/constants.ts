@@ -29,6 +29,21 @@ export { VOLUME_SUCCESS, MAX_GAMES_PER_PAGE };
 export { ROUTE_TO_SENDING_IMAGE };
 export { NUMBER_HINTS };
 export { REPLAY_TIMER_DELAY };
+export {
+    FILE_WRITTEN,
+    FILE_WAS_NOT_WRITTEN,
+    GAME_DATA_NOT_FOUND,
+    ERROR_READING_IMAGE,
+    ERROR_READING_SECOND_IMAGE,
+    FOLDER_NOT_CREATED,
+    FOLDER_CREATED,
+    DELETE_SUCCESS,
+    ERROR,
+    DATABASE_CONNECTION_ERROR,
+    DATABASE_CONNECTION_SUCCESS,
+    REQUIRED_ELEVATED_PRIVILEGES,
+    ALREADY_IN_USE,
+};
 
 const MAX_GAMES_PER_PAGE = 4;
 const NOT_FOUND = -1;
@@ -116,3 +131,18 @@ const MAX_BONUS = 10;
 const NORMAL_SPEED = 1;
 const TWO_TIMES_SPEED = 2;
 const FOUR_TIMES_SPEED = 4;
+
+// Error messages
+const GAME_DATA_NOT_FOUND = 'Game data not found for game with id';
+const ERROR_READING_IMAGE = 'error reading first image';
+const ERROR_READING_SECOND_IMAGE = 'error reading second image';
+const FOLDER_NOT_CREATED = 'Folder not created';
+const FOLDER_CREATED = 'Folder successfully created.';
+const FILE_WAS_NOT_WRITTEN = 'File was not successfully written';
+const FILE_WRITTEN = 'File was successfully written';
+const DELETE_SUCCESS = 'deleted successfully';
+const ERROR = 'error :';
+const DATABASE_CONNECTION_ERROR = 'Database connection error';
+const DATABASE_CONNECTION_SUCCESS = 'Database connection success !';
+const REQUIRED_ELEVATED_PRIVILEGES = 'requires elevated privileges';
+const ALREADY_IN_USE = 'already in use';

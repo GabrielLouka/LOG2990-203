@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
@@ -32,7 +32,7 @@ import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { MatchStatus } from '@common/enums/match.status';
 import { MatchType } from '@common/enums/match.type';
-import { MILLISECOND_TO_SECONDS } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 import { of, throwError } from 'rxjs';
 import { Socket } from 'socket.io-client';

@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { Application } from '@app/app';
+import { ALREADY_IN_USE, DATABASE_CONNECTION_ERROR, DATABASE_CONNECTION_SUCCESS, REQUIRED_ELEVATED_PRIVILEGES } from '@common/utils/constants';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
@@ -55,9 +56,9 @@ export class Server {
         try {
             await this.databaseService.start();
             this.application.gamesController.gameStorageService = new GameStorageService(this.databaseService);
-            console.log('Database connection successful !');
+            console.log(DATABASE_CONNECTION_SUCCESS);
         } catch {
-            console.error('Database connection failed !');
+            console.error(DATABASE_CONNECTION_ERROR);
         }
     }
 
@@ -68,11 +69,11 @@ export class Server {
         const bind: string = typeof Server.appPort === 'string' ? 'Pipe ' + Server.appPort : 'Port ' + Server.appPort;
         switch (error.code) {
             case 'EACCES':
-                console.error(`${bind} requires elevated privileges`);
+                console.error(bind + REQUIRED_ELEVATED_PRIVILEGES);
                 process.exit(1);
                 break;
             case 'EADDRINUSE':
-                console.error(`${bind} is already in use`);
+                console.error(bind + ALREADY_IN_USE);
                 process.exit(1);
                 break;
             default:

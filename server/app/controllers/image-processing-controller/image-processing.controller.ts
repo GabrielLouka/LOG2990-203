@@ -2,7 +2,7 @@ import { GameStorageService } from '@app/services/game-storage-service/game-stor
 import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
 import { ImageUploadForm } from '@common/interfaces/image.upload.form';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
-import { NOT_FOUND } from '@common/utils/env';
+import { NOT_FOUND } from '@common/utils/constants';
 import { Request, Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { Service } from 'typedi';

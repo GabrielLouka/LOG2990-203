@@ -4,7 +4,7 @@ import { Player } from '@common/classes/player';
 import { MatchStatus } from '@common/enums/match.status';
 import { MatchType } from '@common/enums/match.type';
 import { HistoryToSave } from '@common/interfaces/history.to.save';
-import { MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { MILLISECOND_TO_SECONDS, MINUTE_TO_SECONDS } from '@common/utils/constants';
 import { Service } from 'typedi';
 
 @Service()
