@@ -3,7 +3,7 @@ import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { VisitData } from '@common/interfaces/visitData';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, MIN_HARD_DIFFERENCES, REQUIRED_SURFACE_PERCENTAGE } from '@common/utils/env';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, MIN_HARD_DIFFERENCES, REQUIRED_SURFACE_PERCENTAGE } from '@common/utils/constants';
 import { Service } from 'typedi';
 
 @Service()

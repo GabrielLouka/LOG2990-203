@@ -1,6 +1,6 @@
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { RankingData } from '@common/interfaces/ranking.data';
-import { NOT_FOUND } from '@common/utils/env';
+import { NOT_FOUND } from '@common/utils/constants';
 import { Service } from 'typedi';
 
 @Service()
