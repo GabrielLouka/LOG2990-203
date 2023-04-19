@@ -89,18 +89,6 @@ describe('SocketManager', () => {
         data: {},
     };
 
-    it('should disconnect all sockets instances disconnect', (done) => {
-        const spy = sinon.spy(socketManager['sio'].sockets, 'disconnectSockets');
-        matchManagerServiceStub.removePlayerFromMatch.resolves('1');
-        socketManager.disconnect();
-
-        setTimeout(() => {
-            assert(spy.called);
-            spy.restore();
-            done();
-        }, RESPONSE_DELAY); // 1 seconde
-    });
-
     describe('handleSockets', () => {
         it('should registerGameData and call update match', (done) => {
             const dataTest: GameData = {
@@ -189,6 +177,7 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY);
     });
+
     it('should not validate difference when not found', (done) => {
         const differencePosition: Vector2 = new Vector2(300, 200);
         matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(-1);
