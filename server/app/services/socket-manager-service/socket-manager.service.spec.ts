@@ -17,7 +17,7 @@ import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
-import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
+import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
@@ -98,7 +98,7 @@ describe('SocketManager', () => {
             assert(spy.called);
             spy.restore();
             done();
-        }, RESPONSE_DELAY * 5); // 1 seconde
+        }, RESPONSE_DELAY); // 1 seconde
     });
 
     describe('handleSockets', () => {
@@ -187,7 +187,7 @@ describe('SocketManager', () => {
             roomEmitStub.restore();
             sinon.restore();
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
     it('should not validate difference when not found', (done) => {
         const differencePosition: Vector2 = new Vector2(300, 200);
@@ -205,7 +205,7 @@ describe('SocketManager', () => {
             roomEmitStub.restore();
             sinon.restore();
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
@@ -226,7 +226,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('disconnect'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
@@ -246,7 +246,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('disconnect'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should createMatch with matchId and call joinMatchRoom', (done) => {
@@ -259,7 +259,7 @@ describe('SocketManager', () => {
             assert(socket.on.calledWith('createMatch'));
             assert(socket.join.called);
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should set match type', (done) => {
@@ -273,7 +273,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('setMatchType'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should set match player', (done) => {
@@ -288,7 +288,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('setMatchPlayer'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should join match room', (done) => {
@@ -300,7 +300,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('joinRoom'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should send a request to join a match', (done) => {
@@ -314,7 +314,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('requestToJoinMatch'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should send a request to join a match', (done) => {
@@ -326,7 +326,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('requestToJoinMatch'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
     it('should send a request to join a match', (done) => {
         socketManager.handleSockets();
@@ -337,7 +337,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('requestToJoinMatch'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should set the loser of a game', (done) => {
@@ -349,7 +349,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('setLoser'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should cancel a join request', (done) => {
@@ -363,7 +363,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('cancelJoinMatch'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should cancel join match', (done) => {
@@ -378,7 +378,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('cancelJoinMatch'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
     it('should send incoming player request answer', (done) => {
         socketManager.handleSockets();
@@ -392,7 +392,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('randomizeGameOrder'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
     it('should randomize the game order', (done) => {
         socketManager.handleSockets();
@@ -406,7 +406,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('randomizeGameOrder'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
     it('should randomize the game order', (done) => {
         socketManager.handleSockets();
@@ -420,7 +420,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('randomizeGameOrder'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should reset all games', (done) => {
@@ -435,7 +435,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('resetAllGames'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should reset one game', (done) => {
@@ -450,7 +450,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('resetGame'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should send the winning time when a game is over', (done) => {
@@ -476,7 +476,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('gameOver'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should send the winning time when a game is over, but not emit an event for undefined rankingData', (done) => {
@@ -500,7 +500,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('gameOver'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should send the winning time when a game is over, but not emit an event for undefined rankingData', (done) => {
@@ -524,7 +524,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('gameOver'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should refresh the progress of a match in progress', (done) => {
@@ -541,7 +541,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('requestRefreshGameMatchProgress'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should refresh the progress of a match in progress', (done) => {
@@ -558,7 +558,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('requestRefreshGameMatchProgress'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should emit the number of games on the server', (done) => {
@@ -574,7 +574,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('requestGetNumberOfGamesOnServer'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should randomize the game order', (done) => {
@@ -590,7 +590,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('randomizeGameOrder'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should randomize the game order', (done) => {
@@ -606,7 +606,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('readyPlayer'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should start the timer', (done) => {
@@ -622,7 +622,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('startTimer'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should stop the timer', (done) => {
@@ -638,7 +638,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('stopTimer'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should delete all games', (done) => {
@@ -650,7 +650,7 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('deleteAllGames'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should send a message in the chat', (done) => {
@@ -665,6 +665,6 @@ describe('SocketManager', () => {
         setTimeout(() => {
             assert(socket.on.calledWith('sendingMessage'));
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 });
