@@ -659,29 +659,32 @@ describe('SocketManager', () => {
         socket.rooms.has = sinon.stub().returns(true);
         const fakeEmit = sinon.fake();
         socket.to.returns({ emit: fakeEmit });
-        const joinCallback = socket.on.getCall(23).args[1];
-        joinCallback({ matchId: 'test' });
+        const stopCallback = socket.on.getCall(23).args[1];
+        stopCallback({ matchId: 'test' });
+        const timerCallback2 = socket.on.getCall(23).args[1];
+        timerCallback2({ matchId: 'test' });
 
         setTimeout(() => {
             assert(socket.on.calledWith('stopTimer'));
             done();
         }, RESPONSE_DELAY);
     });
-    // it('should stop the timer', (done) => {
-    //     socketManager.handleSockets();
-    //     const connectionCallback = connectionStub.getCall(0).args[1];
-    //     connectionCallback(socket);
-    //     socket.rooms.has = sinon.stub().returns(true);
-    //     const fakeEmit = sinon.fake();
-    //     socket.to.returns({ emit: fakeEmit });
-    //     const joinCallback = socket.on.getCall(23).args[1];
-    //     joinCallback({ matchId: NOT_FOUND });
 
-    //     setTimeout(() => {
-    //         assert(socket.on.calledWith('stopTimer'));
-    //         done();
-    //     }, RESPONSE_DELAY);
-    // });
+    it('should stop the timer', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(23).args[1];
+        joinCallback({ matchId: NOT_FOUND });
+
+        setTimeout(() => {
+            assert(socket.on.calledWith('stopTimer'));
+            done();
+        }, RESPONSE_DELAY);
+    });
 
     it('should delete all games', (done) => {
         socketManager.handleSockets();

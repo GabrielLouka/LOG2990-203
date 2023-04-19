@@ -11,7 +11,7 @@ import {
     PERSISTENT_DATA_FOLDER_PATH,
 } from '@app/utils/env';
 import { GameData } from '@common/interfaces/game.data';
-import { defaultRanking, Ranking } from '@common/interfaces/ranking';
+import { Ranking, defaultRanking } from '@common/interfaces/ranking';
 import {
     DELETE_SUCCESS,
     ERROR,
@@ -24,7 +24,7 @@ import {
     GAME_DATA_NOT_FOUND,
 } from '@common/utils/constants';
 import 'dotenv/config';
-import { mkdir, readdir, readFileSync, rmdir, writeFile, writeFileSync } from 'fs';
+import { mkdir, readFileSync, readdir, rm, writeFile, writeFileSync } from 'fs';
 import { InsertOneResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
@@ -64,8 +64,8 @@ export class GameStorageService {
             } else {
                 files.forEach((file) => {
                     if (file.isDirectory()) {
-                        const folderPath = `${PERSISTENT_DATA_FOLDER_PATH}/${file.name}`;
-                        rmdir(folderPath, { recursive: true }, (error) => {
+                        const folderPath = `${PERSISTENT_DATA_FOLDER_PATH}${file.name}`;
+                        rm(folderPath, { recursive: true }, (error) => {
                             if (error) {
                                 console.error(error);
                             } else {
@@ -85,8 +85,8 @@ export class GameStorageService {
             } else {
                 files.forEach(async (file) => {
                     if (file.name === gameId) {
-                        const folderPath = `${PERSISTENT_DATA_FOLDER_PATH}/${file.name}`;
-                        rmdir(folderPath, { recursive: false }, (error) => {
+                        const folderPath = `${PERSISTENT_DATA_FOLDER_PATH}${file.name}`;
+                        rm(folderPath, { recursive: false }, (error) => {
                             if (error) {
                                 console.error(error);
                             } else {

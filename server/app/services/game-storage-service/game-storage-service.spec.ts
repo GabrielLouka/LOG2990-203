@@ -78,15 +78,15 @@ describe('Game storage service', () => {
         const gameId = '123';
         const files = [{ name: '456' }, { name: '789' }, { name: gameId }];
         const readdirStub = sinon.stub(fs, 'readdir').yields(null, files);
-        const rmdirStub = sinon.stub(fs, 'rmdir').yields(null);
+        const rmStub = sinon.stub(fs, 'rm').yields(null);
 
         await gameStorageService.deleteStoredData(gameId);
 
         sinon.assert.calledOnce(readdirStub);
-        sinon.assert.calledOnce(rmdirStub);
+        sinon.assert.calledOnce(rmStub);
 
         readdirStub.restore();
-        rmdirStub.restore();
+        rmStub.restore();
     });
 
     it('should delete all the games in the database', async () => {
