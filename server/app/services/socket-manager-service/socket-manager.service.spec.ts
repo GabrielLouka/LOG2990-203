@@ -17,7 +17,7 @@ import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
-import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
+import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
@@ -231,7 +231,7 @@ describe('SocketManager', () => {
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
         sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves('-1');
+        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').returns('-1');
         sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
         matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
