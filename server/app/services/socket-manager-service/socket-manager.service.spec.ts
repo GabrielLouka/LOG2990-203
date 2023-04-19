@@ -15,6 +15,7 @@ import { MatchType } from '@common/enums/match.type';
 import { GameData } from '@common/interfaces/game.data';
 import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
+import { NOT_FOUND } from '@common/utils/constants';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
@@ -627,6 +628,21 @@ describe('SocketManager', () => {
         socket.to.returns({ emit: fakeEmit });
         const joinCallback = socket.on.getCall(23).args[1];
         joinCallback({ matchId: 'test' });
+
+        setTimeout(() => {
+            assert(socket.on.calledWith('stopTimer'));
+            done();
+        }, RESPONSE_DELAY);
+    });
+    it('should stop the timer', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(23).args[1];
+        joinCallback({ matchId: NOT_FOUND });
 
         setTimeout(() => {
             assert(socket.on.calledWith('stopTimer'));
