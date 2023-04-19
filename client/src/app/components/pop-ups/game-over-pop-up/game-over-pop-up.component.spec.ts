@@ -134,7 +134,7 @@ describe('GameOverPopUpComponent', () => {
             isTimerDepleted: false,
             matchType: MatchType.LimitedCoop,
             startReplayAction: null,
-            username1: 'Joe',
+            username1: 'John',
             username2: 'Doe',
         } as GameOverPopUpData;
 
@@ -158,12 +158,10 @@ describe('GameOverPopUpComponent', () => {
             matchType: MatchType.LimitedSolo,
             startReplayAction: null,
             username1: 'player1',
-            username2: 'player2',
+            username2: '',
         } as GameOverPopUpData;
-
-        component.displayGameOver(popUpDataPrototype);
-
         spyOn(component, 'display');
+        component.displayGameOver(popUpDataPrototype);
         expect(component.popUpInfo).toEqual([
             {
                 title: 'Le temps est écoulé!',
