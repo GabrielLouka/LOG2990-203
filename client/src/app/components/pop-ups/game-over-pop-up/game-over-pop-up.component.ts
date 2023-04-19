@@ -8,6 +8,7 @@ import {
     MAIN_MENU_TEXT,
     NO_TEXT,
     OPPONENT_QUITTED_THE_GAME_TEXT,
+    PARTNER_LEFT_THE_GAME_TEXT,
     QUITTING_CONFIRMATION_TEXT,
     REPLAY_MODE_TEXT,
     YES_TEXT,
@@ -99,7 +100,7 @@ export class GameOverPopUpComponent {
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: isWinByDefault ? soloMessage : titleMessage,
-            message: isWinByDefault ? OPPONENT_QUITTED_THE_GAME_TEXT : EXCELLENT_GAME_TEXT,
+            message: isWinByDefault ? PARTNER_LEFT_THE_GAME_TEXT : EXCELLENT_GAME_TEXT,
             option1: MAIN_MENU_TEXT,
             option2: '',
             isConfirmation: false,

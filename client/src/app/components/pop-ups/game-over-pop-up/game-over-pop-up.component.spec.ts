@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatchType } from '@common/enums/match.type';
+import { GameOverPopUpData } from '@common/interfaces/game.over.pop.up.data';
 import { EXCELLENT_GAME_TEXT, MAIN_MENU_TEXT, NO_TEXT, QUITTING_CONFIRMATION_TEXT, REPLAY_MODE_TEXT, YES_TEXT } from '@common/utils/constants';
 import { GameOverPopUpComponent } from './game-over-pop-up.component';
 
@@ -35,7 +36,15 @@ describe('GameOverPopUpComponent', () => {
     });
 
     it('should show game over pop-up according to isWinByDefault and isSoloMode values (pt.1)', () => {
-        component.displayGameOver(true, true, MatchType.Solo, null, 'hello', 'world');
+        const popUpDataPrototype = {
+            isWinByDefault: true,
+            isTimerDepleted: true,
+            matchType: MatchType.Solo,
+            startReplayAction: null,
+            username1: 'hello',
+            username2: 'world',
+        } as GameOverPopUpData;
+        component.displayGameOver(popUpDataPrototype);
         expect(component.popUpInfo.length).toEqual(1);
         expect(component.popUpInfo[0].title).toContain('Félicitations vous avez remporté la partie !');
         expect(component.popUpInfo[0].option1).toEqual(MAIN_MENU_TEXT);
@@ -57,7 +66,7 @@ describe('GameOverPopUpComponent', () => {
         const isSoloMode = false;
         spyOn(component, 'display');
 
-        component.displayLimitedGameOver(username1, username2, isWinByDefault, isSoloMode);
+        component.displayLimitedGameOver({ username1, username2 }, isWinByDefault, isSoloMode);
 
         expect(component.popUpInfo).toEqual([
             {
@@ -80,7 +89,7 @@ describe('GameOverPopUpComponent', () => {
         const isSoloMode = false;
         spyOn(component, 'display');
 
-        component.displayLimitedGameOver(username1, username2, isWinByDefault, isSoloMode);
+        component.displayLimitedGameOver({ username1, username2 }, isWinByDefault, isSoloMode);
 
         expect(component.popUpInfo).toEqual([
             {
@@ -103,7 +112,7 @@ describe('GameOverPopUpComponent', () => {
         const isSoloMode = true;
         spyOn(component, 'display');
 
-        component.displayLimitedGameOver(username1, username2, isWinByDefault, isSoloMode);
+        component.displayLimitedGameOver({ username1, username2 }, isWinByDefault, isSoloMode);
 
         expect(component.popUpInfo).toEqual([
             {
@@ -120,19 +129,16 @@ describe('GameOverPopUpComponent', () => {
     });
 
     it('should set up the game over popup with the correct messages and options', () => {
-        // Set up mock data
-        const isWinByDefault = true;
-        const isTimerDepleted = false;
-        const matchType = MatchType.LimitedCoop;
-        const startReplayAction = null; // Create a mock function
+        const popUpDataPrototype = {
+            isWinByDefault: true,
+            isTimerDepleted: false,
+            matchType: MatchType.LimitedCoop,
+            startReplayAction: null,
+            username1: 'Joe',
+            username2: 'Doe',
+        } as GameOverPopUpData;
 
-        const username1 = 'John';
-        const username2 = 'Doe';
-
-        // Call the method being tested
-        component.displayGameOver(isWinByDefault, isTimerDepleted, matchType, startReplayAction, username1, username2);
-
-        // Assert that the popup info was set up correctly
+        component.displayGameOver(popUpDataPrototype);
         expect(component.popUpInfo.length).toBe(1);
 
         const popUp = component.popUpInfo[0];
@@ -142,18 +148,22 @@ describe('GameOverPopUpComponent', () => {
         expect(popUp.option2).toBe('');
         expect(popUp.isConfirmation).toBe(false);
         expect(popUp.isGameOver).toBe(true);
-        expect(popUp.option2Action).toBe(startReplayAction);
+        expect(popUp.option2Action).toBe(null);
     });
 
     it('should set pop-up solo infos and call display', () => {
-        const username1 = 'player1';
-        const username2 = 'player2';
-        const isWinByDefault = true;
-        const isTimerDepleted = true;
+        const popUpDataPrototype = {
+            isWinByDefault: false,
+            isTimerDepleted: true,
+            matchType: MatchType.LimitedSolo,
+            startReplayAction: null,
+            username1: 'player1',
+            username2: 'player2',
+        } as GameOverPopUpData;
+
+        component.displayGameOver(popUpDataPrototype);
+
         spyOn(component, 'display');
-
-        component.displayGameOver(!isWinByDefault, isTimerDepleted, MatchType.LimitedSolo, null, username1, username2);
-
         expect(component.popUpInfo).toEqual([
             {
                 title: 'Le temps est écoulé!',
@@ -169,17 +179,21 @@ describe('GameOverPopUpComponent', () => {
     });
 
     it('should set multi players pop-up and call display', () => {
-        const username1 = 'player1';
-        const username2 = 'player2';
-        const isWinByDefault = true;
-        const isTimerDepleted = true;
         spyOn(component, 'display');
+        const popUpDataPrototype = {
+            isWinByDefault: false,
+            isTimerDepleted: true,
+            matchType: MatchType.OneVersusOne,
+            startReplayAction: null,
+            username1: 'player1',
+            username2: 'player2',
+        } as GameOverPopUpData;
 
-        component.displayGameOver(!isWinByDefault, isTimerDepleted, MatchType.OneVersusOne, null, username1, username2);
+        component.displayGameOver(popUpDataPrototype);
 
         expect(component.popUpInfo).toEqual([
             {
-                title: `${username1} a remporté la partie !`,
+                title: `${popUpDataPrototype.username1} a remporté la partie !`,
                 message: EXCELLENT_GAME_TEXT,
                 option1: MAIN_MENU_TEXT,
                 option2: REPLAY_MODE_TEXT,

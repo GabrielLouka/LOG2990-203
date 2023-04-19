@@ -19,6 +19,7 @@ export {
     QUITTING_CONFIRMATION_TEXT,
     EXCELLENT_GAME_TEXT,
     OPPONENT_QUITTED_THE_GAME_TEXT,
+    PARTNER_LEFT_THE_GAME_TEXT,
 };
 // Buttons actions texts
 export { YES_TEXT, NO_TEXT, OK_TEXT, MAIN_MENU_TEXT, REPLAY_MODE_TEXT };
@@ -113,6 +114,7 @@ const RESET_TEXT = 'RÉINITIALISER ';
 const QUITTING_CONFIRMATION_TEXT = 'VOULEZ-VOUS VRAIMENT QUITTER ?';
 const ABORTED_GAME_TEXT = ' a abandonné la partie';
 const EXCELLENT_GAME_TEXT = 'Excellente partie !';
+const PARTNER_LEFT_THE_GAME_TEXT = 'Votre partenaire a quitté la partie...';
 const OPPONENT_QUITTED_THE_GAME_TEXT = 'Votre adversaire a quitté la partie...';
 
 // Buttons actions texts
