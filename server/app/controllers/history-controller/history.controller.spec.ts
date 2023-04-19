@@ -29,7 +29,6 @@ describe('HistoryController', () => {
     beforeEach(async () => {
         sandbox = createSandbox();
         historyStorageService = createStubInstance(HistoryStorageService);
-
         const app = Container.get(Application);
         Object.defineProperty(app['historyController'], 'historyStorageService', { value: historyStorageService });
         expressApp = app.app;
@@ -42,32 +41,40 @@ describe('HistoryController', () => {
 
     it('GET should return the history', async () => {
         historyStorageService.getAllHistory.resolves([historyPrototype]);
-        const response = await supertest(expressApp).get(`${API_URL}/`);
-        expect(response.status).to.equal(HTTP_STATUS_OK);
-        expect(response.body).to.deep.equal({});
+        await supertest(expressApp)
+            .get(`${API_URL}/`)
+            .expect(HTTP_STATUS_OK)
+            .then((res) => {
+                expect(res.body).to.deep.equal({});
+            });
     });
 
-    it('GET should catch error', async () => {
+    it('GET should catch error', () => {
         const errorMessage = 'Test error';
         historyStorageService.getAllHistory.rejects(errorMessage);
 
         supertest(expressApp)
             .get(`${API_URL}/`)
             .expect(HTTP_STATUS_OK)
-            .end((err) => {
-                if (err) return err;
+            .then((res) => {
+                expect(res.error).to.deep.equal(errorMessage);
             });
     });
 
-    it('DELETE should send not found error when deleting history', async () => {
+    it('DELETE should delete all history', (done) => {
+        historyStorageService.wipeHistory.resolves();
+        supertest(expressApp).delete(`${API_URL}/`).expect(HTTP_STATUS_OK);
+        done();
+    });
+
+    it('DELETE should send not found error when deleting history', () => {
         const errorMessage = 'Test error';
         historyStorageService.wipeHistory.rejects(errorMessage);
-
         supertest(expressApp)
             .delete(`${API_URL}/`)
-            .expect(HTTP_STATUS_OK)
-            .end((err) => {
-                if (err) return err;
+            .expect(StatusCodes.NOT_FOUND)
+            .then((res) => {
+                expect(res.error).to.deep.equal(errorMessage);
             });
     });
 });

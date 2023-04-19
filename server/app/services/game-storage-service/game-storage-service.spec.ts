@@ -47,6 +47,7 @@ describe('Game storage service', () => {
     });
     afterEach(async () => {
         await databaseServiceTest.closeConnection();
+        sinon.restore();
     });
     it('should return all the games from the database', async () => {
         const gamesDatabase = await gameStorageService.getAllGames();
@@ -199,6 +200,7 @@ describe('Game storage service', () => {
         getGameByIdStub.resolves(mockReturnValue);
         const result = await gameStorageService.updateGameSoloNewBreakingRecord(gameId, record);
         expect(result).to.be.equal(-1);
+        sinon.restore();
     });
 
     it('updateGameSoloNewBreakingRecord should throw an error when game data not found', async () => {
@@ -228,6 +230,7 @@ describe('Game storage service', () => {
         getGameByIdStub.resolves(mockReturnValue);
         const result = await gameStorageService.updateGameOneVersusOneNewBreakingRecord(gameId, record);
         expect(result).to.be.equal(-1);
+        sinon.restore();
     });
 
     it('updateGameOneVersusOneNewBreakingRecord should throw an error when game data not found', async () => {
@@ -257,12 +260,14 @@ describe('Game storage service', () => {
     it('should reset scores for a specific game', async () => {
         sinon.stub(gameStorageService.collection, 'findOneAndUpdate').resolves(null);
         expect(await gameStorageService.resetScoresById('1')).to.be.equal(undefined);
+        sinon.restore();
     });
 
     it('should reset scores for all games', async () => {
         sinon.stub(gameStorageService.collection, 'findOneAndUpdate').resolves(null);
 
         expect(await gameStorageService.resetAllScores()).to.be.equal(undefined);
+        sinon.restore();
     });
 
     it('should store the game images in the folder', () => {
