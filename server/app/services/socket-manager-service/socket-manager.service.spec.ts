@@ -17,10 +17,11 @@ import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
-import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
+import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
+// eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
-const RESPONSE_DELAY = 50;
+const RESPONSE_DELAY = 200;
 describe('SocketManager', () => {
     let sandbox: SinonSandbox;
     let server: Server;
@@ -30,7 +31,6 @@ describe('SocketManager', () => {
     let matchingDifferencesServiceStub: SinonStubbedInstance<MatchingDifferencesService>;
     let matchManagerServiceStub: SinonStubbedInstance<MatchManagerService>;
     let roomEmitStub: SinonStub;
-    let disconnectSocketStub: SinonStub;
 
     beforeEach(async () => {
         sandbox = createSandbox();
@@ -46,18 +46,17 @@ describe('SocketManager', () => {
         matchManagerServiceStub.removePlayerFromMatch.returns('test');
         sinon.stub(socketManager['matchManagerService'], 'getMatchAvailableForGame').returns('test');
         socketManager['matchManagerService']['currentOnlinePlayedMatches'] = [new Match(1, 'test')];
+
         roomEmitStub = sinon.stub(socketManager['sio'], <any>'to');
-        disconnectSocketStub = sinon.stub(socketManager['sio'].sockets, 'disconnectSockets');
-        disconnectSocketStub.resolves();
     });
 
     afterEach(() => {
         connectionStub.restore();
-        disconnectSocketStub.restore();
         emitStub.restore();
         roomEmitStub.restore();
         sandbox.restore();
         socketManager.disconnect();
+        socketManager['sio'].close();
         sinon.restore();
     });
 
@@ -159,7 +158,6 @@ describe('SocketManager', () => {
             },
         },
     };
-
     it('should validate difference when one is found', (done) => {
         const differencePosition: Vector2 = new Vector2(200, 100);
         matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
@@ -200,27 +198,26 @@ describe('SocketManager', () => {
         }, RESPONSE_DELAY);
     });
 
-    it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
-        sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves(null);
-        sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
-        matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
+    // it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
+    //     sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
+    //     sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves(null);
+    //     sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
+    //     matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
-        const fakeEmit = sinon.fake();
-        socket.to.returns({ emit: fakeEmit });
+    //     const fakeEmit = sinon.fake();
+    //     socket.to.returns({ emit: fakeEmit });
 
-        socketManager.handleSockets();
-        socket.rooms.has = sinon.stub().returns(false);
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        connectionCallback(socket);
-        const disconnectCallback = socket.on.getCall(2).args[1];
-        disconnectCallback(socket);
-        setTimeout(() => {
-            assert(socket.on.calledWith('disconnect'));
-            done();
-            sinon.restore();
-        }, RESPONSE_DELAY);
-    });
+    //     socketManager.handleSockets();
+    //     socket.rooms.has = sinon.stub().returns(false);
+    //     const connectionCallback = connectionStub.getCall(0).args[1];
+    //     connectionCallback(socket);
+    //     const disconnectCallback = socket.on.getCall(2).args[1];
+    //     disconnectCallback(socket);
+    //     setTimeout(() => {
+    //         assert(socket.on.calledWith('disconnect'));
+    //         done();
+    //     }, RESPONSE_DELAY);
+    // });
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
         sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);

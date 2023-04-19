@@ -25,6 +25,7 @@ export class HistoryController {
         this.router.delete('/', async (req: Request, res: Response) => {
             try {
                 await this.historyStorageService.wipeHistory();
+                res.status(StatusCodes.OK);
             } catch (error) {
                 res.status(StatusCodes.NOT_FOUND).send(error.message);
             }

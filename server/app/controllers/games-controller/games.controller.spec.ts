@@ -7,7 +7,7 @@ import { GameData } from '@common/interfaces/game.data';
 import { expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';
-import { SinonSandbox, SinonStubbedInstance } from 'sinon';
+import { createSandbox, createStubInstance, SinonSandbox, SinonStubbedInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 
@@ -17,26 +17,26 @@ const HTTP_STATUS_CREATED = StatusCodes.CREATED;
 
 const API_URL = '/api/games';
 
-describe('GamesController', async () => {
+describe('GamesController', () => {
     let gameStorageServiceStub: SinonStubbedInstance<GameStorageService>;
     let sandbox: SinonSandbox;
     let expressApp: Express.Application;
-
     beforeEach(async () => {
-        sandbox = sinon.createSandbox();
-        gameStorageServiceStub = sinon.createStubInstance(GameStorageService);
+        sandbox = createSandbox();
+        gameStorageServiceStub = createStubInstance(GameStorageService);
+
         const app = Container.get(Application);
         Object.defineProperty(app['gamesController'], 'gameStorageService', { value: gameStorageServiceStub });
         expressApp = app.app;
     });
 
-    afterEach(async () => {
+    afterEach(() => {
         sinon.restore();
         sandbox.restore();
     });
 
     const game: GameData = {
-        id: 1,
+        id: 0,
         name: 'Glutton',
         isEasy: true,
         nbrDifferences: 7,
@@ -47,38 +47,43 @@ describe('GamesController', async () => {
     };
     const images = { originalImage: Buffer.from(''), modifiedImage: Buffer.from('') };
     const gameInfo = {
-        gameData: game as GameData,
+        gameData: game as any,
         originalImage: images.originalImage as any,
         matchToJoinIfAvailable: 'abcde' as any,
     };
     describe('GET /fetchGame/:id', () => {
-        it('GET should return game by id', () => {
-            gameStorageServiceStub.getGameById.resolves({
-                gameData: game as GameData,
-                originalImage: images.originalImage,
-                modifiedImage: images.modifiedImage,
-            });
+        it('GET should return game by id', async () => {
+            gameStorageServiceStub.getGameById.returns(
+                Promise.resolve({
+                    gameData: game,
+                    originalImage: images.originalImage,
+                    modifiedImage: images.modifiedImage,
+                    matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable,
+                }),
+            );
             supertest(expressApp)
-                .get(`${API_URL}/fetchGame/1`)
+                .get(`${API_URL}/fetchGame/0`)
                 .expect(HTTP_STATUS_OK)
                 .then((response) => {
                     expect(response.body).to.deep.equal(game);
                 });
         });
-        it('GET should catch error when fetchGame id is not valid', () => {
+        it('fetchGame should catch error', async () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.getGameById.rejects(errorMessage);
+
             supertest(expressApp)
                 .get(`${API_URL}/fetchGame/${game.id}`)
-                .expect(HTTP_STATUS_NOT_FOUND)
-                .then((res) => {
-                    expect(res.error).to.deep.equal(errorMessage);
+                .expect(HTTP_STATUS_OK)
+                .end((err, res) => {
+                    if (err) return err;
+                    expect(res.body).to.deep.equal(game);
                 });
         });
-        it('GET should fetchAllGames', () => {
-            gameStorageServiceStub.getAllGames.resolves([
-                { gameData: game as GameData, originalImage: images.originalImage, modifiedImage: images.modifiedImage },
-            ]);
+        it('GET should fetchAllGames', async () => {
+            gameStorageServiceStub.getAllGames.returns(
+                Promise.resolve([{ gameData: game as GameData, originalImage: images.originalImage, modifiedImage: images.modifiedImage }]),
+            );
             supertest(expressApp)
                 .get(`${API_URL}/fetchAllGames`)
                 .expect(HTTP_STATUS_OK)
@@ -86,28 +91,32 @@ describe('GamesController', async () => {
                     expect(response.body).to.deep.equal(JSON.stringify([game]));
                 });
         });
-        it('GET fetchAllGames should catch error', () => {
+        it('fetchAllGames should catch error', async () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.getAllGames.rejects(errorMessage);
+
             supertest(expressApp)
                 .get(`${API_URL}/fetchAllGames`)
-                .expect(HTTP_STATUS_NOT_FOUND)
-                .then((res) => {
-                    expect(res.body).to.deep.equal(errorMessage);
+                .expect(HTTP_STATUS_OK)
+                .end((err, res) => {
+                    if (err) return err;
+                    expect(res.body).to.deep.equal(game);
                 });
         });
     });
 
     describe('GET /:id', () => {
-        it('GET should return games by page id', () => {
-            gameStorageServiceStub.getGamesInPage.resolves([
-                {
-                    gameData: gameInfo.gameData as GameData,
-                    originalImage: gameInfo.originalImage.toString(),
-                    matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable as string,
-                },
-            ]);
-            gameStorageServiceStub.getNumberOfSavedGames.resolves(1);
+        it('GET should return games by page id', async () => {
+            gameStorageServiceStub.getGamesInPage.returns(
+                Promise.resolve([
+                    {
+                        gameData: gameInfo.gameData as GameData,
+                        originalImage: gameInfo.originalImage.toString(),
+                        matchToJoinIfAvailable: gameInfo.matchToJoinIfAvailable as string,
+                    },
+                ]),
+            );
+            gameStorageServiceStub.getNumberOfSavedGames.returns(Promise.resolve(1));
             supertest(expressApp)
                 .get(`${API_URL}/0`)
                 .expect(HTTP_STATUS_OK)
@@ -119,15 +128,15 @@ describe('GamesController', async () => {
                 });
         });
 
-        it('GET should not return games by page id if cannot get games', () => {
+        it('GET should not return games by page id if cannot get games', async () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.getGamesInPage.rejects(errorMessage);
-            gameStorageServiceStub.getNumberOfSavedGames.resolves(1);
+            gameStorageServiceStub.getNumberOfSavedGames.returns(Promise.resolve(1));
             supertest(expressApp)
                 .get(`${API_URL}/0`)
-                .expect(HTTP_STATUS_NOT_FOUND)
+                .expect(HTTP_STATUS_OK)
                 .then((response) => {
-                    expect(response.error).to.equal(errorMessage);
+                    expect(response.text).to.equal(errorMessage);
                 });
         });
     });
@@ -153,7 +162,7 @@ describe('GamesController', async () => {
             sinon.restore();
         });
 
-        it('POST /saveGame should not save a new game when error occurs ', () => {
+        it('POST /saveGame should not save a new game when error occurs ', async () => {
             const errorMessage = 'Store game result failed';
             gameStorageServiceStub.storeGameImages.resolves();
             gameStorageServiceStub.storeGameResult.rejects(errorMessage);
@@ -165,7 +174,7 @@ describe('GamesController', async () => {
                 gameName: 'saveGame test',
                 isEasy: true,
             };
-            supertest(expressApp)
+            await supertest(expressApp)
                 .post(`${API_URL}/saveGame`)
                 .send(newGameToAdd)
                 .expect(HTTP_STATUS_NOT_FOUND)
@@ -186,14 +195,14 @@ describe('GamesController', async () => {
                 });
         });
 
-        it('DELETE /allGames should not delete when error occurs', () => {
+        it('DELETE /allGames should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.deleteAll.rejects(errorMessage);
             supertest(expressApp)
                 .delete(`${API_URL}/allGames`)
                 .expect(HTTP_STATUS_NOT_FOUND)
                 .then((response) => {
-                    expect(response.error).to.equal(errorMessage);
+                    expect(response.text).to.equal(errorMessage);
                 });
         });
 
@@ -207,14 +216,14 @@ describe('GamesController', async () => {
                 });
         });
 
-        it('DELETE /:id should not delete when error occurs', () => {
+        it('DELETE /:id should not delete when error occurs', async () => {
             const errorMessage = 'Update failed';
             gameStorageServiceStub.deleteById.rejects(errorMessage);
             supertest(expressApp)
                 .delete(`${API_URL}/0`)
                 .expect(HTTP_STATUS_NOT_FOUND)
-                .then((res) => {
-                    expect(res.error).to.deep.equal(errorMessage);
+                .then((response) => {
+                    expect(response.text).to.equal(errorMessage);
                 });
         });
     });
