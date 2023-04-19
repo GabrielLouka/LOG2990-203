@@ -1,6 +1,5 @@
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
 import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
-import { SocketManager } from '@app/services/socket-manager-service/socket-manager.service';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { GameData } from '@common/interfaces/game.data';
 import { defaultRanking } from '@common/interfaces/ranking';
@@ -11,11 +10,7 @@ import { Service } from 'typedi';
 @Service()
 export class GamesController {
     router: Router;
-    constructor(
-        public gameStorageService: GameStorageService,
-        public matchManagerService: MatchManagerService,
-        public socketManagerService: SocketManager,
-    ) {
+    constructor(public gameStorageService: GameStorageService, public matchManagerService: MatchManagerService) {
         this.configureRouter();
     }
 
@@ -74,8 +69,6 @@ export class GamesController {
             this.gameStorageService
                 .storeGameResult(newGameToAdd)
                 .then(() => {
-                    // we need to send a socket to refresh the game list
-                    this.socketManagerService.sendRefreshAvailableGames();
                     res.status(StatusCodes.CREATED).send({ body: receivedNameForm.gameName });
                 })
                 .catch((error: Error) => {

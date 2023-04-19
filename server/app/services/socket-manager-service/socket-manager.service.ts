@@ -9,22 +9,20 @@ import { GameData } from '@common/interfaces/game.data';
 import { MILLISECOND_TO_SECONDS, NOT_FOUND } from '@common/utils/constants';
 import * as http from 'http';
 import * as io from 'socket.io';
-import { Service } from 'typedi';
 
-@Service()
 export class SocketManager {
+    matchingDifferencesService: MatchingDifferencesService;
     private sio: io.Server;
 
     // eslint-disable-next-line max-params
     constructor(
+        server: http.Server,
         private readonly matchManagerService: MatchManagerService,
         private readonly gameRankingTimeService: GameRankingService,
         private readonly gamesStorageService: GameStorageService,
-        private readonly matchingDifferencesService: MatchingDifferencesService,
-    ) {}
-
-    initializeHttpServer(server: http.Server): void {
+    ) {
         this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] }, maxHttpBufferSize: 1e8 });
+        this.matchingDifferencesService = new MatchingDifferencesService();
     }
 
     handleSockets(): void {
@@ -114,12 +112,12 @@ export class SocketManager {
 
             socket.on('deleteAllGames', () => {
                 this.sio.emit('allGamesDeleted');
-                this.sendRefreshAvailableGames();
+                this.sio.emit('actionOnGameReloadingThePage');
             });
 
             socket.on('deletedGame', (data: { hasDeletedGame: boolean; id: string }) => {
                 this.sio.emit('gameDeleted', { gameDeleted: data.hasDeletedGame, id: data.id }, socket.id);
-                this.sendRefreshAvailableGames();
+                this.sio.emit('actionOnGameReloadingThePage');
             });
 
             socket.on('sendingMessage', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
@@ -131,13 +129,13 @@ export class SocketManager {
             socket.on('resetAllGames', async () => {
                 await this.gamesStorageService.resetAllScores();
                 this.sio.emit('allGamesReset');
-                this.sendRefreshAvailableGames();
+                this.sio.emit('actionOnGameReloadingThePage');
             });
 
             socket.on('resetGame', async (data: { id: string }) => {
                 await this.gamesStorageService.resetScoresById(data.id);
                 this.sio.emit('gameReset', { id: data.id }, socket.id);
-                this.sendRefreshAvailableGames();
+                this.sio.emit('actionOnGameReloadingThePage');
             });
 
             socket.on(
@@ -263,10 +261,6 @@ export class SocketManager {
                 }
             };
         });
-    }
-
-    sendRefreshAvailableGames(): void {
-        this.sio.emit('actionOnGameReloadingThePage');
     }
 
     disconnect(): void {

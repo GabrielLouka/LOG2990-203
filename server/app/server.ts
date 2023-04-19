@@ -16,13 +16,14 @@ export class Server {
     private static readonly appPort: string | number | boolean = Server.normalizePort(process.env.PORT || '3000');
     private static readonly baseDix: number = baseDix;
     private server: http.Server;
+    private socketManager: SocketManager;
+
     // eslint-disable-next-line max-params
     constructor(
         private application: Application,
         private databaseService: DatabaseService,
         public matchManagerService: MatchManagerService,
         public rankingService: GameRankingService,
-        public socketManager: SocketManager,
     ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -39,7 +40,13 @@ export class Server {
         this.application.app.set('port', Server.appPort);
 
         this.server = http.createServer(this.application.app);
-        this.socketManager.initializeHttpServer(this.server);
+
+        this.socketManager = new SocketManager(
+            this.server,
+            this.matchManagerService,
+            this.rankingService,
+            new GameStorageService(this.databaseService),
+        );
         this.socketManager.handleSockets();
 
         this.server.listen(Server.appPort);
