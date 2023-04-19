@@ -200,7 +200,7 @@ describe('SocketManager', () => {
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
         sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').returns(null);
+        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves(null);
         sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
         matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
@@ -221,7 +221,7 @@ describe('SocketManager', () => {
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
         sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').returns('-1');
+        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves('-1');
         sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
         matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
