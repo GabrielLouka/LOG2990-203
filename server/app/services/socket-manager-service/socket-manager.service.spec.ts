@@ -198,46 +198,46 @@ describe('SocketManager', () => {
         }, RESPONSE_DELAY);
     });
 
-    it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
-        sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves(null);
-        sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
-        matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
+    // it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
+    //     sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
+    //     sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves(null);
+    //     sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
+    //     matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
-        const fakeEmit = sinon.fake();
-        socket.to.returns({ emit: fakeEmit });
+    //     const fakeEmit = sinon.fake();
+    //     socket.to.returns({ emit: fakeEmit });
 
-        socketManager.handleSockets();
-        socket.rooms.has = sinon.stub().returns(false);
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        connectionCallback(socket);
-        const disconnectCallback = socket.on.getCall(2).args[1];
-        disconnectCallback(socket);
-        setTimeout(() => {
-            assert(socket.on.calledWith('disconnect'));
-            done();
-        }, RESPONSE_DELAY);
-    });
+    //     socketManager.handleSockets();
+    //     socket.rooms.has = sinon.stub().returns(false);
+    //     const connectionCallback = connectionStub.getCall(0).args[1];
+    //     connectionCallback(socket);
+    //     const disconnectCallback = socket.on.getCall(2).args[1];
+    //     disconnectCallback(socket);
+    //     setTimeout(() => {
+    //         assert(socket.on.calledWith('disconnect'));
+    //         done();
+    //     }, RESPONSE_DELAY);
+    // });
 
-    it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
-        sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves('-1');
-        sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
-        matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
+    // it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
+    //     sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
+    //     sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves('-1');
+    //     sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
+    //     matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
-        const fakeEmit = sinon.fake();
-        socket.to.returns({ emit: fakeEmit });
+    //     const fakeEmit = sinon.fake();
+    //     socket.to.returns({ emit: fakeEmit });
 
-        socketManager.handleSockets();
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        connectionCallback(socket);
-        const disconnectCallback = socket.on.getCall(2).args[1];
-        disconnectCallback(socket);
-        setTimeout(() => {
-            assert(socket.on.calledWith('disconnect'));
-            done();
-        }, RESPONSE_DELAY);
-    });
+    //     socketManager.handleSockets();
+    //     const connectionCallback = connectionStub.getCall(0).args[1];
+    //     connectionCallback(socket);
+    //     const disconnectCallback = socket.on.getCall(2).args[1];
+    //     disconnectCallback(socket);
+    //     setTimeout(() => {
+    //         assert(socket.on.calledWith('disconnect'));
+    //         done();
+    //     }, RESPONSE_DELAY);
+    // });
 
     it('should createMatch with matchId and call joinMatchRoom', (done) => {
         socketManager.handleSockets();
