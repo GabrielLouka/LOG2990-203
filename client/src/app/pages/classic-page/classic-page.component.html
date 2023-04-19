@@ -38,7 +38,7 @@
                 <app-found-differences-counter
                     class="hints-container"
                     *ngIf="isOneVersusOne && !this.isLimitedTime"
-                    [username]="this.getPlayerUsername(false)"
+                    [username]="this.player2"
                     [differencesFound]="differencesFound2"
                     [differencesNbr]="isOneVersusOne ? minDifferences : totalDifferences"
                     [ngClass]="{
