@@ -13,7 +13,7 @@ import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { assert, expect } from 'chai';
 import { StatusCodes } from 'http-status-codes';
 import * as sinon from 'sinon';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
+import { SinonStubbedInstance, createStubInstance } from 'sinon';
 import * as supertest from 'supertest';
 import { Container } from 'typedi';
 import { ImageProcessingController } from './image-processing.controller';
@@ -84,6 +84,10 @@ describe('ImageProcessingController', () => {
 
         const app = Container.get(Application);
         expressApp = app.app;
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     it('POST should send a created status', async () => {

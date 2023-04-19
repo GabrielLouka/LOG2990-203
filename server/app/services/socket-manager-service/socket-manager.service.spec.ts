@@ -17,8 +17,9 @@ import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
-import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
+import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
+import { NOT_FOUND } from '@common/utils/constants';
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
 const RESPONSE_DELAY = 200;
@@ -158,6 +159,7 @@ describe('SocketManager', () => {
             },
         },
     };
+
     it('should validate difference when one is found', (done) => {
         const differencePosition: Vector2 = new Vector2(200, 100);
         matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
@@ -198,26 +200,26 @@ describe('SocketManager', () => {
         }, RESPONSE_DELAY);
     });
 
-    // it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
-    //     sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
-    //     sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves(null);
-    //     sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
-    //     matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
+    it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
+        sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
+        sinon.stub(socketManager['matchManagerService'], 'removePlayerFromMatch').resolves(null);
+        sinon.stub(socketManager['matchManagerService'], 'getMatchById').returns(new Match(1, '-1'));
+        matchManagerServiceStub.getMatchById.resolves(new Match(1, '-1'));
 
-    //     const fakeEmit = sinon.fake();
-    //     socket.to.returns({ emit: fakeEmit });
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
 
-    //     socketManager.handleSockets();
-    //     socket.rooms.has = sinon.stub().returns(false);
-    //     const connectionCallback = connectionStub.getCall(0).args[1];
-    //     connectionCallback(socket);
-    //     const disconnectCallback = socket.on.getCall(2).args[1];
-    //     disconnectCallback(socket);
-    //     setTimeout(() => {
-    //         assert(socket.on.calledWith('disconnect'));
-    //         done();
-    //     }, RESPONSE_DELAY);
-    // });
+        socketManager.handleSockets();
+        socket.rooms.has = sinon.stub().returns(false);
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        const disconnectCallback = socket.on.getCall(2).args[1];
+        disconnectCallback(socket);
+        setTimeout(() => {
+            assert(socket.on.calledWith('disconnect'));
+            done();
+        }, RESPONSE_DELAY);
+    });
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
         sinon.stub(socketManager['matchManagerService'], 'currentMatches').value([match, match, match]);
@@ -615,6 +617,41 @@ describe('SocketManager', () => {
         }, RESPONSE_DELAY);
     });
 
+    it('should start the timer', (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const joinCallback = socket.on.getCall(22).args[1];
+
+        joinCallback({ matchId: NOT_FOUND, elapsedTime: 1 });
+
+        setTimeout(() => {
+            assert(socket.on.calledWith('startTimer'));
+            done();
+        }, RESPONSE_DELAY);
+    });
+
+    it("should start the timer interval if it hasn't already started", (done) => {
+        socketManager.handleSockets();
+        const connectionCallback = connectionStub.getCall(0).args[1];
+        connectionCallback(socket);
+        socket.rooms.has = sinon.stub().returns(true);
+        const fakeEmit = sinon.fake();
+        socket.to.returns({ emit: fakeEmit });
+        const timerCallback = socket.on.getCall(22).args[1];
+        timerCallback({ matchId: 'test', elapsedTime: 1 });
+        const timerCallback2 = socket.on.getCall(22).args[1];
+        timerCallback2({ matchId: 'test', elapsedTime: 0 });
+
+        setTimeout(() => {
+            assert(socket.on.calledWith('startTimer'));
+            done();
+        }, RESPONSE_DELAY);
+    });
+
     it('should stop the timer', (done) => {
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
@@ -630,6 +667,21 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY);
     });
+    // it('should stop the timer', (done) => {
+    //     socketManager.handleSockets();
+    //     const connectionCallback = connectionStub.getCall(0).args[1];
+    //     connectionCallback(socket);
+    //     socket.rooms.has = sinon.stub().returns(true);
+    //     const fakeEmit = sinon.fake();
+    //     socket.to.returns({ emit: fakeEmit });
+    //     const joinCallback = socket.on.getCall(23).args[1];
+    //     joinCallback({ matchId: NOT_FOUND });
+
+    //     setTimeout(() => {
+    //         assert(socket.on.calledWith('stopTimer'));
+    //         done();
+    //     }, RESPONSE_DELAY);
+    // });
 
     it('should delete all games', (done) => {
         socketManager.handleSockets();
