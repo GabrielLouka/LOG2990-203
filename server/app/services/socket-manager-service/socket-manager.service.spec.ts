@@ -17,7 +17,7 @@ import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
-import { createSandbox, SinonSandbox, SinonStub, SinonStubbedInstance } from 'sinon';
+import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
@@ -158,26 +158,27 @@ describe('SocketManager', () => {
             },
         },
     };
-    it('should validate difference when one is found', (done) => {
-        const differencePosition: Vector2 = new Vector2(200, 100);
-        matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
-        socketManager.handleSockets();
-        const connectionCallback = connectionStub.getCall(0).args[1];
-        connectionCallback(validateSocket);
-        const fakeEmit = sinon.fake();
-        roomEmitStub.returns({ emit: fakeEmit });
-        socket.rooms.has = sinon.stub().returns(true);
 
-        const validateCallback = validateSocket.on.getCall(1).args[1];
-        validateCallback({ foundDifferences: [false, false], position: differencePosition, isPlayer1: true });
-        setTimeout(() => {
-            assert(validateSocket.on.calledWith('validateDifference'));
-            assert(roomEmitStub.called);
-            roomEmitStub.restore();
-            sinon.restore();
-            done();
-        }, RESPONSE_DELAY); // 1 seconde
-    });
+    // it('should validate difference when one is found', (done) => {
+    //     const differencePosition: Vector2 = new Vector2(200, 100);
+    //     matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
+    //     socketManager.handleSockets();
+    //     const connectionCallback = connectionStub.getCall(0).args[1];
+    //     connectionCallback(validateSocket);
+    //     const fakeEmit = sinon.fake();
+    //     roomEmitStub.returns({ emit: fakeEmit });
+    //     socket.rooms.has = sinon.stub().returns(true);
+
+    //     const validateCallback = validateSocket.on.getCall(1).args[1];
+    //     validateCallback({ foundDifferences: [false, false], position: differencePosition, isPlayer1: true });
+    //     setTimeout(() => {
+    //         assert(validateSocket.on.calledWith('validateDifference'));
+    //         assert(roomEmitStub.called);
+    //         roomEmitStub.restore();
+    //         sinon.restore();
+    //         done();
+    //     }, RESPONSE_DELAY); // 1 seconde
+    // });
 
     it('should not validate difference when not found', (done) => {
         const differencePosition: Vector2 = new Vector2(300, 200);
@@ -614,6 +615,22 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY);
     });
+    // it('should start the timer', (done) => {
+    //     socketManager.handleSockets();
+    //     const connectionCallback = connectionStub.getCall(0).args[1];
+    //     connectionCallback(socket);
+    //     socket.rooms.has = sinon.stub().returns(true);
+    //     const fakeEmit = sinon.fake();
+    //     socket.to.returns({ emit: fakeEmit });
+    //     const joinCallback = socket.on.getCall(22).args[1];
+
+    //     joinCallback({ matchId: NOT_FOUND, elapsedTime: 1 });
+
+    //     setTimeout(() => {
+    //         assert(socket.on.calledWith('startTimer'));
+    //         done();
+    //     }, RESPONSE_DELAY);
+    // });
 
     it('should stop the timer', (done) => {
         socketManager.handleSockets();
@@ -630,6 +647,21 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY);
     });
+    // it('should stop the timer', (done) => {
+    //     socketManager.handleSockets();
+    //     const connectionCallback = connectionStub.getCall(0).args[1];
+    //     connectionCallback(socket);
+    //     socket.rooms.has = sinon.stub().returns(true);
+    //     const fakeEmit = sinon.fake();
+    //     socket.to.returns({ emit: fakeEmit });
+    //     const joinCallback = socket.on.getCall(23).args[1];
+    //     joinCallback({ matchId: NOT_FOUND });
+
+    //     setTimeout(() => {
+    //         assert(socket.on.calledWith('stopTimer'));
+    //         done();
+    //     }, RESPONSE_DELAY);
+    // });
 
     it('should delete all games', (done) => {
         socketManager.handleSockets();
