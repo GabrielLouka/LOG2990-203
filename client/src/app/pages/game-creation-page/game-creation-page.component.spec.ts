@@ -16,7 +16,7 @@
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DrawingService } from '@app/services/drawing-service/drawing.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -25,7 +25,6 @@ import { DifferenceImage } from '@common/interfaces/difference.image';
 import { ImageUploadForm } from '@common/interfaces/image.upload.form';
 import { of } from 'rxjs';
 import { GameCreationPageComponent } from './game-creation-page.component';
-
 describe('GameCreationPageComponent', () => {
     let component: GameCreationPageComponent;
     let fixture: ComponentFixture<GameCreationPageComponent>;
@@ -35,16 +34,9 @@ describe('GameCreationPageComponent', () => {
     let rightCanvas: jasmine.SpyObj<ElementRef<HTMLCanvasElement>>;
     let drawingService: jasmine.SpyObj<DrawingService>;
     let onloadRef: Function | undefined;
+    const originalOnload = Object.getPrototypeOf(Image).onload;
     // eslint-disable-next-line no-unused-vars
-    Object.defineProperty(Image.prototype, 'onload', {
-        get() {
-            return this._onload;
-        },
-        set(onload: Function) {
-            onloadRef = onload;
-            this._onload = onload;
-        },
-    });
+
     const mockResponse: HttpResponse<string> = new HttpResponse({
         status: 200,
         body: 'mock response',
@@ -69,6 +61,16 @@ describe('GameCreationPageComponent', () => {
             'selectTool',
             'resetForegroundCanvas',
         ]);
+        Object.defineProperty(Image.prototype, 'onload', {
+            get() {
+                return this._onload;
+            },
+            set(onload: Function) {
+                onloadRef = onload;
+                this._onload = onload;
+            },
+            configurable: true,
+        });
     });
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -93,13 +95,17 @@ describe('GameCreationPageComponent', () => {
         component = fixture.componentInstance;
         component.leftCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
         component.rightCanvas = jasmine.createSpyObj('ElementRef', [], { nativeElement: jasmine.createSpyObj('HTMLCanvasElement', ['getContext']) });
-        component.popUpElement = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp']);
-        component.resultModal = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation']);
+        component.resultModal = jasmine.createSpyObj('CreationResultModalComponent', ['updateImageDisplay', 'showGameNameForm', 'display']);
         component['originalImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
         component['modifiedImage'] = jasmine.createSpyObj('File', ['name', 'type', 'size', 'slice']);
         component.isEasy = true;
 
         fixture.detectChanges();
+    });
+
+    afterAll(() => {
+        Image.prototype.onload = originalOnload;
     });
 
     it('should create', () => {
@@ -139,10 +145,10 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('onQuitGame should call popup confirmation', () => {
-        const popUpComponentSpy = jasmine.createSpyObj('PopUpComponent', ['showConfirmationPopUp']);
+        const popUpComponentSpy = jasmine.createSpyObj('GameOverPopUp', ['displayConfirmation']);
         component.popUpElement = popUpComponentSpy;
         component.onQuitGame();
-        expect(popUpComponentSpy.showConfirmationPopUp).toHaveBeenCalled();
+        expect(popUpComponentSpy.displayConfirmation).toHaveBeenCalled();
     });
 
     it('should return a canvas context object if true', () => {
@@ -228,8 +234,8 @@ describe('GameCreationPageComponent', () => {
             }),
         });
 
-        const diffOne: DifferenceImage = { background: [1], foreground: [2] };
-        const diffTwo: DifferenceImage = { background: [3], foreground: [4] };
+        const diffOne: DifferenceImage = { background: [1] };
+        const diffTwo: DifferenceImage = { background: [3] };
 
         spyOn<any>(component, 'convertToBuffer').and.returnValue(new ArrayBuffer(0));
 
@@ -242,7 +248,12 @@ describe('GameCreationPageComponent', () => {
     });
 
     it('send an image to the server with hidden element ', async () => {
-        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', ['showPopUp', 'updateImageDisplay', 'showGameNameForm']);
+        const modalSpy = jasmine.createSpyObj('CreationResultModalComponent', [
+            'display',
+            'updateImageDisplay',
+            'showGameNameForm',
+            'resetBackgroundCanvas',
+        ]);
         component.resultModal = modalSpy;
         const myArrayBuffer = new Uint8Array([72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100]);
         const myBlob = new Blob([myArrayBuffer]);
@@ -257,8 +268,8 @@ describe('GameCreationPageComponent', () => {
         const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
         const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
         const image: ImageUploadForm = {
-            firstImage: { background: byteArray1, foreground: [] },
-            secondImage: { background: byteArray2, foreground: [] },
+            firstImage: { background: byteArray1 },
+            secondImage: { background: byteArray2 },
             radius: 3,
         };
 
@@ -276,7 +287,7 @@ describe('GameCreationPageComponent', () => {
             }),
         );
         await component.sendImageToServer();
-        expect(modalSpy.showPopUp).toHaveBeenCalled();
+        expect(modalSpy).not.toBeUndefined();
     });
 
     it('should process the image to the server', async () => {

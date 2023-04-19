@@ -1,11 +1,10 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
-import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { DeleteGamesPopUpComponent } from '@app/components/pop-ups/delete-games-pop-up/delete-games-pop-up.component';
+import { ResetPopUpComponent } from '@app/components/pop-ups/reset-pop-up/reset-pop-up.component';
+import { GamesService } from '@app/services/games-service/games.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
-import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { MatchType } from '@common/enums/match-type';
+import { MatchType } from '@common/enums/match.type';
 import { REGISTRATION_PATH } from '@common/utils/env.http';
 
 @Component({
@@ -17,60 +16,53 @@ export class OverlayComponent {
     @Input() isPlayable: boolean;
     @Input() id: string;
     @Input() matchToJoinIfAvailable: string | null = null;
-    @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
-    // eslint-disable-next-line max-params
+    @ViewChild('deletePopUpElement') deletePopUpElement: DeleteGamesPopUpComponent;
+    @ViewChild('resetPopUpElement') resetPopUpElement: ResetPopUpComponent;
+
     constructor(
         private readonly matchmakingService: MatchmakingService,
         private readonly router: Router,
-        private readonly socketService: SocketClientService,
-        private readonly communicationService: CommunicationService,
+        private readonly gamesService: GamesService,
     ) {}
 
-    requestGameCreationToServer(matchType: MatchType) {
+    requestGameCreationToServer(matchType: MatchType): void {
         this.matchmakingService.createGame(this.id);
-        this.matchmakingService.currentMatchType = matchType;
+        this.matchmakingService.setCurrentMatchType(matchType);
     }
 
-    createOneVersusOneGame() {
+    createOneVersusOneGame(): void {
         this.requestGameCreationToServer(MatchType.OneVersusOne);
         this.router.navigate([REGISTRATION_PATH, this.id]);
     }
 
-    createSoloGame() {
+    createSoloGame(): void {
         this.requestGameCreationToServer(MatchType.Solo);
         this.router.navigate([REGISTRATION_PATH, this.id]);
     }
 
-    joinGame() {
+    joinGame(): void {
         if (!this.matchToJoinIfAvailable) return;
-        this.matchmakingService.joinGame(this.matchToJoinIfAvailable);
+        this.matchmakingService.joinGame(this.matchToJoinIfAvailable, this.id);
         this.router.navigate([REGISTRATION_PATH, this.id]);
     }
 
-    showDeletePopUp() {
-        this.popUpElement.showDeleteGamesPopUp(false);
+    showDeletePopUp(): void {
+        this.deletePopUpElement.showPopUp(false);
     }
 
-    async deleteSelectedGame(isDeleteRequest: boolean): Promise<void> {
-        if (isDeleteRequest) {
-            const routeToSend = '/games/' + this.id;
-
-            this.communicationService.delete(routeToSend).subscribe({
-                next: (response) => {
-                    if (response.body) {
-                        this.reloadPage();
-                    }
-                },
-                error: (err: HttpErrorResponse) => {
-                    const responseString = `Server Error : ${err.message}\n`;
-                    const serverResult = JSON.parse(err.error);
-                    alert(responseString + serverResult);
-                },
-            });
-            this.socketService.socket.emit('deletedGame', { hasDeletedGame: true, id: this.id });
-        }
+    showResetPopUp(): void {
+        this.resetPopUpElement.showPopUp(false);
     }
-    reloadPage() {
+
+    deleteSelectedGame(isDeleteRequest: boolean): void {
+        this.gamesService.deleteById(isDeleteRequest, this.id);
+    }
+
+    resetSelectedGame(isResetRequest: boolean): void {
+        this.gamesService.resetById(isResetRequest, this.id);
+    }
+
+    reloadPage(): void {
         window.location.reload();
     }
 }

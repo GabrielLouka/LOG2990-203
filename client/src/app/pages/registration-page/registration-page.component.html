@@ -6,10 +6,12 @@
 <body>
     <Section class="flex-row center header">
         <app-back-button></app-back-button>
-        <h1 class="title">Jeu classique</h1>
+        <h1 class="title" *ngIf="this.id !== '-1'">Jeu Classique</h1>
+        <h1 class="title" *ngIf="this.id === '-1'">Jeu Temps Limité</h1>
     </Section>
     <Section class="flex-row center registerContainer">
-        <form *ngIf="!hasUsernameRegistered" [formGroup]="registrationForm" class="flex-row register-input">
+        <app-no-games-found-popup *ngIf="noGamesAvailableOnServer"></app-no-games-found-popup>
+        <form *ngIf="!hasUsernameRegistered && !noGamesAvailableOnServer" [formGroup]="registrationForm" class="flex-row register-input">
             <label class="flex-row center user-title" for="input"><b>pseudo :</b></label>
             <input
                 name="userName"
@@ -37,13 +39,17 @@
                 </span>
             </button>
         </form>
-        <div *ngIf="hasUsernameRegistered">
-            <div class="flex-row center message-container">
-                <div *ngIf="queueStatusMessage[12] === 'e' || queueStatusMessage[13] === 'u'" class="flex-column center">
-                    <h2>{{ queueStatusMessage }}</h2>
-                    <app-spinner class="spinner"></app-spinner>
-                </div>
 
+        <div *ngIf="hasUsernameRegistered">
+            <div class="flex-column center message-container">
+                <div *ngIf="queueStatusMessage !== '' && !hasFoundIncomingPlayer" class="flex-column center">
+                    <h2>{{ queueStatusMessage }}</h2>
+                    <app-spinner *ngIf="this.id !== '-1'" spinner></app-spinner>
+                </div>
+                <div *ngIf="this.id === '-1' && showButtons" class="flex-row space-around yesNo">
+                    <button class="button-style" (click)="createSoloLimitedTimeGame()">Solo</button>
+                    <button class="button-style" (click)="limitedTimeMatchId ? joinLimitedTimeGame() : createCoopGame()">Coop</button>
+                </div>
                 <div *ngIf="hasFoundIncomingPlayer" class="flex-column center">
                     <h2>{{ queueStatusMessage }}</h2>
                     <div class="flex-row space-around yesNo">

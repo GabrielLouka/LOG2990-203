@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { AfterViewInit, Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
-import { CreationResultModalComponent } from '@app/components/creation-result-modal/creation-result-modal.component';
-import { PopUpComponent } from '@app/components/pop-up/pop-up.component';
+import { CreationResultModalComponent } from '@app/components/pop-ups/creation-result-modal/creation-result-modal.component';
+import { GameOverPopUpComponent } from '@app/components/pop-ups/game-over-pop-up/game-over-pop-up.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { DrawingService } from '@app/services/drawing-service/drawing.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
@@ -10,7 +10,7 @@ import { DifferenceImage } from '@common/interfaces/difference.image';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { ImageUploadForm } from '@common/interfaces/image.upload.form';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, PEN_WIDTH, ROUTE_TO_SENDING_IMAGE } from '@common/utils/env';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, DEFAULT_ENLARGEMENT_RADIUS, PEN_WIDTH, ROUTE_TO_SENDING_IMAGE } from '@common/utils/constants';
 import { Buffer } from 'buffer';
 
 @Component({
@@ -30,7 +30,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     @ViewChild('pen') pen!: ElementRef;
     @ViewChild('eraser') eraser!: ElementRef;
     @ViewChild('rectangle') rectangle!: ElementRef;
-    @ViewChild('popUpElement') popUpElement: PopUpComponent;
+    @ViewChild('popUpElement') popUpElement: GameOverPopUpComponent;
 
     @ViewChild('combine') combine!: ElementRef;
 
@@ -124,26 +124,27 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     }
 
     onQuitGame() {
-        this.popUpElement.showConfirmationPopUp();
+        this.popUpElement.displayConfirmation();
     }
 
     async sendImageToServer(): Promise<void> {
-        this.resultModal.showPopUp();
+        this.resultModal.resetBackgroundCanvas();
+        this.resultModal.display();
 
         if (this.originalImage && this.modifiedImage) {
-            const buffer1 = await this.originalImage.arrayBuffer();
-            const buffer2 = await this.modifiedImage.arrayBuffer();
+            const [buffer1, buffer2] = await Promise.all([this.originalImage.arrayBuffer(), this.modifiedImage.arrayBuffer()]);
 
             this.imageManipulationService.combineImages(Buffer.from(buffer1), this.drawingCanvasOne.nativeElement);
             this.imageManipulationService.combineImages(Buffer.from(buffer2), this.drawingCanvasTwo.nativeElement);
+
             // convert buffer to int array
             const byteArray1: number[] = Array.from(new Uint8Array(buffer1));
             const byteArray2: number[] = Array.from(new Uint8Array(buffer2));
 
             this.resultModal.updateImageDisplay(new ArrayBuffer(0));
 
-            const firstImage: DifferenceImage = { background: byteArray1, foreground: [] };
-            const secondImage: DifferenceImage = { background: byteArray2, foreground: [] };
+            const firstImage: DifferenceImage = { background: byteArray1 };
+            const secondImage: DifferenceImage = { background: byteArray2 };
             const radius = this.enlargementRadius;
 
             const imageUploadForm: ImageUploadForm = { firstImage, secondImage, radius };
@@ -159,7 +160,7 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
     }
 
     private handleImageUploadResult(response: HttpResponse<string>, firstImage: DifferenceImage, secondImage: DifferenceImage) {
-        if (response.body !== null) {
+        if (response.body) {
             const serverResult: ImageUploadResult = JSON.parse(response.body);
             this.resultModal.updateImageDisplay(this.convertToBuffer(serverResult.resultImageByteArray));
             this.formToSendAfterServerConfirmation = {

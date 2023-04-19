@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ChatService } from '@app/services/chat-service/chat.service';
-import { CHAT_TITLE } from '@common/utils/env';
+import { RankingData } from '@common/interfaces/ranking.data';
+import { CHAT_TITLE } from '@common/utils/constants';
 
 @Component({
     selector: 'app-chat',
@@ -16,7 +17,7 @@ export class ChatComponent {
         username: string;
         sentBySystem: boolean;
         sentByPlayer1: boolean;
-        sentByPlayer2: boolean;
+        sentUpdatedScore: boolean;
         sentTime: number;
     }[] = [];
     newMessage = '';
@@ -32,7 +33,15 @@ export class ChatComponent {
         this.chatService.sendMessage(this.chatService.isPlayer1, this.newMessage);
     }
 
-    sendSystemMessage(message: string) {
-        this.chatService.sendMessageFromSystem({ message, chat: this.chat, newMessage: this.newMessage }, this.messages);
+    sendTimeScoreMessage(rankingData: RankingData) {
+        this.chatService.sendRecordBreakingMessage(rankingData, this);
+    }
+
+    sendSystemMessage(textToSend: string) {
+        this.chatService.sendMessageFromSystem(textToSend, this.newMessage, this);
+    }
+
+    reset() {
+        this.messages = [];
     }
 }

@@ -6,9 +6,10 @@
         <p>Informations</p>
     </div>
     <div>
-        <p class="font-size"><strong>Mode : </strong> {{ this.matchMode }} {{ this.matchType }}</p>
+        <p class="font-size"><strong>Nom du jeu : </strong> {{ this.name }}</p>
+        <p class="font-size"><strong>Mode : </strong> {{ this.matchTypeToString }}</p>
         <p class="font-size"><strong>Niveau :</strong> {{ this.difficulty }}</p>
-        <p class="font-size"><strong>N° d'indices : </strong> 3</p>
-        <p class="font-size"><strong>Pénalité d'erreur : </strong> 5 s</p>
+        <p *ngIf="isSoloMode" class="font-size"><strong> Pénalité par indice : </strong> {{ this.gameConstantsService?.penaltyValue }} s</p>
+        <p *ngIf="isLimitedMode" class="font-size"><strong> Temps bonus : </strong> {{ this.gameConstantsService?.bonusValue }} s</p>
     </div>
 </div>

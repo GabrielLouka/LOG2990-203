@@ -1,22 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { HintService } from '@app/services/hint-service/hint.service';
 
 @Component({
     selector: 'app-hint',
     templateUrl: './hint.component.html',
     styleUrls: ['./hint.component.scss'],
 })
-export class HintComponent {
-    maxGivenHints = 3;
+export class HintComponent implements OnInit {
+    @ViewChild('hint') div: ElementRef;
+    maxGivenHints: number;
 
-    giveHint() {
-        this.decrement();
-    }
+    constructor(private hintService: HintService) {}
 
-    decrement() {
-        if (this.maxGivenHints !== 0) {
-            this.maxGivenHints--;
-        } else {
-            window.alert('Vous avez utilisé vos indices !');
-        }
+    ngOnInit() {
+        this.hintService.reset();
+        this.maxGivenHints = this.hintService.maxGivenHints;
     }
 }

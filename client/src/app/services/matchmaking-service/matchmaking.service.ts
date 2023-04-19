@@ -3,8 +3,8 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
 import { Action } from '@common/classes/action';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -16,13 +16,22 @@ export class MatchmakingService {
     onGetJoinRequest = new Action<Player>();
     onGetJoinCancel = new Action<string>();
     onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
-    onAllGameDeleted = new Action<string | null>();
-    onSingleGameDeleted = new Action<string | null>();
+    onDeletedAllGames = new Action<string | null>();
+    onDeletedSingleGame = new Action<string | null>();
+    onResetAllGames = new Action<string | null>();
+    onResetSingleGame = new Action<string | null>();
     matchIdThatWeAreTryingToJoin: string | null = null;
+    gameIdThatWeAreTryingToJoin: string | null = null;
     currentMatch: Match | null;
+    onSingleGameDeleted: Action<string | null>;
+    onAllGameDeleted: Action<string | null>;
+    currentSeeds: number[] = [];
 
     constructor(private readonly socketService: SocketClientService) {}
 
+    get socketClientService() {
+        return this.socketService;
+    }
     get currentMatchPlayed() {
         return this.currentMatch;
     }
@@ -31,20 +40,31 @@ export class MatchmakingService {
         return this.currentMatch?.matchId as string;
     }
 
+    get currentGameId(): string | undefined {
+        return this.currentMatch?.gameId.toString();
+    }
+
     get currentSocketId(): string {
         return this.socketService.socketId;
     }
 
     get isHost(): boolean {
-        return this.matchIdThatWeAreTryingToJoin == null;
+        return !this.matchIdThatWeAreTryingToJoin;
     }
 
     get isPlayer1(): boolean {
         return this.socketService.socketId === this.player1Id;
     }
 
-    get is1vs1Mode(): boolean {
+    get isOneVersusOne(): boolean {
         return this.currentMatch?.matchType === MatchType.OneVersusOne;
+    }
+
+    get isCoopMode(): boolean {
+        return this.currentMatch?.matchType === MatchType.LimitedCoop;
+    }
+    get isLimitedTimeSolo() {
+        return this.currentMatch?.matchType === MatchType.LimitedSolo;
     }
 
     get isSoloMode(): boolean {
@@ -63,13 +83,25 @@ export class MatchmakingService {
         return this.currentMatch?.player1?.playerId;
     }
 
-    set currentMatchType(matchType: MatchType) {
+    get player1(): Player | null | undefined {
+        return this.currentMatch?.player1;
+    }
+
+    get player2(): Player | null | undefined {
+        return this.currentMatch?.player2;
+    }
+
+    set currentMatchGame(match: Match) {
+        this.currentMatch = match;
+    }
+
+    setCurrentMatchType(matchType: MatchType) {
         const matchId = this.currentSocketId;
 
         this.socketService.send<{ matchId: string; matchType: MatchType }>('setMatchType', { matchId, matchType });
     }
 
-    set currentMatchPlayer(playerName: string) {
+    setCurrentMatchPlayer(playerName: string) {
         if (!this.currentMatch) throw new Error('currentMatch is null');
 
         const matchId = this.currentMatch.matchId;
@@ -80,16 +112,15 @@ export class MatchmakingService {
             player,
         });
     }
-    set currentMatchGame(match: Match) {
-        this.currentMatch = match;
-    }
 
     isMatchAborted(match: Match): boolean {
         return match.matchStatus === MatchStatus.Aborted;
     }
 
     connectSocket() {
-        if (this.socketService.isSocketAlive) this.disconnectSocket();
+        if (this.socketService.isSocketAlive) {
+            this.disconnectSocket();
+        }
 
         this.socketService.connect();
         this.handleMatchUpdateEvents();
@@ -113,12 +144,20 @@ export class MatchmakingService {
             this.onGetJoinRequestAnswer.invoke(data);
         });
 
-        this.socketService.on('allGameDeleted', () => {
-            this.onAllGameDeleted.invoke(null);
+        this.socketService.on('allGamesDeleted', () => {
+            this.onDeletedAllGames.invoke(null);
         });
 
         this.socketService.on('gameDeleted', (data: { hasDeletedGame: boolean; id: string }) => {
-            this.onSingleGameDeleted.invoke(data.id);
+            this.onDeletedSingleGame.invoke(data.id);
+        });
+
+        this.socketService.on('allGamesReset', () => {
+            this.onResetAllGames.invoke(null);
+        });
+
+        this.socketService.on('gameReset', (data: { hasResetGame: boolean; id: string }) => {
+            this.onResetSingleGame.invoke(data.id);
         });
     }
 
@@ -129,18 +168,27 @@ export class MatchmakingService {
         this.onGetJoinRequest = new Action<Player>();
         this.onGetJoinCancel = new Action<string>();
         this.onGetJoinRequestAnswer = new Action<{ matchId: string; player: Player; isAccepted: boolean }>();
+        this.onDeletedAllGames = new Action<string | null>();
+        this.onDeletedSingleGame = new Action<string | null>();
+        this.onResetAllGames = new Action<string | null>();
+        this.onResetSingleGame = new Action<string | null>();
+        this.onAllGameDeleted = new Action<string | null>();
+        this.onSingleGameDeleted = new Action<string | null>();
         this.matchIdThatWeAreTryingToJoin = null;
+        this.gameIdThatWeAreTryingToJoin = null;
     }
 
     createGame(gameId: string) {
         this.socketService.send<{ gameId: string }>('createMatch', { gameId });
         this.currentMatch = new Match(parseInt(gameId, 10), this.currentSocketId);
         this.matchIdThatWeAreTryingToJoin = null; // Host doesn't need to join
+        this.gameIdThatWeAreTryingToJoin = null;
     }
 
-    joinGame(matchId: string) {
+    joinGame(matchId: string, gameId: string) {
         this.socketService.send<{ matchId: string }>('joinRoom', { matchId });
         this.matchIdThatWeAreTryingToJoin = matchId;
+        this.gameIdThatWeAreTryingToJoin = gameId;
         this.currentMatch = null;
     }
 

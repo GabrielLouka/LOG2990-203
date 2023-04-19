@@ -1,46 +1,73 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { MILLISECOND_TO_SECONDS, MINUTE_LIMIT, MINUTE_TO_SECONDS } from '@common/utils/env';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
+import { LIMITED_TIME_DURATION, MINUTE_LIMIT, MINUTE_TO_SECONDS, NOT_FOUND } from '@common/utils/constants';
 
 @Component({
     selector: 'app-timer',
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
-export class TimerComponent implements AfterViewInit, OnDestroy {
-    @Input() timeInSeconds: number;
+export class TimerComponent {
+    @Input() isCountdown: boolean = false;
+    @Output() timeReachedZero: EventEmitter<void> = new EventEmitter();
     @ViewChild('minute', { static: true }) minute: ElementRef;
     @ViewChild('second', { static: true }) second: ElementRef;
+    private timeCountInSeconds: number;
+    private timePenalty: number = 0;
+    private initialTime: number = NOT_FOUND;
 
-    shouldStop = false;
-    intervalId: number;
-
-    get minutes() {
-        return Math.floor(this.timeInSeconds / MINUTE_TO_SECONDS);
+    constructor(public gameConstantsService: GameConstantsService) {
+        this.gameConstantsService.initGameConstants();
     }
 
-    get seconds() {
-        return Math.floor(this.timeInSeconds % MINUTE_TO_SECONDS);
+    get elapsedSeconds(): number {
+        const output: number = this.timeCountInSeconds + this.timePenalty;
+        if (output > LIMITED_TIME_DURATION && this.isCountdown) return LIMITED_TIME_DURATION;
+        return output < 0 ? 0 : output;
     }
 
-    ngAfterViewInit() {
-        this.intervalId = window.setInterval(() => {
-            if (this.timeInSeconds >= 0) {
-                this.ticToc();
-            }
-        }, MILLISECOND_TO_SECONDS);
+    get minutes(): number {
+        return Math.floor(this.elapsedSeconds / MINUTE_TO_SECONDS);
     }
 
-    ngOnDestroy() {
-        window.clearInterval(this.intervalId);
+    get seconds(): number {
+        return Math.floor(this.elapsedSeconds % MINUTE_TO_SECONDS);
     }
 
-    ticToc() {
-        if (!this.shouldStop) this.timeInSeconds++;
-        this.minute.nativeElement.innerText = this.minutes < MINUTE_LIMIT ? '0' + this.minutes : this.minutes;
-        this.second.nativeElement.innerText = this.seconds < MINUTE_LIMIT ? '0' + this.seconds : this.seconds;
+    getTimeDisplayValue(value: number): string {
+        return value < MINUTE_LIMIT ? '0' + value : value.toString();
     }
 
-    stopTimer() {
-        this.shouldStop = true;
+    refreshTimerDisplay() {
+        this.minute.nativeElement.innerText = this.getTimeDisplayValue(this.minutes);
+        this.second.nativeElement.innerText = this.getTimeDisplayValue(this.seconds);
+
+        if (this.elapsedSeconds <= 0 && this.isCountdown) {
+            this.timeReachedZero.emit();
+        }
+    }
+
+    forceSetTime(elapsedTime: number) {
+        if (!this.isCountdown) this.timeCountInSeconds = elapsedTime;
+        else {
+            if (this.initialTime === NOT_FOUND) this.initialTime = this.gameConstantsService.countdownValue;
+            this.timeCountInSeconds = this.initialTime - elapsedTime;
+        }
+
+        this.refreshTimerDisplay();
+    }
+
+    applyTimePenalty(decreaseValue: number) {
+        this.timePenalty -= decreaseValue;
+        this.refreshTimerDisplay();
+    }
+
+    reset() {
+        this.timeCountInSeconds = this.isCountdown ? this.gameConstantsService.countdownValue : 0;
+        this.timePenalty = 0;
+        this.initialTime = this.timeCountInSeconds;
+        this.minute.nativeElement.innerText = '00';
+        this.second.nativeElement.innerText = '00';
+        this.refreshTimerDisplay();
     }
 }

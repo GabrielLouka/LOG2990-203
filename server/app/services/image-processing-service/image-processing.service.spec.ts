@@ -1,19 +1,16 @@
-/* eslint-disable import/no-named-as-default */
 /* eslint-disable max-lines */
-/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable prettier/prettier */
-import Queue from '@app/classes/queue';
+import { Queue } from '@app/classes/queue-class/queue';
+import { ImageProcessingService } from '@app/services/image-processing-service/image-processing.service';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { VisitData } from '@common/interfaces/visitData';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
-import { ImageProcessingService } from './image-processing.service';
 describe('Image-Processing Service', () => {
     let imageProcessingService: ImageProcessingService;
 
@@ -463,22 +460,16 @@ describe('Image-Processing Service', () => {
         imageProcessingService['addingPixelToListOfDifference'](visitData, nextPixelsToVisit, differenceObject);
     });
     it('should do nothing if an error occurs during pixel setting', () => {
-        // Arrange
-        const imageBuffer = Buffer.alloc(16); // replace with the appropriate buffer size
+        const imageBuffer = Buffer.alloc(16);
         const positions: Vector2[] = [new Vector2(0, 0), new Vector2(1, 1), new Vector2(2, 2)];
-        // mock the setRGB method to throw an error
+
         imageProcessingService['setRGB'] = () => {
             throw new Error('Failed to set pixel color');
         };
-
-        // Act
         const action = () => imageProcessingService['paintBlackPixelsAtPositions'](positions, imageBuffer);
-
-        // Assert
         expect(action).not.to.throw();
     });
     it('should skip pixel if it has been visited before with a bigger radius', () => {
-        // Arrange
         const visitData: VisitData = {
             alreadyVisited: new Map<string, number>([['1 1', 2]]),
             allPixelsToVisitSet: new Set<string>(),
@@ -496,11 +487,7 @@ describe('Image-Processing Service', () => {
             currentDifferenceGroupIndex: 0,
             differencesList: [[]],
         };
-
-        // Act
         imageProcessingService['addingPixelToListOfDifference'](visitData, nextPixelsToVisit, differenceObject);
-
-        // Assert
         expect(visitData.alreadyVisited.get('1 1')).to.equal(2);
         expect(differenceObject.differencesList[0]).to.deep.equal([]);
     });
@@ -523,7 +510,6 @@ describe('Image-Processing Service', () => {
         nextPixelsToVisit.enqueue(pixelToAdd);
 
         imageProcessingService['addingPixelToListOfDifference'](visitData, nextPixelsToVisit, differenceObject);
-
         expect(visitData.alreadyVisited.get('1 1')).to.equal(2);
     });
 });

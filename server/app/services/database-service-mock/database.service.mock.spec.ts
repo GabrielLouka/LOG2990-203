@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
 /* eslint-disable prettier/prettier */
-
 /* eslint-disable no-unused-expressions */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import { expect } from 'chai';
@@ -29,7 +28,6 @@ describe('DatabaseServiceMock', () => {
     });
     it('should not create a new client', async () => {
         const mongoUri = mongoServer.getUri();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await databaseServiceTest.start(mongoUri);
         await databaseServiceTest.start(mongoUri);
         expect(databaseServiceTest['client']).to.not.be.undefined;

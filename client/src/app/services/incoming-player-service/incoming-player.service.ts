@@ -1,18 +1,24 @@
 import { Injectable } from '@angular/core';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { DO_YOU_WANT_TO_PLAY_WITH_MESSAGE, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
+import {
+    DO_YOU_WANT_TO_PLAY_WITH_TEXT,
+    LIMITED_TIME_USER_ENTERED_TEXT,
+    WAITING_FOR_PLAYER_TEXT,
+    WAITING_PLAYER_ANSWER_TEXT,
+} from '@common/utils/constants';
 
 @Injectable({
     providedIn: 'root',
 })
 export class IncomingPlayerService {
+    id: string | null;
     private waitingPlayers: Player[] = [];
     private incomingPlayer: Player | null = null;
     private joiningStatusMessage: string;
     private hasFoundIncomingPlayer: boolean;
 
-    constructor(private readonly matchmakingService: MatchmakingService) {}
+    constructor(private matchmakingService: MatchmakingService) {}
 
     get incomingPlayers(): Player[] {
         return this.waitingPlayers;
@@ -67,23 +73,28 @@ export class IncomingPlayerService {
     refreshQueueDisplay() {
         this.hasFoundIncomingPlayer = this.hasIncomingPlayer;
         if (this.hasFoundIncomingPlayer) {
-            const startingGameMessage = DO_YOU_WANT_TO_PLAY_WITH_MESSAGE;
+            const startingGameMessage = DO_YOU_WANT_TO_PLAY_WITH_TEXT;
 
             this.joiningStatusMessage = startingGameMessage + `${this.firstIncomingPlayer.username} ?\n`;
-
             this.incomingPlayer = this.firstIncomingPlayer;
+            if (this.id === '-1') {
+                this.acceptIncomingPlayer();
+            }
         } else {
             this.updateWaitingForIncomingPlayerMessage();
             this.incomingPlayer = null;
         }
     }
 
+    updateLimitedTimeNameEntered() {
+        this.joiningStatusMessage = LIMITED_TIME_USER_ENTERED_TEXT;
+    }
     updateWaitingForIncomingPlayerMessage() {
-        this.joiningStatusMessage = WAITING_FOR_PLAYER_MESSAGE;
+        this.joiningStatusMessage = WAITING_FOR_PLAYER_TEXT;
     }
 
     updateWaitingForIncomingPlayerAnswerMessage() {
-        this.joiningStatusMessage = WAITING_PLAYER_ANSWER_MESSAGE;
+        this.joiningStatusMessage = WAITING_PLAYER_ANSWER_TEXT;
     }
 
     handleIncomingPlayerJoinRequest(playerThatWantsToJoin: Player) {

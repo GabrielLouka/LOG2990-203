@@ -1,10 +1,11 @@
-import { Queue } from '@app/classes/queue';
+import { Queue } from '@app/classes/queue-class/queue';
 import { Pixel } from '@common/classes/pixel';
 import { Vector2 } from '@common/classes/vector2';
 import { ImageUploadResult } from '@common/interfaces/image.upload.result';
 import { VisitData } from '@common/interfaces/visitData';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, MIN_HARD_DIFFERENCES, REQUIRED_SURFACE_PERCENTAGE } from '@common/utils/env';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, MIN_HARD_DIFFERENCES, REQUIRED_SURFACE_PERCENTAGE } from '@common/utils/constants';
 import { Service } from 'typedi';
+
 @Service()
 export class ImageProcessingService {
     private static readonly requiredImageWidth = CANVAS_WIDTH;
@@ -78,7 +79,7 @@ export class ImageProcessingService {
                 for (let x = 0; x < imageDimensions.x; x++) {
                     const pixel1 = this.getRGB({ x, y }, imageBuffer1);
                     const pixel2 = this.getRGB({ x, y }, imageBuffer2);
-                    if (pixel1 !== null && pixel2 !== null && !pixel1.equals(pixel2)) {
+                    if (pixel1 && pixel2 && !pixel1.equals(pixel2)) {
                         differences.push({ x, y });
                     }
                 }
@@ -232,9 +233,7 @@ export class ImageProcessingService {
             // Top Down BMP
             yPosition = dimensions.y - position.y - 1;
         }
-
         // Calculate the starting position of the pixel
-        // return (position.x + position.y * imageBuffer.readUInt32LE(imageWidthOffset)) * pixelLength + pixelStart;
         return (position.x + yPosition * imageWidth) * pixelLength + pixelStart;
     };
 

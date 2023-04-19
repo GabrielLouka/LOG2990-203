@@ -5,14 +5,13 @@ import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
+import { GamesService } from '@app/services/games-service/games.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
-import { Buffer } from 'buffer';
+import { GameData } from '@common/interfaces/game.data';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { Socket } from 'socket.io-client';
 import { GamesDisplayComponent } from './games-display.component';
 import SpyObj = jasmine.SpyObj;
-
 class SocketClientServiceMock extends SocketClientService {
     override connect() {}
 }
@@ -24,11 +23,13 @@ describe('GamesDisplayComponent', () => {
     let socketClientService: SocketClientService;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
+    let gameService: SpyObj<GamesService>;
     beforeEach(() => {
         socketTestHelper = new SocketTestHelper();
         socketServiceMock = new SocketClientServiceMock();
         socketServiceMock.socket = socketTestHelper as unknown as Socket;
         communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['get', 'post', 'delete', 'handleError']);
+        gameService = jasmine.createSpyObj('GamesService', ['fetchGameDataFromServer']);
     });
     beforeEach(waitForAsync(() => {
         TestBed.configureTestingModule({
@@ -37,6 +38,7 @@ describe('GamesDisplayComponent', () => {
                 { provide: CommunicationService, useValue: communicationServiceSpy },
                 HttpClient,
                 { provide: SocketClientService, useValue: socketServiceMock },
+                { provide: GamesService, useValue: gameService },
             ],
         }).compileComponents();
     }));
@@ -51,14 +53,12 @@ describe('GamesDisplayComponent', () => {
     });
 
     it('should set title based on isSelection (when true)', () => {
-        spyOn(component.theGamesService, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
         component.isSelection = true;
         component.ngOnInit();
         expect(component.title).toEqual('Page de configuration');
     });
 
     it('should set title based on isSelection (when false)', () => {
-        spyOn(component.theGamesService, 'fetchGameDataFromServer').and.returnValue(Promise.resolve());
         component.isSelection = false;
         component.ngOnInit();
         expect(component.title).toEqual('Page de selection');
@@ -96,9 +96,10 @@ describe('GamesDisplayComponent', () => {
                     { x: 0, y: 0 },
                 ],
             ],
-            ranking: defaultRankings,
+            oneVersusOneRanking: defaultRanking,
+            soloRanking: defaultRanking,
         };
-        component.theGamesService.games = [{ gameData: game, originalImage: Buffer.alloc(3), matchToJoinIfAvailable }];
+        component.theGamesService.games = [{ gameData: game, originalImage: 'http://localhost:3000/api/images/104/1', matchToJoinIfAvailable }];
         component.updateGameAvailability(gameId, matchToJoinIfAvailable);
         expect(component.theGamesService.games[0].matchToJoinIfAvailable).toBe(matchToJoinIfAvailable);
     });

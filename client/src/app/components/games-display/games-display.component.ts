@@ -1,5 +1,5 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { DeleteGamesPopUpComponent } from '@app/components/delete-games-pop-up/delete-games-pop-up.component';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { DeleteGamesPopUpComponent } from '@app/components/pop-ups/delete-games-pop-up/delete-games-pop-up.component';
 import { GamesService } from '@app/services/games-service/games.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
@@ -8,9 +8,10 @@ import { SocketClientService } from '@app/services/socket-client-service/socket-
     templateUrl: './games-display.component.html',
     styleUrls: ['./games-display.component.scss'],
 })
-export class GamesDisplayComponent implements OnInit {
+export class GamesDisplayComponent implements OnInit, OnDestroy {
     @Input() isSelection: boolean;
-    @ViewChild('popUpElement') popUpElement: DeleteGamesPopUpComponent;
+    @ViewChild('deletePopUpElement') deletePopUpElement: DeleteGamesPopUpComponent;
+    @ViewChild('resetPopUpElement') resetPopUpElement: DeleteGamesPopUpComponent;
     title: string;
 
     constructor(
@@ -25,18 +26,26 @@ export class GamesDisplayComponent implements OnInit {
 
     ngOnInit() {
         this.title = this.isSelection ? 'Page de configuration' : 'Page de selection';
-        this.gamesService.fetchGameDataFromServer(this.gamesService.currentPageNbr);
+        this.gamesService.fetchGameDataFromServer(this.gamesService.currentPageNumber);
         this.matchmakingService.connectSocket();
         this.addServerSocketMessagesListeners();
+    }
+
+    ngOnDestroy() {
+        this.gamesService.currentPageNumber = 0;
+        this.gamesService.showNextButton = false;
+        this.gamesService.showPreviousButton = false;
     }
 
     addServerSocketMessagesListeners() {
         this.socketService.on('gameProgressUpdate', (data: { gameId: number; matchToJoinIfAvailable: string | null }) => {
             this.updateGameAvailability(data.gameId, data.matchToJoinIfAvailable);
         });
+
         this.socketService.on('actionOnGameReloadingThePage', () => {
             const pathSegments = window.location.href.split('/');
-            const pageName = pathSegments[pathSegments.length - 2];
+            const pageName = pathSegments[pathSegments.length - 1];
+
             if (pageName === 'selections' || pageName === 'config') {
                 this.reloadPage();
             }

@@ -1,49 +1,57 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-restricted-imports */
-import { HttpHeaders, HttpResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
-import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { MatchType } from '@common/enums/match-type';
-import { of } from 'rxjs';
-import { DeleteGamesPopUpComponent } from '../delete-games-pop-up/delete-games-pop-up.component';
+import { Match } from '@common/classes/match';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
+import { DeleteGamesPopUpComponent } from '../pop-ups/delete-games-pop-up/delete-games-pop-up.component';
+import { ResetPopUpComponent } from '../pop-ups/reset-pop-up/reset-pop-up.component';
 import { OverlayComponent } from './overlay.component';
-
 describe('OverlayComponent', () => {
+    let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
     let component: OverlayComponent;
     let fixture: ComponentFixture<OverlayComponent>;
     let matchmakingServiceSpy: jasmine.SpyObj<MatchmakingService>;
     let routerSpy: jasmine.SpyObj<Router>;
-    let socketServiceSpy: jasmine.SpyObj<SocketClientService>;
-    let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
     let popUpElementSpy: jasmine.SpyObj<DeleteGamesPopUpComponent>;
-    let locationSpy: jasmine.SpyObj<Location>;
-    beforeEach(() => {
-        matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['createGame', 'joinGame']);
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-        socketServiceSpy = jasmine.createSpyObj('SocketClientService', ['emit']);
-        communicationServiceSpy = jasmine.createSpyObj('CommunicationService', ['delete']);
+    let resetPopUpElementSpy: jasmine.SpyObj<ResetPopUpComponent>;
 
-        popUpElementSpy = jasmine.createSpyObj('DeleteGamesPopUpComponent', ['showDeleteGamesPopUp']);
+    let locationSpy: jasmine.SpyObj<Location>;
+
+    beforeEach(() => {
+        matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['createGame', 'joinGame', 'setCurrentMatchType']);
+        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        popUpElementSpy = jasmine.createSpyObj('DeleteGamesPopUpComponent', ['showPopUp', 'displayPopUp']);
+        resetPopUpElementSpy = jasmine.createSpyObj('ResetPopUpComponent', ['showPopUp', 'displayPopUp']);
+
         locationSpy = jasmine.createSpyObj('Location', ['reload']);
+
         TestBed.configureTestingModule({
             imports: [RouterTestingModule],
             declarations: [OverlayComponent],
             providers: [
-                { provide: MatchmakingService, useValue: matchmakingServiceSpy },
-                { provide: Router, useValue: routerSpy },
-                { provide: SocketClientService, useValue: socketServiceSpy },
                 { provide: CommunicationService, useValue: communicationServiceSpy },
+                { provide: MatchmakingService, useValue: matchmakingServiceSpy },
+                HttpClient,
+                { provide: Router, useValue: routerSpy },
                 { provide: Location, useValue: locationSpy },
+                { provide: DeleteGamesPopUpComponent, useValue: popUpElementSpy },
+                { provide: ResetPopUpComponent, useValue: resetPopUpElementSpy },
             ],
         }).compileComponents();
 
         fixture = TestBed.createComponent(OverlayComponent);
         component = fixture.componentInstance;
         component.id = 'game_id_123';
-        component.popUpElement = popUpElementSpy;
+        component.deletePopUpElement = popUpElementSpy;
+        component.resetPopUpElement = resetPopUpElementSpy;
         fixture.detectChanges();
     });
 
@@ -52,18 +60,33 @@ describe('OverlayComponent', () => {
     });
 
     it('should create a OneVersusOne game and navigate to the registration page', () => {
+        const match1: Match = {
+            gameId: 0,
+            matchId: '',
+            player1: { username: undefined as any, playerId: '1' },
+            player2: { username: 'undefined', playerId: '2' },
+            player1Archive: { username: 'mario', playerId: '1' },
+            player2Archive: { username: 'luigi', playerId: '2' },
+            matchType: MatchType.OneVersusOne,
+            matchStatus: MatchStatus.Player1Win,
+        };
+        matchmakingServiceSpy.currentMatch = match1;
         component.createOneVersusOneGame();
 
         expect(matchmakingServiceSpy.createGame).toHaveBeenCalledWith('game_id_123');
-        expect(matchmakingServiceSpy.currentMatchType).toEqual(MatchType.OneVersusOne);
+        expect(matchmakingServiceSpy.currentMatch?.matchType).toEqual(MatchType.OneVersusOne);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/registration', 'game_id_123']);
     });
 
     it('should create a Solo game and navigate to the registration page', () => {
+        component.resetPopUpElement = resetPopUpElementSpy;
         component.createSoloGame();
+        component.showResetPopUp();
+        component.deleteSelectedGame(false);
+        component.resetSelectedGame(false);
 
+        component.showResetPopUp();
         expect(matchmakingServiceSpy.createGame).toHaveBeenCalledWith('game_id_123');
-        expect(matchmakingServiceSpy.currentMatchType).toEqual(MatchType.Solo);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/registration', 'game_id_123']);
     });
 
@@ -79,33 +102,14 @@ describe('OverlayComponent', () => {
 
         component.joinGame();
 
-        expect(matchmakingServiceSpy.joinGame).toHaveBeenCalledWith('match_id_123');
+        expect(matchmakingServiceSpy.joinGame).toHaveBeenCalledWith('match_id_123', 'game_id_123');
         expect(routerSpy.navigate).toHaveBeenCalledWith(['/registration', 'game_id_123']);
     });
 
     it('should call showDeleteGamesPopUp function of popUpElement with false argument', () => {
-        component.popUpElement = new DeleteGamesPopUpComponent();
-        spyOn(component.popUpElement, 'showDeleteGamesPopUp');
+        component.deletePopUpElement = new DeleteGamesPopUpComponent();
+        spyOn(component.deletePopUpElement, 'showPopUp');
         component.showDeletePopUp();
-        expect(component.popUpElement.showDeleteGamesPopUp).toHaveBeenCalled();
-    });
-
-    it('should delete selected game', async () => {
-        // Mock successful response from the communication service
-        communicationServiceSpy.delete.and.returnValue(
-            of({
-                headers: new HttpHeaders(),
-                status: 200,
-                statusText: 'OK',
-                url: '',
-                body: 'body',
-                type: 4,
-                ok: true,
-                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
-            }),
-        );
-        socketServiceSpy.socket = jasmine.createSpyObj('Socket', ['emit']);
-        spyOn(component, 'reloadPage').and.stub();
-        await component.deleteSelectedGame(true);
+        expect(component.deletePopUpElement.showPopUp).toHaveBeenCalled();
     });
 });

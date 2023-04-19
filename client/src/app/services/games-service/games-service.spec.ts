@@ -5,20 +5,19 @@ import { TestBed } from '@angular/core/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { GameData } from '@common/interfaces/game-data';
-import { defaultRankings } from '@common/interfaces/ranking';
+import { GameData } from '@common/interfaces/game.data';
+import { defaultRanking } from '@common/interfaces/ranking';
 import { Buffer } from 'buffer';
 import { of } from 'rxjs';
 import { Socket } from 'socket.io-client';
 import { GamesService } from './games.service';
-import SpyObj = jasmine.SpyObj;
 
 class SocketClientServiceMock extends SocketClientService {
     override connect() {}
 }
 describe('GamesService', () => {
     let service: GamesService;
-    let communicationServiceSpy: SpyObj<CommunicationService>;
+    let communicationServiceSpy: jasmine.SpyObj<CommunicationService>;
     let socketServiceMock: SocketClientServiceMock;
     let socketClientService: SocketClientService;
     let socketTestHelper: SocketTestHelper;
@@ -71,7 +70,8 @@ describe('GamesService', () => {
                         { x: 0, y: 0 },
                     ],
                 ],
-                ranking: defaultRankings,
+                oneVersusOneRanking: defaultRanking,
+                soloRanking: defaultRanking,
             };
             const match = 'match1';
             gameContent.push({ gameData: game, originalImage: Buffer.alloc(3) });
@@ -92,19 +92,19 @@ describe('GamesService', () => {
         );
         service.fetchGameDataFromServer(pageId);
         expect(communicationServiceSpy.get).toHaveBeenCalledWith(`/games/${pageId}`);
-        expect(service.gamesNbr).toEqual(4);
+        expect(service.gamesNumber).toEqual(4);
         expect(service.showNextButton).toBeFalse();
     });
 
-    it('should change game pages (next/previous games)', async () => {
+    it('should change game pages (next/previous games)', () => {
         spyOn(service, 'fetchGameDataFromServer');
-        await service.changeGamePages(true);
-        expect(service.currentPageNbr).toBe(1);
-        await service.changeGamePages(false);
-        expect(service.currentPageNbr).toBe(0);
+        service.changeGamePages(true);
+        expect(service.currentPageNumber).toBe(1);
+        service.changeGamePages(false);
+        expect(service.currentPageNumber).toBe(0);
     });
 
-    it('should delete all games', async () => {
+    it('should delete all games', () => {
         communicationServiceSpy.delete.and.returnValue(
             of({
                 headers: new HttpHeaders(),
@@ -119,9 +119,70 @@ describe('GamesService', () => {
         );
         spyOn(socketClientService.socket, 'emit');
         spyOn(service, 'reloadPage').and.stub();
-        await service.allGames(true);
+        service.deleteAll(true);
         expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/allGames');
-        expect(socketClientService.socket.emit).toHaveBeenCalledWith('allGames', { gameToDelete: true });
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deleteAllGames');
+        expect(service.reloadPage).toHaveBeenCalled();
+    });
+
+    it('should delete game', async () => {
+        communicationServiceSpy.delete.and.returnValue(
+            of({
+                headers: new HttpHeaders(),
+                status: 200,
+                statusText: 'OK',
+                url: '',
+                body: 'test',
+                type: 4,
+                ok: true,
+                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
+            }),
+        );
+        spyOn(socketClientService.socket, 'emit');
+        spyOn(service, 'reloadPage').and.stub();
+        await service.deleteById(true, '3');
+        expect(communicationServiceSpy.delete).toHaveBeenCalledWith('/games/3');
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('deletedGame', { hasDeletedGame: true, id: '3' });
+        expect(service.reloadPage).toHaveBeenCalled();
+    });
+
+    it('should reset a game', async () => {
+        communicationServiceSpy.post.and.returnValue(
+            of({
+                headers: new HttpHeaders(),
+                status: 200,
+                statusText: 'OK',
+                url: '',
+                body: 'test',
+                type: 4,
+                ok: true,
+                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
+            }),
+        );
+        spyOn(socketClientService.socket, 'emit');
+        spyOn(service, 'reloadPage').and.stub();
+        service.resetById(true, '3');
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('resetGame', { id: '3' });
+        expect(service.reloadPage).toHaveBeenCalled();
+    });
+
+    it('should reset all games', async () => {
+        communicationServiceSpy.post.and.returnValue(
+            of({
+                headers: new HttpHeaders(),
+                status: 200,
+                statusText: 'OK',
+                url: '',
+                body: 'test',
+                type: 4,
+                ok: true,
+                clone: (): HttpResponse<string> => new HttpResponse<string>(undefined),
+            }),
+        );
+        spyOn(socketClientService.socket, 'emit');
+        spyOn(service, 'reloadPage').and.stub();
+        service.resetAll(true);
+        expect(socketClientService.socket.emit).toHaveBeenCalledWith('resetAllGames');
         expect(service.reloadPage).toHaveBeenCalled();
     });
 });

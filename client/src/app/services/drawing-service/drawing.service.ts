@@ -3,7 +3,7 @@ import { ActionsContainer, ToolType } from '@app/classes/actions-container/actio
 import { ClearElement } from '@app/classes/clear-element/clear-element';
 import { DuplicationElement } from '@app/classes/duplication-element/duplication-element';
 import { SwitchElement } from '@app/classes/switch-element/switch-element';
-import { NOT_FOUND, PEN_WIDTH } from '@common/utils/env';
+import { MAX_PEN_WIDTH, NOT_FOUND, PEN_WIDTH } from '@common/utils/constants';
 
 @Injectable({
     providedIn: 'root',
@@ -65,7 +65,7 @@ export class DrawingService {
     setPenWidth(isIncremented: boolean) {
         this.penWidth = this.penWidth + (isIncremented ? 1 : NOT_FOUND);
         if (this.penWidth < 1) this.penWidth = 1;
-        if (this.penWidth > PEN_WIDTH) this.penWidth = PEN_WIDTH;
+        if (this.penWidth > MAX_PEN_WIDTH) this.penWidth = MAX_PEN_WIDTH;
 
         this.actionsContainer.penWidth = this.penWidth;
     }

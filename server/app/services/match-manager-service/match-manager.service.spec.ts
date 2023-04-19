@@ -1,11 +1,13 @@
+import { DatabaseService } from '@app/services/database-service/database.service';
+import { HistoryStorageService } from '@app/services/history-storage-service/history-storage.service';
+import { MatchManagerService } from '@app/services/match-manager-service/match-manager.service';
 import { Match } from '@common/classes/match';
 import { Player } from '@common/classes/player';
-import { MatchStatus } from '@common/enums/match-status';
-import { MatchType } from '@common/enums/match-type';
+import { MatchStatus } from '@common/enums/match.status';
+import { MatchType } from '@common/enums/match.type';
 import { expect } from 'chai';
 import { assert } from 'console';
 import * as sinon from 'sinon';
-import { MatchManagerService } from './match-manager.service';
 
 describe('MatchManagerService', () => {
     let matchManagerService: MatchManagerService;
@@ -32,7 +34,7 @@ describe('MatchManagerService', () => {
     };
 
     beforeEach(async () => {
-        matchManagerService = new MatchManagerService();
+        matchManagerService = new MatchManagerService(new HistoryStorageService(new DatabaseService()));
         createdMatch = matchManagerService.createMatch(match.gameId, match.matchId);
     });
 
@@ -66,6 +68,25 @@ describe('MatchManagerService', () => {
         expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.WaitingForPlayer2);
     });
 
+    it('should correctly modify a match after a loss', () => {
+        const storeHistoryStub = sinon.stub(matchManagerService, 'storeHistory');
+        const testMatch = new Match(match.gameId, match.matchId);
+        testMatch.matchStatus = MatchStatus.InProgress;
+        sinon.stub(matchManagerService, 'getMatchById').returns(testMatch);
+        matchManagerService.setMatchLose(match.matchId);
+        sinon.assert.called(storeHistoryStub);
+    });
+
+    it('should correctly modify a match after a win (p2)', () => {
+        const storeHistoryStub = sinon.stub(matchManagerService, 'storeHistory');
+        const testMatch = new Match(match.gameId, match.matchId);
+        testMatch.player1 = matchPlayer;
+        testMatch.matchStatus = MatchStatus.InProgress;
+        sinon.stub(matchManagerService, 'getMatchById').returns(testMatch);
+        matchManagerService.setMatchWinner(match.matchId, matchPlayer);
+        sinon.assert.called(storeHistoryStub);
+    });
+
     it('should set match player 1 and not change match status is not waiting for player 1', () => {
         const newPlayer: Player = {
             username: 'player3',
@@ -76,7 +97,7 @@ describe('MatchManagerService', () => {
         matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
         matchManagerService.setMatchPlayer(match.matchId, newPlayer);
         expect(createdMatch.player1).to.deep.equal(newPlayer);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player2Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
 
     it('should set match player 1 and not change match status is not waiting for player 2', () => {
@@ -89,7 +110,7 @@ describe('MatchManagerService', () => {
         matchManagerService.removePlayerFromMatch(player2.playerId);
         matchManagerService.setMatchPlayer(match.matchId, newPlayer);
         expect(createdMatch.player1).to.deep.equal(matchPlayer);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player1Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
 
     it('should set match player 2 and set match status to in progress', () => {
@@ -121,18 +142,29 @@ describe('MatchManagerService', () => {
         expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Aborted);
     });
 
+    it('removePlayerFromMatch should store the leaderboard data ', () => {
+        const testMatch = new Match(match.gameId, match.matchId);
+        testMatch.player1 = matchPlayer;
+        testMatch.matchType = MatchType.Solo;
+        testMatch.matchStatus = MatchStatus.InProgress;
+        matchManagerService['currentOnlinePlayedMatches'] = [testMatch];
+        sinon.stub(matchManagerService, 'getMatchById').returns(testMatch);
+        matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.WaitingForPlayer1);
+    });
+
     it('should remove player 1 from match and make the player 2 win', () => {
         matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
         matchManagerService.setMatchPlayer(match.matchId, player2);
         matchManagerService.removePlayerFromMatch(matchPlayer.playerId);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player2Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
 
     it('should remove player 2 from match and make the player 1 win', () => {
         matchManagerService.setMatchPlayer(match.matchId, matchPlayer);
         matchManagerService.setMatchPlayer(match.matchId, player2);
         matchManagerService.removePlayerFromMatch(player2.playerId);
-        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.Player1Win);
+        expect(createdMatch.matchStatus).to.deep.equal(MatchStatus.InProgress);
     });
     it('should not remove player when given player is invalid', () => {
         matchManagerService.setMatchPlayer(match.matchId, matchPlayer);

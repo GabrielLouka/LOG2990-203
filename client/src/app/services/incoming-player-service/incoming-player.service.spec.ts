@@ -1,9 +1,16 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { TestBed } from '@angular/core/testing';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { Player } from '@common/classes/player';
-import { DO_YOU_WANT_TO_PLAY_WITH_MESSAGE, WAITING_FOR_PLAYER_MESSAGE, WAITING_PLAYER_ANSWER_MESSAGE } from '@common/utils/env';
+import {
+    DO_YOU_WANT_TO_PLAY_WITH_TEXT,
+    LIMITED_TIME_USER_ENTERED_TEXT,
+    WAITING_FOR_PLAYER_TEXT,
+    WAITING_PLAYER_ANSWER_TEXT,
+} from '@common/utils/constants';
 import { IncomingPlayerService } from './incoming-player.service';
-
+let incomingPlayerService: IncomingPlayerService;
+let matchmakingServiceSpy: jasmine.SpyObj<MatchmakingService>;
 describe('IncomingPlayerService', () => {
     const player: Player = {
         username: 'player',
@@ -14,9 +21,6 @@ describe('IncomingPlayerService', () => {
         playerId: 'socket2',
     };
 
-    let incomingPlayerService: IncomingPlayerService;
-    let matchmakingServiceSpy: jasmine.SpyObj<MatchmakingService>;
-
     beforeEach(() => {
         matchmakingServiceSpy = jasmine.createSpyObj('MatchmakingService', ['sendIncomingPlayerRequestAnswer', 'isHost', 'currentSocketId']);
 
@@ -24,6 +28,7 @@ describe('IncomingPlayerService', () => {
             providers: [IncomingPlayerService, { provide: MatchmakingService, useValue: matchmakingServiceSpy }],
         });
         incomingPlayerService = TestBed.inject(IncomingPlayerService);
+        matchmakingServiceSpy.matchIdThatWeAreTryingToJoin = null;
     });
 
     afterEach(() => {
@@ -94,7 +99,8 @@ describe('IncomingPlayerService', () => {
     });
 
     it('should return false if not host accepting incoming player', () => {
-        incomingPlayerService.isHostAcceptingIncomingPlayer(true);
+        const out = incomingPlayerService.isHostAcceptingIncomingPlayer(true);
+        expect(out).not.toEqual(true);
     });
 
     it('should return the queue status to display for the users', () => {
@@ -121,29 +127,51 @@ describe('IncomingPlayerService', () => {
     it('should update the waiting message when no opponent is found', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleHostRejectingIncomingPlayer();
-        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_FOR_PLAYER_MESSAGE);
+        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_FOR_PLAYER_TEXT);
         expect(incomingPlayerService.numberOfIncomingPlayers).toEqual(0);
     });
 
     it('should update queue status message when incoming player is rejected', () => {
         incomingPlayerService.updateWaitingForIncomingPlayerAnswerMessage();
-        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_PLAYER_ANSWER_MESSAGE);
+        expect(incomingPlayerService.statusToDisplay).toEqual(WAITING_PLAYER_ANSWER_TEXT);
     });
 
     it('should call matchmaking sendIncomingPlayerRequest when incoming player is rejected', () => {
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
-        incomingPlayerService.refuseIncomingPlayer();
+        expect(incomingPlayerService.refuseIncomingPlayer()).toBeUndefined();
+    });
+    it('should call matchmaking sendIncomingPlayerRequest when incoming player is rejected', () => {
+        incomingPlayerService['incomingPlayer'] = null;
+        expect(incomingPlayerService.refuseIncomingPlayer()).toBeUndefined();
     });
 
     it('should refresh queue display', () => {
+        incomingPlayerService.id = '-1';
         incomingPlayerService.handleIncomingPlayerJoinRequest(player);
         incomingPlayerService.handleIncomingPlayerJoinRequest(player2);
         incomingPlayerService.refreshQueueDisplay();
         expect(incomingPlayerService.statusToDisplay).toEqual(
-            DO_YOU_WANT_TO_PLAY_WITH_MESSAGE + incomingPlayerService.firstIncomingPlayer.username + ' ?\n',
+            DO_YOU_WANT_TO_PLAY_WITH_TEXT + incomingPlayerService.firstIncomingPlayer.username + ' ?\n',
         );
         expect(incomingPlayerService.firstIncomingPlayer).toEqual(player);
+    });
+    it('should refresh queue display', () => {
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isHost = false;
+        incomingPlayerService['matchmakingService'] = mockMatchmakingService;
+
+        expect(incomingPlayerService.handleIncomingPlayerJoinRequest(player)).toBeUndefined();
+    });
+    it('should refresh queue display', () => {
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isHost = false;
+        incomingPlayerService['matchmakingService'] = mockMatchmakingService;
+        expect(incomingPlayerService.handleIncomingPlayerJoinCancel(player.playerId)).toBeUndefined();
+    });
+    it('should update limited Name Enterred', () => {
+        incomingPlayerService.updateLimitedTimeNameEntered();
+        expect(incomingPlayerService['joiningStatusMessage']).toEqual(LIMITED_TIME_USER_ENTERED_TEXT);
     });
 
     it('should accept incoming player and call matchmakingService send request answer', () => {

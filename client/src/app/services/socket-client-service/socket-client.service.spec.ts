@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { Socket } from 'socket.io-client';
-// eslint-disable-next-line no-restricted-imports
-import { SocketTestHelper } from '../../classes/socket-test-helper/socket-test-helper';
 import { SocketClientService } from './socket-client.service';
 
 describe('SocketClientService', () => {

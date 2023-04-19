@@ -31,7 +31,7 @@ describe('DrawingService', () => {
 
     it('should undo', () => {
         service.undo();
-        expect(service['actionsContainer'].undoActions[0]);
+        expect(service['actionsContainer'].undoActions[0]).toBeUndefined();
     });
 
     it('should redo', () => {
@@ -56,14 +56,20 @@ describe('DrawingService', () => {
 
     it('should set pen width', () => {
         service.setPenWidth(true);
-        expect(service.penWidth).toBe(10);
+        expect(service.penWidth).toBe(11);
 
         service.setPenWidth(false);
-        expect(service.penWidth).toBe(9);
+        expect(service.penWidth).toBe(10);
 
         service.penWidth = 1;
         service.setPenWidth(false);
         expect(service.penWidth).toBe(1);
+    });
+
+    it('should not exceed max pen width', () => {
+        service.penWidth = 100;
+        service.setPenWidth(true);
+        expect(service.penWidth).toBe(20);
     });
 
     it('should deactivate tools', () => {

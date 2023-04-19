@@ -1,22 +1,26 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HistoryService } from '@app/services/history-service/history.service';
 import { ParameterPageComponent } from './parameter-page.component';
 
-describe('ParameterPageComponent', () => {
-    let component: ParameterPageComponent;
+describe('HistoryService', () => {
+    let service: HistoryService;
     let fixture: ComponentFixture<ParameterPageComponent>;
 
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [ParameterPageComponent],
-        }).compileComponents();
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
+            providers: [HistoryService],
+        });
+        service = TestBed.inject(HistoryService);
+    });
 
+    beforeEach(() => {
         fixture = TestBed.createComponent(ParameterPageComponent);
-        component = fixture.componentInstance;
         fixture.detectChanges();
     });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
+    it('should be created', () => {
+        expect(service).toBeTruthy();
     });
 });

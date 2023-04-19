@@ -1,22 +1,22 @@
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-
+/* eslint-disable @typescript-eslint/no-magic-numbers */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NOT_FOUND } from '@common/utils/constants';
 import { TimerComponent } from './timer.component';
 
 describe('TimerComponent', () => {
     let component: TimerComponent;
     let fixture: ComponentFixture<TimerComponent>;
-    const timeSeconds = 0;
-    const INTERVAL_VALUE = 1000;
-    const MINUTE_LIMIT = 9;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
             declarations: [TimerComponent],
         }).compileComponents();
 
         fixture = TestBed.createComponent(TimerComponent);
         component = fixture.componentInstance;
-        fixture.componentInstance.timeInSeconds = timeSeconds;
         fixture.detectChanges();
     });
 
@@ -25,72 +25,94 @@ describe('TimerComponent', () => {
     });
 
     it('should get actual minutes time', () => {
-        component.timeInSeconds = 60;
+        component['timeCountInSeconds'] = 60;
         const expectedMinutes = 1;
         const getMinutes = component.minutes;
         expect(getMinutes).toEqual(expectedMinutes);
     });
 
     it('should get seconds and return number of seconds', () => {
-        component.timeInSeconds = 120;
+        component['timeCountInSeconds'] = 120;
         const expectedSeconds = 0;
         const getMinutes = component.seconds;
         expect(getMinutes).toEqual(expectedSeconds);
     });
 
-    it('stopTimer should affect true to shouldStop property', () => {
-        component.stopTimer();
-        expect(component['shouldStop']).toEqual(true);
+    it('should display the current elapsed time with the correct format', () => {
+        const result = component.getTimeDisplayValue(2);
+        expect(result).toEqual('02');
     });
 
-    it('tictoc method should increment time in seconds if game still running', () => {
-        const newTime = timeSeconds + 1;
-        component['shouldStop'] = true;
-        component.ticToc();
-        expect(timeSeconds + 1).toEqual(newTime);
+    it('should refresh the current elapsed time with the correct format', () => {
+        spyOn(component, 'getTimeDisplayValue').and.returnValue('30');
+        component.refreshTimerDisplay();
+        expect(component.minute.nativeElement.innerText).toEqual('30');
+        expect(component.minute.nativeElement.innerText).toEqual('30');
     });
 
-    it('should call the tickTock method every INTERVAL_VALUE milliseconds', fakeAsync(() => {
-        spyOn(component, 'ticToc');
-        component.ngAfterViewInit();
-        tick(INTERVAL_VALUE);
-        expect(component.ticToc).toHaveBeenCalled();
-        component.ngOnDestroy();
-    }));
-
-    it('should increase timeInSeconds if shouldStop is false', () => {
-        component.shouldStop = false;
-        component.timeInSeconds = 0;
-
-        component.ticToc();
-
-        expect(component.timeInSeconds).toBe(1);
+    it('should emit time reached 0 when no time left', () => {
+        spyOn(component.timeReachedZero, 'emit').and.callFake(() => new EventEmitter<void>());
+        component['timeCountInSeconds'] = 0;
+        component['timePenalty'] = -1;
+        component.refreshTimerDisplay();
+        expect(component.timeReachedZero.emit).not.toHaveBeenCalled();
     });
 
-    it('should add 0 to minutes if minutes is less than 10', () => {
-        component.timeInSeconds = 0;
-
-        component.ticToc();
-        component.minute.nativeElement.innerText = component.minutes < MINUTE_LIMIT ? '0' + component.minutes : component.minutes;
-
-        expect(component.minute.nativeElement.innerText).toBe('00');
+    it('should apply the chosen time penalty', () => {
+        spyOn(component, 'refreshTimerDisplay');
+        component['timeCountInSeconds'] = 40;
+        component['timePenalty'] = -1;
+        component.applyTimePenalty(1);
+        expect(component['timePenalty']).toEqual(-2);
+        expect(component.refreshTimerDisplay).toHaveBeenCalled();
     });
 
-    it('should not add 0 to minutes if minutes is more than 9', () => {
-        component.timeInSeconds = 10;
-
-        component.ticToc();
-        component.second.nativeElement.innerText = component.seconds < MINUTE_LIMIT ? '0' + component.seconds : component.seconds;
-
-        expect(component.second.nativeElement.innerText).toBe('11');
+    it('should force set time', () => {
+        spyOn(component, 'refreshTimerDisplay');
+        component['timeCountInSeconds'] = 40;
+        component['timePenalty'] = 0;
+        component.isCountdown = false;
+        component.forceSetTime(20);
+        expect(component['timeCountInSeconds']).toEqual(20);
+        expect(component.refreshTimerDisplay).toHaveBeenCalled();
     });
 
-    it('should not add 0 to minutes if minutes is more than 9', () => {
-        component.timeInSeconds = 600;
+    it('should force set time and change time count in seconds', () => {
+        component['timeCountInSeconds'] = 40;
+        component['timePenalty'] = 0;
+        component['initialTime'] = 0;
+        component.isCountdown = true;
+        component.forceSetTime(20);
+        expect(component['timeCountInSeconds']).toEqual(-20);
+    });
 
-        component.ticToc();
-        component.minute.nativeElement.innerText = component.minutes < MINUTE_LIMIT ? '0' + component.minutes : component.minutes;
+    it('should force set time and change initial time', () => {
+        component['timeCountInSeconds'] = 40;
+        component['timePenalty'] = 0;
+        component['initialTime'] = NOT_FOUND;
+        component.isCountdown = true;
+        component.forceSetTime(20);
+        expect(component['initialTime']).toEqual(0);
+    });
 
-        expect(component.minute.nativeElement.innerText).toBe('10');
+    it('should reset all the timer constants and call refreshTimerDisplay', () => {
+        spyOn(component, 'refreshTimerDisplay');
+        component.isCountdown = false;
+        component['timeCountInSeconds'] = 40;
+        component['timePenalty'] = -1;
+        component.reset();
+        expect(component['timeCountInSeconds']).toEqual(0);
+        expect(component['timePenalty']).toEqual(0);
+        expect(component['initialTime']).toEqual(component['timeCountInSeconds']);
+        expect(component.minute.nativeElement.innerText).toEqual('00');
+        expect(component.second.nativeElement.innerText).toEqual('00');
+        expect(component.refreshTimerDisplay).toHaveBeenCalled();
+    });
+
+    it('should reset all the timer constants when it is time limited mode', () => {
+        spyOn(component, 'refreshTimerDisplay');
+        component.isCountdown = true;
+        component.reset();
+        expect(component['timeCountInSeconds']).toEqual(0);
     });
 });

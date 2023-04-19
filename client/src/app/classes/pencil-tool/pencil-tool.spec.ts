@@ -6,7 +6,7 @@ import { ActionsContainer } from '../actions-container/actions-container';
 import { EraserElement } from '../eraser-element/eraser-element';
 import { PencilTool } from './pencil-tool';
 
-describe('EraserTool', () => {
+describe('pencilTool', () => {
     let actionsContainer: ActionsContainer;
     let leftCanvas: ElementRef<HTMLCanvasElement>;
     let rightCanvas: ElementRef<HTMLCanvasElement>;
@@ -57,6 +57,7 @@ describe('EraserTool', () => {
             pencilTool.actionsContainer.undoActions = [];
 
             pencilTool.addUndoElementToActionsContainer(modifiedPixelsMock, isLeftCanvasMock);
+            expect(pencilTool.actionsContainer).not.toBeUndefined();
         });
     });
 });

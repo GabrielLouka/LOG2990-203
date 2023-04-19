@@ -1,9 +1,11 @@
 /* eslint-disable no-console */
 import { Application } from '@app/app';
+import { ALREADY_IN_USE, DATABASE_CONNECTION_ERROR, DATABASE_CONNECTION_SUCCESS, REQUIRED_ELEVATED_PRIVILEGES } from '@common/utils/constants';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
 import { DatabaseService } from './services/database-service/database.service';
+import { GameRankingService } from './services/game-ranking-service/game-ranking.service';
 import { GameStorageService } from './services/game-storage-service/game-storage.service';
 import { MatchManagerService } from './services/match-manager-service/match-manager.service';
 import { SocketManager } from './services/socket-manager-service/socket-manager.service';
@@ -15,7 +17,14 @@ export class Server {
     private static readonly baseDix: number = baseDix;
     private server: http.Server;
     private socketManager: SocketManager;
-    constructor(private application: Application, private databaseService: DatabaseService, public matchManagerService: MatchManagerService) {}
+
+    // eslint-disable-next-line max-params
+    constructor(
+        private application: Application,
+        private databaseService: DatabaseService,
+        public matchManagerService: MatchManagerService,
+        public rankingService: GameRankingService,
+    ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
         const port: number = typeof val === 'string' ? parseInt(val, this.baseDix) : val;
@@ -32,7 +41,12 @@ export class Server {
 
         this.server = http.createServer(this.application.app);
 
-        this.socketManager = new SocketManager(this.server, this.matchManagerService);
+        this.socketManager = new SocketManager(
+            this.server,
+            this.matchManagerService,
+            this.rankingService,
+            new GameStorageService(this.databaseService),
+        );
         this.socketManager.handleSockets();
 
         this.server.listen(Server.appPort);
@@ -43,9 +57,9 @@ export class Server {
         try {
             await this.databaseService.start();
             this.application.gamesController.gameStorageService = new GameStorageService(this.databaseService);
-            console.log('Database connection successful !');
+            console.log(DATABASE_CONNECTION_SUCCESS);
         } catch {
-            console.error('Database connection failed !');
+            console.error(DATABASE_CONNECTION_ERROR);
         }
     }
 
@@ -56,11 +70,11 @@ export class Server {
         const bind: string = typeof Server.appPort === 'string' ? 'Pipe ' + Server.appPort : 'Port ' + Server.appPort;
         switch (error.code) {
             case 'EACCES':
-                console.error(`${bind} requires elevated privileges`);
+                console.error(bind + REQUIRED_ELEVATED_PRIVILEGES);
                 process.exit(1);
                 break;
             case 'EADDRINUSE':
-                console.error(`${bind} is already in use`);
+                console.error(bind + ALREADY_IN_USE);
                 process.exit(1);
                 break;
             default:

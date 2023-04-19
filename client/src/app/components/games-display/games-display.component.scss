@@ -32,3 +32,20 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+.no-game {
+    position: absolute;
+    border: solid;
+    width: 25vw;
+    top: 40vh;
+    left: 35vw;
+}
+
+.no-hover {
+    
+    &:hover {
+        transform: scale(1);
+        background-color: white;
+      }
+    
+}

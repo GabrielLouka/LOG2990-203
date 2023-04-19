@@ -33,28 +33,53 @@ header {
 
 /* Constants */
 .const-container {
-    height: 40vh;
+    height: 55vh;
     width: 35vw;
 
     border: solid; 
     border-radius: 3vh;
 }
 
-.input-container {
-    width: 25vw;
+.value {
+    padding: 1vh;
+    font-size: smaller;
 }
 
-.label-input {
-    width: 18vw;
-    height: 2vh;
-    margin: 1vh;
-
+.const-input {
     justify-content: space-around;
+    height: 28vh;
+    margin-right: 2vw;
 }
 
 .const-btn {
     margin-top: 3vh;
     scale: 0.8;
+}
+
+.confirmation-container {
+    height: 55vh;
+    width: 35vw;
+
+    border-radius: 2.5vh;
+    background-color: rgba(0, 0, 0, 0.253);
+    position: absolute;
+    z-index: 1;
+}
+
+.confirmation-message {
+    text-align: center;
+
+}
+
+.confirmation-btn {
+    margin-top: 5vh;
+    width: 20vw;
+}
+
+.cadre {
+    height: 35vh;
+    width: 25vw;
+    background-color: lightcoral;
 }
 
 
@@ -82,18 +107,98 @@ header {
 }
 
 .history-card {
-    border: 2px solid black;
+    border: 2px solid;
     background-color: white;
-    border-radius: 10px;
+    border-radius: 1vh;
 
     margin: 1vh;
-
-    &:hover {
-        transform: scale(0.97);
-        //cursor: pointer;
-    }
+    padding: 1vh;
 }
 
-.not-allowed {
-    cursor: not-allowed;
-  }
+.divider {
+    border: solid 1px;
+    height: 3vh;
+}
+
+.game-mode {
+    padding: 0.5vh;
+} 
+
+.game-time {
+    font-weight: 400;
+    font-size: medium;
+}
+
+.text-bold {
+    font-weight: bold;
+    color: salmon;
+}
+  
+.crossed-out {
+    text-decoration: line-through;
+    color: #a9a9a9;
+}
+
+.confirmation-history-container {
+    
+    height: 60vh;
+    width: 35vw;
+
+    border-radius: 3vh;
+    position: absolute; 
+    z-index: 1;
+}
+
+.background {
+    background-color: rgba(0, 0, 0, 0.247);
+}
+  
+
+// CSS FOR RANGE SLIDER
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    input[type='range'] {
+      -webkit-appearance: none;
+
+      overflow: hidden;
+      border-radius: 2vh;
+      width: 7vw;
+      cursor: pointer;
+      background-color: whitesmoke;
+    }
+    
+    input[type='range']::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      
+      width: 1vw;
+      height: 1vh;
+
+      border-radius: 5vh;
+
+      background: #434343;
+      box-shadow: -5vw 0 0 8.17vh salmon;
+    }
+
+    input[type="range"]::before {
+        display: flex;
+        margin-left: -1vw;
+        margin-top: -0.25vh;
+        color: black;
+        content: attr(min);
+        position: absolute;
+
+    }
+      
+    input[type="range"]::after {
+        color: black;
+        content: attr(max);
+        position: absolute;
+        display: flex;
+        margin-left: 7.5vw;
+        margin-top: -0.25vh;
+    }
+
+}
+
+
+  
+
