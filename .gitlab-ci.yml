@@ -105,8 +105,7 @@ test:server:
     <<: *only-server
     script:
         - cd server
-        - npm run coverage
-          timeout 30000
+        - npm run coverage -- --timeout 50000
     dependencies:
         - install:server
     artifacts:
