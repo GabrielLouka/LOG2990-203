@@ -160,7 +160,7 @@ describe('SocketManager', () => {
     };
     it('should validate difference when one is found', (done) => {
         const differencePosition: Vector2 = new Vector2(200, 100);
-        matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
+        matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).resolves(0);
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
         connectionCallback(validateSocket);
@@ -177,6 +177,7 @@ describe('SocketManager', () => {
             done();
         }, RESPONSE_DELAY * 5);
     });
+
     it('should not validate difference when not found', (done) => {
         const differencePosition: Vector2 = new Vector2(300, 200);
         matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(-1);
