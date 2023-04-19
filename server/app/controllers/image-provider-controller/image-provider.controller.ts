@@ -33,7 +33,6 @@ export class ImageProviderController {
                         } else {
                             // Set the Content-Type header to indicate that it's a BMP image
                             res.setHeader('Content-Type', 'image/bmp');
-                            // Send the image data as the response
                             res.send(data);
                         }
                     });

@@ -21,6 +21,7 @@ import { Vector2 } from '@common/classes/vector2';
 import { MatchStatus } from '@common/enums/match.status';
 import { MatchType } from '@common/enums/match.type';
 import { GameData } from '@common/interfaces/game.data';
+import { GameOverPopUpData } from '@common/interfaces/game.over.pop.up.data';
 import { RankingData } from '@common/interfaces/ranking.data';
 import {
     ABORTED_GAME_TEXT,
@@ -565,14 +566,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver();
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
-        this.popUpElement.displayGameOver(
+        this.popUpElement.displayGameOver({
             isWinByDefault,
-            this.timerElement.elapsedSeconds <= 0,
-            this.currentMatchType as MatchType,
+            isTimerDepleted: this.timerElement.elapsedSeconds <= 0,
+            matchType: this.currentMatchType as MatchType,
             startReplayAction,
-            this.getPlayerUsername(isPlayer1Win),
-            this.getPlayerUsername(!isPlayer1Win),
-        );
+            username1: this.getPlayerUsername(isPlayer1Win),
+            username2: this.getPlayerUsername(!isPlayer1Win),
+        } as GameOverPopUpData);
     }
 
     onTimerEnd() {
@@ -586,14 +587,14 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         this.gameOver();
         const startReplayAction = this.replayModeService.startReplayModeAction;
         this.isOver = true;
-        this.popUpElement.displayGameOver(
-            false,
-            true,
-            this.currentMatchType as MatchType,
+        this.popUpElement.displayGameOver({
+            isWinByDefault: !this.isWinByDefault,
+            isTimerDepleted: true,
+            matchType: this.currentMatchType as MatchType,
             startReplayAction,
-            this.getPlayerUsername(true),
-            this.getPlayerUsername(false),
-        );
+            username1: this.getPlayerUsername(true),
+            username2: this.getPlayerUsername(false),
+        } as GameOverPopUpData);
     }
 
     handleClickAndLetterTEvent(event: KeyboardEvent | MouseEvent) {
@@ -622,7 +623,11 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
 
     onWinGameLimited(winningPlayer1: string, winningPlayer2: string, isWinByDefault: boolean) {
         this.gameOver();
-        this.popUpElement.displayLimitedGameOver(winningPlayer1, winningPlayer2, isWinByDefault, this.matchmakingService.isLimitedTimeSolo);
+        this.popUpElement.displayLimitedGameOver(
+            { username1: winningPlayer1, username2: winningPlayer2 },
+            isWinByDefault,
+            this.matchmakingService.isLimitedTimeSolo,
+        );
     }
 
     hintModeButton() {

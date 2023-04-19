@@ -1,4 +1,6 @@
+// Default ranking score time
 export { THREE_MINUTES_TO_SECONDS, FOUR_MINUTES_TO_SECONDS, FIVE_MINUTES_TO_SECONDS };
+// Queue displayed texts
 export {
     DO_YOU_WANT_TO_PLAY_WITH_TEXT,
     WAITING_FOR_PLAYER_TEXT,
@@ -8,10 +10,21 @@ export {
     REDIRECTED_TO_MAIN_PAGE_TEXT,
 };
 // Pop up displayed texts
-export { ALL_GAMES_TEXT, THIS_GAME_TEXT, DELETE_TEXT, RESET_TEXT, ABORTED_GAME_TEXT, QUITTING_CONFIRMATION_TEXT, EXCELLENT_GAME_TEXT };
+export {
+    ALL_GAMES_TEXT,
+    THIS_GAME_TEXT,
+    DELETE_TEXT,
+    RESET_TEXT,
+    ABORTED_GAME_TEXT,
+    QUITTING_CONFIRMATION_TEXT,
+    EXCELLENT_GAME_TEXT,
+    OPPONENT_QUITTED_THE_GAME_TEXT,
+};
 // Buttons actions texts
 export { YES_TEXT, NO_TEXT, OK_TEXT, MAIN_MENU_TEXT, REPLAY_MODE_TEXT };
+// Replay mode speed
 export { NORMAL_SPEED, TWO_TIMES_SPEED, FOUR_TIMES_SPEED };
+// Default game constants
 export { INITIAL_COUNTDOWN, INITIAL_PENALTY, INITIAL_BONUS, MAX_PENALTY, MAX_BONUS };
 export { CHAT_TITLE };
 export { PEN_WIDTH, MAX_PEN_WIDTH };
@@ -24,8 +37,8 @@ export { BLINK_TIME, NUMBER_OF_BLINKS };
 export { SYSTEM_NAME };
 export { MIN_NBR_OF_DIFFERENCES, MAX_NBR_OF_DIFFERENCES, MIN_HARD_DIFFERENCES, QUARTER };
 export { REQUIRED_SURFACE_PERCENTAGE, DEFAULT_ENLARGEMENT_RADIUS };
-export { VOLUME_ERROR };
-export { VOLUME_SUCCESS, MAX_GAMES_PER_PAGE };
+export { VOLUME_ERROR, VOLUME_SUCCESS };
+export { MAX_GAMES_PER_PAGE };
 export { ROUTE_TO_SENDING_IMAGE };
 export { NUMBER_HINTS };
 export { REPLAY_TIMER_DELAY };
@@ -100,6 +113,7 @@ const RESET_TEXT = 'RÉINITIALISER ';
 const QUITTING_CONFIRMATION_TEXT = 'VOULEZ-VOUS VRAIMENT QUITTER ?';
 const ABORTED_GAME_TEXT = ' a abandonné la partie';
 const EXCELLENT_GAME_TEXT = 'Excellente partie !';
+const OPPONENT_QUITTED_THE_GAME_TEXT = 'Votre adversaire a quitté la partie...';
 
 // Buttons actions texts
 const YES_TEXT = 'OUI';
@@ -140,7 +154,7 @@ const FOLDER_NOT_CREATED = 'Folder not created';
 const FOLDER_CREATED = 'Folder successfully created.';
 const FILE_WAS_NOT_WRITTEN = 'File was not successfully written';
 const FILE_WRITTEN = 'File was successfully written';
-const DELETE_SUCCESS = 'deleted successfully';
+const DELETE_SUCCESS = ' deleted successfully';
 const ERROR = 'error :';
 const DATABASE_CONNECTION_ERROR = 'Database connection error';
 const DATABASE_CONNECTION_SUCCESS = 'Database connection success !';
