@@ -160,7 +160,7 @@ describe('SocketManager', () => {
     };
     it('should validate difference when one is found', (done) => {
         const differencePosition: Vector2 = new Vector2(200, 100);
-        matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).resolves(0);
+        matchingDifferencesServiceStub.getDifferenceIndex.withArgs(data, differencePosition).returns(0);
         socketManager.handleSockets();
         const connectionCallback = connectionStub.getCall(0).args[1];
         connectionCallback(validateSocket);
@@ -175,7 +175,7 @@ describe('SocketManager', () => {
             roomEmitStub.restore();
             sinon.restore();
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should not validate difference when not found', (done) => {
@@ -194,7 +194,7 @@ describe('SocketManager', () => {
             roomEmitStub.restore();
             sinon.restore();
             done();
-        }, RESPONSE_DELAY * 5);
+        }, RESPONSE_DELAY);
     });
 
     it('should remove player from match when disconnect is called and update if a match was affected', (done) => {
