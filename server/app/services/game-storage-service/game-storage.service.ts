@@ -162,7 +162,7 @@ export class GameStorageService {
         for (const game of nextGames) {
             gamesToReturn.push({
                 gameData: game,
-                originalImage: IMAGE_DELIVERY_SERVER + '/images/' + game.id.toString() + '/1',
+                originalImage: IMAGE_DELIVERY_SERVER + game.id.toString() + '/1',
                 matchToJoinIfAvailable: null,
             });
         }
@@ -253,7 +253,7 @@ export class GameStorageService {
         await this.collection.updateMany({}, resetRanking);
     }
 
-    createFolder(folderPath: string) {
+    async createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
                 console.error(FOLDER_NOT_CREATED);
@@ -266,7 +266,7 @@ export class GameStorageService {
     async storeGameImages(id: number, firstImage: Buffer, secondImage: Buffer): Promise<void> {
         const folderPath = PERSISTENT_DATA_FOLDER_PATH + id + '/';
         // Creates the subfolder for the game if it does not exist
-        this.createFolder(folderPath);
+        await this.createFolder(folderPath);
 
         writeFile(folderPath + ORIGINAL_IMAGE_FILE, firstImage, this.writeFileErrorManagement);
         writeFile(folderPath + MODIFIED_IMAGE_FILE, secondImage, this.writeFileErrorManagement);

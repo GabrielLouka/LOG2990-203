@@ -8,7 +8,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ElementRef } from '@angular/core';
-import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { DelayedMethod } from '@app/classes/delayed-method/delayed-method';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
@@ -21,7 +21,6 @@ import { TimerComponent } from '@app/components/timer/timer.component';
 import { ClassicPageComponent } from '@app/pages/classic-page/classic-page.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
 import { ChatService } from '@app/services/chat-service/chat.service';
-import { CheatModeService } from '@app/services/cheat-mode-service/cheat-mode.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { CanvasHandlingService } from '@app/services/gameplay-service/canvas-handling.service';
 import { HintService } from '@app/services/hint-service/hint.service';
@@ -45,7 +44,6 @@ describe('ClassicPageComponent', () => {
     let component: ClassicPageComponent;
     let fixture: ComponentFixture<ClassicPageComponent>;
     let matchMakingService: jasmine.SpyObj<MatchmakingService>;
-    let cheatModeService: jasmine.SpyObj<CheatModeService>;
     let socketTestHelper: SocketTestHelper;
     let socketServiceMock: SocketClientServiceMock;
     let socketClientService: SocketClientService;
@@ -150,7 +148,6 @@ describe('ClassicPageComponent', () => {
             'sendIncomingPlayerRequestAnswer',
             'setCurrentMatchType',
         ]);
-        cheatModeService = jasmine.createSpyObj('CheatModeService', ['focusKeyEvent', 'putCanvasIntoInitialState', 'stopCheating', 'startInterval']);
 
         matchMakingService.onMatchUpdated = new Action<Match | null>();
 
@@ -175,7 +172,6 @@ describe('ClassicPageComponent', () => {
                 { provide: CommunicationService, useValue: commService },
                 { provide: ImageManipulationService, useValue: imageService },
                 { provide: MatchmakingService, useValue: matchMakingService },
-                { provide: CheatModeService, useValue: cheatModeService },
                 { provide: SocketClientService, useValue: socketServiceMock },
                 { provide: CanvasHandlingService, useValue: canvasHandlingService },
                 { provide: HintService, useValue: hintService },
@@ -1101,13 +1097,6 @@ describe('ClassicPageComponent', () => {
         component.onWinGameLimited('hi', 'hello', true);
         expect(spy).toHaveBeenCalled();
     });
-
-    // it('should return put canvas', () => {
-    //     const canvas = document.createElement('canvas');
-    //     component.leftCanvas = { nativeElement: canvas };
-    //     component.rightCanvas = { nativeElement: canvas };
-    //     cheatModeService = jasmine.createSpyObj('CheatModeService', ['focusKeyEvent', 'putCanvasIntoInitialState', 'stopCheating', 'startInterval']);
-    // });
 
     it('should call getInitialImagesFromServer() when both canvas contexts are defined', () => {
         const spy = spyOn(component, 'getInitialImagesFromServer');
