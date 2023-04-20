@@ -1,3 +1,4 @@
+/* Needed to check the nature of the errors */
 /* eslint-disable no-console */
 import { Application } from '@app/app';
 import { ALREADY_IN_USE, DATABASE_CONNECTION_ERROR, DATABASE_CONNECTION_SUCCESS, REQUIRED_ELEVATED_PRIVILEGES } from '@common/utils/constants';

@@ -8,7 +8,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { SocketTestHelper } from '@app/classes/socket-test-helper/socket-test-helper';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { SocketClientService } from '@app/services/socket-client-service/socket-client.service';
-import { CLASSIC_PATH, SELECTION_PATH } from '@common/utils/env.http';
+import { CLASSIC_PATH, SELECTION_PATH } from '@common/utils/constants.http';
 import { Socket } from 'socket.io-client';
 import { RegistrationService } from './registration.service';
 

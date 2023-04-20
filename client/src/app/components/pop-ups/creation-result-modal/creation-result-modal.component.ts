@@ -6,7 +6,7 @@ import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { MAX_NBR_OF_DIFFERENCES, MIN_NBR_OF_DIFFERENCES } from '@common/utils/constants';
-import { HOME_PATH, SAVE_GAMES_PATH } from '@common/utils/env.http';
+import { HOME_PATH, SAVE_GAMES_PATH } from '@common/utils/constants.http';
 
 @Component({
     selector: 'app-creation-result-modal',

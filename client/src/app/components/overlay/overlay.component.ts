@@ -5,7 +5,7 @@ import { ResetPopUpComponent } from '@app/components/pop-ups/reset-pop-up/reset-
 import { GamesService } from '@app/services/games-service/games.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { MatchType } from '@common/enums/match.type';
-import { REGISTRATION_PATH } from '@common/utils/env.http';
+import { REGISTRATION_PATH } from '@common/utils/constants.http';
 
 @Component({
     selector: 'app-overlay',

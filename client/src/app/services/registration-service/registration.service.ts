@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
 import { REDIRECTED_WHEN_GAME_DELETED_TEXT } from '@common/utils/constants';
-import { CLASSIC_PATH, HOME_PATH, SELECTION_PATH } from '@common/utils/env.http';
+import { CLASSIC_PATH, HOME_PATH, SELECTION_PATH } from '@common/utils/constants.http';
 
 @Injectable({
     providedIn: 'root',

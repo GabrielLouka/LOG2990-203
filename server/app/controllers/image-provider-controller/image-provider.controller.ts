@@ -1,4 +1,4 @@
-import { PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
+import { PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/constants';
 import { Request, Response, Router } from 'express';
 import * as fs from 'fs';
 import { StatusCodes } from 'http-status-codes';

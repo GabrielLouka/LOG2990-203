@@ -146,6 +146,7 @@ export class ImageManipulationService {
         const resetMethod = this.createResetMethod(canvasState);
         await this.blinkDisk(canvasState.context, randomVector.x, height - randomVector.y, resetMethod);
     }
+
     createResetMethod(canvasState: {
         context: CanvasRenderingContext2D;
         canvas: ElementRef<HTMLCanvasElement>;

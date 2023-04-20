@@ -1,5 +1,6 @@
+/* Needed to check the nature of the errors */
 /* eslint-disable no-console */
-import { GAME_CONSTANTS_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
+import { GAME_CONSTANTS_FILE, PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/constants';
 import { ConstantsData } from '@common/interfaces/constants.data';
 import { readFileSync, writeFileSync } from 'fs';
 import { Service } from 'typedi';

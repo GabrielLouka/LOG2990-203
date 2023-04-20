@@ -6,14 +6,14 @@
 import { HttpHeaders, HttpResponse } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SpinnerComponent } from '@app/components/spinner/spinner.component';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { Vector2 } from '@common/classes/vector2';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
-import { SAVE_GAMES_PATH } from '@common/utils/env.http';
+import { SAVE_GAMES_PATH } from '@common/utils/constants.http';
 import { of } from 'rxjs';
 import { CreationResultModalComponent } from './creation-result-modal.component';
 
