@@ -42,6 +42,13 @@ describe('TimerComponent', () => {
         const result = component.getTimeDisplayValue(2);
         expect(result).toEqual('02');
     });
+    it('should display the current elapsed time with the correct format', () => {
+        component.isCountdown = true;
+        component['timeCountInSeconds'] = 500;
+        component['timePenalty'] = 50;
+        const result = component.elapsedSeconds;
+        expect(result).toEqual(120);
+    });
 
     it('should refresh the current elapsed time with the correct format', () => {
         spyOn(component, 'getTimeDisplayValue').and.returnValue('30');
