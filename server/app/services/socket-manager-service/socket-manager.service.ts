@@ -112,12 +112,12 @@ export class SocketManager {
 
             socket.on('deleteAllGames', () => {
                 this.sio.emit('allGamesDeleted');
-                this.sio.emit('actionOnGameReloadingThePage');
+                this.sendRefreshAvailableGames();
             });
 
             socket.on('deletedGame', (data: { hasDeletedGame: boolean; id: string }) => {
                 this.sio.emit('gameDeleted', { gameDeleted: data.hasDeletedGame, id: data.id }, socket.id);
-                this.sio.emit('actionOnGameReloadingThePage');
+                this.sendRefreshAvailableGames();
             });
 
             socket.on('sendingMessage', (data: { username: string; message: string; sentByPlayer1: boolean }) => {
@@ -129,13 +129,13 @@ export class SocketManager {
             socket.on('resetAllGames', async () => {
                 await this.gamesStorageService.resetAllScores();
                 this.sio.emit('allGamesReset');
-                this.sio.emit('actionOnGameReloadingThePage');
+                this.sendRefreshAvailableGames();
             });
 
             socket.on('resetGame', async (data: { id: string }) => {
                 await this.gamesStorageService.resetScoresById(data.id);
                 this.sio.emit('gameReset', { id: data.id }, socket.id);
-                this.sio.emit('actionOnGameReloadingThePage');
+                this.sendRefreshAvailableGames();
             });
 
             socket.on(
@@ -261,6 +261,10 @@ export class SocketManager {
                 }
             };
         });
+    }
+
+    sendRefreshAvailableGames(): void {
+        this.sio.emit('actionOnGameReloadingThePage');
     }
 
     disconnect(): void {

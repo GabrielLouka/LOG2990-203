@@ -4,6 +4,7 @@ import { ALREADY_IN_USE, DATABASE_CONNECTION_ERROR, DATABASE_CONNECTION_SUCCESS,
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { Service } from 'typedi';
+import { GamesController } from './controllers/games-controller/games.controller';
 import { DatabaseService } from './services/database-service/database.service';
 import { GameRankingService } from './services/game-ranking-service/game-ranking.service';
 import { GameStorageService } from './services/game-storage-service/game-storage.service';
@@ -24,6 +25,7 @@ export class Server {
         private databaseService: DatabaseService,
         public matchManagerService: MatchManagerService,
         public rankingService: GameRankingService,
+        public gamesController: GamesController,
     ) {}
 
     private static normalizePort(val: number | string): number | string | boolean {
@@ -47,6 +49,7 @@ export class Server {
             this.rankingService,
             new GameStorageService(this.databaseService),
         );
+        this.gamesController.initializeSocketManager(this.socketManager);
         this.socketManager.handleSockets();
 
         this.server.listen(Server.appPort);
