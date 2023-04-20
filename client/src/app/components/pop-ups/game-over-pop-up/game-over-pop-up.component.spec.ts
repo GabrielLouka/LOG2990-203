@@ -1,4 +1,6 @@
+/* eslint-disable max-len */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Action } from '@common/classes/action';
 import { MatchType } from '@common/enums/match.type';
 import { GameOverPopUpData } from '@common/interfaces/game.over.pop.up.data';
 import { EXCELLENT_GAME_TEXT, MAIN_MENU_TEXT, NO_TEXT, QUITTING_CONFIRMATION_TEXT, REPLAY_MODE_TEXT, YES_TEXT } from '@common/utils/constants';
@@ -57,6 +59,39 @@ describe('GameOverPopUpComponent', () => {
     it('should close pop-up correctly', () => {
         component.closePopUp();
         expect(component.modal.nativeElement.style.display).toEqual('none');
+    });
+    it('should close pop-up correctly', () => {
+        component.popUpInfo[0] = {
+            title: 'string',
+            message: '',
+            option1: 'string;',
+            option2: ' string;',
+            isConfirmation: true,
+            isGameOver: true,
+            option2Action: new Action(),
+        };
+        component.closePopUp();
+        expect(component.modal.nativeElement.style.display).toEqual('none');
+    });
+    it('should update the new breaking Score', () => {
+        component.popUpInfo[0] = {
+            title: 'string',
+            message: '',
+            option1: 'string;',
+            option2: ' string;',
+            isConfirmation: true,
+            isGameOver: true,
+            option2Action: new Action(),
+        };
+        const rankingData = {
+            username: 'Marc',
+            position: '1',
+            gameName: 'Tetris',
+            matchType: 'Classic Solo',
+            winnerSocketId: 'socket1',
+        };
+        component.updateNewBreakingScore(rankingData);
+        expect(component.popUpInfo[0].message).not.toEqual('');
     });
 
     it('should set popUpInfo and call showPopUp', () => {

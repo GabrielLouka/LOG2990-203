@@ -1043,6 +1043,20 @@ describe('ClassicPageComponent', () => {
         component.onWinGame(true, true);
         expect(component.winningPlayerName).toEqual('');
     });
+    it('should return the appropriate value on win game', () => {
+        component.popUpElement = jasmine.createSpyObj('GameOverPopUpComponent', ['displayConfirmation', 'displayGameOver', 'display', 'closePopUp']);
+        spyOnProperty(component, 'isPlayer1').and.returnValue(true);
+        const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
+        mockMatchmakingService.isSolo = false;
+        mockMatchmakingService.isOneVersusOne = true;
+        component.matchmakingService = mockMatchmakingService;
+        spyOn(component, 'sendNewTimeScoreToServer').and.callFake(() => {
+            return;
+        });
+
+        component.onWinGame(true, false);
+        expect(component.winningPlayerName).toEqual('');
+    });
 
     it('should return the appropriate value on win game', () => {
         const match: Match = {
