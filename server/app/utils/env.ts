@@ -22,8 +22,8 @@ const MODIFIED_IMAGE_FILE = '2.bmp';
 const IMAGE_REQUIRED_WIDTH = '640';
 const IMAGE_REQUIRED_HEIGHT = '480';
 // The value of this constant varies depending on whether the website is deployed or not. If not deployed, use the commented value
-// const IMAGE_DELIVERY_SERVER = 'http://localhost:3000/api';
-const IMAGE_DELIVERY_SERVER = 'http://ec2-35-183-123-130.ca-central-1.compute.amazonaws.com:3000/api';
+const IMAGE_DELIVERY_SERVER = 'http://localhost:3000/api/images/';
+// const IMAGE_DELIVERY_SERVER = 'http://ec2-35-183-123-130.ca-central-1.compute.amazonaws.com:3000/api/images/';
 
 // Limit of games displayed
 const DISPLAYED_GAMES_LIMIT = 4;

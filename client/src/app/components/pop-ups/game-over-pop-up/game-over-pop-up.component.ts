@@ -1,9 +1,18 @@
-/* eslint-disable max-params */
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Action } from '@common/classes/action';
 import { MatchType } from '@common/enums/match.type';
+import { GameOverPopUpData } from '@common/interfaces/game.over.pop.up.data';
 import { RankingData } from '@common/interfaces/ranking.data';
-import { EXCELLENT_GAME_TEXT, MAIN_MENU_TEXT, NO_TEXT, QUITTING_CONFIRMATION_TEXT, REPLAY_MODE_TEXT, YES_TEXT } from '@common/utils/constants';
+import {
+    EXCELLENT_GAME_TEXT,
+    MAIN_MENU_TEXT,
+    NO_TEXT,
+    OPPONENT_QUITTED_THE_GAME_TEXT,
+    PARTNER_LEFT_THE_GAME_TEXT,
+    QUITTING_CONFIRMATION_TEXT,
+    REPLAY_MODE_TEXT,
+    YES_TEXT,
+} from '@common/utils/constants';
 
 @Component({
     selector: 'app-game-over-pop-up',
@@ -38,46 +47,43 @@ export class GameOverPopUpComponent {
         this.display();
     }
 
-    displayGameOver(
-        isWinByDefault: boolean,
-        isTimerDepleted: boolean,
-        matchType: MatchType,
-        startReplayAction: Action<void> | null,
-        username1: string | undefined,
-        username2: string | undefined = undefined,
-    ) {
+    displayGameOver(gameOverData: GameOverPopUpData) {
         let winMessage;
-
         let secondaryMessage = EXCELLENT_GAME_TEXT;
 
-        if (matchType === MatchType.LimitedCoop) {
+        if (gameOverData.matchType === MatchType.LimitedCoop) {
             this.isLimitedTime = true;
-            winMessage = `Félicitations ${username1} et ${username2} vous avez remporté la partie !`;
+            winMessage = `Félicitations ${gameOverData.username1} et ${gameOverData.username2} vous avez remporté la partie !`;
         } else {
-            if (matchType === MatchType.LimitedSolo || matchType === MatchType.Solo) winMessage = 'Félicitations vous avez remporté la partie !';
-            else winMessage = `${username1} a remporté la partie !`;
+            if (gameOverData.matchType === MatchType.LimitedSolo || gameOverData.matchType === MatchType.Solo)
+                winMessage = 'Félicitations vous avez remporté la partie !';
+            else winMessage = `${gameOverData.username1} a remporté la partie !`;
         }
-        if (matchType === MatchType.LimitedSolo || matchType === MatchType.LimitedCoop) {
-            if (isTimerDepleted) {
+        if (gameOverData.matchType === MatchType.LimitedSolo || gameOverData.matchType === MatchType.LimitedCoop) {
+            if (gameOverData.isTimerDepleted) {
                 winMessage = 'Le temps est écoulé!';
                 secondaryMessage = 'Dommage...';
             }
         }
-        if (isWinByDefault) {
-            secondaryMessage = 'Votre adversaire a quitté la partie...';
+        if (gameOverData.isWinByDefault) {
+            secondaryMessage = OPPONENT_QUITTED_THE_GAME_TEXT;
         }
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: winMessage,
             message: secondaryMessage,
             option1: MAIN_MENU_TEXT,
-            option2: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? REPLAY_MODE_TEXT : '',
+            option2: gameOverData.matchType === MatchType.Solo || gameOverData.matchType === MatchType.OneVersusOne ? REPLAY_MODE_TEXT : '',
             isConfirmation: false,
             isGameOver: true,
-            option2Action: matchType === MatchType.Solo || matchType === MatchType.OneVersusOne ? startReplayAction : null,
+            option2Action:
+                gameOverData.matchType === MatchType.Solo || gameOverData.matchType === MatchType.OneVersusOne
+                    ? gameOverData.startReplayAction
+                    : null,
         });
         this.display();
     }
+
     updateNewBreakingScore(rankingData: RankingData) {
         {
             const winMessage = `Félicitations vous obtenez la ${rankingData.position} 
@@ -85,17 +91,16 @@ export class GameOverPopUpComponent {
             this.popUpInfo[0].message = winMessage;
         }
     }
-    // eslint-disable-next-line max-params
-    // TODO faire une interface
-    displayLimitedGameOver(username1: string | undefined, username2: string | undefined, isWinByDefault: boolean, isSoloMode: boolean) {
+
+    displayLimitedGameOver(players: { username1: string; username2: string }, isWinByDefault: boolean, isSoloMode: boolean) {
         this.isLimitedTime = true;
-        const soloMessage = `Félicitations ${username1} vous avez remporté !`;
-        const multiPlayerMessage = `Félicitations ${username1 + ' ' + username2} vous avez remporté !`;
+        const soloMessage = `Félicitations ${players.username1} vous avez remporté !`;
+        const multiPlayerMessage = `Félicitations ${players.username1 + ' ' + players.username2} vous avez remporté !`;
         const titleMessage = isSoloMode ? soloMessage : multiPlayerMessage;
         this.popUpInfo.splice(0, this.popUpInfo.length);
         this.popUpInfo.push({
             title: isWinByDefault ? soloMessage : titleMessage,
-            message: isWinByDefault ? 'Votre partenaire a quitté la partie...' : EXCELLENT_GAME_TEXT,
+            message: isWinByDefault ? PARTNER_LEFT_THE_GAME_TEXT : EXCELLENT_GAME_TEXT,
             option1: MAIN_MENU_TEXT,
             option2: '',
             isConfirmation: false,

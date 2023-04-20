@@ -78,15 +78,15 @@ describe('Game storage service', () => {
         const gameId = '123';
         const files = [{ name: '456' }, { name: '789' }, { name: gameId }];
         const readdirStub = sinon.stub(fs, 'readdir').yields(null, files);
-        const rmdirStub = sinon.stub(fs, 'rmdir').yields(null);
+        const rmStub = sinon.stub(fs, 'rm').yields(null);
 
         await gameStorageService.deleteStoredData(gameId);
 
         sinon.assert.calledOnce(readdirStub);
-        sinon.assert.calledOnce(rmdirStub);
+        sinon.assert.calledOnce(rmStub);
 
         readdirStub.restore();
-        rmdirStub.restore();
+        rmStub.restore();
     });
 
     it('should delete all the games in the database', async () => {
@@ -203,7 +203,9 @@ describe('Game storage service', () => {
 
     it('updateGameSoloNewBreakingRecord should throw an error when game data not found', async () => {
         try {
-            sinon.stub(gameStorageService, 'getGameById').resolves({ gameData: null, originalImage: new Buffer(3), modifiedImage: new Buffer(3) });
+            sinon
+                .stub(gameStorageService, 'getGameById')
+                .resolves({ gameData: null, originalImage: Buffer.alloc(3), modifiedImage: Buffer.alloc(3) });
             await gameStorageService.updateGameSoloNewBreakingRecord('-1', gamePrototype.oneVersusOneRanking[0]);
         } catch (err) {
             expect(err.message).equal(`Game data not found for game with id${-1}`);
@@ -230,9 +232,11 @@ describe('Game storage service', () => {
         expect(result).to.be.equal(-1);
     });
 
-    it('updateGameOneVersusOneNewBreakingRecord should throw an error when game data not found', async () => {
+    it('should throw an error when updateGameOneVersusOneNewBreakingRecord data not found', async () => {
         try {
-            sinon.stub(gameStorageService, 'getGameById').resolves({ gameData: null, originalImage: new Buffer(3), modifiedImage: new Buffer(3) });
+            sinon
+                .stub(gameStorageService, 'getGameById')
+                .resolves({ gameData: null, originalImage: Buffer.alloc(3), modifiedImage: Buffer.alloc(3) });
             await gameStorageService.updateGameOneVersusOneNewBreakingRecord('-1', gamePrototype.oneVersusOneRanking[0]);
         } catch (err) {
             expect(err.message).to.deep.equals(`Game data not found for game with id${-1}`);
@@ -265,13 +269,13 @@ describe('Game storage service', () => {
         expect(await gameStorageService.resetAllScores()).to.be.equal(undefined);
     });
 
-    it('should store the game images in the folder', () => {
+    it('should store the game images in the folder', async () => {
         const sandbox: sinon.SinonSandbox = sinon.createSandbox();
         const writeFileSpy = sandbox.spy(fs, 'writeFile');
         const id = 5;
         const bufferImage1 = Buffer.from([0]);
         const bufferImage2 = Buffer.from([0]);
-        gameStorageService.storeGameImages(id, bufferImage1, bufferImage2);
+        await gameStorageService.storeGameImages(id, bufferImage1, bufferImage2);
         sinon.assert.calledTwice(writeFileSpy);
         sandbox.restore();
         sinon.restore();

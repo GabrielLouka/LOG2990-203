@@ -72,7 +72,6 @@ export class ImageProcessingService {
     private getDifferentPixelPositionsBetweenImages = (imageBuffer1: Buffer, imageBuffer2: Buffer): Vector2[] => {
         try {
             const imageDimensions: Vector2 = this.getImageDimensions(imageBuffer1);
-
             const differences: Vector2[] = [];
 
             for (let y = 0; y < imageDimensions.y; y++) {
