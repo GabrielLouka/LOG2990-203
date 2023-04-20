@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
-import { PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/env';
+import { PERSISTENT_DATA_FOLDER_PATH } from '@app/utils/constants';
 import { Vector2 } from '@common/classes/vector2';
 import { GameData } from '@common/interfaces/game.data';
 import { expect } from 'chai';

@@ -1,3 +1,4 @@
+/* Needed to check the nature of the errors */
 /* eslint-disable no-console */
 import { DatabaseService } from '@app/services/database-service/database.service';
 import { FileSystemManager } from '@app/services/file-system/file-system-manager';
@@ -9,9 +10,9 @@ import {
     MODIFIED_IMAGE_FILE,
     ORIGINAL_IMAGE_FILE,
     PERSISTENT_DATA_FOLDER_PATH,
-} from '@app/utils/env';
+} from '@app/utils/constants';
 import { GameData } from '@common/interfaces/game.data';
-import { Ranking, defaultRanking } from '@common/interfaces/ranking';
+import { defaultRanking, Ranking } from '@common/interfaces/ranking';
 import {
     DELETE_SUCCESS,
     ERROR,
@@ -24,7 +25,7 @@ import {
     GAME_DATA_NOT_FOUND,
 } from '@common/utils/constants';
 import 'dotenv/config';
-import { mkdir, readFileSync, readdir, rm, writeFile, writeFileSync } from 'fs';
+import { mkdir, readdir, readFileSync, rm, writeFile, writeFileSync } from 'fs';
 import { InsertOneResult } from 'mongodb';
 import 'reflect-metadata';
 import { Service } from 'typedi';
@@ -197,12 +198,14 @@ export class GameStorageService {
     async updateGameSoloNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
         const gameData = (await this.getGameById(id)).gameData;
         const query = { id: parseInt(id, 10) };
+        /* Needed to retrieve from MongoDB */
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'soloRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { soloRanking: { $each: [], $sort: { score: 1 } } } };
         if (!gameData) throw new Error(GAME_DATA_NOT_FOUND + id);
         const options = {
             multi: false,
+            /* Needed to retrieve from MongoDB */
             // eslint-disable-next-line @typescript-eslint/naming-convention
             arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.soloRanking[2].name }],
         };
@@ -218,6 +221,7 @@ export class GameStorageService {
     async updateGameOneVersusOneNewBreakingRecord(id: string, newBreakingRanking: Ranking): Promise<number | undefined> {
         const gameData = (await this.getGameById(id)).gameData;
         const query = { id: parseInt(id, 10) };
+        /* Needed to retrieve from MongoDB */
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const update = { $set: { 'oneVersusOneRanking.$[elem]': newBreakingRanking } };
         const scoreUpdate = { $push: { oneVersusOneRanking: { $each: [], $sort: { score: 1 } } } };
@@ -225,6 +229,7 @@ export class GameStorageService {
 
         const options = {
             multi: false,
+            /* Needed to retrieve from MongoDB */
             // eslint-disable-next-line @typescript-eslint/naming-convention
             arrayFilters: [{ 'elem.score': { $gt: newBreakingRanking.score }, 'elem.name': gameData.oneVersusOneRanking[2].name }],
         };

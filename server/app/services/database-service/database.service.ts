@@ -6,6 +6,7 @@ import { Service } from 'typedi';
 export class DatabaseService {
     private db: Db;
     private client: MongoClient;
+
     get database(): Db {
         return this.db;
     }
