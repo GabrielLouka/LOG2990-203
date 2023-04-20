@@ -1,3 +1,4 @@
+/* eslint-disable max-params */
 import { ElementRef, Injectable } from '@angular/core';
 import { ChatComponent } from '@app/components/chat/chat.component';
 import { GameConstantsService } from '@app/services/game-constants-service/game-constants.service';
@@ -51,7 +52,10 @@ export class HintService {
         return display;
     }
 
-    // eslint-disable-next-line max-params
+    refreshCurrentCanvasContext(canvas: ElementRef<HTMLCanvasElement>, context: CanvasRenderingContext2D, image: Buffer, otherImage: Buffer) {
+        this.imageManipulationService.currentCanvasState = { canvas, context, imageNew: image, original: otherImage };
+    }
+
     showHint(
         canvas: ElementRef<HTMLCanvasElement>,
         context: CanvasRenderingContext2D,

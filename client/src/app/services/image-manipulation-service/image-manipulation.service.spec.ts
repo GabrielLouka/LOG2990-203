@@ -441,7 +441,7 @@ describe('ImageManipulationService', () => {
             original: Buffer.alloc(100, 1),
         };
 
-        const resetMethod = service.createResetMethod(canvasContext);
+        const resetMethod = service.createResetMethod();
         spyOn(service, 'loadCanvasImages');
 
         resetMethod();
