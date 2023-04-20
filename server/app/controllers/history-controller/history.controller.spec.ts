@@ -25,6 +25,7 @@ describe('HistoryController', () => {
         isWinByDefault: false,
         isPlayer1Victory: true,
         isGameLoose: false,
+        lastPlayerStanding: undefined,
     };
     beforeEach(async () => {
         sandbox = createSandbox();

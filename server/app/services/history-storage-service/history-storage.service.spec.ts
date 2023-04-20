@@ -25,6 +25,7 @@ describe('History storage service', () => {
             isWinByDefault: false,
             isPlayer1Victory: true,
             isGameLoose: false,
+            lastPlayerStanding: undefined,
         };
         await historyStorageService.collection.insertOne(historyPrototype);
     });

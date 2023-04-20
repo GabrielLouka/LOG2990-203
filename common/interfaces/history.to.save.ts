@@ -9,4 +9,5 @@ export interface HistoryToSave {
     isWinByDefault: boolean;
     isPlayer1Victory: boolean;
     isGameLoose: boolean;
+    lastPlayerStanding: string | undefined;
 }
