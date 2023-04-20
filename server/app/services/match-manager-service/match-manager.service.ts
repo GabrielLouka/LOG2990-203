@@ -116,6 +116,7 @@ export class MatchManagerService {
             isWinByDefault,
             isPlayer1Victory: match.matchStatus === MatchStatus.Player1Win,
             isGameLoose: match.matchStatus === MatchStatus.PlayersLose ? true : false,
+            lastPlayerStanding: match.player1?.username ? match.player1.username : match.player2?.username,
         };
         this.historyStorageService.storeHistory(newHistory);
     }

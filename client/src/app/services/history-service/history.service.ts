@@ -39,7 +39,6 @@ export class HistoryService {
                 startingTime: result.startingTime,
                 duration: result.duration,
                 gameMode: this.convertGameModeToString(result.gameMode),
-
                 player1:
                     result.gameMode === (MatchType.Solo || MatchType.LimitedSolo)
                         ? result.player1
@@ -47,11 +46,15 @@ export class HistoryService {
                         ? result.player1
                         : result.player2,
                 player2:
-                    result.gameMode === (MatchType.Solo || MatchType.LimitedSolo) ? '' : !result.isPlayer1Victory ? result.player1 : result.player2,
+                    result.gameMode === MatchType.Solo && !MatchType.LimitedSolo ? '' : result.isPlayer1Victory ? result.player2 : result.player1,
                 isWinByDefault: result.isWinByDefault,
                 isGameLoose: result.isGameLoose,
             };
             gameHistory.startingTime = datePipe.transform(gameHistory.startingTime, 'dd.MM.yyyy - HH:mm');
+            if (gameHistory.gameMode === 'Temps Limité - Solo' && !result.isPlayer1Victory && result.player2) {
+                gameHistory.player1 = result.lastPlayerStanding === result.player2 ? result.player2 : result.player1;
+                gameHistory.player2 = result.lastPlayerStanding === result.player2 ? result.player1 : result.player2;
+            }
             return gameHistory;
         });
     }
