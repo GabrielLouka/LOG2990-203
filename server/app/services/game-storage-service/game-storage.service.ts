@@ -253,7 +253,7 @@ export class GameStorageService {
         await this.collection.updateMany({}, resetRanking);
     }
 
-    async createFolder(folderPath: string) {
+    createFolder(folderPath: string) {
         mkdir(folderPath, { recursive: true }, (err) => {
             if (err) {
                 console.error(FOLDER_NOT_CREATED);
@@ -266,7 +266,7 @@ export class GameStorageService {
     async storeGameImages(id: number, firstImage: Buffer, secondImage: Buffer): Promise<void> {
         const folderPath = PERSISTENT_DATA_FOLDER_PATH + id + '/';
         // Creates the subfolder for the game if it does not exist
-        await this.createFolder(folderPath);
+        this.createFolder(folderPath);
 
         writeFile(folderPath + ORIGINAL_IMAGE_FILE, firstImage, this.writeFileErrorManagement);
         writeFile(folderPath + MODIFIED_IMAGE_FILE, secondImage, this.writeFileErrorManagement);

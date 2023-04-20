@@ -20,9 +20,9 @@ import { GameOverPopUpComponent } from '@app/components/pop-ups/game-over-pop-up
 import { TimerComponent } from '@app/components/timer/timer.component';
 import { ClassicPageComponent } from '@app/pages/classic-page/classic-page.component';
 import { AuthService } from '@app/services/auth-service/auth.service';
+import { CanvasHandlingService } from '@app/services/canvas-handling-service/canvas-handling.service';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { CommunicationService } from '@app/services/communication-service/communication.service';
-import { CanvasHandlingService } from '@app/services/gameplay-service/canvas-handling.service';
 import { HintService } from '@app/services/hint-service/hint.service';
 import { ImageManipulationService } from '@app/services/image-manipulation-service/image-manipulation.service';
 import { MatchmakingService } from '@app/services/matchmaking-service/matchmaking.service';
@@ -281,7 +281,6 @@ describe('ClassicPageComponent', () => {
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
         const event = new MouseEvent('mousedown');
-        component.canvasHandlingService.canvasIsClickable = true;
         const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
         mockMatchmakingService.isSoloMode = false;
         component.matchmakingService = mockMatchmakingService;
@@ -293,7 +292,6 @@ describe('ClassicPageComponent', () => {
         component.leftCanvas = { nativeElement: canvas };
         component.rightCanvas = { nativeElement: canvas };
         const event = new MouseEvent('mousedown');
-        component.canvasHandlingService.canvasIsClickable = true;
         const mockMatchmakingService = jasmine.createSpyObj('MatchmakingService', ['on']);
         mockMatchmakingService.isSoloMode = true;
         component.matchmakingService = mockMatchmakingService;
@@ -303,7 +301,6 @@ describe('ClassicPageComponent', () => {
     it('onMouseDown should check mouse event', () => {
         spyOnProperty(component, 'isGameInteractive').and.returnValue(false);
         const event = new MouseEvent('mousedown');
-        component.canvasHandlingService.canvasIsClickable = true;
 
         expect(component.onMouseDown(event)).toEqual(undefined);
     });
