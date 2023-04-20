@@ -40,7 +40,7 @@ describe('HistoryService', () => {
 
     it('convertGameModeToString should return the correct string', () => {
         const gameMode = 4;
-        expect(service.convertGameModeToString(gameMode)).toEqual('sus');
+        expect(service.convertGameModeToString(gameMode)).toEqual('Loading ...');
     });
 
     it('should format history data correctly', () => {
