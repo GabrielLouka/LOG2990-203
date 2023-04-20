@@ -76,7 +76,7 @@ export class GamesController {
                 .storeGameResult(newGameToAdd)
                 .then(() => {
                     // we need to send a socket to refresh the game list
-                    this.socketManagerService?.sendRefreshAvailableGames();
+                    this.socketManagerService.sendRefreshAvailableGames();
                     res.status(StatusCodes.CREATED).send({ body: receivedNameForm.gameName });
                 })
                 .catch((error: Error) => {

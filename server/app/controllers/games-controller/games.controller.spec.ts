@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Application } from '@app/app';
 import { GameStorageService } from '@app/services/game-storage-service/game-storage.service';
+import { SocketManager } from '@app/services/socket-manager-service/socket-manager.service';
 import { Vector2 } from '@common/classes/vector2';
 import { EntireGameUploadForm } from '@common/interfaces/entire.game.upload.form';
 import { GameData } from '@common/interfaces/game.data';
@@ -19,14 +20,17 @@ const API_URL = '/api/games';
 
 describe('GamesController', () => {
     let gameStorageServiceStub: SinonStubbedInstance<GameStorageService>;
+    let socketManagerServiceStub: SinonStubbedInstance<SocketManager>;
     let sandbox: SinonSandbox;
     let expressApp: Express.Application;
     beforeEach(async () => {
         sandbox = createSandbox();
         gameStorageServiceStub = createStubInstance(GameStorageService);
+        socketManagerServiceStub = createStubInstance(SocketManager);
 
         const app = Container.get(Application);
         Object.defineProperty(app['gamesController'], 'gameStorageService', { value: gameStorageServiceStub });
+        Object.defineProperty(app['gamesController'], 'socketManagerService', { value: socketManagerServiceStub, configurable: true });
         expressApp = app.app;
     });
 
@@ -144,6 +148,7 @@ describe('GamesController', () => {
         it('POST /saveGame should save a new game ', async () => {
             gameStorageServiceStub.storeGameImages.resolves();
             gameStorageServiceStub.storeGameResult.resolves();
+            socketManagerServiceStub.sendRefreshAvailableGames.resolves();
             const newGameToAdd: EntireGameUploadForm = {
                 gameId: 2,
                 firstImage: { background: [] },
