@@ -24,6 +24,14 @@ import { Buffer } from 'buffer';
 })
 export class ImageManipulationService {
     randomNumber: number = NOT_FOUND;
+
+    currentCanvasState: {
+        context: CanvasRenderingContext2D;
+        canvas: ElementRef<HTMLCanvasElement>;
+        imageNew: Buffer;
+        original: Buffer;
+    };
+
     // can be used on a canvas from a buffer
     getImageSourceFromBuffer(buffer: Buffer): string {
         return `data:image/png;base64,${Buffer.from(buffer).toString('base64')}`;
@@ -93,7 +101,8 @@ export class ImageManipulationService {
         const randomRect =
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
-        const resetMethod = this.createResetMethod(canvasContext);
+        this.currentCanvasState = canvasContext;
+        const resetMethod = this.createResetMethod();
 
         await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
@@ -133,7 +142,8 @@ export class ImageManipulationService {
         const randomRect =
             quadrantsThatContainTheRandomVector[Math.floor(this.generatePseudoRandomNumber() * quadrantsThatContainTheRandomVector.length)];
 
-        const resetMethod = this.createResetMethod(canvasContext);
+        this.currentCanvasState = canvasContext;
+        const resetMethod = this.createResetMethod();
         await this.blinkQuadrant(canvasContext.context, randomRect, resetMethod);
     }
     async showThirdHint(
@@ -143,20 +153,19 @@ export class ImageManipulationService {
     ): Promise<void> {
         const height = canvasState.canvas.nativeElement.height;
         const randomVector = this.generateRandomVector(game, differences);
-        const resetMethod = this.createResetMethod(canvasState);
+
+        this.currentCanvasState = canvasState;
+        const resetMethod = this.createResetMethod();
         await this.blinkDisk(canvasState.context, randomVector.x, height - randomVector.y, resetMethod);
     }
-    createResetMethod(canvasState: {
-        context: CanvasRenderingContext2D;
-        canvas: ElementRef<HTMLCanvasElement>;
-        imageNew: Buffer;
-        original: Buffer;
-    }): () => void {
+    createResetMethod(): () => void {
         return () => {
+            const canvasState = this.currentCanvasState;
             const imageSource = this.getImageSourceFromBuffer(canvasState.imageNew ? canvasState.imageNew : canvasState.original);
             this.loadCanvasImages(imageSource, canvasState.context);
         };
     }
+
     // eslint-disable-next-line max-params
     async blinkDisk(context: CanvasRenderingContext2D, x: number, y: number, reset: () => void) {
         const radius = 70;
