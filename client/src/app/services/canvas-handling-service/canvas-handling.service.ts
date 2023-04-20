@@ -12,24 +12,11 @@ export class CanvasHandlingService {
     blinkDelayedMethodLeft: DelayedMethod;
     blinkDelayedMethodRight: DelayedMethod;
     isCheating: boolean = false;
-    isWinByDefault: boolean = true;
     foundDifferences: boolean[];
-    letterTPressed: boolean = true;
     currentGameId: string | null;
     originalImage: Buffer;
     modifiedImage: Buffer;
-    gameTitle: string = '';
-    player1: string = '';
-    player2: string = '';
     currentModifiedImage: Buffer;
-    totalDifferences: number = 0;
-    differencesFound1: number = 0;
-    differencesFound2: number = 0;
-    minDifferences: number = 0;
-    canvasIsClickable: boolean = false;
-    games: { gameData: GameData; originalImage: Buffer; modifiedImage: Buffer }[] = [];
-    currentGameIndex: number = 0;
-    // eslint-disable-next-line max-params
     constructor(
         private leftCanvas: ElementRef<HTMLCanvasElement>,
         private rightCanvas: ElementRef<HTMLCanvasElement>,

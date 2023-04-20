@@ -13,8 +13,8 @@ export class GameConstantsService {
             const data = JSON.parse(response.toString());
             output = data;
         } catch (error) {
-            writeFileSync(PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE, '{ countdownValue: 45, penaltyValue: 5, bonusValue: 5 }');
-            output = { countdownValue: 45, penaltyValue: 5, bonusValue: 5 };
+            writeFileSync(PERSISTENT_DATA_FOLDER_PATH + GAME_CONSTANTS_FILE, '{ countdownValue: 30, penaltyValue: 5, bonusValue: 5 }');
+            output = { countdownValue: 30, penaltyValue: 5, bonusValue: 5 };
         }
         return output;
     }

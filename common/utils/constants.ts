@@ -137,7 +137,7 @@ const VOLUME_SUCCESS = 1;
 const VOLUME_ERROR = 0.3;
 
 // Default game constants
-const INITIAL_COUNTDOWN = 45;
+const INITIAL_COUNTDOWN = 30;
 const INITIAL_PENALTY = 5;
 const INITIAL_BONUS = 5;
 const MAX_PENALTY = 10;
