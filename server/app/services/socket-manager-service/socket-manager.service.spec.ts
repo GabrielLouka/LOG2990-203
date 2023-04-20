@@ -15,11 +15,11 @@ import { MatchType } from '@common/enums/match.type';
 import { GameData } from '@common/interfaces/game.data';
 import { defaultRanking } from '@common/interfaces/ranking';
 import { RankingData } from '@common/interfaces/ranking.data';
+import { NOT_FOUND } from '@common/utils/constants';
 import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 import { SinonSandbox, SinonStub, SinonStubbedInstance, createSandbox } from 'sinon';
 // eslint-disable-next-line import/no-named-as-default
-import { NOT_FOUND } from '@common/utils/constants';
 import Container from 'typedi';
 import { SocketManager } from './socket-manager.service';
 const RESPONSE_DELAY = 200;

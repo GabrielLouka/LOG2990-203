@@ -31,6 +31,7 @@ export class ChatComponent {
 
     sendMessage() {
         this.chatService.sendMessage(this.chatService.isPlayer1, this.newMessage);
+        this.chatService.clearMessage(this);
     }
 
     sendTimeScoreMessage(rankingData: RankingData) {
