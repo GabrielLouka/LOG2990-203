@@ -90,8 +90,8 @@ describe('ChatService', () => {
     });
 
     it("clearMessage should return '' ", () => {
-        const res = chatService.clearMessage();
-        expect(res).toEqual('');
+        const res = chatService.clearMessage(new ChatComponent(chatService));
+        expect(res).toBeUndefined();
     });
 
     it('should call scrollToBottom and set newMessage to empty string when pushMessage is called', () => {

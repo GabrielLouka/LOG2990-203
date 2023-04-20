@@ -78,15 +78,14 @@ export class ChatService {
         const pushMethod = () => {
             chatComponent.messages.push(messageToPush);
             this.scrollToBottom(chatComponent.chat);
-            chatComponent.newMessage = this.clearMessage();
         };
 
         pushMethod();
         this.replayModeService.addMethodToReplay(pushMethod);
     }
 
-    clearMessage() {
-        return '';
+    clearMessage(chatComponent: ChatComponent) {
+        chatComponent.newMessage = '';
     }
 
     scrollToBottom(chat: ElementRef) {
