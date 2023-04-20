@@ -322,6 +322,13 @@ export class ClassicPageComponent implements AfterViewInit, OnInit, OnDestroy {
         }
         this.isEasy = this.games[this.currentGameIndex].gameData.isEasy;
         this.gameTitle = this.games[this.currentGameIndex].gameData.name;
+
+        this.hintService.refreshCurrentCanvasContext(
+            this.rightCanvas,
+            this.rightCanvasContext as CanvasRenderingContext2D,
+            this.canvasHandlingService.currentModifiedImage,
+            this.games[this.currentGameIndex].modifiedImage,
+        );
     }
 
     onMouseDown(event: MouseEvent) {

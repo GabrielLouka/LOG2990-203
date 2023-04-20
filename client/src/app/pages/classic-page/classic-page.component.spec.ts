@@ -105,6 +105,7 @@ describe('ClassicPageComponent', () => {
             'showRedError',
             'returnDisplay',
             'showHint',
+            'refreshCurrentCanvasContext',
         ]);
 
         commService = jasmine.createSpyObj('CommunicationService', ['basicGet', 'basicPost', 'get', 'post', 'delete']);
