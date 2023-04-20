@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { ChatService } from '@app/services/chat-service/chat.service';
 import { RankingData } from '@common/interfaces/ranking.data';
 import { CHAT_TITLE } from '@common/utils/constants';
@@ -9,6 +9,7 @@ import { CHAT_TITLE } from '@common/utils/constants';
     styleUrls: ['./chat.component.scss'],
 })
 export class ChatComponent {
+    @Input() isGameInteractive: boolean;
     @ViewChild('chat') chat: ElementRef;
     @ViewChild('inputElement') input: ElementRef;
 
