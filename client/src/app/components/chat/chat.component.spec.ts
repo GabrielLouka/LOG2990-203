@@ -9,7 +9,13 @@ describe('ChatComponent', () => {
     let chatService: jasmine.SpyObj<ChatService>;
 
     beforeEach(() => {
-        chatService = jasmine.createSpyObj('ChatService', ['sendMessage', 'sendMessageFromSystem', 'scrollToBottom', 'sendRecordBreakingMessage']);
+        chatService = jasmine.createSpyObj('ChatService', [
+            'sendMessage',
+            'sendMessageFromSystem',
+            'scrollToBottom',
+            'sendRecordBreakingMessage',
+            'clearMessage',
+        ]);
     });
 
     beforeEach(async () => {
