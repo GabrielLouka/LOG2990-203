@@ -28,6 +28,12 @@ describe('Database service', () => {
         expect(databaseService['db'].databaseName).to.equal('LOG2990');
         await databaseService.closeConnection();
     });
+    it('should not crash when environment is not set', async () => {
+        await databaseService.start();
+        expect(databaseService['client']).to.not.be.undefined;
+        expect(databaseService['db'].databaseName).to.equal('LOG2990');
+        await databaseService.closeConnection();
+    });
     it('should insert data into the collection if the collection is empty', async () => {
         const mongoUri = mongoServer.getUri();
         const client = new MongoClient(mongoUri);
