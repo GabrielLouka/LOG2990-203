@@ -118,8 +118,10 @@ export class GameCreationPageComponent implements OnInit, AfterViewInit {
 
         if (rightImage) {
             this.input2.nativeElement.value = '';
+            this.modifiedImage = this.defaultImageFile;
         } else {
             this.input1.nativeElement.value = '';
+            this.originalImage = this.defaultImageFile;
         }
     }
 
